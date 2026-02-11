@@ -57,7 +57,7 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
     protected $student;
 
     /**
-     * @var object $student
+     * @var object $student2
      */
     protected $student2;
 
@@ -231,7 +231,7 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
     protected function custom_course_field() {
         global $DB;
 
-        // Check if the category exists
+        // Check if the category exists.
         if (!$category = $DB->get_record('customfield_category', ['name' => 'MyGrades'])) {
             $category = new \stdClass();
             $category->name = 'Student MyGrades';
@@ -248,7 +248,7 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
             $categoryid = $category->id;
         }
 
-        // Check if the customfield exists
+        // Check if the customfield exists.
         if (!$field = $DB->get_record('customfield_field', ['shortname' => 'studentmygrades', 'categoryid' => $categoryid])) {
             $field = new \stdClass();
             $field->shortname = 'studentmygrades';
@@ -281,7 +281,7 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
         parent::setUp();
         $this->resetAfterTest(true);
 
-        // create custom course field
+        // Create custom course field.
         $this->custom_course_field();
 
         // Create a course to apply settings to.
@@ -362,7 +362,14 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
      * @param string $reason = 'FIRST'
      * @param string $importadditional = 'update'
      */
-    protected function import_grades(int $courseid, int $gradeitemid, array $userlist, string $fillns = '', string $reason = 'FIRST', string $importadditional = 'update') {
+    protected function import_grades(
+        int $courseid,
+        int $gradeitemid,
+        array $userlist,
+        string $fillns = '',
+        string $reason = 'FIRST',
+        string $importadditional = 'update'
+        ) {
         $status = import_grades_users::execute(
             courseid:       $courseid,
             gradeitemid:    $gradeitemid,

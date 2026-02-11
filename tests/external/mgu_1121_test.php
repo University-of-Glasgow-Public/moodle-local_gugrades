@@ -36,8 +36,7 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
 /**
  * Test(s) for get_all_strings webservice
  */
-final class MGU_1121_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
+final class mgu_1121_test extends \local_gugrades\external\gugrades_advanced_testcase {
     /**
      * @var int $gradeitemsecondx
      */
@@ -141,31 +140,31 @@ final class MGU_1121_test extends \local_gugrades\external\gugrades_advanced_tes
         $assign3 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id, 'name' => 'MGU3']);
         $assign4 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id, 'name' => 'MGU4']);
 
-        // Get grade items
+        // Get grade items.
         $gradeitemidassign1 = $this->get_grade_item('', 'assign', $assign1->id);
         $gradeitemidassign2 = $this->get_grade_item('', 'assign', $assign2->id);
         $gradeitemidassign3 = $this->get_grade_item('', 'assign', $assign3->id);
         $gradeitemidassign4 = $this->get_grade_item('', 'assign', $assign4->id);
 
-        // Add them to the summative category
+        // Add them to the summative category.
         $this->update_category($gradeitemidassign1, $summative->id);
         $this->update_category($gradeitemidassign2, $summative->id);
         $this->update_category($gradeitemidassign3, $summative->id);
         $this->update_category($gradeitemidassign4, $summative->id);
 
-        // Shift them all to 22 point scale
+        // Shift them all to 22 point scale.
         $this->set_gradetype($scaleid, $gradeitemidassign1);
         $this->set_gradetype($scaleid, $gradeitemidassign2);
         $this->set_gradetype($scaleid, $gradeitemidassign3);
         $this->set_gradetype($scaleid, $gradeitemidassign4);
 
-        // Give then all a grade
+        // Give then all a grade.
         $this->add_assignment_grade($assign1->id, $student->id, 12);
         $this->add_assignment_grade($assign2->id, $student->id, 18);
         $this->add_assignment_grade($assign3->id, $student->id, 1);
         $this->add_assignment_grade($assign4->id, $student->id, 20);
 
-        // Import
+        // Import.
         $this->import_student_grades($gradeitemidassign1, $student->id);
         $this->import_student_grades($gradeitemidassign2, $student->id);
         $this->import_student_grades($gradeitemidassign3, $student->id);
@@ -198,8 +197,5 @@ final class MGU_1121_test extends \local_gugrades\external\gugrades_advanced_tes
             get_aggregation_user::execute_returns(),
             $user
         );
-
-        //var_dump($user);
     }
-
 }

@@ -36,8 +36,7 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 /**
  * More test(s) for get_aggregation_page webservice
  */
-final class MGU_1191_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
+final class mgu_1191_test extends \local_gugrades\external\gugrades_aggregation_testcase {
     /**
      * @var object $gradecatsummative
      */
@@ -100,7 +99,7 @@ final class MGU_1191_test extends \local_gugrades\external\gugrades_aggregation_
         $this->assertCount(5, $adminmenu);
 
         // Try category 'Summer exam'.
-        // Should still not work
+        // Should still not work.
         $summerexamitemid = $this->get_gradeitemid_for_category('Summer exam');
         $form = get_add_grade_form::execute($this->course->id, $summerexamitemid, $this->student->id);
         $form = external_api::clean_returnvalue(
@@ -181,7 +180,7 @@ final class MGU_1191_test extends \local_gugrades\external\gugrades_aggregation_
             $nothing
         );
 
-        // Get aggregation page with single NS0
+        // Get aggregation page with single NS0.
         $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, false);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),
@@ -209,7 +208,7 @@ final class MGU_1191_test extends \local_gugrades\external\gugrades_aggregation_
             $nothing
         );
 
-        // Get aggregation page with two NS0
+        // Get aggregation page with two NS0.
         $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, false);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),
@@ -255,7 +254,7 @@ final class MGU_1191_test extends \local_gugrades\external\gugrades_aggregation_
             $nothing
         );
 
-        // Get aggregation page for all NS0
+        // Get aggregation page for all NS0.
         $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, true);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),
@@ -264,6 +263,5 @@ final class MGU_1191_test extends \local_gugrades\external\gugrades_aggregation_
 
         $fred = $page['users'][0];
         $this->assertEquals('NS', $fred['displaygrade']);
-}
-
+    }
 }

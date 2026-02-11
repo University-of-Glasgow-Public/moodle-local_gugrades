@@ -893,7 +893,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test getting the form for top-level total
-     * 
+     *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
     public function test_total_override_error(): void {

@@ -36,8 +36,7 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
 /**
  * Test import_grades_users web service.
  */
-final class MGU_1222_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
+final class mgu_1222_test extends \local_gugrades\external\gugrades_advanced_testcase {
     /**
      * Import and then release Assignment grades
      *
@@ -64,11 +63,11 @@ final class MGU_1222_test extends \local_gugrades\external\gugrades_advanced_tes
         $this->assertEquals(10, $grades[1]->convertedgrade);
 
         // Check for grades in Moodle Gradebook
-        // There should be none as nothing released
+        // There should be none as nothing released.
         $mgrades = $DB->get_records('grade_grades', ['userid' => $this->student->id]);
         $this->assertCount(0, $mgrades);
 
-        // Release grade for $assignment2
+        // Release grade for $assignment2.
         $status = release_grades::execute($this->course->id, $this->gradeitemidassign2, 0, false);
         $status = external_api::clean_returnvalue(
             release_grades::execute_returns(),
@@ -84,17 +83,18 @@ final class MGU_1222_test extends \local_gugrades\external\gugrades_advanced_tes
         $this->assertEquals('A3:20', $grades[1]->displaygrade);
         $this->assertEquals('1', $grades[1]->iscurrent);
 
-        // Check assignment user flags
+        // Check assignment user flags.
         $flags = array_values($DB->get_records('assign_user_flags', ['userid' => $this->student->id]));
         $this->assertEquals('released', $flags[0]->workflowstate);
 
         // Check for grades in Moodle Gradebook
-        // Grades should have been copied to the Gradebook
-        $mgrades = array_values($DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]));
+        // Grades should have been copied to the Gradebook.
+        $mgrades = array_values(
+            $DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]));
         $this->assertEquals('21.00000', $mgrades[0]->finalgrade);
         $this->assertEquals('Your work is terrible', $mgrades[0]->feedback);
 
-        // (un)release grade for $assignment2
+        // (un)release grade for $assignment2.
         $status = release_grades::execute($this->course->id, $this->gradeitemidassign2, 0, true);
         $status = external_api::clean_returnvalue(
             release_grades::execute_returns(),
@@ -110,15 +110,15 @@ final class MGU_1222_test extends \local_gugrades\external\gugrades_advanced_tes
         $this->assertEquals('A3:20', $grades[0]->displaygrade);
         $this->assertEquals('0', $grades[0]->iscurrent);
 
-        // Check assignment user flags
+        // Check assignment user flags.
         $flags = array_values($DB->get_records('assign_user_flags', ['userid' => $this->student->id]));
         $this->assertEquals('readyforrelease', $flags[0]->workflowstate);
 
         // Check for grades in Moodle Gradebook
-        // Grades should have been removed from the Gradebook
-        $mgrades = array_values($DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]));
+        // Grades should have been removed from the Gradebook.
+        $mgrades = array_values(
+            $DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]));
         $this->assertNull($mgrades[0]->finalgrade);
 
     }
-
 }

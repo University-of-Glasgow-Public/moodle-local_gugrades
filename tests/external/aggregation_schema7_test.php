@@ -265,7 +265,7 @@ final class aggregation_schema7_test extends \local_gugrades\external\gugrades_a
     /**
      * Test for MGU-1184
      * Reason text is appearing in sub-category total column when grade is overridden
-     * 
+     *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
     public function test_mgu_1184(): void {
