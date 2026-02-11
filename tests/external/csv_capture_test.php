@@ -262,7 +262,7 @@ final class csv_capture_test extends \local_gugrades\external\gugrades_advanced_
     /**
      * MGU-1247
      * Check that H grades are accepted
-     * 
+     *
      * @covers \local_gugrades\external\upload_csv::execute
      */
     public function test_mgu_1247(): void {

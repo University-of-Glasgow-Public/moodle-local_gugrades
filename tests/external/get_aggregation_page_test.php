@@ -448,8 +448,12 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         );
 
         // Get corresponding itemid for Scaleexam.
-        $scaleexamitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $scaleexamid], '*', MUST_EXIST);
+        $scaleexamitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $scaleexamid],
+            '*',
+            MUST_EXIST
+        );
 
         // Get the corresponding form for this category.
         $form = get_add_grade_form::execute($this->course->id, $scaleexamitem->id, $this->student->id);
@@ -531,8 +535,12 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         );
 
         // Get corresponding itemid for summerexam.
-        $summerexamitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $summerexamid], '*', MUST_EXIST);
+        $summerexamitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $summerexamid],
+            '*',
+            MUST_EXIST
+        );
 
         // Get the corresponding form for this category.
         $form = get_add_grade_form::execute($this->course->id, $summerexamitem->id, $this->student->id);
@@ -599,8 +607,12 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         );
 
         // Get corresponding itemid for summerexam.
-        $bexamitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $bexamid], '*', MUST_EXIST);
+        $bexamitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $bexamid],
+            '*',
+            MUST_EXIST
+        );
 
         // Get the corresponding form for this category.
         $form = get_add_grade_form::execute($this->course->id, $bexamitem->id, $this->student->id);
@@ -674,8 +686,12 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
 
         // Get categoryid and item idfor 'Scale exam' which should be Schedule A
         $scaleexamid = $this->get_grade_category('Scale exam');
-        $scaleexamitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $scaleexamid], '*', MUST_EXIST);
+        $scaleexamitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $scaleexamid],
+            '*',
+            MUST_EXIST
+        );
 
         // Get aggregation page for above.
         $page = get_aggregation_page::execute($this->course->id, $scaleexamid, '', '', 0, false);
@@ -693,8 +709,12 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
 
         // Override (missing) grade in Schedule B exam.
         $bexamid = $this->get_grade_category('Schedule B exam');
-        $bexamitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $bexamid], '*', MUST_EXIST);
+        $bexamitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $bexamid],
+            '*',
+            MUST_EXIST
+        );
 
         // Get the corresponding form for this category
         $form = get_add_grade_form::execute($this->course->id, $bexamitem->id, $this->student->id);
@@ -895,8 +915,12 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
 
         // Get the gradeitemid for summative.
         $summativeid = $this->get_grade_category('Summative');
-        $summativeitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $summativeid], '*', MUST_EXIST);
+        $summativeitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $summativeid],
+            '*',
+            MUST_EXIST
+        );
 
         // Check for summative category.
         $form = get_add_grade_form::execute($this->course->id, $summativeitem->id, $this->student->id);

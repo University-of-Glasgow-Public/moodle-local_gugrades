@@ -195,7 +195,10 @@ final class get_explain_aggregation_test extends \local_gugrades\external\gugrad
 
         // Get corresponding itemid for summerexam.
         $summerexamitem = $DB->get_record(
-            'grade_items', ['itemtype' => 'category', 'iteminstance' => $gradecatsummer->id], '*', MUST_EXIST
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $gradecatsummer->id],
+            '*',
+            MUST_EXIST
         );
 
         // Override category grade for gradecatsummer.

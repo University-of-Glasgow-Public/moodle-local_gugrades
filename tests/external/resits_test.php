@@ -193,7 +193,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
     /**
      * Check aggregation works as expected with combinations of resit selected
      * grades and admin grades.
-     * 
+     *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
     public function test_resit_aggregation(): void {
