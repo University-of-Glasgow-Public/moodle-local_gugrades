@@ -25,7 +25,6 @@
 namespace local_gugrades\task;
 
 class cleanup extends \core\task\scheduled_task {
-
     public function get_name() {
         // Shown in admin screens
         return get_string('cleanuptask', 'local_gugrades');

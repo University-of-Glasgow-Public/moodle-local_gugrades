@@ -51,7 +51,7 @@ function scale_setting_updated($name) {
             if (!$line) {
                 continue;
             }
-            list($item, $value) = explode(',', $line);
+            [$item, $value] = explode(',', $line);
             $item = trim($item);
             $value = trim($value);
             $sql = 'SELECT * FROM {local_gugrades_scalevalue}
@@ -61,7 +61,7 @@ function scale_setting_updated($name) {
                 $record->value = $value;
                 $DB->update_record('local_gugrades_scalevalue', $record);
             } else {
-                $record = new stdClass;
+                $record = new stdClass();
                 $record->scaleid = $scale->id;
                 $record->item = $item;
                 $record->value = $value;
@@ -93,7 +93,7 @@ function custom_course_field() {
 
     // Check if the category exists
     if (!$category = $DB->get_record('customfield_category', ['name' => 'Student MyGrades'])) {
-        $category = new stdClass;
+        $category = new stdClass();
         $category->name = 'Student MyGrades';
         $category->descriptionformat = 0;
         $category->sortorder = 0;
@@ -118,7 +118,7 @@ function custom_course_field() {
 
     // Check if the customfield exists
     if (!$field = $DB->get_record('customfield_field', ['shortname' => 'studentmygrades', 'categoryid' => $categoryid])) {
-        $field = new stdClass;
+        $field = new stdClass();
         $field->shortname = 'studentmygrades';
         $field->name = 'Enable Student MyGrades';
         $field->type = 'checkbox';
@@ -141,4 +141,3 @@ function custom_course_field() {
     // Reset caches
     \local_gugrades\api::reset_all_caches();
 }
-

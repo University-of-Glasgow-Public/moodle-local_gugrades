@@ -34,7 +34,6 @@
  * Define function has_capability
  */
 class has_capability extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -76,5 +75,4 @@ class has_capability extends external_api {
             'hascapability' => new external_value(PARAM_BOOL, 'Does the user have the capability in the course'),
         ]);
     }
-
 }

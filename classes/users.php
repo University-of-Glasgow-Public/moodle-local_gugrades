@@ -29,7 +29,6 @@ namespace local_gugrades;
  * Group functions used to manipulate user-related data
  */
 class users {
-
     /**
      * Get course module from grade item
      * @param int $itemid Grade item ID
@@ -47,7 +46,7 @@ class users {
         }
 
         // Get course module.
-        //$cm = get_coursemodule_from_instance($item->itemmodule, $item->iteminstance, $courseid, false, MUST_EXIST);
+        // $cm = get_coursemodule_from_instance($item->itemmodule, $item->iteminstance, $courseid, false, MUST_EXIST);
 
         // "Set to -1 to avoid calculation of dynamic user-depended data".
         $modinfo = get_fast_modinfo($courseid, -1);
@@ -125,7 +124,7 @@ class users {
 
         // Filter.
         if ($firstname || $lastname) {
-            $users = array_filter($users, function($user) use ($firstname, $lastname) {
+            $users = array_filter($users, function ($user) use ($firstname, $lastname) {
                 if ($firstname && (strcasecmp(substr($user->firstname, 0, 1), $firstname))) {
                     return false;
                 }
@@ -262,8 +261,10 @@ class users {
     public static function add_gradehidden_to_user_record(object $user, int $gradeitemid) {
         global $DB;
 
-        $user->gradehidden = $DB->record_exists('local_gugrades_hidden',
-            ['gradeitemid' => $gradeitemid, 'userid' => $user->id]);
+        $user->gradehidden = $DB->record_exists(
+            'local_gugrades_hidden',
+            ['gradeitemid' => $gradeitemid, 'userid' => $user->id]
+        );
 
         return $user;
     }
@@ -288,8 +289,14 @@ class users {
     public static function get_course_code(int $courseid, int $userid) {
         global $DB;
 
-        if ($gudatabasecode = $DB->get_record('enrol_gudatabase_users',
-            ['userid' => $userid, 'courseid' => $courseid], '*', IGNORE_MULTIPLE)) {
+        if (
+            $gudatabasecode = $DB->get_record(
+                'enrol_gudatabase_users',
+                ['userid' => $userid, 'courseid' => $courseid],
+                '*',
+                IGNORE_MULTIPLE
+            )
+        ) {
             $code = $gudatabasecode->code;
         } else {
             $code = '';

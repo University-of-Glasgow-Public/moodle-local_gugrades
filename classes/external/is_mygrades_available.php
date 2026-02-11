@@ -35,7 +35,6 @@
  * Define function is_mygrades_available
  */
 class is_mygrades_available extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -77,5 +76,4 @@ class is_mygrades_available extends external_api {
             'available' => new external_value(PARAM_BOOL, 'Can MyGrades be used in this course?'),
         ]);
     }
-
 }

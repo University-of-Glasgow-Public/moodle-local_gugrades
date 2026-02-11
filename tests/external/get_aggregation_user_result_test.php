@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Test(s) for get_aggregation_user webservice
  */
 final class get_aggregation_user_result_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var int $gradeitemsecondx
      */
@@ -138,9 +137,5 @@ final class get_aggregation_user_result_test extends \local_gugrades\external\gu
         );
 
         $this->assertEquals('C3 (12.05)', $user['displaygrade']);
-
     }
-
 }
-
-

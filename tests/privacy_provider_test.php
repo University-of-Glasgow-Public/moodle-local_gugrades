@@ -33,7 +33,6 @@ use format_topcoll\privacy\provider;
  * @group format_topcoll
  */
 final class privacy_provider_test extends \core_privacy\tests\provider_testcase {
-
     /**
      * Set up.
      */
@@ -146,6 +145,4 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
         $userids = $users->get_userids();
         $this->assertCount(1, $userids);
     }
-
-
 }

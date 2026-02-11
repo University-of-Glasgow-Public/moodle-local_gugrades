@@ -32,4 +32,3 @@ $plugin->component    = 'local_gugrades';
 $plugin->maturity     = MATURITY_BETA;
 
 $plugin->release      = '0.3 Beta';
-

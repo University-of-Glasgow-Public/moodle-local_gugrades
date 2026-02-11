@@ -31,7 +31,6 @@ use html_writer;
  * Custom admit setting.
  */
 class admin_setting_configdate extends \admin_setting {
-
     /**
      * Returns current value of this setting
      * @return mixed array or string depending on instance, NULL means not set yet
@@ -62,7 +61,7 @@ class admin_setting_configdate extends \admin_setting {
      * @param string $query
      * @return string
      */
-    public function output_html($data, $query='') {
+    public function output_html($data, $query = '') {
         $default = $this->get_defaultsetting();
         if ($default) {
             $defaultinfo = userdate($default, get_string('strftimedatetime', 'langconfig'));
@@ -99,11 +98,11 @@ class admin_setting_configdate extends \admin_setting {
                 $range = array_combine($range, $range);
             }
             if ($type == 'hours' || $type == 'minutes') {
-                $range = array_map(function($item) {
+                $range = array_map(function ($item) {
                     return sprintf('%02d', $item);
                 }, $range);
             }
-            $out .= html_writer::select($range, $this->get_full_name().'['.$type.']', $data[$type], null);
+            $out .= html_writer::select($range, $this->get_full_name() . '[' . $type . ']', $data[$type], null);
         }
         $out = html_writer::tag('div', $out, ['class' => 'form-date defaultsnext']);
 

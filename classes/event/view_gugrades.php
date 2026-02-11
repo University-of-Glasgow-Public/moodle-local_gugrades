@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * view_gugrades event
  */
 class view_gugrades extends \core\event\base {
-
     /**
      * Initialise event
      */

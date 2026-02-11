@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_activities
  */
 class get_activities extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -81,5 +80,4 @@ class get_activities extends external_api {
             'error' => new external_value(PARAM_RAW, 'Error string (if any)'),
         ]);
     }
-
 }

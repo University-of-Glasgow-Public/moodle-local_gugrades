@@ -25,7 +25,6 @@
 namespace local_gugrades\external;
 
 use core_external\external_api;
-
 use externallib_advanced_testcase;
 
 defined('MOODLE_INTERNAL') || die();
@@ -39,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test(s) for (both) save_settings and get_settings webservices
  */
 final class settings_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Just check that strings are returned
      *

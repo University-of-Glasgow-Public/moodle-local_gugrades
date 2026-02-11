@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function reset MyGrades data
  */
 class reset extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -85,5 +84,4 @@ class reset extends external_api {
         return new external_single_structure([
         ]);
     }
-
 }

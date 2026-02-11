@@ -26,7 +26,6 @@
 namespace local_gugrades\task;
 
 class recalculate extends \core\task\adhoc_task {
-
     /**
      * Create the task
      * @param int $courseid

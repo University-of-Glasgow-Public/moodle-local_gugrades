@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Specific tests for list of examples in the Excel file on Teams somewhere.
  */
 final class aggregation_examples_dl_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     protected $gradecatsummative;
 
     protected $gradecatquizzes;
@@ -122,9 +121,9 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         );
     }
 
-    //==================================================================
+    // ==================================================================
     // TESTS FROM DROP LOWEST PRIORITY TAB
-    //==================================================================
+    // ==================================================================
 
     /**
      * Test "With NS grade and 0 grade both present"
@@ -133,7 +132,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B1', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -159,7 +158,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B1', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -176,7 +175,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         $fred = $page['users'][0];
         $this->assertEquals('C3', $fred['displaygrade']);
         $this->assertTrue($fred['fields'][0]['dropped']);
-    }    
+    }
 
     /**
      * Test "With EC grade and 0 grade both present"
@@ -185,7 +184,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B1', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -204,7 +203,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         for ($i = 0; $i <= 3; $i++) {
             $this->assertFalse($fred['fields'][$i]['dropped']);
         }
-    }  
+    }
 
     /**
      * Test "With ECC grade and 0 grade both present"
@@ -213,7 +212,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B1', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -230,7 +229,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         $fred = $page['users'][0];
         $this->assertEquals('A5', $fred['displaygrade']);
         $this->assertTrue($fred['fields'][1]['dropped']);
-    } 
+    }
 
     /**
      * Test "With ECC grade, NS grade and 0 grade present"
@@ -239,7 +238,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -256,7 +255,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         $fred = $page['users'][0];
         $this->assertEquals('D3', $fred['displaygrade']);
         $this->assertTrue($fred['fields'][1]['dropped']);
-    } 
+    }
 
     /**
      * Test "With ECC grade, NS0 grade and 0 grade present"
@@ -265,7 +264,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION_0'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION_0');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -282,7 +281,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         $fred = $page['users'][0];
         $this->assertEquals('D3', $fred['displaygrade']);
         $this->assertTrue($fred['fields'][1]['dropped']);
-    } 
+    }
 
     /**
      * Test "With NS, EC grades and 0 grade present"
@@ -291,7 +290,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -310,7 +309,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         for ($i = 0; $i <= 3; $i++) {
             $this->assertFalse($fred['fields'][$i]['dropped']);
         }
-    }  
+    }
 
     /**
      * Test "With NS, ECC grades and 0 grade present"
@@ -319,7 +318,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -345,7 +344,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION_0'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION_0');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -371,7 +370,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'H', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
 
@@ -390,5 +389,5 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         for ($i = 0; $i <= 3; $i++) {
             $this->assertFalse($fred['fields'][$i]['dropped']);
         }
-    } 
+    }
 }

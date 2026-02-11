@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test has_capability web service.
  */
 final class has_capability_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check that a teacher has the capability that they should have
      *

@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_activities web service.
  */
 final class get_groups_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check for no groups and some groups
      *

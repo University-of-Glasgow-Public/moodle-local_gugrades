@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_image_urls
  */
 final class get_image_urls_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Test that getting some image URLs works
      *
@@ -47,7 +46,7 @@ final class get_image_urls_test extends \local_gugrades\external\gugrades_advanc
 
         // Get URL for some images
         $images = [
-            ['imagename' => 'MyGradesLogoSmall', 'component' => 'local_gugrades']
+            ['imagename' => 'MyGradesLogoSmall', 'component' => 'local_gugrades'],
         ];
 
         // Call external function
@@ -59,5 +58,4 @@ final class get_image_urls_test extends \local_gugrades\external\gugrades_advanc
 
         $this->assertCount(1, $urls);
     }
-
 }

@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_audit
  */
 class get_audit extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -86,6 +85,5 @@ class get_audit extends external_api {
                 'message' => new external_value(PARAM_TEXT, 'Message text'),
             ])
         );
-
     }
 }

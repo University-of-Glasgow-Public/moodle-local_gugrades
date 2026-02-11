@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test has_capability web service.
  */
 final class is_grades_imported_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check that a top=level activiy shows recursiveavailable = true
      * Note this functionality changed MGU-1103

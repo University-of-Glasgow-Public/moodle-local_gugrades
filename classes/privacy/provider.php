@@ -29,18 +29,14 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist, approved_userlist, userlist};
 use stdClass;
 
-class provider implements
-    \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\request\core_userlist_provider,
-    \core_privacy\local\metadata\provider {
-
+class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider {
     /**
      * Returns meta data about this system.
      *
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
 
         $collection->add_database_table(
             'local_gugrades_audit',
@@ -101,7 +97,7 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new \core_privacy\local\request\contextlist();
 
         // All course contexts for which this user has any data
@@ -261,6 +257,5 @@ class provider implements
             $DB->delete_records('local_gugrades_hidden', $params);
             $DB->delete_records('local_gugrades_resitrequired', $params);
         }
-
     }
 }

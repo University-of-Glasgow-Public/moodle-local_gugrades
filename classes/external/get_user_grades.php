@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_user_grades
  */
 class get_user_grades extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -92,7 +91,5 @@ class get_user_grades extends external_api {
                 'auditcomment' => new external_value(PARAM_TEXT, 'Audit comment'),
             ])
         );
-
     }
 }
-

@@ -29,7 +29,6 @@ namespace local_gugrades\export;
  *
  */
 abstract class base {
-
     /**
      * Define name of export
      * @return string
@@ -77,7 +76,7 @@ abstract class base {
     protected function convert_csv(array $data) {
         $csv = '';
         foreach ($data as $line) {
-            $quoted = array_map(function($str) {
+            $quoted = array_map(function ($str) {
                 return sprintf('"%s"', $str);
             }, $line);
             $csv .= implode(',', $quoted) . PHP_EOL;
@@ -85,5 +84,4 @@ abstract class base {
 
         return $csv;
     }
-
 }

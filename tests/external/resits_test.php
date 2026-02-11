@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Test(s) for resit web services
  */
 final class resits_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var int $gradeitemsecondx
      */
@@ -88,7 +87,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
 
-        // Test get_activities web service. 
+        // Test get_activities web service.
         $treejson = get_activities::execute($this->course->id, $this->gradecatsummative->id, true);
         $treejson = external_api::clean_returnvalue(
             get_activities::execute_returns(),
@@ -96,7 +95,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         );
         $tree = json_decode($treejson['activities']);
 
-        // There should be resit candidates. 
+        // There should be resit candidates.
         $this->assertTrue($tree->anyresitcandidates);
 
         // Start by examining 'Summer exam', which has two simple grade items.
@@ -148,7 +147,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
 
-        // Test get_activities web service. 
+        // Test get_activities web service.
         $treejson = get_activities::execute($this->course->id, $this->gradecatsummative->id, true);
         $treejson = external_api::clean_returnvalue(
             get_activities::execute_returns(),
@@ -189,14 +188,14 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         $this->assertEquals('Scale exam', $scaleexamcat->fullname);
         $this->assertTrue($scaleexamcat->resitcandidate);
         $this->assertEquals($resitid, $scaleexamcat->resititemid);
-    }    
+    }
 
     /**
      * Check aggregation works as expected with combinations of resit selected
      * grades and admin grades.
      */
     public function test_resit_aggregation(): void {
-        
+
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
 
@@ -209,7 +208,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
             $result
         );
 
-        // Write some random grade into 1st sitting. 
+        // Write some random grade into 1st sitting.
         // As resit is a missing grade then this should be the aggregated result
         $nothing = write_additional_grade::execute(
             courseid:          $this->course->id,
@@ -235,7 +234,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
             $page
         );
 
-        // Aggregated result should be the grade that exists 
+        // Aggregated result should be the grade that exists
         $fred = $page['users'][0];
         $this->assertEquals(52, $fred['displaygrade']);
 

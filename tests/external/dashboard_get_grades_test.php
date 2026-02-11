@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_activities web service.
  */
 final class dashboard_get_grades_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Set up some grades for a student and check that they can be read
      *
@@ -53,8 +52,6 @@ final class dashboard_get_grades_test extends \local_gugrades\external\gugrades_
 
         // Summative grade category.
         $gradecategoryid = $this->gradecatsumm->id;
-
-
 
         // Need to release grades for this grade item -assignment1.
         $mapping1 = \local_gugrades\grades::mapping_factory($this->course->id, $this->gradeitemidassign1);
@@ -110,8 +107,6 @@ final class dashboard_get_grades_test extends \local_gugrades\external\gugrades_
         $this->assertEquals('Assignment 2', $assign2['itemname']);
         $this->assertEquals(20, $assign2['convertedgrade']);
         $this->assertEquals('A3:20', $assign2['displaygrade']);
-        //$this->assertEquals(23, $assign2['grademax']);
-
+        // $this->assertEquals(23, $assign2['grademax']);
     }
-
 }

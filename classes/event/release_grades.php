@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * release_grades event
  */
 class release_grades extends \core\event\base {
-
     /**
      * Initialise event
      */

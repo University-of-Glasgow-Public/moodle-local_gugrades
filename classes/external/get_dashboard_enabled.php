@@ -34,7 +34,6 @@
  * Define function has_capability
  */
 class get_dashboard_enabled extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -79,5 +78,4 @@ class get_dashboard_enabled extends external_api {
             'gradesreleased' => new external_value(PARAM_BOOL, 'Have grades been released?'),
         ]);
     }
-
 }

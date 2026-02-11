@@ -68,7 +68,7 @@ $string['by'] = 'By';
 $string['cachedef_availableusers'] = 'Cache MyGrades user data';
 $string['cachedef_gradeitems'] = 'Grade item info when building aggregation tree structure';
 $string['cachedef_progress'] = 'Cache current progress of long-running activities';
-$string['cachedef_provisionalgrade'] ='Cache MyGrades provisional grades.';
+$string['cachedef_provisionalgrade'] = 'Cache MyGrades provisional grades.';
 $string['cachedef_useraggdata'] = 'Cache MyGrades aggregated user data.';
 $string['cancel'] = 'Cancel';
 $string['cannotaggregate'] = 'Cannot aggregate';
@@ -444,9 +444,3 @@ $string['yes'] = 'Yes';
 $string['yesimport'] = 'Import grades';
 $string['yesrelease'] = 'Yes, release grades';
 $string['yesunrelease'] = 'Yes, revert release';
-
-
-
-
-
-

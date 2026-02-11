@@ -34,7 +34,6 @@ use core_external\external_value;
  * Get the information to construct add grade form
  */
 class get_selected_conversion extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters

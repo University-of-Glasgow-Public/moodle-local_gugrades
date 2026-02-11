@@ -29,8 +29,6 @@ namespace local_gugrades;
  * Static class implementation to deal with audit trail
  */
 class export {
-
-
     /**
      * Instantiate export plugin
      * @param string $pluginname
@@ -48,7 +46,7 @@ class export {
             throw new \moodle_exception('Export plugin does not exist - "' . $pluginname . '"');
         }
 
-        return new $classname;
+        return new $classname();
     }
 
     /**
@@ -81,7 +79,6 @@ class export {
 
             return $subject . '_' . $catnumber . '_' . $year;
         } else {
-
              // Make up some name
              return 'MyGrades_' . $course->shortname . '_' . $year;
         }
@@ -107,7 +104,6 @@ class export {
             if ($file = end($parts)) {
                 $nameparts = explode('.', $file);
                 if ($name = reset($nameparts)) {
-
                     // 'base' is not for use
                     if ($name == 'base') {
                         continue;
@@ -115,7 +111,7 @@ class export {
 
                     // Instantiate class
                     $classname = 'local_gugrades\\export\\' . $name;
-                    $export = new $classname;
+                    $export = new $classname();
                     $description = $export->get_name();
 
                     $plugins[] = [
@@ -183,5 +179,4 @@ class export {
             'csv' => $data,
         ];
     }
-
 }

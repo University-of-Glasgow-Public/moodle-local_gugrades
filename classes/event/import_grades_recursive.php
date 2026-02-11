@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * import_grades_users event
  */
 class import_grades_recursive extends \core\event\base {
-
     /**
      * Initialise event
      */

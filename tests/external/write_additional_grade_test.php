@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test has_capability web service.
  */
 final class write_additional_grade_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Add some grades and check capture page data is correct
      *
@@ -165,7 +164,7 @@ final class write_additional_grade_test extends \local_gugrades\external\gugrade
         // Import grades.
         $userlist = [
             $this->student->id,
-            //$this->student2->id,
+            // $this->student2->id,
         ];
 
         // Assign2 (which is using scale).
@@ -199,5 +198,4 @@ final class write_additional_grade_test extends \local_gugrades\external\gugrade
         $fred = $page['users'][0];
         $this->assertEquals(false, $fred['alert']);
     }
-
 }

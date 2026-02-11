@@ -34,7 +34,6 @@ use core_external\external_value;
  * Get the data associated with a grade item
  */
 class get_grade_item extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -89,5 +88,4 @@ class get_grade_item extends external_api {
             'link' => new external_value(PARAM_URL, 'Link to activity (if it is one) or empty'),
         ]);
     }
-
 }

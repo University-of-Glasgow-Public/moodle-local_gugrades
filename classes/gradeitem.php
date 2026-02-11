@@ -33,7 +33,6 @@ require_once($CFG->dirroot . '/grade/lib.php');
  * Handles gradeitem and scale conversion (if required)
  */
 class gradeitem {
-
     /**
      * @var int $courseid
      */
@@ -75,5 +74,4 @@ class gradeitem {
     public function get_name() {
         return $this->gradeitem->itemname;
     }
-
 }

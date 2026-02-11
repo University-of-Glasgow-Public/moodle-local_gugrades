@@ -33,7 +33,6 @@ require_once(dirname(__FILE__) . '/constants.php');
  * Actual implementation of all the external functions
  */
 class api {
-
     /**
      * Extend time limit and clear sessions
      * This allows processes to run forever and stops Moodle blocking because the session is active
@@ -78,14 +77,20 @@ class api {
      * @param bool $viewfullnames
      * @return array
      */
-    public static function get_capture_page(int $courseid, int $gradeitemid,
-        string $firstname, string $lastname, int $groupid, bool $viewfullnames) {
+    public static function get_capture_page(
+        int $courseid,
+        int $gradeitemid,
+        string $firstname,
+        string $lastname,
+        int $groupid,
+        bool $viewfullnames
+    ) {
 
         global $USER;
 
         self::more_time();
 
-        //xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
+        // xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
 
         // Is aggregation supported for this gradeitem / is gradeitem supported?
         $gradeitemsupported = \local_gugrades\grades::is_grade_supported($gradeitemid);
@@ -114,7 +119,7 @@ class api {
         }
 
         // Cleanup unused columns for grade item.
-        //\local_gugrades\grades::cleanup_empty_columns($gradeitemid);
+        // \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
 
         // Hidden or locked in gradebook?
         [$gradehidden, $gradelocked] = \local_gugrades\grades::is_grade_hidden_locked($gradeitemid);
@@ -139,12 +144,12 @@ class api {
         $released = \local_gugrades\grades::is_grades_released($courseid, $gradeitemid);
         $showcsvimport = \local_gugrades\users::showcsvimport($users);
 
-        //file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
+        // file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
 
         return [
             'users' => $users,
             'columns' => $columns,
-            //'hidden' => $activity->is_names_hidden() || self::is_gradeitem_hidden($gradeitemid),
+            // 'hidden' => $activity->is_names_hidden() || self::is_gradeitem_hidden($gradeitemid),
             'hidden' => $activity->is_names_hidden(),
             'itemtype' => $activity->get_itemtype(),
             'itemname' => $activity->get_itemname(),
@@ -236,7 +241,6 @@ class api {
         $csv .= get_string('name', 'local_gugrades') . ',' . get_string('idnumber', 'local_gugrades') . ',' .
             get_string('grade', 'local_gugrades') . PHP_EOL;
         foreach ($users as $user) {
-
             // MGU-897: Don't include users with no idnumber (we can't re-import them, anyway).
             if ($user->idnumber) {
                 $csv .= $user->displayname . ',' . $user->idnumber . ',' . PHP_EOL;
@@ -258,8 +262,15 @@ class api {
      * @param string $csv
      * @return array [$testrunlines, $errorcount, $addcount]
      */
-    public static function csv_upload(int $courseid, int $gradeitemid, int $groupid,
-        bool $testrun, string $reason, string $other, string $csv) {
+    public static function csv_upload(
+        int $courseid,
+        int $gradeitemid,
+        int $groupid,
+        bool $testrun,
+        string $reason,
+        string $other,
+        string $csv
+    ) {
 
         // Get correct level for this category.
         $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
@@ -319,7 +330,6 @@ class api {
 
         // Iterate over CSV lines, checking and (optionally) adding new grade.
         foreach ($lines as $line) {
-
             // Need prefilled to keep web service return check happy.
             $testrunline = [
                 'name' => '',
@@ -373,10 +383,9 @@ class api {
                 $testrunline['gradevalue'] = 0;
                 $testrunline['state'] = 1;
             } else {
-
                 // Check if valid grade.
                 if ($grade != '') {
-                    list($gradevalid, $gradevalue) = $mapping->csv_value($grade);
+                    [$gradevalid, $gradevalue] = $mapping->csv_value($grade);
                     if (!$gradevalid) {
                         $testrunline['error'] = get_string('csvgradeinvalid', 'local_gugrades');
                         $errors['csvgradeinvalid']++;
@@ -417,9 +426,9 @@ class api {
 
                 // Re-aggregate this user
                 // DON'T, we'll do it in one hit at the end.
-                //if ($aggregationsupported) {
-                //    \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $user->id);
-                //}
+                // if ($aggregationsupported) {
+                // \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $user->id);
+                // }
             }
         }
 
@@ -580,7 +589,7 @@ class api {
      * @param string $reason
      * @param string $other
      * @param bool $noaggregation
-     * @param bool $dryrun 
+     * @param bool $dryrun
      * @return bool - was a grade imported
      */
     public static function import_grade(
@@ -595,7 +604,7 @@ class api {
         string $other,
         bool $noaggregation = false,
         bool $dryrun = false,
-        ) {
+    ) {
 
         $fillns = self::check_fillns($fillns);
 
@@ -617,7 +626,7 @@ class api {
             if (\local_gugrades\grades::skip_update($gradeitemid, $userid, $additional)) {
                 return false;
             }
-        } 
+        }
 
         // Can we aggregate?
         if (!$noaggregation) {
@@ -630,7 +639,6 @@ class api {
         // If fillns not selected, then write whatever we got
         // MGU-1293: including null (no grade).
         if (empty($fillns) || (!empty($fillns) && !is_null($rawgrade))) {
-
             // Can (sometimes) come back as string, for some reason.
             if ($rawgrade) {
                 $rawgrade = floatval($rawgrade);
@@ -640,7 +648,6 @@ class api {
 
             // don't write or aggregate if it's a dry run
             if (!$dryrun) {
-
                 // TODO: Is rawgrade correct? For scheduleB this will be completely
                 // unrelated. E.g. rawgrade 6 = converted grade = 14.
                 \local_gugrades\grades::write_grade(
@@ -648,7 +655,7 @@ class api {
                     gradeitemid:    $gradeitemid,
                     userid:         $userid,
                     admingrade:     '',
-                    //rawgrade:       $rawgrade,
+                    // rawgrade:       $rawgrade,
                     rawgrade:       $convertedgrade,
                     convertedgrade: $convertedgrade,
                     displaygrade:   $displaygrade,
@@ -668,9 +675,7 @@ class api {
             }
 
             return true;
-
         } else {
-
             // If there's no grade and fillns is enabled, write
             // an NS grade, instead.
             [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($fillns);
@@ -839,7 +844,7 @@ class api {
      */
     public static function is_grades_imported(int $courseid, int $gradeitemid, $groupid) {
         $imported = \local_gugrades\grades::is_grades_imported($courseid, $gradeitemid, $groupid);
-        list($recursiveavailable, $recursivematch, $allgradesvalid) = \local_gugrades\grades::recursive_import_match($gradeitemid);
+        [$recursiveavailable, $recursivematch, $allgradesvalid] = \local_gugrades\grades::recursive_import_match($gradeitemid);
         $level = \local_gugrades\grades::get_gradeitem_level($gradeitemid);
 
         return [
@@ -871,7 +876,7 @@ class api {
         self::more_time();
 
         // Check!
-        list($recursiveavailable, $recursivematch, $allgradesvalid) = \local_gugrades\grades::recursive_import_match($gradeitemid);
+        [$recursiveavailable, $recursivematch, $allgradesvalid] = \local_gugrades\grades::recursive_import_match($gradeitemid);
         if (!$recursiveavailable) {
             throw new \moodle_exception("import_grades_recursive called for <2nd level grade item. ID = " . $gradeitemid);
         }
@@ -901,21 +906,22 @@ class api {
             // Iterate over these users importing grade.
             $iusers = 0;
             foreach ($users as $user) {
-
                 // Import but do not aggregate
-                if (self::import_grade(
-                    courseid: $courseid,
-                    gradeitemid: $item->id,
-                    mapping: $mapping,
-                    activity: $activity,
-                    userid: $user->id,
-                    additional: $additional,
-                    fillns: $fillns, 
-                    reason: $reason,
-                    other: $other,
-                    noaggregation: true,
-                    dryrun: $dryrun
-                    )) {
+                if (
+                    self::import_grade(
+                        courseid: $courseid,
+                        gradeitemid: $item->id,
+                        mapping: $mapping,
+                        activity: $activity,
+                        userid: $user->id,
+                        additional: $additional,
+                        fillns: $fillns,
+                        reason: $reason,
+                        other: $other,
+                        noaggregation: true,
+                        dryrun: $dryrun
+                    )
+                ) {
                     $gradecount++;
                 }
                 $iusers++;
@@ -969,8 +975,8 @@ class api {
      * @return array (of objects)
      */
     private static function formkit_menu(array $inputarray, bool $reverse = false) {
-        $menu = array_map(function($key, $value) {
-            $item = new \stdClass;
+        $menu = array_map(function ($key, $value) {
+            $item = new \stdClass();
             $item->value = $key;
             $item->label = $value;
             return $item;
@@ -996,7 +1002,7 @@ class api {
         $converted = \local_gugrades\conversion::is_conversion_applied($courseid, $gradeitemid);
 
         // Gradeitem.
-        list($itemtype, $gradeitem) = \local_gugrades\grades::analyse_gradeitem($gradeitemid);
+        [$itemtype, $gradeitem] = \local_gugrades\grades::analyse_gradeitem($gradeitemid);
         if ($gradeitem == false) {
             throw new \moodle_exception('Unsupported grade item encountered in get_add_grade_form. Gradeitemid = ' . $gradeitemid);
         }
@@ -1096,8 +1102,10 @@ class api {
         $adminmenu = self::formkit_menu($admingrades, true);
 
         // Is this already overridden in grade table
-        $overridden = $DB->record_exists('local_gugrades_grade',
-            ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'iscurrent' => 1, 'catoverride' => 1]);
+        $overridden = $DB->record_exists(
+            'local_gugrades_grade',
+            ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'iscurrent' => 1, 'catoverride' => 1]
+        );
 
         return [
             'gradetypes' => $wsgradetypes,
@@ -1128,14 +1136,13 @@ class api {
         global $DB;
 
         // Check gradeitem.
-        list($itemtype, $gradeitem) = \local_gugrades\grades::analyse_gradeitem($gradeitemid);
+        [$itemtype, $gradeitem] = \local_gugrades\grades::analyse_gradeitem($gradeitemid);
         if ($gradeitem == false) {
             throw new \moodle_exception('Unsupported grade item encountered in get_add_grade_form. Gradeitemid = ' . $gradeitemid);
         }
 
         // Is this actually a category?
         if ($itemtype == 'category') {
-
             return self::get_category_add_grade_form($courseid, $gradeitemid, $userid, $gradeitem);
         }
 
@@ -1151,8 +1158,12 @@ class api {
         // If converted then we can't change existing points columns.
         if ($converted) {
             foreach ($gradetypes as $gradetype => $description) {
-                if ($column = $DB->get_record('local_gugrades_column',
-                    ['gradeitemid' => $gradeitemid, 'gradetype' => $gradetype])) {
+                if (
+                    $column = $DB->get_record(
+                        'local_gugrades_column',
+                        ['gradeitemid' => $gradeitemid, 'gradetype' => $gradetype]
+                    )
+                ) {
                     if ($column->points) {
                         unset($gradetypes[$gradetype]);
                     }
@@ -1170,7 +1181,7 @@ class api {
         $adminmenu = self::formkit_menu($admingrades, true);
 
         // Gradeitem.
-        list($itemtype, $gradeitem) = \local_gugrades\grades::analyse_gradeitem($gradeitemid);
+        [$itemtype, $gradeitem] = \local_gugrades\grades::analyse_gradeitem($gradeitemid);
         if ($gradeitem == false) {
             throw new \moodle_exception('Unsupported grade item encountered in get_add_grade_form. Gradeitemid = ' . $gradeitemid);
         }
@@ -1223,8 +1234,12 @@ class api {
         $converted = \local_gugrades\conversion::is_conversion_applied($courseid, $gradeitemid);
         if ($converted) {
             foreach ($gradetypes as $gradetype => $description) {
-                if ($column = $DB->get_record('local_gugrades_column',
-                    ['gradeitemid' => $gradeitemid, 'gradetype' => $gradetype])) {
+                if (
+                    $column = $DB->get_record(
+                        'local_gugrades_column',
+                        ['gradeitemid' => $gradeitemid, 'gradetype' => $gradetype]
+                    )
+                ) {
                     if ($column->points) {
                         unset($gradetypes[$gradetype]);
                     }
@@ -1265,7 +1280,7 @@ class api {
         float $grade,
         string $notes,
         bool $delete = false
-        ) {
+    ) {
 
         global $DB;
 
@@ -1328,7 +1343,6 @@ class api {
             [$code, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
             $displaygrade = $code;
         } else if ($usescale) {
-
             // MGU-1293: Check for -1, which is No grade
             if ($scale == -1) {
                 $displaygrade = get_string('nograde', 'local_gugrades');
@@ -1359,7 +1373,6 @@ class api {
         if ($catoverride && $delete) {
             \local_gugrades\grades::remove_catoverride($gradeitemid, $userid);
         } else {
-
             // Happy as we're going to get, so write the new data.
             // overwrite is set to false to indicate that this is a 'new' grade
             \local_gugrades\grades::write_grade(
@@ -1386,7 +1399,6 @@ class api {
         if ($aggregationsupported) {
             \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $userid);
         }
-
     }
 
     /**
@@ -1434,7 +1446,7 @@ class api {
                 $config->value = $setting['value'];
                 $DB->update_record('local_gugrades_config', $config);
             } else {
-                $config = new \stdClass;
+                $config = new \stdClass();
                 $config->courseid = $courseid;
                 $config->gradeitemid = $gradeitemid;
                 $config->name = $setting['name'];
@@ -1529,7 +1541,7 @@ class api {
             $enabled = false;
         }
 
-        return (Boolean)$enabled;
+        return (bool)$enabled;
     }
 
     /**
@@ -1679,9 +1691,8 @@ class api {
 
         // Is it an aggregated category
         if (!$released = \local_gugrades\grades::get_aggregated_from_gradeitemid($gradeitemid, $userid)) {
-
             // Nope. So get 'normal' grade.
-            //$usercapture = new usercapture($courseid, $gradeitemid, $userid);
+            // $usercapture = new usercapture($courseid, $gradeitemid, $userid);
             $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $userid);
             $released = $usercapture->get_released();
         }
@@ -1735,7 +1746,6 @@ class api {
         // Iterate over users releasing/reverting grades.
         foreach ($users as $user) {
             if ($revert) {
-
                 // If reverting, mark any grades marked RELEASED for this
                 // gradeitemid / user as not current.
                 $sql = 'UPDATE {local_gugrades_grade}
@@ -1872,7 +1882,13 @@ class api {
      * @return int
      */
     public static function write_conversion_map(
-        int $courseid, int $mapid, string $name, string $schedule, float $maxgrade, array $map): int {
+        int $courseid,
+        int $mapid,
+        string $name,
+        string $schedule,
+        float $maxgrade,
+        array $map
+    ): int {
         $mapid = \local_gugrades\conversion::write_conversion_map($courseid, $mapid, $name, $schedule, $maxgrade, $map);
 
         return $mapid;
@@ -2033,7 +2049,7 @@ class api {
         string $lastname,
         int $groupid,
         bool $aggregate
-        ) {
+    ) {
 
         global $CFG, $USER;
 
@@ -2172,13 +2188,13 @@ class api {
         global $DB;
 
         // Get the level 1 parent category.
-        //$level1id = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
+        // $level1id = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
 
         // (Re-)aggregate this user. Regardless.
         \local_gugrades\aggregation::aggregate_user_helper($courseid, $gradecategoryid, $userid, true);
 
         // Build (and cache) grade structure (whole tree).
-        //\local_gugrades\aggregation::recurse_tree($courseid, $level1id, false);
+        // \local_gugrades\aggregation::recurse_tree($courseid, $level1id, false);
 
         // Get categories and items at this level.
         [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid);
@@ -2359,7 +2375,12 @@ class api {
      * @return array
      */
     public static function get_capture_export_data(
-        int $courseid, int $gradeitemid, int $groupid, bool $viewfullnames, array $options) {
+        int $courseid,
+        int $gradeitemid,
+        int $groupid,
+        bool $viewfullnames,
+        array $options
+    ) {
 
         // Save user's selection.
         set_user_preference('local_gugrades_captureexportselect', serialize($options));
@@ -2459,7 +2480,7 @@ class api {
         // Convert array of arrays to csv string.
         $csv = '';
         foreach ($data as $line) {
-            $quoted = array_map(function($str) {
+            $quoted = array_map(function ($str) {
                 return sprintf('"%s"', $str);
             }, $line);
             $csv .= implode(',', $quoted) . PHP_EOL;
@@ -2482,7 +2503,6 @@ class api {
         if ($userid) {
             \local_gugrades\aggregation::aggregate_user_helper($courseid, $gradecategoryid, $userid);
         } else {
-
             // Clear cache items for this course.
             \local_gugrades\aggregation::invalidate_cache($courseid);
 
@@ -2526,7 +2546,7 @@ class api {
         foreach ($columns[0] as $id => $column) {
             $field = $userfields[$id];
             [$originalweight, $alteredweight, $isaltered] = \local_gugrades\grades::get_altered_weight($column->gradeitemid, $userid);
-            $item = new \stdClass;
+            $item = new \stdClass();
             $item->fullname = $column->fullname;
             $item->gradeitemid = $column->gradeitemid;
             $item->gradetype = $column->gradetype;

@@ -22,14 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$tasks = [                                                                                                                     
-    [                                                                                                                          
-        'classname' => 'local_gugrades\task\cleanup',                                                                            
-        'blocking' => 0,                                                                                                            
-        'minute' => '0',                                                                                                            
-        'hour' => '*',                                                                                                              
-        'day' => '*',                                                                                                               
-        'dayofweek' => '*',                                                                                                         
-        'month' => '*'                                                                                                              
-    ]
+$tasks = [
+    [
+        'classname' => 'local_gugrades\task\cleanup',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
 ];

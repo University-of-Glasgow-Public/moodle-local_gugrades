@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * settings_updated event
  */
 class settings_updated extends \core\event\base {
-
     /**
      * Initialise event
      */

@@ -34,7 +34,6 @@ use core_external\external_value;
  * Get the information to construct add grade form
  */
 class get_gradetypes extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -67,7 +66,7 @@ class get_gradetypes extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        list($gradetypes, $admingrades) = \local_gugrades\api::get_gradetypes($courseid, $gradeitemid);
+        [$gradetypes, $admingrades] = \local_gugrades\api::get_gradetypes($courseid, $gradeitemid);
 
         return [
             'gradetypes' => $gradetypes,

@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test(s) for get_all_strings webservice
  */
 final class get_capture_export_options_data_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Checking getting options
      *
@@ -179,5 +178,4 @@ final class get_capture_export_options_data_test extends \local_gugrades\externa
         $this->assertTrue($options[7]['selected']);
         $this->assertFalse($options[8]['selected']);
     }
-
 }

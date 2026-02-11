@@ -43,7 +43,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_base_testc
  * Test(s) for (both) save_settings and get_settings webservices
  */
 class gugrades_aggregation_testcase extends gugrades_base_testcase {
-
     /**
      * @var array $gradeitems
      */
@@ -79,7 +78,6 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
         $this->gradeitems = [];
 
         foreach ($items as $item) {
-
             // Get weight ('aggregationcoef' in the grade_items table).
             if (isset($item->weight)) {
                 $weight = $item->weight;
@@ -130,7 +128,6 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
                 $this->move_gradeitem_to_category($gradeitem->id, $gradeitemid);
                 $this->gradeitems[] = $gradeitem;
             } else {
-
                 // Aggregation? (default is weighted_mean).
                 if (!empty($item->aggregation)) {
                     $aggregation = $lookup[$item->aggregation];
@@ -155,8 +152,12 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
                 ]);
 
                 // Set weight (aggregationcoef).
-                $gradeitem = $DB->get_record('grade_items',
-                    ['itemtype' => 'category', 'iteminstance' => $gradecategory->id], '*', MUST_EXIST);
+                $gradeitem = $DB->get_record(
+                    'grade_items',
+                    ['itemtype' => 'category', 'iteminstance' => $gradecategory->id],
+                    '*',
+                    MUST_EXIST
+                );
                 $gradeitem->aggregationcoef = $weight;
                 $DB->update_record('grade_items', $gradeitem);
 
@@ -299,7 +300,6 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
         $json = json_decode($filecontents);
 
         foreach ($json as $item) {
-
             // Look up grade item just using name
             // There's only one course, anyway.
             $gradeitem = $DB->get_record('grade_items', ['itemname' => $item->item], '*', MUST_EXIST);
@@ -379,6 +379,4 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
         $student2 = $this->student2;
         $teacher = $this->teacher;
     }
-
-
 }

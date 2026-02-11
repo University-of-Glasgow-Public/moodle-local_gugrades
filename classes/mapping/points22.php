@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Conversion class for exactly out of 22. 
+ * Conversion class for exactly out of 22.
  * This is a proxy for Schedule A when a maximum points grade of exactly
  * 22 is specified.
  *
@@ -31,7 +31,6 @@ namespace local_gugrades\mapping;
  * Note that this extends ScheduleA, instead of base
  */
 class points22 extends schedulea {
-
     /**
      * Constructor. Get grade info
      * @param int $courseid
@@ -127,5 +126,4 @@ class points22 extends schedulea {
 
         return [$converted, $scaleitem];
     }
-
 }

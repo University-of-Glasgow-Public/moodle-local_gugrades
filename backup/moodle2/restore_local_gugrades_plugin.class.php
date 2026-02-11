@@ -30,7 +30,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_local_gugrades_plugin extends restore_local_plugin {
-
     /**
      * Return the paths to be handled by the plugin (course level)
      */
@@ -123,7 +122,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $DB->insert_record('local_gugrades_map_item', $data);
     }
 
-    /** 
+    /**
      * Process columns
      */
     public function process_gugrades_column($data) {
@@ -162,7 +161,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $data->courseid = $this->task->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        // Negative to prevent unique key errors. 
+        // Negative to prevent unique key errors.
         $data->categoryid = 0 - $data->categoryid;
         $data->gradeitemid = 0 - $data->gradeitemid;
 
@@ -268,5 +267,4 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
             $DB->update_record('local_gugrades_hidden', $hidden);
         }
     }
-
 }

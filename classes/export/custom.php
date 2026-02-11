@@ -29,7 +29,6 @@ namespace local_gugrades\export;
  *
  */
 class custom extends base {
-
     /**
      * Define name of export
      * @return string
@@ -240,7 +239,6 @@ class custom extends base {
 
         // If category...
         if ($iscategory) {
-
             // get the aggregated category grades
             [$category, $released] = \local_gugrades\grades::get_category_grades($gradeitemid, $userid);
 
@@ -277,10 +275,8 @@ class custom extends base {
                 $csvitems[$identifier . '_warnings'] = $warning;
             }
         } else {
-
             // Ordinary item.
             if ($provisional = \local_gugrades\grades::get_provisional_from_id($gradeitemid, $userid)) {
-
                 $displaygrade = $provisional->displaygrade;
                 $csvitems[$identifier] = $displaygrade;
             } else {
@@ -300,7 +296,6 @@ class custom extends base {
 
         // If showing weight.
         if ($options['weights'] && $isweighted) {
-
             [ , $alteredweight] = \local_gugrades\grades::get_altered_weight($gradeitemid, $userid);
             $csvitems[$identifier . '_weights'] = number_format(100 * $alteredweight, 2) . '%';
         }
@@ -437,7 +432,7 @@ class custom extends base {
         $users = \local_gugrades\aggregation::get_users($courseid, $gradecategoryid, '', '', $groupid);
 
         // Aggregate all the users.
-        //\local_gugrades\aggregation::aggregate($courseid, $gradecategoryid, $users);
+        // \local_gugrades\aggregation::aggregate($courseid, $gradecategoryid, $users);
         [$columns] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid);
         [$users] = \local_gugrades\aggregation::add_aggregation_fields_to_users($courseid, $gradecategoryid, $users, $columns);
 
@@ -491,12 +486,11 @@ class custom extends base {
                 } else if (str_starts_with($ident, 'ITEM_')) {
                     $itemcsv = $this->process_item($ident, $courseid, $user->id, $options);
                     $line = array_merge($line, $itemcsv);
-                } else if ($ident =='letter'){
+                } else if ($ident == 'letter') {
                     $line[$ident] = $this->sanitise_grade($user);
-                } else if ($ident =='numerical'){
+                } else if ($ident == 'numerical') {
                     $line[$ident] = $user->rawgrade;
                 }
-
             }
 
             $lines[] = $line;

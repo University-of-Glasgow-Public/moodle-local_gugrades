@@ -33,7 +33,6 @@ require_once($CFG->dirroot . '/grade/lib.php');
  * Class to store and manipulate grade structures for course
  */
 class grades {
-
     /**
      * Get a grade item.
      * As we can constantly look up the same grade item over and over
@@ -232,7 +231,6 @@ class grades {
 
             return $gradecategory->parent;
         } else {
-
             return $gradeitem->categoryid;
         }
     }
@@ -463,7 +461,6 @@ class grades {
 
             // Only for additional detail
             if ($detailed) {
-
                 // Add aggregation strategy.
                 $gradecategories[$id]->strategy = \local_gugrades\aggregation::get_formatted_strategy($id);
                 $gradecategories[$id]->weighted = \local_gugrades\aggregation::is_gradecategory_weighted($id);
@@ -576,11 +573,9 @@ class grades {
 
             // Get grade items.
             if ($items = self::get_gradeitems_recursive($gradecategory)) {
-
                 // Check for any items with invalid grade types.
                 foreach ($items as $item) {
                     if (!self::is_grade_supported($item->id)) {
-
                         // Recursive is technically available but a grade is invalid.
                         return [true, false, false];
                     }
@@ -650,21 +645,24 @@ class grades {
                 return $column;
             }
         } else {
-
             // If other text, due to sql_compare_text it all gets a bit more complicated.
             $compareother = $DB->sql_compare_text('other');
             $sql = "SELECT * FROM {local_gugrades_column}
                 WHERE gradeitemid = :gradeitemid
                 AND gradetype = :gradetype
                 AND $compareother = :other";
-            if ($column = $DB->get_record_sql($sql,
-                ['gradeitemid' => $gradeitemid, 'gradetype' => $gradetype, 'other' => $other])) {
+            if (
+                $column = $DB->get_record_sql(
+                    $sql,
+                    ['gradeitemid' => $gradeitemid, 'gradetype' => $gradetype, 'other' => $other]
+                )
+            ) {
                 return $column;
             }
         }
 
         // Failing the above, we need a new column record.
-        $column = new \stdClass;
+        $column = new \stdClass();
         $column->courseid = $courseid;
         $column->gradeitemid = $gradeitemid;
         $column->gradetype = $gradetype;
@@ -790,17 +788,18 @@ class grades {
                 AND iscurrent = :iscurrent
                 AND columnid = :columnid
                 AND catoverride = 0';
-                //AND ' . $gradetypecompare . ' = :gradetype';
-            if ($oldgrades = $DB->get_records_sql($sql, [
+                // AND ' . $gradetypecompare . ' = :gradetype';
+            if (
+                $oldgrades = $DB->get_records_sql($sql, [
                 'courseid' => $courseid,
                 'gradeitemid' => $gradeitemid,
                 'userid' => $userid,
                 'iscurrent' => true,
                 'columnid' => $column->id,
                 'gradetype' => $gradetype,
-            ])) {
+                ])
+            ) {
                 foreach ($oldgrades as $oldgrade) {
-
                     // It's not current any more.
                     $oldgrade->iscurrent = false;
                     $DB->update_record('local_gugrades_grade', $oldgrade);
@@ -810,10 +809,13 @@ class grades {
 
         // Are we overwriting an existing grade (probably CATEGORY)?
         if ($overwrite) {
-
             // Find the existing entry - if not, create a new one anyway
-            if ($gugrade = $DB->get_record('local_gugrades_grade',
-                ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'userid' => $userid, 'columnid' => $column->id, 'iscurrent' => 1])) {
+            if (
+                $gugrade = $DB->get_record(
+                    'local_gugrades_grade',
+                    ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'userid' => $userid, 'columnid' => $column->id, 'iscurrent' => 1]
+                )
+            ) {
                 $gugrade->rawgrade = $rawgrade;
                 $gugrade->admingrade = $admingrade;
                 $gugrade->convertedgrade = $convertedgrade;
@@ -836,7 +838,7 @@ class grades {
             }
         }
 
-        $gugrade = new \stdClass;
+        $gugrade = new \stdClass();
         $gugrade->courseid = $courseid;
         $gugrade->gradeitemid = $gradeitemid;
         $gugrade->userid = $userid;
@@ -975,7 +977,7 @@ class grades {
      * @return array
      */
     public static function add_grades_for_user(int $courseid, int $gradeitemid, object $user, bool $gradehidden = false) {
-        //$usercapture = new usercapture($courseid, $gradeitemid, $user->id);
+        // $usercapture = new usercapture($courseid, $gradeitemid, $user->id);
         $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $user->id);
         $user->grades = $usercapture->get_grades();
         $user->alert = $usercapture->alert();
@@ -1010,8 +1012,12 @@ class grades {
         }
         if ($gradetype == GRADE_TYPE_SCALE) {
             $scaleid = $gradeitem->scaleid;
-            if (!$DB->record_exists_sql('select * from {local_gugrades_scalevalue} where scaleid=:scaleid',
-                ['scaleid' => $scaleid])) {
+            if (
+                !$DB->record_exists_sql(
+                    'select * from {local_gugrades_scalevalue} where scaleid=:scaleid',
+                    ['scaleid' => $scaleid]
+                )
+            ) {
                 return false;
             }
 
@@ -1102,19 +1108,18 @@ class grades {
         $gradetype = $gradeitem->gradetype;
         if ($gradetype == GRADE_TYPE_VALUE) {
             if ($gradeitem->grademax == 22) {
-
                 // TODO: May change but to get it working.
-                //return ['value', $gradeitem];
+                // return ['value', $gradeitem];
                 return ['scale22', $gradeitem];
             } else {
                 return ['value', $gradeitem];
             }
         } else if ($gradetype == GRADE_TYPE_SCALE) {
-            //if (($gradeitem->grademin == 1) && ($gradeitem->grademax == 23)) {
-            //    return ['scale22', $gradeitem];
-            //} else {
+            // if (($gradeitem->grademin == 1) && ($gradeitem->grademax == 23)) {
+            // return ['scale22', $gradeitem];
+            // } else {
                 return ['scale', $gradeitem];
-            //}
+            // }
         }
 
         throw new \moodle_exception('Invalid gradeitem encountered in grades::analyse_gradeitem');
@@ -1167,7 +1172,7 @@ class grades {
             return false;
         }
 
-        // If admin then we can skip if there was any kind of grade. 
+        // If admin then we can skip if there was any kind of grade.
         if ($additional == 'admin') {
             return true;
         }
@@ -1190,8 +1195,12 @@ class grades {
 
         $columns = $DB->get_records('local_gugrades_column', ['gradeitemid' => $gradeitemid]);
         foreach ($columns as $column) {
-            if (!$DB->record_exists('local_gugrades_grade',
-                ['gradeitemid' => $gradeitemid, 'gradetype' => $column->gradetype, 'iscurrent' => 1])) {
+            if (
+                !$DB->record_exists(
+                    'local_gugrades_grade',
+                    ['gradeitemid' => $gradeitemid, 'gradetype' => $column->gradetype, 'iscurrent' => 1]
+                )
+            ) {
                 $DB->delete_records('local_gugrades_column', ['id' => $column->id]);
             }
         }
@@ -1209,7 +1218,6 @@ class grades {
         global $DB;
 
         if ($columns = $DB->get_records('local_gugrades_column', ['gradeitemid' => $gradeitemid])) {
-
             // As there is at least one column then there must be a provisional
             // But it has to go at the end.
             $provisionalcolumn = self::get_column($courseid, $gradeitemid, 'PROVISIONAL', '', false);
@@ -1227,7 +1235,6 @@ class grades {
                     $column->description = gradetype::get_description($column->gradetype);
                 }
             }
-
         } else {
             $columns = [];
         }
@@ -1279,7 +1286,6 @@ class grades {
 
         // Is it a category?
         if ($gradeitem->itemtype == 'category') {
-
             // Get the aggregated category
             $category = \local_gugrades\aggregation::get_enhanced_grade_category($courseid, $gradeitem->iteminstance);
 
@@ -1301,7 +1307,6 @@ class grades {
 
         // Is it a scale of some sort?
         if ($converted) {
-
             $mapitem = $DB->get_record('local_gugrades_map_item', ['gradeitemid' => $gradeitemid], '*', MUST_EXIST);
             $map = $DB->get_record('local_gugrades_map', ['id' => $mapitem->mapid], '*', MUST_EXIST);
 
@@ -1311,9 +1316,7 @@ class grades {
             }
 
             return new $classname($courseid, $gradeitemid, $converted);
-
         } else if ($gradetype == GRADE_TYPE_SCALE) {
-
             // See if scale is in our scaletype table.
             if (!$scaletype = $DB->get_record('local_gugrades_scaletype', ['scaleid' => $gradeitem->scaleid])) {
                 throw new \moodle_exception('Scale not found in gugrades_scaletype table. ScaleID = ' . $gradeitem->scaleid . ' gradeitemid = ' . $gradeitemid);
@@ -1327,7 +1330,6 @@ class grades {
 
             return new $classname($courseid, $gradeitemid, $converted);
         } else {
-
             // It's points. BUT... *special case*
             // Grading out of 0 to 22 is a proxy for Schedule A.
             if (($gradeitem->grademin == 0) && ($gradeitem->grademax == 22)) {
@@ -1497,8 +1499,10 @@ class grades {
     public static function is_grades_released(int $courseid, int $gradeitemid) {
         global $DB;
 
-        return $DB->record_exists('local_gugrades_grade',
-            ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'gradetype' => 'RELEASED', 'iscurrent' => 1]);
+        return $DB->record_exists(
+            'local_gugrades_grade',
+            ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'gradetype' => 'RELEASED', 'iscurrent' => 1]
+        );
     }
 
     /**
@@ -1605,12 +1609,16 @@ class grades {
         /*
         $grades = $DB->get_records('local_gugrades_grade',
         ['gradeitemid' => $gradeitemid, 'gradetype' => 'CATEGORY', 'userid' => $userid, 'iscurrent' => 1]);
-    if (count($grades)>1) {
-    var_dump($grades); die;}
-    */
+        if (count($grades)>1) {
+        var_dump($grades); die;}
+        */
 
-        if ($grade = $DB->get_record('local_gugrades_grade',
-            ['gradeitemid' => $gradeitemid, 'gradetype' => 'CATEGORY', 'userid' => $userid, 'iscurrent' => 1])) {
+        if (
+            $grade = $DB->get_record(
+                'local_gugrades_grade',
+                ['gradeitemid' => $gradeitemid, 'gradetype' => 'CATEGORY', 'userid' => $userid, 'iscurrent' => 1]
+            )
+        ) {
             $grade->catoverride = false;
             $grade->iscurrent = false;
             $DB->update_record('local_gugrades_grade', $grade);
@@ -1695,7 +1703,7 @@ class grades {
             $altered->timealtered = time();
             $DB->update_record('local_gugrades_altered_weight', $altered);
         } else {
-            $altered = new \stdClass;
+            $altered = new \stdClass();
             $altered->courseid = $courseid;
             $altered->categoryid = $categoryid;
             $altered->gradeitemid = $gradeitemid;
@@ -1853,7 +1861,7 @@ class grades {
     public static function check_grade_type_integrity(int $courseid) {
         global $DB;
 
-        // We only store points or not points but that will do. 
+        // We only store points or not points but that will do.
         // Get possible gradeitemids against points/not points flag.
         $sql = "SELECT DISTINCT gradeitemid, points FROM {local_gugrades_grade}
             WHERE courseid = :courseid
@@ -1865,7 +1873,6 @@ class grades {
 
         $erroritems = [];
         foreach ($items as $item) {
-
             // If there are first grades then check is irrelevant.
             if (self::any_first($courseid, $item->gradeitemid)) {
                 continue;
@@ -1889,7 +1896,7 @@ class grades {
             }
         }
 
-        // Check for out of range grades. 
+        // Check for out of range grades.
         $sql = "SELECT DISTINCT gradeitemid, max(rawgrade) AS maxgrade FROM {local_gugrades_grade}
             WHERE courseid = :courseid
             AND rawgrade IS NOT NULL
@@ -1901,7 +1908,6 @@ class grades {
         $grades = $DB->get_records_sql($sql, ['courseid' => $courseid]);
 
         foreach ($grades as $grade) {
-
             // If there are first grades then check is irrelevant.
             if (self::any_first($courseid, $grade->gradeitemid)) {
                 continue;
@@ -1918,5 +1924,4 @@ class grades {
 
         return $erroritems;
     }
-
 }

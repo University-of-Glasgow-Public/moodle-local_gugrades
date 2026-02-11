@@ -34,7 +34,6 @@
  * Define function get_history
  */
 class get_history extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -97,7 +96,5 @@ class get_history extends external_api {
                 'auditcomment' => new external_value(PARAM_TEXT, 'Audit comment'),
             ])
         );
-
     }
-
 }

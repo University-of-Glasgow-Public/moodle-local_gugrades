@@ -29,7 +29,6 @@ namespace local_gugrades;
  * Various functions related to conversion tasks
  */
 class conversion {
-
     /**
      * Get schedule a/b mapping
      * @param string $schedule
@@ -109,7 +108,6 @@ class conversion {
         // Iterate over scale to add data.
         $map = [];
         foreach ($scaleitems as $grade => $band) {
-
             // Get correct default point.
             $default = array_shift($defaultpoints);
             if (is_null($default)) {
@@ -192,7 +190,13 @@ class conversion {
      * @return int
      */
     public static function write_conversion_map(
-        int $courseid, int $mapid, string $name, string $schedule, float $maxgrade, array $map): int {
+        int $courseid,
+        int $mapid,
+        string $name,
+        string $schedule,
+        float $maxgrade,
+        array $map
+    ): int {
         global $DB, $USER;
 
         $name = trim($name);
@@ -226,7 +230,6 @@ class conversion {
             }
 
             $newmapid = $mapid;
-
         } else {
             $mapinfo = new \stdClass();
             $mapinfo->courseid = $courseid;
@@ -335,7 +338,9 @@ class conversion {
         $inorder = true;
 
         foreach ($map as $item) {
-            if ($item['band'] == 'H') continue;
+            if ($item['band'] == 'H') {
+                continue;
+            }
 
             if ((is_int($item['bound']) || is_float($item['bound'])) && $item['bound'] > 0) {
                 if ($currentbound >= $item['bound']) {
@@ -407,7 +412,7 @@ class conversion {
             // Get the containing gradecategory for aggregation recalc.
             if ($gradecategoryid) {
                 \local_gugrades\api::recalculate($courseid, $gradecategoryid);
-            } else if ($gradeitemid){
+            } else if ($gradeitemid) {
                 $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
                 if ($gradeitem->categoryid) {
                     \local_gugrades\api::recalculate($courseid, $gradeitem->categoryid);
@@ -451,7 +456,6 @@ class conversion {
             $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
             \local_gugrades\api::recalculate($courseid, $gradeitem->categoryid);
         } else {
-
             // Recalculate everything :(
             \local_gugrades\api::recalculate($courseid, $gradecategoryid);
         }
@@ -588,7 +592,7 @@ class conversion {
 
         // Iterate over users converting grades.
         foreach ($users as $user) {
-            //$usercapture = new usercapture($courseid, $gradeitemid, $user->id);
+            // $usercapture = new usercapture($courseid, $gradeitemid, $user->id);
             $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $user->id);
             $provisional = $usercapture->get_provisional();
 
@@ -616,7 +620,6 @@ class conversion {
                     ispoints:           false,
                 );
             } else {
-
                 // MGU-1293: A null grade (No grade) just stays as No Grade
                 if (!is_null($provisional->rawgrade)) {
                     $convertedgrade = self::convert_grade($provisional->rawgrade, $gradeitem->grademax, $mapvalues);
@@ -637,7 +640,7 @@ class conversion {
                     userid:             $user->id,
                     admingrade:         '',
                     rawgrade:           $provisional->rawgrade,
-                    convertedgrade:     $convertedgrade->scalevalue,  // TODO: Is this correct?
+                    convertedgrade:     $convertedgrade->scalevalue, // TODO: Is this correct?
                     displaygrade:       $convertedgrade->band,
                     weightedgrade:      0,
                     gradetype:          'CONVERTED',
@@ -651,8 +654,12 @@ class conversion {
         }
 
         // Provisional column will now represent a scale.
-        if ($provisionalcolumn = $DB->get_record('local_gugrades_column',
-            ['gradeitemid' => $gradeitemid, 'gradetype' => 'PROVISIONAL'])) {
+        if (
+            $provisionalcolumn = $DB->get_record(
+                'local_gugrades_column',
+                ['gradeitemid' => $gradeitemid, 'gradetype' => 'PROVISIONAL']
+            )
+        ) {
             $provisionalcolumn->points = false;
             $DB->update_record('local_gugrades_column', $provisionalcolumn);
         }

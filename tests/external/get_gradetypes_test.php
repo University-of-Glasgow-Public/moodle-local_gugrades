@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test import_grades_users web service.
  */
 final class get_gradetypes_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Get the types and check
      *

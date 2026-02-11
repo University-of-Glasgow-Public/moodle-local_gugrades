@@ -39,7 +39,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * More test(s) for get_aggregation_page webservice
  */
 final class aggregation_schema8_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummer
      */
@@ -66,7 +65,6 @@ final class aggregation_schema8_test extends \local_gugrades\external\gugrades_a
 
         // Get the grade category 'Summer exam'.
         $this->gradecatsummer = $DB->get_record('grade_categories', ['fullname' => 'Summer exam'], '*', MUST_EXIST);
-
     }
 
     /**
@@ -189,5 +187,4 @@ final class aggregation_schema8_test extends \local_gugrades\external\gugrades_a
         $fred = $page['users'][0];
         $this->assertEquals(100, $fred['completed']);
     }
-
 }

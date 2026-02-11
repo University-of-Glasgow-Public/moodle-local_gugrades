@@ -29,7 +29,6 @@ namespace local_gugrades\mapping;
  * Base class for scale mappings / conversions
  */
 abstract class base {
-
     /**
      * @var int $courseid
      */
@@ -68,7 +67,8 @@ abstract class base {
         $this->gradeitemid = $gradeitemid;
         $this->converted = $converted;
 
-        $this->gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);;
+        $this->gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
+        ;
     }
 
     /**
@@ -203,7 +203,6 @@ abstract class base {
 
             // Check if the grade is in the array of scale values.
             if (!array_key_exists($csvgrade, $this->items)) {
-
                 // Failing that, we will accept the 'basic' grade (A1, A2...)
                 $grade = array_search($csvgrade, $this->get_map());
                 if ($grade === false) {
@@ -224,5 +223,4 @@ abstract class base {
 
         return [true, $grade];
     }
-
 }

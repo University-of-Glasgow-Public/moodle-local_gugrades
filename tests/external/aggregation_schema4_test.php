@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * More test(s) for get_aggregation_page webservice
  */
 final class aggregation_schema4_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummative
      */
@@ -203,7 +202,7 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
             reason:         'CATEGORY',
             other:          '',
             admingrade:     '',
-            scale:          11, //D0.
+            scale:          11, // D0.
             grade:          0,
             notes:          'Test notes'
         );
@@ -225,7 +224,7 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         $this->assertEquals(11, $fred['rawgrade']);
 
         $grades = $DB->get_records('local_gugrades_grade', ['gradeitemid' => $summerexamitem->id, 'userid' => $this->student->id]);
-        //var_dump($grades); die;
+        // var_dump($grades); die;
 
         // Remove the grade mapping.
         // Removing the mapping should also remove any overridden grades.
@@ -251,5 +250,4 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         $this->assertEquals(85.25926, $fred['rawgrade']);
         $this->assertEquals('85.25926', $fred['displaygrade']);
     }
-
 }

@@ -25,7 +25,6 @@
 namespace local_gugrades\external;
 
 use core_external\external_api;
-
 use externallib_advanced_testcase;
 
 defined('MOODLE_INTERNAL') || die();
@@ -38,7 +37,6 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * Test(s) for get_all_strings webservice
  */
 final class get_all_strings_test extends externallib_advanced_testcase {
-
     /**
      * Called before every test
      */

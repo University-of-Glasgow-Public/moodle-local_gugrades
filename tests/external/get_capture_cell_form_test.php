@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test import_grades_users web service.
  */
 final class get_capture_cell_form_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Grade item with points
      *
@@ -91,7 +90,8 @@ final class get_capture_cell_form_test extends \local_gugrades\external\gugrades
         $this->assertTrue($usescale);
         $this->assertEquals(0, $grademax);
         $this->assertCount(24, $scalemenu);
-        $this->assertGreaterThan(0, count($admingrades));;
+        $this->assertGreaterThan(0, count($admingrades));
+        ;
         $this->assertEquals('H:0', $scalemenu[22]['label']);
     }
 }

@@ -35,7 +35,6 @@ use core_external\external_value;
  * Define function get_capture_page
  */
 class get_capture_user extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -103,5 +102,4 @@ class get_capture_user extends external_api {
             ),
         ]);
     }
-
 }

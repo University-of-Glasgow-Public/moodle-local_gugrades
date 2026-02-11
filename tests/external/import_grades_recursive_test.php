@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test import_grades_recursive web service.
  */
 final class import_grades_recursive_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Import first grades.
      *
@@ -50,9 +49,9 @@ final class import_grades_recursive_test extends \local_gugrades\external\gugrad
         // Check gradeitemsecond1 (no grades assigned so shouldn't return anything).
         $counts = import_grades_recursive::execute(
             courseid: $this->course->id,
-            gradeitemid: $this->gradeitemsecond1, 
-            groupid: 0, 
-            additional: 'update', 
+            gradeitemid: $this->gradeitemsecond1,
+            groupid: 0,
+            additional: 'update',
             fillns: 'none',
             reason: 'FIRST',
             other: '',
@@ -87,9 +86,9 @@ final class import_grades_recursive_test extends \local_gugrades\external\gugrad
         // This time we should get those two grades.
         $counts = import_grades_recursive::execute(
             courseid: $this->course->id,
-            gradeitemid: $this->gradeitemsecond1, 
-            groupid: 0, 
-            additional: 'update', 
+            gradeitemid: $this->gradeitemsecond1,
+            groupid: 0,
+            additional: 'update',
             fillns: 'none',
             reason: 'FIRST',
             other: '',

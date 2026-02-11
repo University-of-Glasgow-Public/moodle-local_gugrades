@@ -31,7 +31,6 @@ namespace local_gugrades\aggregation;
  * aggregation 'rules'
  */
 class base {
-
     /**
      * @var int $courseid
      */
@@ -116,12 +115,11 @@ class base {
      * @return array
      */
     public function availability(array $items, int $userid) {
-        //return $items;
-        //$this->availableuserids = [];
+        // return $items;
+        // $this->availableuserids = [];
 
         $filtereditems = [];
         foreach ($items as $id => $item) {
-
             // MGU-1349 (et al): If this is a category, then it must be available
             // UNLESS its $notavailable flag is true.
             if ($item->iscategory) {
@@ -154,9 +152,9 @@ class base {
     }
 
     /**
-     * If there are no items left after availability checked 
+     * If there are no items left after availability checked
      * (i.e. ALL items turned out to be not available) then
-     * determine what the category total should be. 
+     * determine what the category total should be.
      * This is mostly an issue for Level 1
      * @param int $level
      * @return [$admingrade, $error, $displaygrade]
@@ -171,11 +169,9 @@ class base {
             [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
             return [$admingrade, '', $displaygrade];
         } else {
-
             // If not L1, then the total is just 'Not available'.
             return ['', $strnotavailable, $strnotavailable];
         }
-
     }
 
     /**
@@ -230,7 +226,7 @@ class base {
         }
 
         // Sort items by grade (ascending).
-        usort($items, function($g1, $g2) {
+        usort($items, function ($g1, $g2) {
 
             // Usort only likes integers, so the 100* is required.
             $normalised1 = 100 * $g1->grade / $g1->grademax;
@@ -317,7 +313,6 @@ class base {
             }
         }
         if ($allns) {
-
             // MGU-1216.
             if ($level == 1) {
                 $this->explain = get_string('explain_allnslevel1', 'local_gugrades');
@@ -372,10 +367,8 @@ class base {
         // UNLESS there is any NS - CoS12
         // Superceded by MGU-1213
         if ($completion < 75.0) {
-
             // Check for MV0
             if ($this->mv0found) {
-
                 // If there is an NS, then it's CW
                 foreach ($items as $item) {
                     if ($item->admingrade == 'NOSUBMISSION') {
@@ -397,7 +390,7 @@ class base {
 
     /**
      * MGU-1351:
-     * Handle resit grade. 
+     * Handle resit grade.
      * - If there is only one item, then that's the grade (or admingrade)
      * - If there are any admingrade then the resit grade is the grade (or admingrade)
      * - If there are two valid grades then aggregation completes 'normally'
@@ -420,7 +413,7 @@ class base {
             $explain = get_string('explain_resitoneitem', 'local_gugrades');
             $item = $items[0];
 
-            // Normalise grade. 
+            // Normalise grade.
             $norm = $maxgrade * $item->grade / $item->grademax;
             return [$norm, $item->admingrade, $explain];
         }
@@ -431,7 +424,7 @@ class base {
         foreach ($items as $index => $item) {
             if ($item->itemid == $resititemid) {
                 $resitindex = $index;
-            } 
+            }
             if ($item->itemid != $resititemid) {
                 $firstindex = $index;
             }
@@ -448,9 +441,9 @@ class base {
             if ($first->admingrade == '') {
                 $explain = get_string('explain_resitnosubmission', 'local_gugrades');
 
-                // Normalise grade. 
+                // Normalise grade.
                 $norm = $maxgrade * $first->grade / $first->grademax;
-                return [$norm, $first->admingrade, $explain];                
+                return [$norm, $first->admingrade, $explain];
             }
         }
 
@@ -459,7 +452,7 @@ class base {
             $explain = get_string('explain_resitadmingrade', 'local_gugrades');
             $item = $items[$resitindex];
 
-            // Normalise grade. 
+            // Normalise grade.
             $norm = $maxgrade * $item->grade / $item->grademax;
             return [$norm, $item->admingrade, $explain];
         }
@@ -493,7 +486,6 @@ class base {
         $countcompleted = 0;
 
         foreach ($items as $item) {
-
             // If item is not available, then just ignore it.
             if (isset($item->available) && !$item->available) {
                 continue;
@@ -598,7 +590,7 @@ class base {
             throw new \moodle_exception('Unknown or unsupported aggregation strategy. Aggregation ID ' . $aggregationid);
         }
 
-        return "strategy_" .$agf;
+        return "strategy_" . $agf;
     }
 
     /**
@@ -726,7 +718,6 @@ class base {
         if ($roundindex != $medianindex) {
             return $this->round_float($grades[$medianindex]);
         } else {
-
             // It's the mean of the two middle values.
             $midh = $grades[$roundindex];
             $midl = $grades[$roundindex - 1];

@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function import_grade
  */
 class import_grade extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -75,11 +74,11 @@ class import_grade extends external_api {
         $mapping = \local_gugrades\grades::mapping_factory($courseid, $gradeitemid);
         $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid);
         $success = \local_gugrades\api::import_grade(
-            courseid: $courseid, 
-            gradeitemid: $gradeitemid, 
-            mapping: $mapping, 
-            activity: $activity, 
-            userid: $userid, 
+            courseid: $courseid,
+            gradeitemid: $gradeitemid,
+            mapping: $mapping,
+            activity: $activity,
+            userid: $userid,
             additional: 'update',
             fillns: '',
             reason: 'FIRST',
@@ -105,5 +104,4 @@ class import_grade extends external_api {
             'success' => new external_value(PARAM_BOOL, 'If true, import was successful'),
         ]);
     }
-
 }

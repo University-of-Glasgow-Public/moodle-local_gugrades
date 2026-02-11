@@ -33,7 +33,6 @@ require_once($CFG->dirroot . '/grade/lib.php');
  * Represents a single row of capture data for a user
  */
 class usercapture {
-
     /**
      * @var int $courseid
      */
@@ -79,7 +78,7 @@ class usercapture {
     public static function create(int $courseid, int $gradeitemid, int $userid) {
 
         $usercapture = new usercapture($courseid, $gradeitemid, $userid);
-        
+
         return $usercapture;
     }
 
@@ -131,7 +130,6 @@ class usercapture {
 
             return $provisional;
         } else {
-
             return null;
         }
     }
@@ -188,7 +186,7 @@ class usercapture {
 
         // The -1 if they don't exist (not existing is proxy for equal).
 
-        $first = array_key_exists('FIRST', $gradesbygt)  ? $gradesbygt['FIRST']->rawgrade : -1;
+        $first = array_key_exists('FIRST', $gradesbygt) ? $gradesbygt['FIRST']->rawgrade : -1;
         $second = array_key_exists('SECOND', $gradesbygt) ? $gradesbygt['SECOND']->rawgrade : -1;
         $third = array_key_exists('THIRD', $gradesbygt) ? $gradesbygt['THIRD']->rawgrade : -1;
 
@@ -223,7 +221,6 @@ class usercapture {
         global $DB;
 
         if ($grade = $DB->get_record('grade_grades', ['itemid' => $this->gradeitemid, 'userid' => $this->userid])) {
-            
             return $grade->hidden != 0;
         }
 
@@ -268,13 +265,18 @@ class usercapture {
         if ($grades) {
             $provisional = $this->get_provisional_from_grades($grades);
 
-            // MGU-1344: If points grade, check for over-range. Can happen if grade item edited after import. 
+            // MGU-1344: If points grade, check for over-range. Can happen if grade item edited after import.
             if ($provisional->points && ($provisional->rawgrade > $gradeitem->grademax)) {
-                throw new \moodle_exception('Out of range grade detected for ' . $gradeitem->itemname . 
+                throw new \moodle_exception('Out of range grade detected for ' . $gradeitem->itemname .
                     '. gradeitemid = ' . $this->gradeitemid . ', userid = ' . $this->userid . ', rawgrade = ' . $provisional->rawgrade . ', grademax = ' . $gradeitem->grademax);
             }
-            $provisionalcolumn = \local_gugrades\grades::get_column($this->courseid, $this->gradeitemid, 'PROVISIONAL', '',
-                $provisional->points);
+            $provisionalcolumn = \local_gugrades\grades::get_column(
+                $this->courseid,
+                $this->gradeitemid,
+                'PROVISIONAL',
+                '',
+                $provisional->points
+            );
 
             $provisional->columnid = $provisionalcolumn->id;
             $this->provisional = $provisional;
@@ -322,5 +324,4 @@ class usercapture {
     public function alert() {
         return $this->alert;
     }
-
 }

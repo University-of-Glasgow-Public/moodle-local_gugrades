@@ -34,7 +34,6 @@
  * Define function get_user_picture_url
  */
 class get_user_picture_url extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters

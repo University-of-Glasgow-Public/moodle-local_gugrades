@@ -28,7 +28,6 @@ namespace local_gugrades;
 defined('MOODLE_INTERNAL') || die();
 
 class progress {
-
     /**
      * Create progress cache tag
      * @param int $courseid
@@ -60,7 +59,7 @@ class progress {
         $cache = \cache::make('local_gugrades', 'progress');
         $tag = self::get_tag($courseid, $uniqueid, $progresstype);
 
-        $cache->set($tag, 0);       
+        $cache->set($tag, 0);
     }
 
     /**
@@ -90,7 +89,7 @@ class progress {
      * @return int
      */
     public static function get(int $courseid, int $uniqueid, string $progresstype, int $staffuserid = 0) {
- 
+
         $cache = \cache::make('local_gugrades', 'progress');
         $tag = self::get_tag($courseid, $uniqueid, $progresstype, $staffuserid);
 
@@ -111,7 +110,7 @@ class progress {
 
         $cache = \cache::make('local_gugrades', 'progress');
         $tag = self::get_tag($courseid, $uniqueid, $progresstype);
-        
+
         $cache->delete($tag);
     }
 }

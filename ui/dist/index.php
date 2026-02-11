@@ -76,4 +76,3 @@ echo '<div class="text-center my-3">
           <a class="btn btn-info px-5" href="' . $helpurl . '" target="_blank">' . $helptext . '</a>
       </div>';
 echo $OUTPUT->footer();
-

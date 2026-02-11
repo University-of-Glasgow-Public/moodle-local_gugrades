@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * More test(s) for get_aggregation_page webservice
  */
 final class override_top_level_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummative
      */
@@ -61,8 +60,12 @@ final class override_top_level_test extends \local_gugrades\external\gugrades_ag
 
         // Get the grade category 'summative'.
         $this->gradecatsummative = $DB->get_record('grade_categories', ['fullname' => 'Summative'], '*', MUST_EXIST);
-        $this->summativeitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $this->gradecatsummative->id], '*', MUST_EXIST);
+        $this->summativeitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $this->gradecatsummative->id],
+            '*',
+            MUST_EXIST
+        );
     }
 
     /**
@@ -223,5 +226,4 @@ final class override_top_level_test extends \local_gugrades\external\gugrades_ag
         $this->assertTrue($user['overridden']);
         $this->assertEquals('E1', $user['displaygrade']);
     }
-
 }

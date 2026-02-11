@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_aggregation_page
  */
 class get_aggregation_user extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -70,7 +69,10 @@ class get_aggregation_user extends external_api {
         self::validate_context($context);
 
         $page = \local_gugrades\api::get_aggregation_user(
-            $courseid, $gradecategoryid, $userid);
+            $courseid,
+            $gradecategoryid,
+            $userid
+        );
 
         return $page;
     }
@@ -113,5 +115,4 @@ class get_aggregation_user extends external_api {
             ),
         ]);
     }
-
 }

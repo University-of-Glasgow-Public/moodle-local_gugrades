@@ -29,7 +29,6 @@ namespace local_gugrades\export;
  *
  */
 class mycampus extends base {
-
     /**
      * Define name of export
      * @return string

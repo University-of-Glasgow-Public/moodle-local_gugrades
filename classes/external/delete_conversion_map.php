@@ -34,7 +34,6 @@ use core_external\external_value;
  * Read a single map
  */
 class delete_conversion_map extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters

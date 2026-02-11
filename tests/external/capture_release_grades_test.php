@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_dashboard_enabled web service.
  */
 final class capture_release_grades_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check the enabled state under different circumstances
      *
@@ -102,6 +101,5 @@ final class capture_release_grades_test extends \local_gugrades\external\gugrade
 
         $this->assertEquals('Assignment 2', $user->fields[2]['itemname']);
         $this->assertTrue($user->fields[2]['released']);
-
     }
 }

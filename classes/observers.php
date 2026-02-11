@@ -29,8 +29,6 @@ namespace local_gugrades;
  * Static class implementation to deal with event observers
  */
 class observers {
-
-
     /**
      * Handle deleted grade item
      * @param \core\event\grade_item_deleted $event
@@ -64,5 +62,4 @@ class observers {
 
         \local_gugrades\grades::grade_item_updated($courseid, $itemid);
     }
-
 }

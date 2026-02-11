@@ -34,7 +34,6 @@ use core_external\external_value;
  * Get image urls
  */
 class get_image_urls extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -47,7 +46,7 @@ class get_image_urls extends external_api {
                     'imagename' => new external_value(PARAM_TEXT, 'Image name'),
                     'component' => new external_value(PARAM_TEXT, 'Component'),
                 ])
-            )
+            ),
         ]);
     }
 
@@ -83,5 +82,4 @@ class get_image_urls extends external_api {
             ])
         );
     }
-
 }

@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 define('XHPROF_PATH', '/profiles/');
 
 class development {
-
     /**
      * Start XHPROF profile
      * Check included for xhprof being installed (in case we forget)

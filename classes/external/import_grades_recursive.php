@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function import_grades_users
  */
 class import_grades_recursive extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -87,8 +86,16 @@ class import_grades_recursive extends external_api {
             throw new \moodle_exception('Import is not permitted after conversion applied.');
         }
 
-        [$itemcount, $gradecount] = \local_gugrades\api::import_grades_recursive($courseid,
-            $gradeitemid, $groupid, $additional, $fillns, $reason, $other, $dryrun);
+        [$itemcount, $gradecount] = \local_gugrades\api::import_grades_recursive(
+            $courseid,
+            $gradeitemid,
+            $groupid,
+            $additional,
+            $fillns,
+            $reason,
+            $other,
+            $dryrun
+        );
 
         // Log.
         $event = \local_gugrades\event\import_grades_recursive::create([
@@ -116,5 +123,4 @@ class import_grades_recursive extends external_api {
             'gradecount' => new external_value(PARAM_INT, 'Number of individual grades imported'),
         ]);
     }
-
 }

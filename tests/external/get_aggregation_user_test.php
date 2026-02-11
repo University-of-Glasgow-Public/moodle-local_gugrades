@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Test(s) for get_aggregation_user webservice
  */
 final class get_aggregation_user_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var int $gradeitemsecondx
      */
@@ -134,8 +133,6 @@ final class get_aggregation_user_test extends \local_gugrades\external\gugrades_
         // Install test data for student.
         $this->load_data('data1a', $this->student->id);
 
-
-
         // Import ALL gradeitems.
         foreach ($this->gradeitemids as $gradeitemid) {
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
@@ -155,7 +152,7 @@ final class get_aggregation_user_test extends \local_gugrades\external\gugrades_
 
     /**
      * Check API call when there is no data
-     * 
+     *
      */
     public function test_direct_no_data(): void {
         global $DB;
@@ -172,9 +169,5 @@ final class get_aggregation_user_test extends \local_gugrades\external\gugrades_
         $schedulebexam = $DB->get_record('grade_categories', ['fullname' => 'Schedule B exam'], '*', MUST_EXIST);
 
         $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $schedulebexam->id, $this->student->id);
-
     }
-
 }
-
-

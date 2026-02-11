@@ -28,7 +28,6 @@ namespace local_gugrades\activities;
  * Manual grade items
  */
 class manual extends base {
-
     /**
      * Get item type
      * @return string
@@ -36,5 +35,4 @@ class manual extends base {
     public function get_itemtype() {
         return  'manual';
     }
-
 }

@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_capture_page
  */
 class get_capture_page extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -123,8 +122,10 @@ class get_capture_page extends external_api {
             'hidden' => new external_value(PARAM_BOOL, 'True if student names are hidden'),
             'itemtype' => new external_value(PARAM_TEXT, 'Name of item type (quiz, assign, manual etc)'),
             'itemname' => new external_value(PARAM_TEXT, 'Name of item'),
-            'gradesupported' => new external_value(PARAM_BOOL,
-                'Is the selected grade type one we can handle / have configured (for scales)?'),
+            'gradesupported' => new external_value(
+                PARAM_BOOL,
+                'Is the selected grade type one we can handle / have configured (for scales)?'
+            ),
             'aggregationsupported' => new external_value(PARAM_BOOL, 'Is it possible to aggregate this (top level) category?'),
             'unsupportedscales' => new external_value(PARAM_TEXT, 'List of unsupported scales if above is true'),
             'gradesimported' => new external_value(PARAM_BOOL, 'Have the grades been imported for this grade item?'),
@@ -137,5 +138,4 @@ class get_capture_page extends external_api {
             'staffuserid' => new external_value(PARAM_INT, 'UserID of person running MyGrades ($USER->id'),
         ]);
     }
-
 }

@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test import_grades_users web service.
  */
 final class reset_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Import first grades.
      *
@@ -64,7 +63,7 @@ final class reset_test extends \local_gugrades\external\gugrades_advanced_testca
             activity:       $activity,
             userid:         $studentid,
             additional:     'update',
-            fillns:         'none', 
+            fillns:         'none',
             reason:         'FIRST',
             other:          '',
             noaggregation:  false
@@ -81,7 +80,7 @@ final class reset_test extends \local_gugrades\external\gugrades_advanced_testca
             activity:       $activity,
             userid:         $studentid,
             additional:     'update',
-            fillns:         'none', 
+            fillns:         'none',
             reason:         'FIRST',
             other:          '',
             noaggregation:  false

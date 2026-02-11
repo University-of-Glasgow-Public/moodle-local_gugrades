@@ -34,7 +34,6 @@ use core_external\external_value;
  * Get the information to construct add grade form
  */
 class get_add_grade_form extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -111,5 +110,4 @@ class get_add_grade_form extends external_api {
             ),
         ]);
     }
-
 }

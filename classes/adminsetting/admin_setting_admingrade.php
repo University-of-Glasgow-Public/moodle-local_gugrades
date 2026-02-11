@@ -31,7 +31,6 @@ use html_writer;
  * Custom admit setting.
  */
 class admin_setting_admingrade extends \admin_setting {
-
     /**
      * Returns current value of this setting
      * @return mixed array or string depending on instance, NULL means not set yet
@@ -62,7 +61,7 @@ class admin_setting_admingrade extends \admin_setting {
      * @param string $query
      * @return string
      */
-    public function output_html($data, $query='') {
+    public function output_html($data, $query = '') {
         global $OUTPUT;
 
         $default = $this->get_defaultsetting();

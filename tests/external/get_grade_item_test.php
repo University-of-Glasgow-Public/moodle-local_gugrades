@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test import_grades_users web service.
  */
 final class get_grade_item_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Get the types and check
      *
@@ -96,8 +95,12 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
 
         // Category to test.
         $gradecategoryid = $this->gradecatsecond->id;
-        $gradeitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
+        $gradeitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $gradecategoryid],
+            '*',
+            MUST_EXIST
+        );
 
         $item = get_grade_item::execute($gradeitem->id);
         $item = external_api::clean_returnvalue(
@@ -131,8 +134,12 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
 
         // Category to test with scales.
         $gradecategoryid = $this->gradecatsecond->id;
-        $gradeitem = $DB->get_record('grade_items',
-            ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
+        $gradeitem = $DB->get_record(
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $gradecategoryid],
+            '*',
+            MUST_EXIST
+        );
 
         $item = get_grade_item::execute($gradeitem->id);
         $item = external_api::clean_returnvalue(

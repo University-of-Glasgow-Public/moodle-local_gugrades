@@ -42,7 +42,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_base_testc
  * Test(s) for (both) save_settings and get_settings webservices
  */
 class gugrades_advanced_testcase extends gugrades_base_testcase {
-
     /**
      * @var object $gradcatsumm
      */
@@ -210,7 +209,8 @@ class gugrades_advanced_testcase extends gugrades_base_testcase {
 
         // Create a "second level" grade category and put some iems in it.
         $gradecatsecond = $this->getDataGenerator()->create_grade_category(
-            ['courseid' => $course->id, 'fullname' => 'Second Level', 'parent' => $gradecatsumm->id]);
+            ['courseid' => $course->id, 'fullname' => 'Second Level', 'parent' => $gradecatsumm->id]
+        );
         $seconditem1 = $this->getDataGenerator()->create_grade_item(['courseid' => $course->id, 'fullname' => 'Second item 1']);
         $this->move_gradeitem_to_category($seconditem1->id, $gradecatsecond->id);
         $seconditem2 = $this->getDataGenerator()->create_grade_item(['courseid' => $course->id, 'fullname' => 'Second item 2']);
@@ -222,5 +222,4 @@ class gugrades_advanced_testcase extends gugrades_base_testcase {
         $this->gradeitemsecond1 = $seconditem1->id;
         $this->gradeitemsecond2 = $seconditem2->id;
     }
-
 }

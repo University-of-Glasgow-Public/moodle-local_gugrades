@@ -34,7 +34,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2024080500) {
-
         // Define index logugradesgigtuiic (not unique) to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $index = new xmldb_index('logugradesgigtuiic', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid', 'gradetype', 'userid', 'iscurrent']);
@@ -85,7 +84,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024081900) {
-
         // Define table local_gugrades_agg_conversion to be created.
         $table = new xmldb_table('local_gugrades_agg_conversion');
 
@@ -111,7 +109,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024082600) {
-
         // Define field dropped to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $field = new xmldb_field('dropped', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'auditcomment');
@@ -126,7 +123,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024082800) {
-
         // Define field catoverride to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $field = new xmldb_field('catoverride', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'dropped');
@@ -141,7 +137,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024092400) {
-
         // Define field normalisedweight to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $field = new xmldb_field('normalisedweight', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'catoverride');
@@ -156,7 +151,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024101000) {
-
         // Define table local_gugrades_altered_weight to be created.
         $table = new xmldb_table('local_gugrades_altered_weight');
 
@@ -183,7 +177,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024101501) {
-
         // Define field courseid to be added to local_gugrades_altered_weight.
         $table = new xmldb_table('local_gugrades_altered_weight');
         $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, 'id');
@@ -198,7 +191,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024101600) {
-
         // Define field categoryid to be added to local_gugrades_altered_weight.
         $table = new xmldb_table('local_gugrades_altered_weight');
         $field = new xmldb_field('categoryid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, 'courseid');
@@ -213,7 +205,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024111100) {
-
         // Define index local_gugrades_giuiic (not unique) to be dropped form local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $index = new xmldb_index('local_gugrades_giuiic', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid', 'userid', 'iscurrent']);
@@ -237,7 +228,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024111101) {
-
         // Define index local_gugrades_prov (not unique) to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $index = new xmldb_index('local_gugrades_prov', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid', 'userid', 'iscurrent']);
@@ -252,7 +242,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024111200) {
-
         // Define index gugrades_giid (not unique) to be added to local_gugrades_map_item.
         $table = new xmldb_table('local_gugrades_map_item');
         $index = new xmldb_index('gugrades_giid', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid']);
@@ -267,7 +256,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025051301) {
-
         // Changing precision of field admingrade on table local_gugrades_grade to (30).
         $table = new xmldb_table('local_gugrades_grade');
         $field = new xmldb_field('admingrade', XMLDB_TYPE_CHAR, '30', null, null, null, null, 'convertedgrade');
@@ -294,7 +282,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025110600) {
-
         // Define field notavailable to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $field = new xmldb_field('notavailable', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'iserror');
@@ -309,7 +296,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025111700) {
-
         // Define table local_gugrades_resit to be created.
         $table = new xmldb_table('local_gugrades_resit');
 

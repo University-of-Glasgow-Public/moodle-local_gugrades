@@ -29,7 +29,6 @@ namespace local_gugrades\mapping;
  * Handle 22-point scale / Schedule A
  */
 class schedulea extends base {
-
     /**
      * @var array $scaleitems
      */
@@ -46,7 +45,7 @@ class schedulea extends base {
 
         parent::__construct($courseid, $gradeitemid, $converted);
 
-         if (!$converted) {
+        if (!$converted) {
             // If converted, use the built-in grade.
 
             // Get scale. If it doesn't exist, use the internal map
@@ -185,5 +184,4 @@ class schedulea extends base {
 
         return [$converted, $scaleitem];
     }
-
 }

@@ -28,7 +28,6 @@ namespace local_gugrades\activities;
  * Implement other grade types
  */
 class default_activity extends base {
-
     /**
      * Get item type
      * @return string
@@ -36,5 +35,4 @@ class default_activity extends base {
     public function get_itemtype() {
         return $this->itemtype;
     }
-
 }

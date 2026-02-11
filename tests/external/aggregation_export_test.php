@@ -37,8 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Test(s) aggregation export
  */
 final class aggregation_export_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
-
     /**
      * Called before every test
      */
@@ -49,7 +47,6 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
 
         // Install test schema.
         $this->gradeitemids = $this->load_schema('schema1');
-
     }
 
     /**

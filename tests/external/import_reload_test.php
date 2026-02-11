@@ -40,7 +40,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test importing more than once into same grad item.
  */
 final class import_reload_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * @var object $gradecatsummative
      */
@@ -56,7 +55,7 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
     }
 
     /**
-     * Import then import again and so on. 
+     * Import then import again and so on.
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
@@ -67,7 +66,7 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
 
         $userlist = [
             $this->student->id,
-            //$this->student2->id,
+            // $this->student2->id,
         ];
 
         // Assign2 (which is useing scale).
@@ -85,7 +84,7 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
         $this->assertEquals('FIRST', $fred['grades'][0]['gradetype']);
         $this->assertEquals('A3:20', $fred['grades'][0]['displaygrade']);
 
-        // Do the same thing again. 
+        // Do the same thing again.
         $this->import_grades($this->course->id, $this->gradeitemidassign2, $userlist, '', 'SECOND');
 
         // Get capture page to demonstrate it worked.
@@ -102,7 +101,7 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
         $this->assertEquals('SECOND', $fred['grades'][1]['gradetype']);
         $this->assertEquals('A3:20', $fred['grades'][1]['displaygrade']);
 
-        // Add admin grade for Fred. 
+        // Add admin grade for Fred.
         $nothing = write_additional_grade::execute(
             courseid:          $this->course->id,
             gradeitemid:       $this->gradeitemidassign2,
@@ -176,6 +175,4 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
         $this->assertEquals('PROVISIONAL', $fred['grades'][3]['gradetype']);
         $this->assertEquals('A3:20', $fred['grades'][3]['displaygrade']);
     }
-
- 
 }

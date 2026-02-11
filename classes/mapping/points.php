@@ -29,7 +29,6 @@ namespace local_gugrades\mapping;
  * Handle points grades
  */
 class points extends base {
-
     /**
      * "Human" name of this type of grade
      * @return string
@@ -84,5 +83,4 @@ class points extends base {
 
         return [$floatgrade, "$floatgrade"];
     }
-
 }

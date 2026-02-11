@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_levelonecategories web service.
  */
 final class get_levelonecategories_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check correct categories are returned
      *

@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * Import conversion map
  */
 class select_conversion extends \core\event\base {
-
     /**
      * Initialise event
      */

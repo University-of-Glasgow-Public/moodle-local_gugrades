@@ -32,7 +32,6 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * Specific implementation for assignment
  */
 class assign_activity extends base {
-
     /**
      * @var object $assign
      */
@@ -109,7 +108,7 @@ class assign_activity extends base {
 
         // Re-order by uniqueid.
         if ($hidden) {
-            usort($users, function($a, $b) {
+            usort($users, function ($a, $b) {
                 return $a->uniqueid <=> $b->uniqueid;
             });
         }
@@ -176,7 +175,6 @@ class assign_activity extends base {
         // Either of these represent no grade for our purposes.
         // MGU-1293: any kind of 'empty' grade means null (No grade).
         if (($assigngrade !== false) && ($assigngrade->grade != -1) && ($assigngrade->grade != null)) {
-
             return $assigngrade->grade;
         } else {
             return null;
@@ -236,5 +234,4 @@ class assign_activity extends base {
 
         return;
     }
-
 }

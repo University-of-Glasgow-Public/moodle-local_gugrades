@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * additional_grade event
  */
 class delete_conversion_map extends \core\event\base {
-
     /**
      * Initialise event
      */

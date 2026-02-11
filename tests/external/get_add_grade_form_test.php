@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_add_grade_form web service.
  */
 final class get_add_grade_form_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check that expected form structure is returned
      *
@@ -211,6 +210,4 @@ final class get_add_grade_form_test extends \local_gugrades\external\gugrades_ad
         $this->assertEquals('OTHER_' . $id2, $gradetypes[10]['value']);
         $this->assertEquals('Other Variation Two', $gradetypes[10]['label']);
     }
-
-
 }

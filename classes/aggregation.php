@@ -42,7 +42,6 @@ require_once($CFG->dirroot . '/grade/lib.php');
  * Class to store and manipulate grade structures for course
  */
 class aggregation {
-
     /**
      * Store instance(s)
      */
@@ -52,7 +51,6 @@ class aggregation {
      * Constructor is protected to prevent new()
      */
     protected function __construct() {
-
     }
 
     /**
@@ -192,7 +190,7 @@ class aggregation {
         }
 
         // Short names for items.
-        $gradeitems = array_map(function($gi) {
+        $gradeitems = array_map(function ($gi) {
             $gi->shortname = shorten_text($gi->itemname, SHORTNAME_LENGTH);
             $gi->weight = $gi->aggregationcoef;
             $gi->gradeitemid = $gi->id;
@@ -312,8 +310,12 @@ class aggregation {
      */
     public static function get_users(int $courseid, int $categoryid, string $firstname, string $lastname, int $groupid) {
         $context = \context_course::instance($courseid);
-        $users = \local_gugrades\users::get_gradeable_users($context, $firstname,
-            $lastname, $groupid);
+        $users = \local_gugrades\users::get_gradeable_users(
+            $context,
+            $firstname,
+            $lastname,
+            $groupid
+        );
 
         // Add aditional fields.
         foreach ($users as $user) {
@@ -416,14 +418,16 @@ class aggregation {
     private static function get_check_category(int $courseid, int $gradeitemid, int $userid) {
         global $DB;
 
-        $items = $DB->get_records('local_gugrades_grade',
+        $items = $DB->get_records(
+            'local_gugrades_grade',
             [
                 'courseid' => $courseid,
                 'gradeitemid' => $gradeitemid,
                 'gradetype' => 'CATEGORY',
                 'userid' => $userid,
                 'iscurrent' => 1,
-            ]);
+            ]
+        );
 
         // There must be at least one
         $nitems = count($items);
@@ -440,7 +444,7 @@ class aggregation {
         }
 
         return $returnitem;
-}
+    }
 
     /**
      * Add aggregation data for a single user
@@ -468,13 +472,12 @@ class aggregation {
         // Get the grade item corresponding to this category.
         $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
         $gradecatitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
-        //$gradecatitem = $DB->get_record('grade_items',
-        //    ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
+        // $gradecatitem = $DB->get_record('grade_items',
+        // ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
 
         $fields = [];
         $items = [];
         foreach ($columns as $column) {
-
             // Basic fields.
             $fieldname = 'AGG_' . $column->gradeitemid;
             $data = [
@@ -490,7 +493,7 @@ class aggregation {
                 'isscale' => $column->isscale,
                 'dropped' => false,
                 'isadmin' => false,
-                //'hidden' => self::is_grade_hidden($column->gradeitemid, $user->id),
+                // 'hidden' => self::is_grade_hidden($column->gradeitemid, $user->id),
                 'hidden' => in_array($column->gradeitemid, $hiddenids),
                 'overridden' => false,
                 'available' => true,
@@ -547,14 +550,14 @@ class aggregation {
         // This is needed if no aggregation is performed.
         // This is messy :( but check for duplicate CATEGORY grades here and fix.
         $item = self::get_check_category($courseid, $gradecatitem->id, $user->id);
-        //$item = $DB->get_record('local_gugrades_grade',
-        //    [
-        //        'courseid' => $courseid,
-        //        'gradeitemid' => $gradecatitem->id,
-        //        'gradetype' => 'CATEGORY',
-        //        'userid' => $user->id,
-        //        'iscurrent' => 1,
-        //    ], '*', MUST_EXIST);
+        // $item = $DB->get_record('local_gugrades_grade',
+        // [
+        // 'courseid' => $courseid,
+        // 'gradeitemid' => $gradecatitem->id,
+        // 'gradetype' => 'CATEGORY',
+        // 'userid' => $user->id,
+        // 'iscurrent' => 1,
+        // ], '*', MUST_EXIST);
         $user->rawgrade = $item->rawgrade;
         $user->total = $item->convertedgrade;
         $user->displaygrade = $converted && empty($item->admingrade) ? $item->displaygrade . ' (' . $item->rawgrade . ')' : $item->displaygrade;
@@ -563,7 +566,7 @@ class aggregation {
         $user->admingrade = $item->admingrade;
         $weighted = $aggregation->is_strategy_weighted($gcat->aggregation);
         $user->completed = $aggregation->completion($items, $weighted);
-        //$user->error = $item->auditcomment;
+        // $user->error = $item->auditcomment;
         $user->error = '';
         $user->overridden = $item->catoverride;
         $user->itemname = $gcat->fullname;
@@ -590,24 +593,27 @@ class aggregation {
     public static function add_aggregation_fields_to_users(int $courseid, int $gradecategoryid, array $users, array $columns) {
         global $DB;
 
-        //xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
+        // xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
 
         $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
 
         // Get the grad item corresponding to this category.
         $gradecatitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
-        //$gradecatitem = $DB->get_record('grade_items',
-        //    ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
+        // $gradecatitem = $DB->get_record('grade_items',
+        // ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
 
         // Debugging stuff.
         $userhelpercount = 0;
 
         foreach ($users as $id => $user) {
-
             // The agregated 'CATEGORY' field should already be in the grades table.
             // If it's not, we need to aggregate this user.
-            if (!$DB->record_exists('local_gugrades_grade',
-                ['gradeitemid' => $gradecatitem->id, 'gradetype' => 'CATEGORY', 'userid' => $user->id, 'iscurrent' => 1])) {
+            if (
+                !$DB->record_exists(
+                    'local_gugrades_grade',
+                    ['gradeitemid' => $gradecatitem->id, 'gradetype' => 'CATEGORY', 'userid' => $user->id, 'iscurrent' => 1]
+                )
+            ) {
                 self::aggregate_user_helper($courseid, $gradecategoryid, $user->id);
                 $userhelpercount++;
             }
@@ -619,7 +625,7 @@ class aggregation {
         $debug = [];
         $debug[]['line'] = "$userhelpercount User helper calls count.";
 
-        //file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
+        // file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
 
         return [$users, $debug];
     }
@@ -699,7 +705,6 @@ class aggregation {
         $warnings = [];
         $atype = null;
         foreach ($items as $item) {
-
             // If any item schedule is an error, then the result is as well.
             if ($item->schedule == 'E') {
                 $atype = \local_gugrades\GRADETYPE_ERROR;
@@ -754,8 +759,10 @@ class aggregation {
 
         // If we have decided it's points but a conversion map has been applied,
         // then it's whatever that map says.
-        if (($atype == \local_gugrades\GRADETYPE_POINTS) &&
-            ($mapitem = $DB->get_record('local_gugrades_map_item', ['gradecategoryid' => $gradecategoryid]))) {
+        if (
+            ($atype == \local_gugrades\GRADETYPE_POINTS) &&
+            ($mapitem = $DB->get_record('local_gugrades_map_item', ['gradecategoryid' => $gradecategoryid]))
+        ) {
             $mapid = $mapitem->mapid;
             $map = $DB->get_record('local_gugrades_map', ['id' => $mapid], '*', MUST_EXIST);
             $atype = $map->scale == 'schedulea' ? \local_gugrades\GRADETYPE_SCHEDULEA : \local_gugrades\GRADETYPE_SCHEDULEB;
@@ -782,7 +789,6 @@ class aggregation {
         } else {
             throw new \moodle_exception('Unrecognised $atype - ' . $atype);
         }
-
     }
 
     /**
@@ -828,8 +834,8 @@ class aggregation {
         // Get the category and corresponding instance.
         $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
         $gradeitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
-        //$gradeitem = $DB->get_record('grade_items',
-        //    ['iteminstance' => $gradecategoryid, 'itemtype' => 'category'], '*', MUST_EXIST);
+        // $gradeitem = $DB->get_record('grade_items',
+        // ['iteminstance' => $gradecategoryid, 'itemtype' => 'category'], '*', MUST_EXIST);
         if (\local_gugrades\grades::is_gradeitem_grade_type_none($gradeitem)) {
             throw new \moodle_exception('Trying to open category with gradetype of none. grade_item id = ' . $gradeitem->id);
         }
@@ -842,11 +848,11 @@ class aggregation {
             'shortname' => shorten_text($gcat->fullname, SHORTNAME_LENGTH),
             'keephigh' => (int)$gcat->keephigh,
             'droplow' => (int)$gcat->droplow,
-            'excludeempty' => (boolean)$gcat->aggregateonlygraded,
+            'excludeempty' => (bool)$gcat->aggregateonlygraded,
             'aggregation' => (int)$gcat->aggregation,
             'weight' => (float)$gradeitem->aggregationcoef,
             'grademax' => 0.0, // Calculated further down.
-            'isscale' => false,  // Calculated further down.
+            'isscale' => false, // Calculated further down.
             'children' => [],
         ];
 
@@ -855,7 +861,6 @@ class aggregation {
         // the (parent) categoryid field is null. So...
         $childcategories = $DB->get_records('grade_categories', ['parent' => $gradecategoryid]);
         foreach ($childcategories as $childcategory) {
-
             // Ignore gradetype == none grade categories.
             if (!\local_gugrades\grades::is_gradecategory_grade_type_none($childcategory)) {
                 $categorynode->children[] = self::recurse_tree($courseid, $childcategory->id, $force);
@@ -865,7 +870,6 @@ class aggregation {
         // Get grade items in this grade category.
         $items = $DB->get_records('grade_items', ['categoryid' => $gradecategoryid]);
         foreach ($items as $item) {
-
             // Ignore items that are gradetype == none.
             if (\local_gugrades\grades::is_gradeitem_grade_type_none($item)) {
                 continue;
@@ -920,8 +924,8 @@ class aggregation {
 
         // The cache uses the corresponding grade item id.
         $gradeitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
-        //$gradeitem = $DB->get_record('grade_items',
-        //    ['iteminstance' => $gradecategoryid, 'itemtype' => 'category'], '*', MUST_EXIST);
+        // $gradeitem = $DB->get_record('grade_items',
+        // ['iteminstance' => $gradecategoryid, 'itemtype' => 'category'], '*', MUST_EXIST);
 
         // Get cache instance.
         $cache = \cache::make('local_gugrades', 'gradeitems');
@@ -1074,8 +1078,7 @@ class aggregation {
 
         // Need to have a valid aggregation type to actually do the aggregation.
         if ($category->atype == \local_gugrades\GRADETYPE_ERROR) {
-
-            // Additional check for zero weights. This is an exceptional case for atype = ERROR. So check specifically. 
+            // Additional check for zero weights. This is an exceptional case for atype = ERROR. So check specifically.
             if ($aggregation->weight_error($items, $aggmethod)) {
                 $explain = get_string('explain_zeroweights', 'local_gugrades');
                 return [null, null, '', null, $completion, get_string('cannotaggregate', 'local_gugrades'), $explain, false];
@@ -1097,7 +1100,7 @@ class aggregation {
         }
 
         // Ignore unavailable weights for purposes of aggregation. MGU-1224.
-        //$items = self::filter_available($items);
+        // $items = self::filter_available($items);
 
         // Quick check - all items must have a grade.
         foreach ($items as $item) {
@@ -1108,9 +1111,8 @@ class aggregation {
             }
         }
 
-        // If this is a resit category then we may be able to resolve aggregation before doing anything else. 
+        // If this is a resit category then we may be able to resolve aggregation before doing anything else.
         if ($isresitcategory) {
-
             // Find the resit item id (must exist).
             $resititemid = \local_gugrades\grades::get_resit_itemid($category->categoryid, true);
 
@@ -1124,7 +1126,12 @@ class aggregation {
                         [$convertedgrade, $convertedgradevalue] = $aggregation->convert($rawgrade, $atype);
                         $parentgrade = $aggregation->get_grade_for_parent($rawgrade, $convertedgradevalue);
                         $displaygrade = $aggregation->format_displaygrade(
-                            $convertedgrade, $rawgrade, $convertedgradevalue, 0, $level);
+                            $convertedgrade,
+                            $rawgrade,
+                            $convertedgradevalue,
+                            0,
+                            $level
+                        );
 
                         return [$parentgrade, $parentgrade, '', $displaygrade, 0, '', $explain, false];
                     } else {
@@ -1137,7 +1144,6 @@ class aggregation {
         // If a resit category and we got this far, then none of the remaining checks are needed.
         // (We *know* that there cannot be any admin grades)
         if (!$isresitcategory) {
-
             // Pre-process. Can optionally return aggregated grade
             [$admingrade, $items] = $aggregation->pre_process_items($items);
             if ($admingrade) {
@@ -1193,7 +1199,7 @@ class aggregation {
         // Record normalised weights
         self::record_weights($items, $userid);
 
-        // Check for zero weights with whatever items remain. 
+        // Check for zero weights with whatever items remain.
         if ($aggregation->weight_error($items, $aggmethod)) {
             $explain = get_string('explain_zeroweights', 'local_gugrades');
             return [null, null, '', null, $completion, get_string('cannotaggregate', 'local_gugrades'), $explain, false];
@@ -1211,7 +1217,12 @@ class aggregation {
 
             // How do we want to display this?
             $displaygrade = $aggregation->format_displaygrade(
-                $convertedgrade, $aggregatedgrade, $convertedgradevalue, $completion, $level);
+                $convertedgrade,
+                $aggregatedgrade,
+                $convertedgradevalue,
+                $completion,
+                $level
+            );
 
             $explain = get_string('explain_schedule', 'local_gugrades');
 
@@ -1266,7 +1277,7 @@ class aggregation {
             other:          '',
             iscurrent:      true,
             iserror:        $iserror,
-            auditcomment:   $category->error,  // Hide the error message here
+            auditcomment:   $category->error, // Hide the error message here
             ispoints:       !$category->isscale,
             overwrite:      true,
             notavailable:   $category->notavailable,
@@ -1388,7 +1399,7 @@ class aggregation {
         int $userid,
         int $level,
         bool $skipdroplow = false,
-        ) {
+    ) {
 
         // Are there any altered weights at all for this course?
         // This avoids a load of relatively expensive checks.
@@ -1402,7 +1413,6 @@ class aggregation {
         $children = $category->children;
         $items = [];
         foreach ($children as $child) {
-
             // Clear droplow flag. We'll put it back later if required
             if (!$skipdroplow) {
                 self::clear_droplow($child->itemid, $userid);
@@ -1419,13 +1429,16 @@ class aggregation {
             // If this is itself a grade category then we need to recurse to get the aggregated total
             // of this category (and any error). Call with the 'child' segment of the category tree.
             if ($child->iscategory) {
-
                 // Is the category overridden? Nothing more to do if it is.
                 if ($overriddencategory = self::get_overridden_category($child->itemid, $userid)) {
                     [$childcategorytotal, $rawgrade, $admingrade, $display, $completion, $error, $notavailable] = $overriddencategory;
                 } else {
                     [$childcategorytotal, $rawgrade, $admingrade, $display, $completion, $error, $explain, $notavailable] = self::aggregate_user(
-                        $courseid, $child, $userid, $level + 1, $skipdroplow
+                        $courseid,
+                        $child,
+                        $userid,
+                        $level + 1,
+                        $skipdroplow
                     );
                 }
                 $item = (object)[
@@ -1444,10 +1457,9 @@ class aggregation {
                     'notavailable' => $notavailable,
                 ];
             } else {
-
                 // Is there a grade (in MyGrades) for this user?
                 // Provisional will be null if nothing has been imported.
-                //$usercapture = new \local_gugrades\usercapture($courseid, $child->itemid, $userid);
+                // $usercapture = new \local_gugrades\usercapture($courseid, $child->itemid, $userid);
                 $usercapture = \local_gugrades\usercapture::create($courseid, $child->itemid, $userid);
                 $provisional = $usercapture->get_provisional();
 
@@ -1487,9 +1499,8 @@ class aggregation {
         // If this is a points grade, level 2 or deeper, a grade is returned and a map exists then
         // we need to deal with this as a converted grade
         if (($level >= 2) && ($mapid = \local_gugrades\conversion::get_mapid_for_category($category->categoryid)) && $rawgrade) {
-
             // Get original maximum grade for conversion
-            //$grademax = \local_gugrades\grades::get_grademax_for_gradecategory($category->categoryid);
+            // $grademax = \local_gugrades\grades::get_grademax_for_gradecategory($category->categoryid);
             $grademax = $category->grademax;
 
             // Sanity check for conversion.
@@ -1584,7 +1595,7 @@ class aggregation {
 
         // Aggregate this user.
         $aggregated_result = self::aggregate_user($courseid, $tree, $userid, $level, $skipdroplow);
-        [,,,,,,$explain] = $aggregated_result;
+        [, , , , , , $explain] = $aggregated_result;
 
         return $explain;
     }
@@ -1616,7 +1627,6 @@ class aggregation {
 
         // Run through each user and aggregate their grades.
         foreach ($users as $user) {
-
             // Progress.
             $progress = 100 * $count / $numberofusers;
             $count++;
@@ -1631,5 +1641,4 @@ class aggregation {
             self::aggregate_user($courseid, $toplevel, $user->id, 1, $skipdroplow);
         }
     }
-
 }

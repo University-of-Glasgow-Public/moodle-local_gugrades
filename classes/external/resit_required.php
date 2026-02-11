@@ -34,7 +34,6 @@ use core_external\external_value;
  * Write the data from the 'add grade' button
  */
 class resit_required extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -83,5 +82,4 @@ class resit_required extends external_api {
 
         ]);
     }
-
 }

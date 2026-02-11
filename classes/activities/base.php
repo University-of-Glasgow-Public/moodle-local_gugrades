@@ -31,7 +31,6 @@ namespace local_gugrades\activities;
  *
  */
 abstract class base {
-
     /**
      * @var string $firstnamefilter
      */
@@ -125,10 +124,19 @@ abstract class base {
         // whatever module it is. Failing that, just get everybody in the course.
         if ($this->cm) {
             $users = \local_gugrades\users::get_available_users_from_cm(
-                $this->cm, $context, $this->firstnamefilter, $this->lastnamefilter, $this->groupid);
+                $this->cm,
+                $context,
+                $this->firstnamefilter,
+                $this->lastnamefilter,
+                $this->groupid
+            );
         } else {
-            $users = \local_gugrades\users::get_gradeable_users($context, $this->firstnamefilter,
-                $this->lastnamefilter, $this->groupid);
+            $users = \local_gugrades\users::get_gradeable_users(
+                $context,
+                $this->firstnamefilter,
+                $this->lastnamefilter,
+                $this->groupid
+            );
         }
 
         // Displayname.
@@ -215,7 +223,6 @@ abstract class base {
 
         // MGU-1293: If there's no grade return null (No grade)
         if ($grade = $DB->get_record('grade_grades', ['itemid' => $this->gradeitemid, 'userid' => $userid])) {
-
             return $grade->finalgrade;
         } else {
             return null;
@@ -227,7 +234,6 @@ abstract class base {
      * @return string
      */
     public function get_itemtype() {
-
     }
 
     /**
@@ -255,5 +261,4 @@ abstract class base {
     public function unrelease_grades(int $userid) {
         return;
     }
-
 }

@@ -33,7 +33,6 @@ require_once($CFG->dirroot . '/grade/lib.php');
  * Handles admin grades in one place
  */
 class admingrades {
-
     /**
      * Default definitions of admin grades and where they may be used.
      * levels means....
@@ -168,7 +167,7 @@ class admingrades {
                 ],
                 'grandtotal' => true,
                 'items' => true,
-            ]
+            ],
         ];
     }
 
@@ -261,7 +260,7 @@ class admingrades {
     public static function replace_explain(string $explain) {
         $defaults = self::defaults();
         foreach ($defaults as $name => $default) {
-            [$admincode,] = self::get_displaygrade_from_name($name);
+            [$admincode, ] = self::get_displaygrade_from_name($name);
             $explain = str_replace($name, $admincode, $explain);
         }
 
@@ -311,7 +310,6 @@ class admingrades {
 
         $admingrades = [];
         foreach ($defaults as $name => $default) {
-
             // Work out if this is ok for this level / grandtotal
             $send = false;
             if ($grandtotal && self::flag_set($default, 'grandtotal')) {
@@ -367,7 +365,6 @@ class admingrades {
         $admingrades = [];
 
         foreach ($defaults as $name => $default) {
-
             // Has to be in items list.
             if (!self::flag_set($default, 'items')) {
                 continue;
@@ -384,5 +381,4 @@ class admingrades {
 
         return $admingrades;
     }
-
 }

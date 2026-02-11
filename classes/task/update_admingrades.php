@@ -26,7 +26,6 @@
 namespace local_gugrades\task;
 
 class update_admingrades extends \core\task\adhoc_task {
-
     /**
      * Create the task
      * @param string $name

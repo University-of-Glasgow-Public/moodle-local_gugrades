@@ -31,14 +31,15 @@ if ($hassiteconfig) {
 
     if ($ADMIN->fulltree) {
         require_once(dirname(__FILE__) . '/locallib.php');
-        $settingspage->add(new admin_setting_heading('local_gugrades/headingscales',
+        $settingspage->add(new admin_setting_heading(
+            'local_gugrades/headingscales',
             new lang_string('scalevalues', 'local_gugrades'),
-            new lang_string('scalevaluesinfo', 'local_gugrades')));
+            new lang_string('scalevaluesinfo', 'local_gugrades')
+        ));
 
         // Get current site-wide settings.
         $scales = $DB->get_records('scale', ['courseid' => 0]);
         foreach ($scales as $scale) {
-
             $name = "local_gugrades/scalevalue_" . $scale->id;
 
             $items = explode(',', $scale->scale);
@@ -64,26 +65,39 @@ if ($hassiteconfig) {
                     $default .= $item . ', ' . $value . PHP_EOL;
                 }
             }
-            $scalesetting = new admin_setting_configtextarea($name, $scale->name,
+            $scalesetting = new admin_setting_configtextarea(
+                $name,
+                $scale->name,
                 new lang_string('scalevalueshelp', 'local_gugrades'),
-                $default, PARAM_RAW, 30, count($items) + 1);
+                $default,
+                PARAM_RAW,
+                30,
+                count($items) + 1
+            );
             $scalesetting->set_updatedcallback('scale_setting_updated');
             $settingspage->add($scalesetting);
 
             // Add option for type.
             $typename  = "local_gugrades/scaletype_" . $scale->id;
-            $typesetting = new admin_setting_configtext($typename, $scale->name . ' type',
+            $typesetting = new admin_setting_configtext(
+                $typename,
+                $scale->name . ' type',
                 new lang_string('scaletypehelp', 'local_gugrades'),
-                $typedefault, PARAM_ALPHA, 25);
+                $typedefault,
+                PARAM_ALPHA,
+                25
+            );
             $typesetting->set_updatedcallback('scale_setting_updated');
             $settingspage->add($typesetting);
         }
     }
 
     // Heading for conversion stuff.
-    $settingspage->add(new admin_setting_heading('local_gugrades/headingconversion',
-    new lang_string('conversion', 'local_gugrades'),
-    new lang_string('conversioninfo', 'local_gugrades')));
+    $settingspage->add(new admin_setting_heading(
+        'local_gugrades/headingconversion',
+        new lang_string('conversion', 'local_gugrades'),
+        new lang_string('conversioninfo', 'local_gugrades')
+    ));
 
     // Schedule A default.
     $defaulta = '10, 15, 20, 24, 27, 30, 34, 37, 40, 44, 47, 50, 54, 57, 60, 64, 67, 70, 74, 79, 85, 92';
@@ -112,9 +126,11 @@ if ($hassiteconfig) {
     /**
      * General settings
      */
-    $settingspage->add(new admin_setting_heading('local_gugrades/headinggeneral',
-    new lang_string('generalsettings', 'local_gugrades'),
-    new lang_string('generalsettingsinfo', 'local_gugrades')));
+    $settingspage->add(new admin_setting_heading(
+        'local_gugrades/headinggeneral',
+        new lang_string('generalsettings', 'local_gugrades'),
+        new lang_string('generalsettingsinfo', 'local_gugrades')
+    ));
 
     // Maximum number of participants in course.
     $maxparticipants = new admin_setting_configtext(
@@ -141,9 +157,11 @@ if ($hassiteconfig) {
     /**
      * Admingrades definitions
      */
-    $settingspage->add(new admin_setting_heading('local_gugrades/headingadmingrades',
-    new lang_string('admingrades', 'local_gugrades'),
-    new lang_string('admingradesinfo', 'local_gugrades')));
+    $settingspage->add(new admin_setting_heading(
+        'local_gugrades/headingadmingrades',
+        new lang_string('admingrades', 'local_gugrades'),
+        new lang_string('admingradesinfo', 'local_gugrades')
+    ));
 
     $admingrades = \local_gugrades\admingrades::get_settings_data();
     foreach ($admingrades as $name => $admingrade) {
@@ -153,7 +171,7 @@ if ($hassiteconfig) {
             get_string('admingrade_help', 'local_gugrades'),
             $admingrade['default'],
         );
-        $admingradeconfig->set_updatedcallback(function() use ($name) {
+        $admingradeconfig->set_updatedcallback(function () use ($name) {
             $task = \local_gugrades\task\update_admingrades::instance($name);
             \core\task\manager::queue_adhoc_task($task);
         });
@@ -162,9 +180,10 @@ if ($hassiteconfig) {
 
     /**
      * Help
-     * 
+     *
      */
-    $settingspage->add(new admin_setting_heading('local_gugrades/headinghelp',
+    $settingspage->add(new admin_setting_heading(
+        'local_gugrades/headinghelp',
         new lang_string('helpsettings', 'local_gugrades'),
         new lang_string('helpsettingsinfo', 'local_gugrades')
     ));
@@ -191,4 +210,3 @@ if ($hassiteconfig) {
 
     $ADMIN->add('localplugins', $settingspage);
 }
-

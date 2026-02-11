@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_activities web service.
  */
 final class get_write_conversion_maps_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check writing and reading data
      * @covers \local_gugrades\external\get_conversion_maps::execute
@@ -147,7 +146,6 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
         // Try to read it again (should fail).
         $this->expectException('dml_missing_record_exception');
         $mapstuff = get_conversion_map::execute($this->course->id, $mapid, 'schedulea');
-
     }
 
     /**
@@ -1023,7 +1021,6 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
             get_add_grade_form::execute_returns(),
             $form
         );
-
     }
 
     /**
@@ -1040,118 +1037,118 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
             [
                 "band" => "H",
                 "bound" => 0,
-                "grade" => 0
+                "grade" => 0,
             ],
             [
                 "band" => "G2",
                 "bound" => 0,
-                "grade" => 1
+                "grade" => 1,
             ],
             [
                 "band" => "G1",
                 "bound" => 15,
-                "grade" => 2
+                "grade" => 2,
             ],
             [
                 "band" => "F3",
                 "bound" => 20,
-                "grade" => 3
+                "grade" => 3,
             ],
             [
                 "band" => "F2",
                 "bound" => 0,
-                "grade" => 4
+                "grade" => 4,
             ],
             [
                 "band" => "F1",
                 "bound" => 27,
-                "grade" => 5
+                "grade" => 5,
             ],
             [
                 "band" => "E3",
                 "bound" => 30,
-                "grade" => 6
+                "grade" => 6,
             ],
             [
                 "band" => "E2",
                 "bound" => 0,
-                "grade" => 7
+                "grade" => 7,
             ],
             [
                 "band" => "E1",
                 "bound" => 37,
-                "grade" => 8
+                "grade" => 8,
             ],
             [
                 "band" => "D3",
                 "bound" => 40,
-                "grade" => 9
+                "grade" => 9,
             ],
             [
                 "band" => "D2",
                 "bound" => 0,
-                "grade" => 10
+                "grade" => 10,
             ],
             [
                 "band" => "D1",
                 "bound" => 47,
-                "grade" => 11
+                "grade" => 11,
             ],
             [
                 "band" => "C3",
                 "bound" => 50,
-                "grade" => 12
+                "grade" => 12,
             ],
             [
                 "band" => "C2",
                 "bound" => 0,
-                "grade" => 13
+                "grade" => 13,
             ],
             [
                 "band" => "C1",
                 "bound" => 57,
-                "grade" => 14
+                "grade" => 14,
             ],
             [
                 "band" => "B3",
                 "bound" => 60,
-                "grade" => 15
+                "grade" => 15,
             ],
             [
                 "band" => "B2",
                 "bound" => 0,
-                "grade" => 16
+                "grade" => 16,
             ],
             [
                 "band" => "B1",
                 "bound" => 67,
-                "grade" => 17
+                "grade" => 17,
             ],
             [
                 "band" => "A5",
                 "bound" => 0,
-                "grade" => 18
+                "grade" => 18,
             ],
             [
                 "band" => "A4",
                 "bound" => 0,
-                "grade" => 19
+                "grade" => 19,
             ],
             [
                 "band" => "A3",
                 "bound" => 79,
-                "grade" => 20
+                "grade" => 20,
             ],
             [
                 "band" => "A2",
                 "bound" => 0,
-                "grade" => 21
+                "grade" => 21,
             ],
             [
                 "band" => "A1",
                 "bound" => 92,
-                "grade" => 22
-            ]
+                "grade" => 22,
+            ],
         ];
 
         // Write the map back.
@@ -1255,7 +1252,6 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
             get_add_grade_form::execute_returns(),
             $form
         );
-
     }
 
     /**

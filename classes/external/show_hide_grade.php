@@ -34,7 +34,6 @@ use core_external\external_value;
  * Write the data from the 'add grade' button
  */
 class show_hide_grade extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -86,5 +85,4 @@ class show_hide_grade extends external_api {
 
         ]);
     }
-
 }

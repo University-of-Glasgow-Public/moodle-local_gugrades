@@ -41,7 +41,6 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * Test(s) for (both) save_settings and get_settings webservices
  */
 class gugrades_base_testcase extends externallib_advanced_testcase {
-
     /**
      * @var object $course
      */
@@ -120,14 +119,14 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
         global $DB;
 
         foreach ($scale as $value => $item) {
-            $scalevalue = new \stdClass;
+            $scalevalue = new \stdClass();
             $scalevalue->scaleid = $scaleid;
             $scalevalue->item = trim($item);
             $scalevalue->value = $value;
             $DB->insert_record('local_gugrades_scalevalue', $scalevalue);
         }
 
-        $scaletype = new \stdClass;
+        $scaletype = new \stdClass();
         $scaletype->scaleid = $scaleid;
         $scaletype->type = $type;
         $DB->insert_record('local_gugrades_scaletype', $scaletype);
@@ -228,13 +227,13 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
 
     /**
      * Check for MyGrades custom course category and field
-    */
+     */
     protected function custom_course_field() {
         global $DB;
 
         // Check if the category exists
         if (!$category = $DB->get_record('customfield_category', ['name' => 'MyGrades'])) {
-            $category = new \stdClass;
+            $category = new \stdClass();
             $category->name = 'Student MyGrades';
             $category->descriptionformat = 0;
             $category->sortorder = 0;
@@ -251,7 +250,7 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
 
         // Check if the customfield exists
         if (!$field = $DB->get_record('customfield_field', ['shortname' => 'studentmygrades', 'categoryid' => $categoryid])) {
-            $field = new \stdClass;
+            $field = new \stdClass();
             $field->shortname = 'studentmygrades';
             $field->name = 'Enable Student MyGrades';
             $field->type = 'checkbox';
@@ -365,9 +364,9 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
      */
     protected function import_grades(int $courseid, int $gradeitemid, array $userlist, string $fillns = '', string $reason = 'FIRST', string $importadditional = 'update') {
         $status = import_grades_users::execute(
-            courseid:       $courseid, 
-            gradeitemid:    $gradeitemid, 
-            additional:     $importadditional, 
+            courseid:       $courseid,
+            gradeitemid:    $gradeitemid,
+            additional:     $importadditional,
             fillns:         $fillns,
             reason:         $reason,
             other:          '',

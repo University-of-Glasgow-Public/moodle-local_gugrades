@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test has_capability web service.
  */
 final class is_mygrades_available_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check for the default setup which only has two participants
      *

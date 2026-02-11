@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_audit
  */
 class get_capture_export_data extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -50,7 +49,7 @@ class get_capture_export_data extends external_api {
                     'gradetype' => new external_value(PARAM_TEXT, 'Short name of grade type'),
                     'selected' => new external_value(PARAM_BOOL, 'Previously selected by this user'),
                 ]),
-            )
+            ),
         ]);
     }
 

@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_audit
  */
 class upload_csv extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -81,8 +80,15 @@ class upload_csv extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        [$lines, $errorcount, $addcount, $errorlist] = \local_gugrades\api::csv_upload($courseid, $gradeitemid, $groupid,
-            $testrun, $reason, $other, $csv);
+        [$lines, $errorcount, $addcount, $errorlist] = \local_gugrades\api::csv_upload(
+            $courseid,
+            $gradeitemid,
+            $groupid,
+            $testrun,
+            $reason,
+            $other,
+            $csv
+        );
 
         // Log.
         $event = \local_gugrades\event\upload_csv::create([
@@ -128,7 +134,7 @@ class upload_csv extends external_api {
                     'error' => new external_value(PARAM_TEXT, 'Name of error/warning'),
                     'count' => new external_value(PARAM_INT, 'Error/warning count'),
                 ])
-            )
+            ),
         ]);
     }
 }

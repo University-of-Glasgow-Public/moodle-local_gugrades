@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test(s) for get_all_strings webservice
  */
 final class get_capture_page_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * @var int $gradeitemsecondx
      */
@@ -78,7 +77,7 @@ final class get_capture_page_test extends \local_gugrades\external\gugrades_adva
         // Assign2 (which is useing scale).
         $this->import_grades($this->course->id, $this->gradeitemidassign2, $userlist);
 
-        //xhprof_enable(XHPROF_FLAGS_MEMORY + XHPROF_FLAGS_CPU);
+        // xhprof_enable(XHPROF_FLAGS_MEMORY + XHPROF_FLAGS_CPU);
 
         // Get first csv test string.
         $page = get_capture_page::execute($this->course->id, $this->gradeitemidassign2, '', '', 0, false);
@@ -87,7 +86,7 @@ final class get_capture_page_test extends \local_gugrades\external\gugrades_adva
             $page
         );
 
-        //file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
+        // file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
 
         $this->assertIsArray($page);
         $this->assertEquals('assign', $page['itemtype']);
@@ -95,7 +94,6 @@ final class get_capture_page_test extends \local_gugrades\external\gugrades_adva
         $users = $page['users'];
         $this->assertCount(2, $users);
         $this->assertEquals('Juan Perez', $users[1]['displayname']);
-
     }
 
     /**
@@ -116,7 +114,7 @@ final class get_capture_page_test extends \local_gugrades\external\gugrades_adva
             $page
         );
 
-        //var_dump($page); die;
+        // var_dump($page); die;
 
         $this->assertIsArray($page);
         $this->assertTrue($page['gradesupported']);

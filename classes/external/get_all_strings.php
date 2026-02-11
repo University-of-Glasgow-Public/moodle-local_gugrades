@@ -34,7 +34,6 @@
  * Define function get_all_strings
  */
 class get_all_strings extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -68,5 +67,4 @@ class get_all_strings extends external_api {
             ])
         );
     }
-
 }

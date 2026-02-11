@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test has_capability web service.
  */
 final class write_column_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Test that a new column appears in the database
      *
@@ -70,5 +69,4 @@ final class write_column_test extends \local_gugrades\external\gugrades_advanced
         $this->assertCount(1, $columns);
         $this->assertEquals('AGREED', $columns[0]->gradetype);
     }
-
 }

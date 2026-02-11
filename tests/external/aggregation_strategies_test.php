@@ -41,7 +41,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * More test(s) for get_aggregation_page webservice
  */
 final class aggregation_strategies_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummative
      */
@@ -65,7 +64,6 @@ final class aggregation_strategies_test extends \local_gugrades\external\gugrade
 
         // Get the grade category 'summative'.
         $this->gradecatsummative = $DB->get_record('grade_categories', ['fullname' => 'Summative'], '*', MUST_EXIST);
-
     }
 
     /**

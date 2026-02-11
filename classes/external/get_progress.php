@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_audit
  */
 class get_progress extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters

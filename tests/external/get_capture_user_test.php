@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test(s) for get_all_strings webservice
  */
 final class get_capture_user_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * @var int $gradeitemsecondx
      */
@@ -96,5 +95,4 @@ final class get_capture_user_test extends \local_gugrades\external\gugrades_adva
         $this->assertEquals('1234567', $user['idnumber']);
         $this->assertCount(2, $user['grades']);
     }
-
 }

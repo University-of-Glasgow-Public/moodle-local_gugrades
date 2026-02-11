@@ -29,7 +29,6 @@ namespace local_gugrades;
  * Static class implementation to deal with audit trail
  */
 class audit {
-
     /**
      * Write audit
      * Utility function to add stuff to the audit trail
@@ -41,7 +40,7 @@ class audit {
     public static function write(int $courseid, int $relateduserid, int $gradeitemid, string $message) {
         global $USER, $DB;
 
-        $a = new \stdClass;
+        $a = new \stdClass();
         $a->courseid = $courseid;
         $a->userid = $USER->id;
         $a->relateduserid = $relateduserid;
@@ -94,7 +93,6 @@ class audit {
                 }
             }
             if ($gradeitem) {
-
                 // If gradeitem is a category, then more work to do.
                 if ($gradeitem->itemtype == 'category') {
                     $category = $DB->get_record('grade_categories', ['id' => $gradeitem->iteminstance], '*', MUST_EXIST);

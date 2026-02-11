@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_activities web service.
  */
 final class get_activities_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Just check that strings are returned
      *

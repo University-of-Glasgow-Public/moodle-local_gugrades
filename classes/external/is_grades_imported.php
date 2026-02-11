@@ -34,7 +34,6 @@
  * Define function is_grades_imported
  */
 class is_grades_imported extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters

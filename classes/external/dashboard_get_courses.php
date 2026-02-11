@@ -34,7 +34,6 @@ use core_external\external_value;
  * Get the data associated with a grade item
  */
 class dashboard_get_courses extends external_api {
-
     /**
      * Define parameters
      * @return external_function_parameters
@@ -97,5 +96,4 @@ class dashboard_get_courses extends external_api {
             ])
         );
     }
-
 }

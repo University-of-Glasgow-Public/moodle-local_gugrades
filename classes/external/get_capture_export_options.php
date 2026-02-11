@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_audit
  */
 class get_capture_export_options extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters

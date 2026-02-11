@@ -29,7 +29,6 @@ namespace local_gugrades\mapping;
  * Handle Schedule B
  */
 class scheduleb extends base {
-
     /**
      * @var array $scaleitems
      */
@@ -48,7 +47,6 @@ class scheduleb extends base {
 
         // If converted, use the built-in grade.
         if (!$converted) {
-
             // Get scale. Use internal map if not found.
             if (!$scale = $DB->get_record('scale', ['id' => $this->gradeitem->scaleid])) {
                 $map = $this->get_map();
@@ -196,5 +194,4 @@ class scheduleb extends base {
     public function validate_csv(float $grade) {
         return ($grade >= 0) && ($grade <= 22);
     }
-
 }

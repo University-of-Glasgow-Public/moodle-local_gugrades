@@ -36,7 +36,6 @@ define('LOCAL_GUGRADES_NOTFORMENU', false);
  * Handles custom gradetypes all in one place
  */
 class gradetype {
-
     /**
      * Define the different types of grade
      * @param bool $menu - return truncated list for menu
@@ -195,7 +194,6 @@ class gradetype {
         // Sort into order of gradetypes.
         $sortedcolumns = [];
         foreach ($gradetypes as $gradetype => $description) {
-
             // There can be multiple 'other' columns.
             if ($gradetype == 'OTHER') {
                 foreach ($othercolumns as $column) {
@@ -208,5 +206,4 @@ class gradetype {
 
         return $sortedcolumns;
     }
-
 }

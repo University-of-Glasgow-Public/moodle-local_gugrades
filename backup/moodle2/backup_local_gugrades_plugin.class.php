@@ -30,7 +30,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_local_gugrades_plugin extends backup_local_plugin {
-
     /**
      * Returns the format information to attach to course element.
      */
@@ -78,10 +77,9 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
 
         // If userdata is included (pretty much everything).
         if ($userdata) {
-
             // Add map items (converted items or categories).
             // This is part of userdata. If not, a grade item looks converted even though there is no
-            // data. 
+            // data.
             // MGU-1309
             $mapitems = new backup_nested_element('gugrades_map_items');
             $mapitem = new backup_nested_element('gugrades_map_item', null, ['mapid', 'gradeitemid', 'gradecategoryid', 'userid', 'timemodified']);
@@ -99,9 +97,18 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
 
             // Backup grades
             $grades = new backup_nested_element('gugrades_grades');
-            $grade = new backup_nested_element('gugrades_grade', null, 
+            $grade = new backup_nested_element(
+                'gugrades_grade',
+                null,
                 ['gradeitemid', 'userid', 'points', 'rawgrade', 'convertedgrade', 'admingrade', 'displaygrade', 'weightedgrade', 'gradetype', 'columnid', 'iscurrent',
-                'iserror', 'auditby', 'audittimecreated', 'auditcomment', 'dropped', 'catoverride', 'normalisedweight']);
+                'iserror',
+                'auditby',
+                'audittimecreated',
+                'auditcomment',
+                'dropped',
+                'catoverride',
+                'normalisedweight']
+            );
             $grade->annotate_ids('user', 'userid');
             $grade->annotate_ids('user', 'auditby');
             $grades->add_child($grade);
@@ -147,5 +154,4 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
 
         return $plugin;
     }
-
 }

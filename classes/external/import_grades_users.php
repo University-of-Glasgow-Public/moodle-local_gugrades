@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function import_grades_users
  */
 class import_grades_users extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -99,30 +98,31 @@ class import_grades_users extends external_api {
         $userids = $userlist;
         $importcount = 0;
 
-        //\local_gugrades\development::xhprof_start();
+        // \local_gugrades\development::xhprof_start();
 
         // Track progress
         $count = 0;
 
         foreach ($userids as $userid) {
-
             // If additional selected then skip users who already have data.
-            //if ($additional && \local_gugrades\grades::user_has_grades($gradeitemid, $userid)) {
-            //    continue;
-            //}
-            if (\local_gugrades\api::import_grade(
-                courseid:       $courseid,
-                gradeitemid:    $gradeitemid,
-                mapping:        $mapping,
-                activity:       $activity,
-                userid:         intval($userid),
-                additional:     $additional,
-                fillns:         $fillns,
-                reason:         $reason,
-                other:          $other,
-                noaggregation:  false,
-                dryrun:         $dryrun,
-                )) {
+            // if ($additional && \local_gugrades\grades::user_has_grades($gradeitemid, $userid)) {
+            // continue;
+            // }
+            if (
+                \local_gugrades\api::import_grade(
+                    courseid:       $courseid,
+                    gradeitemid:    $gradeitemid,
+                    mapping:        $mapping,
+                    activity:       $activity,
+                    userid:         intval($userid),
+                    additional:     $additional,
+                    fillns:         $fillns,
+                    reason:         $reason,
+                    other:          $other,
+                    noaggregation:  false,
+                    dryrun:         $dryrun,
+                )
+            ) {
                 $importcount++;
             }
 
@@ -132,7 +132,7 @@ class import_grades_users extends external_api {
             \local_gugrades\progress::record($courseid, 0, 'import', intval($progress));
         }
 
-        //\local_gugrades\development::xhprof_stop();
+        // \local_gugrades\development::xhprof_stop();
 
         // Log.
         if (!$dryrun) {
@@ -161,5 +161,4 @@ class import_grades_users extends external_api {
             'importcount' => new external_value(PARAM_INT, 'Number of grades imported'),
         ]);
     }
-
 }

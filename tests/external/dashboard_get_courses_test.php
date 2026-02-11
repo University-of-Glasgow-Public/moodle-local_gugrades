@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_activities web service.
  */
 final class dashboard_get_courses_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Enable customfield setting for course
      * @param int $courseid
@@ -53,7 +52,7 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
 
         // does the field exist
         if (!$data = $DB->get_record('customfield_data', ['fieldid' => $field->id, 'instanceid' => $courseid])) {
-            $data = new \stdClass;
+            $data = new \stdClass();
             $data->fieldid = $field->id;
             $data->instanceid = $courseid;
             $data->intvalue = $enable ? 1 : 0;
@@ -253,5 +252,4 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
         // Should still be three courses (@see MGU-1245).
         $this->assertCount(3, $courses);
     }
-
 }

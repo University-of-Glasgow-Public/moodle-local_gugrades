@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test import_grades_users web service.
  */
 final class points_22_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Get the types and check
      *
@@ -107,5 +106,4 @@ final class points_22_test extends \local_gugrades\external\gugrades_advanced_te
 
         $this->assertFalse($page['showconversion']);
     }
-
 }

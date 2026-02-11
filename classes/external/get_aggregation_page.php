@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function get_aggregation_page
  */
 class get_aggregation_page extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -78,12 +77,18 @@ class get_aggregation_page extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        //\local_gugrades\development::xhprof_start();
+        // \local_gugrades\development::xhprof_start();
 
         $page = \local_gugrades\api::get_aggregation_page(
-            $courseid, $gradecategoryid, $firstname, $lastname, $groupid, $aggregate);
+            $courseid,
+            $gradecategoryid,
+            $firstname,
+            $lastname,
+            $groupid,
+            $aggregate
+        );
 
-        //\local_gugrades\development::xhprof_stop();
+        // \local_gugrades\development::xhprof_stop();
 
         return $page;
     }
@@ -176,5 +181,4 @@ class get_aggregation_page extends external_api {
             ),
         ]);
     }
-
 }

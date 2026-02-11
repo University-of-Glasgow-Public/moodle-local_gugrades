@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test get_dashboard_enabled web service.
  */
 final class get_dashboard_enabled_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Check the enabled state under different circumstances
      *

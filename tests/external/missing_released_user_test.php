@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test import_grades_users web service.
  */
 final class missing_released_user_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Import first grades.
      *
@@ -62,7 +61,7 @@ final class missing_released_user_test extends \local_gugrades\external\gugrades
         );
 
         // Get aggregated data for this category
-        //$userdata = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $this->student->id);
+        // $userdata = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $this->student->id);
 
         // Enrol a new student into the course.
         $newstudent = $this->getDataGenerator()->create_user(['idnumber' => '1234569', 'firstname' => 'Greg', 'lastname' => 'Pedder']);
@@ -70,6 +69,5 @@ final class missing_released_user_test extends \local_gugrades\external\gugrades
 
         // Try to get data for this student.
         $newuserdata = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $newstudent->id);
-
     }
 }

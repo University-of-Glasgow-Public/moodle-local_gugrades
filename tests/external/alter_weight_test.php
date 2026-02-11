@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * More test(s) for get_aggregation_page webservice
  */
 final class alter_weight_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummative
      */
@@ -184,7 +183,5 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
         $this->assertEquals(25.0, $user->fields[1]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[2]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[3]['normalisedweight']);
-
     }
-
 }

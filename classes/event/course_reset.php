@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * release_grades event
  */
 class course_reset extends \core\event\base {
-
     /**
      * Initialise event
      */

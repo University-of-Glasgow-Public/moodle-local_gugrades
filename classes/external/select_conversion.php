@@ -34,7 +34,6 @@ use core_external\external_value;
  * User has selected conversion for gradeitemid
  */
 class select_conversion extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters

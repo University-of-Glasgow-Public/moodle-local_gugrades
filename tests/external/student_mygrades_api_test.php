@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * More test(s) for get_aggregation_page webservice
  */
 final class student_mygrades_api_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummer
      */
@@ -65,7 +64,6 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
 
         // Get the grade category 'Summer exam'.
         $this->gradecatsummer = $DB->get_record('grade_categories', ['fullname' => 'Summer exam'], '*', MUST_EXIST);
-
     }
 
     /**
@@ -135,7 +133,7 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
         // Check student mygrades API returns correct data
         $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsummative->id, $this->student->id);
 
-        //var_dump($user);
+        // var_dump($user);
 
         return;
 
@@ -164,5 +162,4 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
             $page
         );
     }
-
 }

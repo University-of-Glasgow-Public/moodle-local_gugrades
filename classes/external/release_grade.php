@@ -34,7 +34,6 @@ use core_external\external_value;
  * Define function release_grade
  */
 class release_grade extends external_api {
-
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -95,5 +94,4 @@ class release_grade extends external_api {
         return new external_single_structure([
         ]);
     }
-
 }

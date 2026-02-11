@@ -39,4 +39,3 @@ function local_gugrades_extend_navigation_course($parentnode, $course, $context)
     $parentnode->add($name, $url, navigation_node::NODETYPE_LEAF, 'gugrades', null, $icon);
     $parentnode->make_active();
 }
-

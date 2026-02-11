@@ -29,7 +29,6 @@ namespace local_gugrades\event;
  * additional_grade event
  */
 class additional_grade extends \core\event\base {
-
     /**
      * Initialise event
      */

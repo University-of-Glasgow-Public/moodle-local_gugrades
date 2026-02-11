@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test has_capability web service.
  */
 final class show_hide_grade_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Test that setting and clearing condition works
      *
@@ -84,5 +83,4 @@ final class show_hide_grade_test extends \local_gugrades\external\gugrades_advan
         $fred = $page['users'][0];
         $this->assertFalse($fred['gradehidden']);
     }
-
 }

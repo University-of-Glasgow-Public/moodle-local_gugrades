@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Specific tests for list of examples in the Excel file on Teams somewhere.
  */
 final class aggregation_examples_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     protected $gradecatsummative;
 
     protected $gradecatquizzes;
@@ -126,13 +125,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
         );
     }
 
-    //==================================================================
+    // ==================================================================
     // TESTS FROM LEVEL 2+ TAB
-    //==================================================================
+    // ==================================================================
 
     /**
      * Test "With DFR deferred grade"
-     * 
+     *
      * If there is a DFR deferred grade for any of the components at level 2, the level 2 category
      * total automatically becomes DF deferred. This includes if there are other admin grades present.
      */
@@ -140,7 +139,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'DEFERRED');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -161,7 +160,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies"
-     * 
+     *
      * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
      * total automatically becomes IS interruption of studies.
      */
@@ -169,7 +168,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -190,7 +189,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and NS no submission"
-     * 
+     *
      * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
      * total automatically becomes IS interruption of studies.
      */
@@ -198,7 +197,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -219,7 +218,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With NS no submission"
-     * 
+     *
      * If the student gets a NS grade at Leve 2+, they will automatically be awarded
      * a NS grade for the category total
      */
@@ -227,7 +226,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -248,7 +247,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and NS no submission (0 grade)"
-     * 
+     *
      * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
      * total automatically becomes IS interruption of studies.
      */
@@ -256,7 +255,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, '', 'NOSUBMISSION_0');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -277,13 +276,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and EC extenuating circumstances (further opportunity)"
-     * 
+     *
      */
     public function test_with_IS_interruption_of_studies_and_EC_extenuating_circumstances_fo(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'INTERRUPTIONOFSTUDIES'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -304,13 +303,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With EC extenuating circumstances (further opportunity)"
-     * 
+     *
      */
     public function test_with_EC_extenuating_circumstances_fo(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -331,13 +330,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and EC extenuating circumstances (condoned)"
-     * 
+     *
      */
     public function test_with_IS_interruption_of_studies_and_EC_extenuating_circumstances_condoned(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'INTERRUPTIONOFSTUDIES'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -358,13 +357,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With  EC extenuating circumstances (condoned)"
-     * 
+     *
      */
     public function test_with_EC_extenuating_circumstances_condoned(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -385,13 +384,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "All NS no submission"
-     * 
+     *
      */
     public function test_with_all_NS(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['quiz3'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['quiz4'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['quiz5'], $studentid, '', 'NOSUBMISSION');
@@ -412,13 +411,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "All NS0 no submission 0"
-     * 
+     *
      */
     public function test_with_all_NS0(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION_0'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION_0');
         $this->write_grade($this->itemids['quiz3'], $studentid, '', 'NOSUBMISSION_0');
         $this->write_grade($this->itemids['quiz4'], $studentid, '', 'NOSUBMISSION_0');
         $this->write_grade($this->itemids['quiz5'], $studentid, '', 'NOSUBMISSION_0');
@@ -439,13 +438,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "All EC extenuating circumstances (further opportunity)"
-     * 
+     *
      */
     public function test_with_all_EC(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['quiz3'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['quiz4'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['quiz5'], $studentid, '', 'GOODCAUSE_FO');
@@ -466,13 +465,13 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "All ECC extenuating circumstances (condoned)"
-     * 
+     *
      */
     public function test_with_all_ECC(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['quiz3'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['quiz4'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['quiz5'], $studentid, '', 'GOODCAUSE_NR');
@@ -498,7 +497,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -524,7 +523,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -550,7 +549,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -576,7 +575,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
-        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR'); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'B1', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
@@ -603,7 +602,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, 'B2', '');
-        $this->write_grade($this->itemids['quiz2'], $studentid, 'B3', ''); 
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['quiz3'], $studentid, 'A5', '');
         $this->write_grade($this->itemids['quiz4'], $studentid, 'C2', '');
         $this->write_grade($this->itemids['quiz5'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
@@ -622,9 +621,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
         $this->assertEquals('NS', $fred['displaygrade']);
     }
 
-    //==================================================================
+    // ==================================================================
     // TESTS FROM LEVEL 1 TAB
-    //==================================================================
+    // ==================================================================
 
     /**
      * Test "With DFR deferred grade"
@@ -633,7 +632,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'DEFERRED', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -659,7 +658,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -685,7 +684,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -711,7 +710,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION_0'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION_0');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -737,7 +736,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'NOSUBMISSION', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -763,7 +762,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, '', 'NOSUBMISSION');
 
@@ -789,7 +788,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_FO'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -815,7 +814,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -841,7 +840,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, '', 'GOODCAUSE_FO');
 
@@ -867,7 +866,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_NR'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -893,7 +892,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_NR', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -919,7 +918,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, '', 'GOODCAUSE_NR');
 
@@ -945,7 +944,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'NOSUBMISSION', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['ExamA'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['ExamB'], $studentid, '', 'NOSUBMISSION');
 
@@ -971,7 +970,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_FO'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['ExamA'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['ExamB'], $studentid, '', 'GOODCAUSE_FO');
 
@@ -997,7 +996,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_NR', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_NR'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['ExamA'], $studentid, '', 'GOODCAUSE_NR');
         $this->write_grade($this->itemids['ExamB'], $studentid, '', 'GOODCAUSE_NR');
 
@@ -1023,7 +1022,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION'); 
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION');
         $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
         $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
 
@@ -1049,7 +1048,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);
-        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', ''); 
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
         $this->write_grade($this->itemids['ExamA'], $studentid, '', 'GOODCAUSE_FO');
         $this->write_grade($this->itemids['ExamB'], $studentid, '', 'NOSUBMISSION');
 
