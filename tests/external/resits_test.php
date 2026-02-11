@@ -117,7 +117,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
             $result
         );
 
-        // Get the updated data
+        // Get the updated data.
         $treejson = get_activities::execute($this->course->id, $this->gradecatsummative->id, true);
         $treejson = external_api::clean_returnvalue(
             get_activities::execute_returns(),
@@ -155,7 +155,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         );
         $tree = json_decode($treejson['activities']);
 
-        // Look at 'Scale exam'
+        // Look at 'Scale exam'.
         $scaleexam = $tree->categories[1];
         $scaleexamcat = $scaleexam->category;
         $this->assertEquals('Scale exam', $scaleexamcat->fullname);
@@ -174,7 +174,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
             $result
         );
 
-        // Get the updated data
+        // Get the updated data.
         $treejson = get_activities::execute($this->course->id, $this->gradecatsummative->id, true);
         $treejson = external_api::clean_returnvalue(
             get_activities::execute_returns(),
@@ -193,6 +193,8 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
     /**
      * Check aggregation works as expected with combinations of resit selected
      * grades and admin grades.
+     * 
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
     public function test_resit_aggregation(): void {
 
@@ -209,7 +211,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         );
 
         // Write some random grade into 1st sitting.
-        // As resit is a missing grade then this should be the aggregated result
+        // As resit is a missing grade then this should be the aggregated result.
         $nothing = write_additional_grade::execute(
             courseid:          $this->course->id,
             gradeitemid:       $summerfirstsittingid,
@@ -234,7 +236,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
             $page
         );
 
-        // Aggregated result should be the grade that exists
+        // Aggregated result should be the grade that exists.
         $fred = $page['users'][0];
         $this->assertEquals(52, $fred['displaygrade']);
 

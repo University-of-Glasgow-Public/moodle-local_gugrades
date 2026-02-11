@@ -1353,47 +1353,5 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
 
         // Assign1 (which is useing points).
         $this->import_grades($this->course->id, $this->gradeitemidassign1, $userlist);
-
-        // Add additional grade.
-        // IS not currently used
-        /*
-        $nothing = write_additional_grade::execute(
-            $this->course->id,
-            $this->gradeitemidassign1,
-            $this->student->id,
-            'SECOND',
-            '',
-            'IS',
-            0,
-            0,
-            'Test admin grade'
-        );
-        $nothing = external_api::clean_returnvalue(
-            write_additional_grade::execute_returns(),
-            $nothing
-        );
-
-        // Apply the test conversion map to Assign1.
-        $nothing = select_conversion::execute($this->course->id, $this->gradeitemidassign1, 0, $mapida);
-        $nothing = external_api::clean_returnvalue(
-            select_conversion::execute_returns(),
-            $nothing
-        );
-
-        // Get capture page.
-        $page = get_capture_page::execute($this->course->id, $this->gradeitemidassign1, '', '', 0, false);
-        $page = external_api::clean_returnvalue(
-            get_capture_page::execute_returns(),
-            $page
-        );
-
-        $fred = $page['users'][0];
-        $grades = $fred['grades'];
-        $this->assertCount(4, $grades);
-        $this->assertEquals('IS', $grades[2]['displaygrade']);
-        $this->assertEquals('CONVERTED', $grades[2]['gradetype']);
-        $this->assertEquals('IS', $grades[3]['displaygrade']);
-        $this->assertEquals('PROVISIONAL', $grades[3]['gradetype']);
-        */
     }
 }

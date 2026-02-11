@@ -87,14 +87,14 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Check student mygrades API returns correct data
+        // Check student mygrades API returns correct data.
         $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
         $this->assertEquals(25.0, $user->fields[0]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[1]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[2]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[3]['normalisedweight']);
 
-        // Get alter weights form
+        // Get alter weights form.
         $form = get_alter_weight_form::execute($this->course->id, $gradecatsummer->id, $this->student->id);
         $form = external_api::clean_returnvalue(
             get_alter_weight_form::execute_returns(),
@@ -108,7 +108,7 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
         $this->assertCount(4, $items);
         $this->assertEquals('Question 4', $items[3]['fullname']);
 
-        // Create items array for changing some weights
+        // Create items array for changing some weights.
         $saveitems = [
             [
                 'gradeitemid' => $items[0]['gradeitemid'],
@@ -120,11 +120,18 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
             ],
         ];
 
-        // Reason for the update
+        // Reason for the update.
         $reason = 'Why ever not?';
 
         // Save weights.
-        $nothing = save_altered_weights::execute($this->course->id, $gradecatsummer->id, $this->student->id, false, $reason, $saveitems);
+        $nothing = save_altered_weights::execute(
+            $this->course->id,
+            $gradecatsummer->id,
+            $this->student->id,
+            false,
+            $reason,
+            $saveitems
+        );
         $nothing = external_api::clean_returnvalue(
             save_altered_weights::execute_returns(),
             $nothing
@@ -147,15 +154,26 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
         $users = $page['users'];
         $this->assertTrue($users[0]['alteredweight']);
 
-        // Check student mygrades API returns correct data
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
+        // Check student mygrades API returns correct data.
+        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id,
+            $summercategoryid,
+            $this->student->id
+        );
         $this->assertEquals(12.64368, $user->fields[0]['normalisedweight']);
         $this->assertEquals(10.72797, $user->fields[1]['normalisedweight']);
         $this->assertEquals(38.31418, $user->fields[2]['normalisedweight']);
         $this->assertEquals(38.31418, $user->fields[3]['normalisedweight']);
 
         // Revert weights.
-        $nothing = save_altered_weights::execute($this->course->id, $gradecatsummer->id, $this->student->id, true, '', []);
+        $nothing = save_altered_weights::execute(
+            $this->course->id,
+            $gradecatsummer->id,
+            $this->student->id,
+            true,
+            '',
+            []
+        );
         $nothing = external_api::clean_returnvalue(
             save_altered_weights::execute_returns(),
             $nothing
@@ -177,7 +195,7 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
         $users = $page['users'];
         $this->assertFalse($users[0]['alteredweight']);
 
-        // Check student mygrades API returns correct data
+        // Check student mygrades API returns correct data.
         $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
         $this->assertEquals(25.0, $user->fields[0]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[1]['normalisedweight']);

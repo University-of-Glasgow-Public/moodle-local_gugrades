@@ -216,7 +216,7 @@ final class csv_capture_test extends \local_gugrades\external\gugrades_advanced_
         $errorcount = $data['errorcount'];
         $addcount = $data['addcount'];
 
-        // Get the capture page
+        // Get the capture page.
         $page = get_capture_page::execute($this->course->id, $this->gradeitemidassign2, '', '', 0, false);
         $page = external_api::clean_returnvalue(
             get_capture_page::execute_returns(),
@@ -262,6 +262,8 @@ final class csv_capture_test extends \local_gugrades\external\gugrades_advanced_
     /**
      * MGU-1247
      * Check that H grades are accepted
+     * 
+     * @covers \local_gugrades\external\upload_csv::execute
      */
     public function test_mgu_1247(): void {
 

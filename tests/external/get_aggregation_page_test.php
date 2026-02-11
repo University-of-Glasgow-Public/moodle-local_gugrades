@@ -95,14 +95,10 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         // Install test data for student.
         $this->load_data('data1a', $this->student->id);
 
-        // xhprof_enable(XHPROF_FLAGS_MEMORY + XHPROF_FLAGS_CPU);
-
         // Import ALL gradeitems.
         foreach ($this->gradeitemids as $gradeitemid) {
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
-
-        // file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
 
         // Get first csv test string.
         $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
@@ -142,7 +138,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $nothing
         );
 
-        // Get page again after recalculation
+        // Get page again after recalculation.
         $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, false);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),
@@ -176,7 +172,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $this->student->id,
         ];
 
-        // Reset caches
+        // Reset caches.
         \local_gugrades\api::reset_all_caches();
 
         // Install test data for student.
@@ -441,7 +437,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Get categoryid for 'Scale exam' which should be Schedule A
+        // Get categoryid for 'Scale exam' which should be Schedule A.
         $scaleexamid = $this->get_grade_category('Scale exam');
 
         // Get aggregation page for above.
@@ -451,10 +447,11 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $page
         );
 
-        // Get corresponding itemid for Scaleexam
-        $scaleexamitem = $DB->get_record('grade_items', ['itemtype' => 'category', 'iteminstance' => $scaleexamid], '*', MUST_EXIST);
+        // Get corresponding itemid for Scaleexam.
+        $scaleexamitem = $DB->get_record('grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $scaleexamid], '*', MUST_EXIST);
 
-        // Get the corresponding form for this category
+        // Get the corresponding form for this category.
         $form = get_add_grade_form::execute($this->course->id, $scaleexamitem->id, $this->student->id);
         $form = external_api::clean_returnvalue(
             get_add_grade_form::execute_returns(),
@@ -523,7 +520,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Get categoryid for 'Summer exam' which should be Points
+        // Get categoryid for 'Summer exam' which should be Points.
         $summerexamid = $this->get_grade_category('Summer exam');
 
         // Get aggregation page for above.
@@ -533,10 +530,11 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $page
         );
 
-        // Get corresponding itemid for summerexam
-        $summerexamitem = $DB->get_record('grade_items', ['itemtype' => 'category', 'iteminstance' => $summerexamid], '*', MUST_EXIST);
+        // Get corresponding itemid for summerexam.
+        $summerexamitem = $DB->get_record('grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $summerexamid], '*', MUST_EXIST);
 
-        // Get the corresponding form for this category
+        // Get the corresponding form for this category.
         $form = get_add_grade_form::execute($this->course->id, $summerexamitem->id, $this->student->id);
         $form = external_api::clean_returnvalue(
             get_add_grade_form::execute_returns(),
@@ -544,7 +542,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         );
 
         // This should not be possible as overriding level 2 points
-        // is not permitted. Must first be converted
+        // is not permitted. Must first be converted.
         $this->assertFalse($form['available']);
 
         // Attempting to write anyway should lead to an exception.
@@ -564,47 +562,6 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             write_additional_grade::execute_returns(),
             $nothing
         );
-
-        // TODO - really needs a third level points test.
-
-        /*
-        // This should reflect Schedule A.
-        $this->assertFalse($form['usescale']);
-        $this->assertTrue($form['iscategory']);
-        $this->assertEquals('Summer exam', $form['itemname']);
-        $this->assertCount(0, $form['scalemenu']);
-        $this->assertCount(9, $form['gradetypes']);
-        $this->assertCount(4, $form['adminmenu']);
-
-        // Write a new grade for this category.
-        $nothing = write_additional_grade::execute(
-            courseid:       $this->course->id,
-            gradeitemid:    $summerexamitem->id,
-            userid:         $this->student->id,
-            reason:         'CATEGORY',
-            other:          '',
-            admingrade:     '',
-            scale:          0,
-            grade:          72.5,
-            notes:          'Test notes'
-        );
-        $nothing = external_api::clean_returnvalue(
-            write_additional_grade::execute_returns(),
-            $nothing
-        );
-
-        // Get aggregation page for above.
-        $page = get_aggregation_page::execute($this->course->id, $summerexamid, '', '', 0, false);
-        $page = external_api::clean_returnvalue(
-            get_aggregation_page::execute_returns(),
-            $page
-        );
-
-        $this->assertEquals('P', $page['atype']);
-        $users = $page['users'];
-        $this->assertEquals('72.5', $users[0]['displaygrade']);
-        $this->assertEquals(72.5, $users[0]['rawgrade']);
-        */
     }
 
     /**
@@ -641,10 +598,11 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $page
         );
 
-        // Get corresponding itemid for summerexam
-        $bexamitem = $DB->get_record('grade_items', ['itemtype' => 'category', 'iteminstance' => $bexamid], '*', MUST_EXIST);
+        // Get corresponding itemid for summerexam.
+        $bexamitem = $DB->get_record('grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $bexamid], '*', MUST_EXIST);
 
-        // Get the corresponding form for this category
+        // Get the corresponding form for this category.
         $form = get_add_grade_form::execute($this->course->id, $bexamitem->id, $this->student->id);
         $form = external_api::clean_returnvalue(
             get_add_grade_form::execute_returns(),
@@ -716,7 +674,8 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
 
         // Get categoryid and item idfor 'Scale exam' which should be Schedule A
         $scaleexamid = $this->get_grade_category('Scale exam');
-        $scaleexamitem = $DB->get_record('grade_items', ['itemtype' => 'category', 'iteminstance' => $scaleexamid], '*', MUST_EXIST);
+        $scaleexamitem = $DB->get_record('grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $scaleexamid], '*', MUST_EXIST);
 
         // Get aggregation page for above.
         $page = get_aggregation_page::execute($this->course->id, $scaleexamid, '', '', 0, false);
@@ -725,16 +684,17 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $page
         );
 
-        // Confirm that Schedule B exam is grades missing
+        // Confirm that Schedule B exam is grades missing.
         $this->assertFalse($page['toplevel']);
         $users = $page['users'];
         $this->assertEquals('Grades missing', $users[0]['displaygrade']);
         $this->assertEquals('Schedule B exam', $users[0]['fields'][0]['itemname']);
         $this->assertEquals('Grades missing', $users[0]['fields'][0]['display']);
 
-        // Override (missing) grade in Schedule B exam
+        // Override (missing) grade in Schedule B exam.
         $bexamid = $this->get_grade_category('Schedule B exam');
-        $bexamitem = $DB->get_record('grade_items', ['itemtype' => 'category', 'iteminstance' => $bexamid], '*', MUST_EXIST);
+        $bexamitem = $DB->get_record('grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $bexamid], '*', MUST_EXIST);
 
         // Get the corresponding form for this category
         $form = get_add_grade_form::execute($this->course->id, $bexamitem->id, $this->student->id);
@@ -822,7 +782,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         );
 
         // Confirm that Schedule B exam is grades missing
-        // How is was before the additional grade
+        // How is was before the additional grade.
         $this->assertFalse($page['toplevel']);
         $users = $page['users'];
         $this->assertEquals('Grades missing', $users[0]['displaygrade']);
@@ -877,7 +837,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $nothing
         );
 
-        // Write an H0 grade to check for 0 handling
+        // Write an H0 grade to check for 0 handling.
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
             gradeitemid:    $bexamitem->id,
@@ -933,18 +893,19 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Get the gradeitemid for summative/
+        // Get the gradeitemid for summative.
         $summativeid = $this->get_grade_category('Summative');
-        $summativeitem = $DB->get_record('grade_items', ['itemtype' => 'category', 'iteminstance' => $summativeid], '*', MUST_EXIST);
+        $summativeitem = $DB->get_record('grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $summativeid], '*', MUST_EXIST);
 
-        // Check for summative category
+        // Check for summative category.
         $form = get_add_grade_form::execute($this->course->id, $summativeitem->id, $this->student->id);
         $form = external_api::clean_returnvalue(
             get_add_grade_form::execute_returns(),
             $form
         );
 
-        // This cannot aggregate (as schema is mostly points), so should be an error condition
+        // This cannot aggregate (as schema is mostly points), so should be an error condition.
         $this->assertTrue($form['error']);
     }
 }

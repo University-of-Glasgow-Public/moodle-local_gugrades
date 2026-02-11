@@ -164,7 +164,6 @@ final class write_additional_grade_test extends \local_gugrades\external\gugrade
         // Import grades.
         $userlist = [
             $this->student->id,
-            // $this->student2->id,
         ];
 
         // Assign2 (which is using scale).
