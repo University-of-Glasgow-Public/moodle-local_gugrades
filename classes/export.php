@@ -53,7 +53,7 @@ class export {
      * Is enrol_gudatabase enabled?
      * We can't use this in unit tests, so we need to check
      */
-    private static function is_enrol_gudatabase_enabled() {
+    public static function is_enrol_gudatabase_enabled() {
         $manager = \core\plugin_manager::instance();
         $plugins = $manager->get_installed_plugins('enrol');
 

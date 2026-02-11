@@ -289,6 +289,11 @@ class users {
     public static function get_course_code(int $courseid, int $userid) {
         global $DB;
 
+        // Is enrol_gudatabase installed at all?
+        if (!\local_gugrades\export::is_enrol_gudatabase_enabled()) {
+            return '';
+        }
+
         if (
             $gudatabasecode = $DB->get_record(
                 'enrol_gudatabase_users',
