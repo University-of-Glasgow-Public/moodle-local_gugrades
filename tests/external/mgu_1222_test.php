@@ -89,12 +89,12 @@ final class mgu_1222_test extends \local_gugrades\external\gugrades_advanced_tes
 
         // Check for grades in Moodle Gradebook
         // Grades should have been copied to the Gradebook.
-        $mgrades = array_values(
-            $DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]));
+        $mgrades = $DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]);
+        $mgrades = array_values($mgrades);
         $this->assertEquals('21.00000', $mgrades[0]->finalgrade);
         $this->assertEquals('Your work is terrible', $mgrades[0]->feedback);
 
-        // (un)release grade for $assignment2.
+        // ...(un)release grade for $assignment2.
         $status = release_grades::execute($this->course->id, $this->gradeitemidassign2, 0, true);
         $status = external_api::clean_returnvalue(
             release_grades::execute_returns(),
@@ -116,9 +116,8 @@ final class mgu_1222_test extends \local_gugrades\external\gugrades_advanced_tes
 
         // Check for grades in Moodle Gradebook
         // Grades should have been removed from the Gradebook.
-        $mgrades = array_values(
-            $DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]));
+        $mgrades = $DB->get_records('grade_grades', ['userid' => $this->student->id, 'itemid' => $this->gradeitemidassign2]);
+        $mgrades = array_values($mgrades);
         $this->assertNull($mgrades[0]->finalgrade);
-
     }
 }

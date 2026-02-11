@@ -369,7 +369,7 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
         string $fillns = '',
         string $reason = 'FIRST',
         string $importadditional = 'update'
-        ) {
+    ) {
         $status = import_grades_users::execute(
             courseid:       $courseid,
             gradeitemid:    $gradeitemid,

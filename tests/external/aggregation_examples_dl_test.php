@@ -67,7 +67,7 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         $this->gradecatsummative = $DB->get_record('grade_categories', ['fullname' => 'Summative'], '*', MUST_EXIST);
         $this->gradecatquizzes = $DB->get_record('grade_categories', ['fullname' => 'Quizzes'], '*', MUST_EXIST);
 
-        // Get the itemids
+        // Get the itemids.
         for ($i = 1; $i <= 4; $i++) {
             $item = $DB->get_record('grade_items', ['itemname' => 'Quiz ' . $i], '*', MUST_EXIST);
             $itemids['quiz' . $i] = $item->id;
@@ -130,14 +130,16 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
         );
     }
 
-    // ==================================================================
-    // TESTS FROM DROP LOWEST PRIORITY TAB
-    // ==================================================================
+    /**
+     * TESTS FROM DROP LOWEST PRIORITY TAB
+    */
 
     /**
      * Test "With NS grade and 0 grade both present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_and_0_grade(): void {
+    public function test_with_ns_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -162,8 +164,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With NS0 grade and 0 grade both present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS0_and_0_grade(): void {
+    public function test_with_ns0_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
@@ -188,8 +192,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With EC grade and 0 grade both present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_EC_and_0_grade(): void {
+    public function test_with_ec_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
@@ -216,8 +222,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With ECC grade and 0 grade both present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_ECC_and_0_grade(): void {
+    public function test_with_ecc_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
@@ -242,8 +250,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With ECC grade, NS grade and 0 grade present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_ECC_NS_and_0_grade(): void {
+    public function test_with_ecc_ns_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
@@ -268,8 +278,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With ECC grade, NS0 grade and 0 grade present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_ECC_NS0_and_0_grade(): void {
+    public function test_with_ecc_ns0_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
@@ -294,8 +306,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With NS, EC grades and 0 grade present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_EC_and_0_grade(): void {
+    public function test_with_ns_ec_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -322,8 +336,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With NS, ECC grades and 0 grade present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_ECC_and_0_grade(): void {
+    public function test_with_ns_ecc_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -348,8 +364,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With NS, NS0 grades and 0 grade present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_NS0_and_0_grade(): void {
+    public function test_with_ns_ns0_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -374,8 +392,10 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Test "With EC, ECC grades and 0 grade present"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_EC_ECC_and_0_grade(): void {
+    public function test_with_ec_ecc_and_0_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
