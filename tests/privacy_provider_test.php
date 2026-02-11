@@ -26,11 +26,11 @@ namespace local_gugrades;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\writer;
-use format_topcoll\privacy\provider;
+use local_gugrades\privacy\provider;
 
 /**
  * Privacy unit tests for the Collapsed Topics course format.
- * @group format_topcoll
+ * @group local_gugrades
  */
 final class privacy_provider_test extends \core_privacy\tests\provider_testcase {
     /**
