@@ -50,6 +50,17 @@ class export {
     }
 
     /**
+     * Is enrol_gudatabase enabled?
+     * We can't use this in unit tests, so we need to check
+     */
+    private static function is_enrol_gudatabase_enabled() {
+        $manager = \core\plugin_manager::instance();
+        $plugins = $manager->get_installed_plugins('enrol');
+
+        return array_key_exists('gudatabase', $plugins);
+    }
+
+    /**
      * Get filename
      * We need to get the code(s) for this course, discovered by enrol_gudatabase
      * There can be only 1. Failing that, we just use a default filename.
@@ -65,7 +76,11 @@ class export {
         $year = date('Y', $course->startdate);
 
         // Get any records for this course from gudatabase
-        $codes = array_values($DB->get_records('enrol_gudatabase_codes', ['courseid' => $courseid]));
+        if (self::is_enrol_gudatabase_enabled()) {
+            $codes = array_values($DB->get_records('enrol_gudatabase_codes', ['courseid' => $courseid]));
+        } else {
+            $codes = [];
+        }
 
         // Create standard "MyCampus" format ONLY if there is a single code
         if (count($codes) == 1) {
