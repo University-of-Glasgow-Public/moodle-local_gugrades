@@ -468,7 +468,7 @@ final class mgu_1110_test extends \local_gugrades\external\gugrades_aggregation_
         // Get the grade category 'Summer exam'.
         $gradecatsummer = $DB->get_record('grade_categories', ['fullname' => 'Summer exam'], '*', MUST_EXIST);
 
-        // Set to droplow=1
+        // Set to droplow=1.
         $gradecatsummer->droplow = 1;
         $DB->update_record('grade_categories', $gradecatsummer);
 
@@ -553,7 +553,7 @@ final class mgu_1110_test extends \local_gugrades\external\gugrades_aggregation_
         );
 
         // Get aggregation page with all MV0.
-        // Result should be MV0
+        // Result should be MV0.
         $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, false);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),

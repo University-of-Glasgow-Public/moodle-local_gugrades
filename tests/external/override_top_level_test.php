@@ -99,7 +99,7 @@ final class override_top_level_test extends \local_gugrades\external\gugrades_ag
             $page
         );
 
-        // Should be 'grades missing'
+        // Should be 'grades missing'.
         $this->assertEquals('Grades missing', $page['users'][0]['displaygrade']);
 
         // Check override form.
@@ -183,7 +183,7 @@ final class override_top_level_test extends \local_gugrades\external\gugrades_ag
             $page
         );
 
-        // Should be back to 'grades missing'
+        // Should be back to 'grades missing'.
         $this->assertEquals('Grades missing', $page['users'][0]['displaygrade']);
 
         // Get the history for this grade category.
@@ -199,7 +199,7 @@ final class override_top_level_test extends \local_gugrades\external\gugrades_ag
         $this->assertEquals('Grades missing', $history[2]['displaygrade']);
 
         // Write grade to level one total again.
-        // This time, we'll read data for single user
+        // This time, we'll read data for single user.
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
             gradeitemid:    $this->summativeitem->id,

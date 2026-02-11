@@ -100,7 +100,7 @@ final class release_aggregated_grades_test extends \local_gugrades\external\gugr
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Get grade categoryid for summer exam
+        // Get grade categoryid for summer exam.
         $summercategoryid = $this->get_grade_category('Summer exam');
 
         // Convert summer exam.
@@ -134,9 +134,6 @@ final class release_aggregated_grades_test extends \local_gugrades\external\gugr
 
         // Released grades should be there (where there are grades to release).
         $grades = array_values($grades);
-        // $this->assertCount(3, $grades);
-        // $this->assertEquals('RELEASED', $grades[1]->gradetype);
-        // $this->assertEquals('A2', $grades[1]->displaygrade);
 
         // Get the page for the Summer exam. Should now have a released column.
         $page = get_aggregation_page::execute($this->course->id, $summercategoryid, '', '', 0, true);
@@ -265,7 +262,7 @@ final class release_aggregated_grades_test extends \local_gugrades\external\gugr
         $this->assertFalse($user->mismatch);
         $this->assertFalse($user->parent->released);
 
-        // Release grades for Item 1 to check that is flagged properly
+        // Release grades for Item 1 to check that is flagged properly.
         $item1id = $this->get_gradeitemid('Item 1');
         $status = release_grades::execute($this->course->id, $item1id, 0, false);
         $status = external_api::clean_returnvalue(

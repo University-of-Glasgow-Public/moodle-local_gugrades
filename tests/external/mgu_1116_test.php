@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 /**
  * Test for inconsistent NS aggregation - MGU-1116
  */
-final class MGU_1116_test extends \local_gugrades\external\gugrades_aggregation_testcase {
+final class mgu_1116_test extends \local_gugrades\external\gugrades_aggregation_testcase {
 
     /**
      * @var object $gradecatsummative
@@ -67,7 +67,7 @@ final class MGU_1116_test extends \local_gugrades\external\gugrades_aggregation_
      */
     protected function write_grade(int $courseid, int $gradeitemid, int $grade, string $admingrade) {
 
-            // Override category grade for gradecatsummer
+            // Override category grade for gradecatsummer.
             $nothing = write_additional_grade::execute(
                 courseid:       $courseid,
                 gradeitemid:    $gradeitemid,
@@ -127,7 +127,7 @@ final class MGU_1116_test extends \local_gugrades\external\gugrades_aggregation_
         $fred = $page['users'][0];
         $this->assertEquals(33.33333, $fred['displaygrade']);
 
-        // Change Question 4 to NS
+        // Change Question 4 to NS.
         $q4id = $this->get_gradeitemid('Question 4');
         $this->write_grade($courseid, $q4id, 0, 'NOSUBMISSION');
 
@@ -141,7 +141,7 @@ final class MGU_1116_test extends \local_gugrades\external\gugrades_aggregation_
         $fred = $page['users'][0];
         $this->assertEquals(14.44444, $fred['displaygrade']);
 
-        // Change Question 3 to 0
+        // Change Question 3 to 0.
         $q4id = $this->get_gradeitemid('Question 3');
         $this->write_grade($courseid, $q4id, 0, '');
 
@@ -155,5 +155,4 @@ final class MGU_1116_test extends \local_gugrades\external\gugrades_aggregation_
         $fred = $page['users'][0];
         $this->assertEquals(10, $fred['displaygrade']);
     }
-
 }

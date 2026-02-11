@@ -217,7 +217,7 @@ final class aggregation_schema7_test extends \local_gugrades\external\gugrades_a
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_EC(): void {
+    public function test_ec(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -260,32 +260,15 @@ final class aggregation_schema7_test extends \local_gugrades\external\gugrades_a
         $fred = $page['users'][0];
         $this->assertEquals("EC", $fred['displaygrade']);
         $this->assertEquals(0.0, $fred['rawgrade']);
-
-        // Set IS for question 7. Should now be IS.
-        // IS IS NOT IMPLEMENTED
-        /*
-        $this->apply_admingrade('Question 7', $this->student->id, 'IS');
-
-        // Get aggregation page for above.
-        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummer->id, '', '', 0, true);
-        $page = external_api::clean_returnvalue(
-            get_aggregation_page::execute_returns(),
-            $page
-        );
-
-        $this->assertFalse($page['toplevel']);
-        $this->assertEquals('A', $page['atype']);
-        $fred = $page['users'][0];
-        $this->assertEquals("IS", $fred['displaygrade']);
-        $this->assertEquals(0, $fred['rawgrade']);
-        */
     }
 
     /**
      * Test for MGU-1184
      * Reason text is appearing in sub-category total column when grade is overridden
+     * 
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_mgu_1184() {
+    public function test_mgu_1184(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);

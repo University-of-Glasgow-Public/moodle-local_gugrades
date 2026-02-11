@@ -131,7 +131,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         $fred = $users[0];
         $this->assertEquals("47.23333", $fred['fields'][0]['display']);
 
-        // Test aggregation recalculate
+        // Test aggregation recalculate.
         $nothing = recalculate::execute($this->course->id, $this->gradecatsummative->id);
         $nothing = external_api::clean_returnvalue(
             recalculate::execute_returns(),
@@ -596,7 +596,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Get categoryid for 'Summer exam' which should be Points
+        // Get categoryid for 'Summer exam' which should be Points.
         $bexamid = $this->get_grade_category('Schedule B exam');
 
         // Get aggregation page for above.
@@ -684,7 +684,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Get categoryid and item idfor 'Scale exam' which should be Schedule A
+        // Get categoryid and item idfor 'Scale exam' which should be Schedule A.
         $scaleexamid = $this->get_grade_category('Scale exam');
         $scaleexamitem = $DB->get_record(
             'grade_items',
@@ -716,7 +716,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             MUST_EXIST
         );
 
-        // Get the corresponding form for this category
+        // Get the corresponding form for this category.
         $form = get_add_grade_form::execute($this->course->id, $bexamitem->id, $this->student->id);
         $form = external_api::clean_returnvalue(
             get_add_grade_form::execute_returns(),
@@ -893,6 +893,8 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test getting the form for top-level total
+     * 
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
     public function test_total_override_error(): void {
         global $DB;
