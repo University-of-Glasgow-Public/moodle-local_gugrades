@@ -382,7 +382,7 @@ class custom extends base {
      */
     protected function save_preferences(int $gradecategoryid, array $form) {
 
-        // Convert form to a simple array
+        // Convert form to a simple array.
         $preferences = [];
         foreach ($form as $record) {
             if ($record['selected']) {
@@ -465,7 +465,7 @@ class custom extends base {
                     continue;
                 }
 
-                // Ignore the non-data flags
+                // Ignore the non-data flags.
                 if ($ident == 'weights') {
                     continue;
                 }
