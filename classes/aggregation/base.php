@@ -25,6 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  * @phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameLowerCase
+ * @phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
  */
 
 namespace local_gugrades\aggregation;

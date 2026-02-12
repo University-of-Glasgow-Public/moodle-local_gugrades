@@ -141,8 +141,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
      *
      * If there is a DFR deferred grade for any of the components at level 2, the level 2 category
      * total automatically becomes DF deferred. This includes if there are other admin grades present.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_DFR_deferred_grade(): void {
+    public function test_with_dfr_deferred_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'DEFERRED');
@@ -170,8 +172,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
      *
      * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
      * total automatically becomes IS interruption of studies.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_IS_interruption_of_studies_grade(): void {
+    public function test_with_is_interruption_of_studies_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
@@ -199,8 +203,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
      *
      * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
      * total automatically becomes IS interruption of studies.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_IS_interruption_of_studies_and_NS_no_submission(): void {
+    public function test_with_is_interruption_of_studies_and_ns_no_submission(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
@@ -228,8 +234,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
      *
      * If the student gets a NS grade at Leve 2+, they will automatically be awarded
      * a NS grade for the category total
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_no_submission(): void {
+    public function test_with_ns_no_submission(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -257,8 +265,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
      *
      * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
      * total automatically becomes IS interruption of studies.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_IS_interruption_of_studies_and_NS0_no_submission0(): void {
+    public function test_with_is_interruption_of_studies_and_ns0_no_submission0(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
@@ -284,8 +294,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "With IS interruption of studies and EC extenuating circumstances (further opportunity)"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_IS_interruption_of_studies_and_EC_extenuating_circumstances_fo(): void {
+    public function test_with_is_interruption_of_studies_and_ec_extenuating_circumstances_fo(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
@@ -311,8 +322,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "With EC extenuating circumstances (further opportunity)"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_EC_extenuating_circumstances_fo(): void {
+    public function test_with_ec_extenuating_circumstances_fo(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
@@ -338,8 +350,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "With IS interruption of studies and EC extenuating circumstances (condoned)"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_IS_interruption_of_studies_and_EC_extenuating_circumstances_condoned(): void {
+    public function test_with_is_interruption_of_studies_and_ec_extenuating_circumstances_condoned(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
@@ -365,8 +378,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "With  EC extenuating circumstances (condoned)"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_EC_extenuating_circumstances_condoned(): void {
+    public function test_with_ec_extenuating_circumstances_condoned(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
@@ -392,8 +406,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "All NS no submission"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_all_NS(): void {
+    public function test_with_all_ns(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -419,8 +434,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "All NS0 no submission 0"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_all_NS0(): void {
+    public function test_with_all_ns0(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
@@ -446,8 +462,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "All EC extenuating circumstances (further opportunity)"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_all_EC(): void {
+    public function test_with_all_ec(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
@@ -473,8 +490,9 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "All ECC extenuating circumstances (condoned)"
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_all_ECC(): void {
+    public function test_with_all_ecc(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
@@ -499,8 +517,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With NS no submission and EC extenuating circumstances"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_no_submission_and_EC_extenuating_circumstances(): void {
+    public function test_with_ns_no_submission_and_ec_extenuating_circumstances(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -525,8 +545,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With NS no submission and ECC extenuating circumstances (condoned)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_no_submission_and_ECC_extenuating_circumstances_condoned(): void {
+    public function test_with_ns_no_submission_and_ecc_extenuating_circumstances_condoned(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
@@ -551,8 +573,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With NS0 no submission (0 grade) and EC extenuating circumstances"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS_no_submission_0_and_EC_extenuating_circumstances(): void {
+    public function test_with_ns_no_submission_0_and_ec_extenuating_circumstances(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
@@ -577,8 +601,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With NS0 no submission (0 grade) and ECC extenuating circumstances (condoned)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_with_NS0_no_submission_0_and_ECC_extenuating_circumstances_condoned(): void {
+    public function test_with_ns0_no_submission_0_and_ecc_extenuating_circumstances_condoned(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION_0');
@@ -604,8 +630,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
     /**
      * Test "With IS interruption of studies for a 0% weighted item"
      * NOTE: This one doesn't make any sense in the sheet.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function xx_test_with_IS_for_0percent_weighted(): void {
+    public function xx_test_with_is_for_0percent_weighted(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['quiz1'], $studentid, 'B2', '');
@@ -632,8 +660,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With DFR deferred grade"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_DFR_deferred_grade(): void {
+    public function test_l1_dfr_deferred_grade(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'DEFERRED', true);
@@ -658,8 +688,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_IS_interruption_of_studies(): void {
+    public function test_l1_is_interruption_of_studies(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
@@ -684,8 +716,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and NS no submission"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_IS_interruption_of_studies_NS_no_submission(): void {
+    public function test_l1_is_interruption_of_studies_ns_no_submission(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
@@ -710,8 +744,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and NS0 no submission (0%)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_IS_interruption_of_studies_NS0_no_submission_0(): void {
+    public function test_l1_is_interruption_of_studies_ns0_no_submission_0(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
@@ -736,8 +772,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With NS no submission and completion >= 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_NS_no_submission_greater75(): void {
+    public function test_l1_ns_no_submission_greater75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'NOSUBMISSION', true);
@@ -762,8 +800,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With NS no submission and completion < 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_NS_no_submission_lessthan75(): void {
+    public function test_l1_ns_no_submission_lessthan75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);
@@ -788,8 +828,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and EC extenuating circumstances"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_IS_interruption_of_studies_and_EC_extenuating_circumstances(): void {
+    public function test_l1_is_interruption_of_studies_and_ec_extenuating_circumstances(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
@@ -814,8 +856,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With EC extenuating circumstances and completion >= 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_EC_extenuating_circumstances_greater75(): void {
+    public function test_l1_ec_extenuating_circumstances_greater75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
@@ -840,8 +884,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With EC extenuating circumstances and completion < 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_EC_extenuating_circumstances_lessthan75(): void {
+    public function test_l1_ec_extenuating_circumstances_lessthan75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);
@@ -866,8 +912,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With IS interruption of studies and ECC extenuating circumstances (Condoned)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_IS_interruption_of_studies_and_ECC_extenuating_circumstances_condoned(): void {
+    public function test_l1_is_interruption_of_studies_and_ecc_extenuating_circumstances_condoned(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
@@ -892,8 +940,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With ECC extenuating circumstances condoned and completion >= 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_ECC_extenuating_circumstances_condoned_greater75(): void {
+    public function test_l1_ecc_extenuating_circumstances_condoned_greater75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_NR', true);
@@ -918,8 +968,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With ECC extenuating circumstances condoned and completion < 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_ECC_extenuating_circumstances_condoned_lessthan75(): void {
+    public function test_l1_ecc_extenuating_circumstances_condoned_lessthan75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);
@@ -944,8 +996,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With all NS"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_all_NS(): void {
+    public function test_l1_all_ns(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'NOSUBMISSION', true);
@@ -970,8 +1024,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With all EC"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_all_EC(): void {
+    public function test_l1_all_ec(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
@@ -996,8 +1052,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With all ECC"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_all_ECC(): void {
+    public function test_l1_all_ecc(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_NR', true);
@@ -1022,8 +1080,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With EC and NS and completion >= 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_EC_and_NS_greater75(): void {
+    public function test_l1_ec_and_ns_greater75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
@@ -1048,8 +1108,10 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test "With EC and NS and completion < 75%"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_l1_EC_and_NS_lessthan75(): void {
+    public function test_l1_ec_and_ns_lessthan75(): void {
 
         $studentid = $this->student->id;
         $this->write_grade($this->itemids['Quizzes'], $studentid, 'A4', '', true);

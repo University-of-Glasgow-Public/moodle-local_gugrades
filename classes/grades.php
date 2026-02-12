@@ -21,6 +21,9 @@
  * @copyright  2023
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameLowerCase
+ * @phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
  */
 
 namespace local_gugrades;
@@ -44,7 +47,7 @@ class grades {
 
         // Just bypassign this, for the moment, as it seems to cause
         // issues in tests.
-        // (presumably, data is changing)
+        // (presumably, data is changing).
 
         return $DB->get_record('grade_items', ['id' => $gradeitemid], '*', MUST_EXIST);
 
@@ -130,7 +133,7 @@ class grades {
         global $DB;
 
         // If there's no associated grade_item (which probably isn't good), just assume it's no grade.
-        // MGU-1392: Make sure we're hitting indexes so this isn't slow
+        // MGU-1392: Make sure we're hitting indexes so this isn't slow.
         $sql = "SELECT * FROM {grade_items}
             WHERE iteminstance = :iteminstance
             AND itemtype = 'category'
@@ -358,11 +361,11 @@ class grades {
         // Now get the count of child categories.
         $childcategorycount = $DB->count_records('grade_categories', ['parent' => $gradecategoryid]);
 
-        // The total of both must be exactly 2
+        // The total of both must be exactly 2.
         $iscandidate = ($gradeitemscount + $childcategorycount) == 2;
 
         // If it's NOT a candidate, then we should delete any resit records in gugrades_resits
-        // (gradebook structure must have changed)
+        // (gradebook structure must have changed).
         if (!$iscandidate) {
             $DB->delete_records('local_gugrades_resit', ['gradecategoryid' => $gradecategoryid]);
         }
@@ -459,7 +462,7 @@ class grades {
             // Add gradeitemid.
             $gradecategories[$id]->itemid = self::get_gradeitemid_from_gradecategoryid($id);
 
-            // Only for additional detail
+            // Only for additional detail.
             if ($detailed) {
                 // Add aggregation strategy.
                 $gradecategories[$id]->strategy = \local_gugrades\aggregation::get_formatted_strategy($id);
@@ -563,7 +566,7 @@ class grades {
         // This MUST be a 'second level' category. Which is actually the 3rd one down.
         // SO it will have a path field like /a/b/c/ or longer.
         // If not, recursive import is not available.
-        // MGU-1103 - now available at any level
+        // MGU-1103 - now available at any level.
         $gradecategory = $DB->get_record('grade_categories', ['id' => $categoryid], '*', MUST_EXIST);
 
         // Trim to remove leading and trailing /, otherwise you get two extra empty fields.
@@ -631,7 +634,9 @@ class grades {
         if (str_contains($gradetype, 'OTHER_')) {
             $parts = explode('_', $gradetype);
             if ((count($parts) != 2) || !is_numeric($parts[1])) {
-                throw new \moodle_exception('Invalid OTHER_ string. Gradetype = "' . $gradetype . '", gradeitemid = ' . $gradeitemid);
+                throw new \moodle_exception(
+                    'Invalid OTHER_ string. Gradetype = "' . $gradetype . '", gradeitemid = ' . $gradeitemid
+                );
             }
             $columnid = $parts[1];
             $column = $DB->get_record('local_gugrades_column', ['id' => $columnid], '*', MUST_EXIST);
@@ -741,7 +746,7 @@ class grades {
     ) {
         global $DB, $USER;
 
-        // Must have editgrade capability to change anything at all
+        // Must have editgrade capability to change anything at all.
         $context = \context_course::instance($courseid);
         if (!has_capability('local/gugrades:editgrades', $context)) {
             return;
@@ -766,7 +771,8 @@ class grades {
         // If this is CATEGORY and there's a corresponding 'catoverride' record then we don't
         // attempt to write anything new.
         if ($gradetype == 'CATEGORY') {
-            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'columnid' => $column->id, 'catoverride' => 1])) {
+            $params = ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'columnid' => $column->id, 'catoverride' => 1];
+            if ($DB->record_exists('local_gugrades_grade', $params)) {
                 return;
             }
         }
@@ -788,7 +794,6 @@ class grades {
                 AND iscurrent = :iscurrent
                 AND columnid = :columnid
                 AND catoverride = 0';
-                // AND ' . $gradetypecompare . ' = :gradetype';
             if (
                 $oldgrades = $DB->get_records_sql($sql, [
                 'courseid' => $courseid,
@@ -809,13 +814,15 @@ class grades {
 
         // Are we overwriting an existing grade (probably CATEGORY)?
         if ($overwrite) {
-            // Find the existing entry - if not, create a new one anyway
-            if (
-                $gugrade = $DB->get_record(
-                    'local_gugrades_grade',
-                    ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'userid' => $userid, 'columnid' => $column->id, 'iscurrent' => 1]
-                )
-            ) {
+            // Find the existing entry - if not, create a new one anyway.
+            $params = [
+                'courseid' => $courseid,
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+                'columnid' => $column->id,
+                'iscurrent' => 1
+            ];
+            if ($gugrade = $DB->get_record('local_gugrades_grade', $params)) {
                 $gugrade->rawgrade = $rawgrade;
                 $gugrade->admingrade = $admingrade;
                 $gugrade->convertedgrade = $convertedgrade;
@@ -977,14 +984,13 @@ class grades {
      * @return array
      */
     public static function add_grades_for_user(int $courseid, int $gradeitemid, object $user, bool $gradehidden = false) {
-        // $usercapture = new usercapture($courseid, $gradeitemid, $user->id);
         $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $user->id);
         $user->grades = $usercapture->get_grades();
         $user->alert = $usercapture->alert();
 
         // If the parent grade is hidden, then the individual items are assumed to be.
         // This is (I hope) what Moodle does (hidden flag is on and greyed out).
-        // MGU-1233
+        // MGU-1233.
         if ($gradehidden) {
             $user->gradebookhidden = true;
         } else {
@@ -1006,7 +1012,7 @@ class grades {
         $gradetype = $gradeitem->gradetype;
 
         // Grade type "none" is technically supported as we will deal with it elsewhere.
-        // None means that the grade is ignored completely. Text is a proxy for None in some activities (just text)
+        // None means that the grade is ignored completely. Text is a proxy for None in some activities (just text).
         if (($gradetype == GRADE_TYPE_NONE) || ($gradetype == GRADE_TYPE_TEXT)) {
             return true;
         }
@@ -1108,18 +1114,12 @@ class grades {
         $gradetype = $gradeitem->gradetype;
         if ($gradetype == GRADE_TYPE_VALUE) {
             if ($gradeitem->grademax == 22) {
-                // TODO: May change but to get it working.
-                // return ['value', $gradeitem];
                 return ['scale22', $gradeitem];
             } else {
                 return ['value', $gradeitem];
             }
         } else if ($gradetype == GRADE_TYPE_SCALE) {
-            // if (($gradeitem->grademin == 1) && ($gradeitem->grademax == 23)) {
-            // return ['scale22', $gradeitem];
-            // } else {
-                return ['scale', $gradeitem];
-            // }
+             return ['scale', $gradeitem];
         }
 
         throw new \moodle_exception('Invalid gradeitem encountered in grades::analyse_gradeitem');
@@ -1162,12 +1162,12 @@ class grades {
     public static function skip_update(int $gradeitemid, int $userid, string $additional) {
         global $DB;
 
-        // Get the provisional grade. If there isn't one, then no skip
+        // Get the provisional grade. If there isn't one, then no skip.
         if (!$provisional = self::get_provisional_from_id($gradeitemid, $userid)) {
             return false;
         }
 
-        // If the grade has neither admin or raw grade then also do not skip
+        // If the grade has neither admin or raw grade then also do not skip.
         if (($provisional->rawgrade == null) && ($provisional->admingrade == '')) {
             return false;
         }
@@ -1179,7 +1179,7 @@ class grades {
 
         // Additional must be missing. If the grade is admin then we do not skip.
 
-        // If there is an admin grade then do not skip (false)
+        // If there is an admin grade then do not skip (false).
         $isadmin = $provisional->admingrade != '';
 
         return !$isadmin;
@@ -1289,7 +1289,7 @@ class grades {
             // Get the aggregated category
             $category = \local_gugrades\aggregation::get_enhanced_grade_category($courseid, $gradeitem->iteminstance);
 
-            // Use the category 'atype' to determine correct class
+            // Use the category 'atype' to determine correct class.
             if ($category->atype == 'A') {
                 $type = 'schedulea';
             } else if ($category->atype == 'B') {
@@ -1319,7 +1319,10 @@ class grades {
         } else if ($gradetype == GRADE_TYPE_SCALE) {
             // See if scale is in our scaletype table.
             if (!$scaletype = $DB->get_record('local_gugrades_scaletype', ['scaleid' => $gradeitem->scaleid])) {
-                throw new \moodle_exception('Scale not found in gugrades_scaletype table. ScaleID = ' . $gradeitem->scaleid . ' gradeitemid = ' . $gradeitemid);
+                throw new \moodle_exception(
+                    'Scale not found in gugrades_scaletype table. ScaleID = ' .
+                    $gradeitem->scaleid . ' gradeitemid = ' . $gradeitemid
+                );
             }
 
             // Get the name of the class and see if it exists.
@@ -1358,7 +1361,7 @@ class grades {
         $level1category = $DB->get_record('grade_categories', ['id' => $level1], '*', MUST_EXIST);
         $items = self::get_gradeitems_recursive($level1category);
 
-        // check all are supported
+        // Check all are supported.
         $unsupported = [];
         foreach ($items as $item) {
             if (!self::is_grade_supported($item->id)) {
@@ -1515,7 +1518,14 @@ class grades {
     public static function get_released_grade(int $courseid, int $gradeitemid, int $userid) {
         global $DB;
 
-        if ($grade = $DB->get_record('local_gugrades_grade', ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'userid' => $userid, 'gradetype' => 'RELEASED', 'iscurrent' => 1])) {
+        $params = [
+            'courseid' => $courseid,
+            'gradeitemid' => $gradeitemid,
+            'userid' => $userid,
+            'gradetype' => 'RELEASED',
+            'iscurrent' => 1
+        ];
+        if ($grade = $DB->get_record('local_gugrades_grade', $params)) {
             return $grade;
         } else {
             return false;
@@ -1576,7 +1586,7 @@ class grades {
     public static function grade_item_updated(int $courseid, int $gradeitemid) {
         global $DB;
 
-        // If there are no grades then there's little point
+        // If there are no grades then there's little point.
         if (!self::any_grades($gradeitemid)) {
             return;
         }
@@ -1590,7 +1600,7 @@ class grades {
             }
             $level1 = self::get_level_one_parent($categoryid);
 
-            // Queue an adhoc-task
+            // Queue an adhoc-task.
             if ($level1) {
                 $task = \local_gugrades\task\recalculate::instance($courseid, $level1);
                 \core\task\manager::queue_adhoc_task($task);
@@ -1605,13 +1615,6 @@ class grades {
      */
     public static function remove_catoverride(int $gradeitemid, int $userid) {
         global $DB;
-
-        /*
-        $grades = $DB->get_records('local_gugrades_grade',
-        ['gradeitemid' => $gradeitemid, 'gradetype' => 'CATEGORY', 'userid' => $userid, 'iscurrent' => 1]);
-        if (count($grades)>1) {
-        var_dump($grades); die;}
-        */
 
         if (
             $grade = $DB->get_record(
@@ -1641,7 +1644,8 @@ class grades {
         }
 
         // Get current corresponding gugrades_grade
-        if ($grade = $DB->get_record('local_gugrades_grade', ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'gradetype' => 'CATEGORY', 'iscurrent' => 1])) {
+        $params = ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'gradetype' => 'CATEGORY', 'iscurrent' => 1];
+        if ($grade = $DB->get_record('local_gugrades_grade', $params)) {
             return $grade;
         } else {
             return false;
@@ -1749,7 +1753,7 @@ class grades {
             'userid' => $userid,
         ]);
 
-        // Released
+        // Released?
         $sql = 'SELECT * FROM {local_gugrades_grade}
         WHERE id = (SELECT max(id) FROM {local_gugrades_grade}
             WHERE gradeitemid = :gradeitemid
@@ -1822,7 +1826,7 @@ class grades {
         $level1id = self::get_level_one_parent($gradecategoryid);
         $itemid = self::get_gradeitemid_from_gradecategoryid($level1id);
 
-        // There should be an entry for the above item if it's been properly aggregated
+        // There should be an entry for the above item if it's been properly aggregated.
         return $DB->record_exists('local_gugrades_grade', ['gradeitemid' => $itemid, 'userid' => $userid]);
     }
 
@@ -1849,7 +1853,8 @@ class grades {
     public static function any_first(int $courseid, int $gradeitemid) {
         global $DB;
 
-        return $DB->record_exists('local_gugrades_grade', ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'gradetype' => 'FIRST']);
+        $params = ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'gradetype' => 'FIRST'];
+        return $DB->record_exists('local_gugrades_grade', $params);
     }
 
     /**
@@ -1878,7 +1883,7 @@ class grades {
                 continue;
             }
 
-            // If this gradeitem is converted then we can't do check
+            // If this gradeitem is converted then we can't do check.
             if (\local_gugrades\conversion::is_conversion_applied($courseid, $item->gradeitemid)) {
                 continue;
             }
@@ -1886,7 +1891,7 @@ class grades {
             $gradeitem = self::get_gradeitem($item->gradeitemid);
 
             // If scaleid in gradeitem is null then it's points
-            // However, forget it if exactly 22 points (special case)
+            // However, forget it if exactly 22 points (special case).
             $gradeispoints = empty($gradeitem->scaleid);
             if (($gradeispoints != $item->points) && ($gradeitem->grademax != 22)) {
                 $erroritems[] = [

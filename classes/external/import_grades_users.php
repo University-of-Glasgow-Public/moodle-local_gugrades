@@ -65,7 +65,16 @@ class import_grades_users extends external_api {
      * @param array $userlist
      * @return array
      */
-    public static function execute(int $courseid, int $gradeitemid, string $additional, string $fillns, string $reason, string $other, bool $dryrun, array $userlist) {
+    public static function execute(
+        int $courseid,
+        int $gradeitemid,
+        string $additional,
+        string $fillns,
+        string $reason,
+        string $other,
+        bool $dryrun,
+        array $userlist
+        ) {
 
         \local_gugrades\development::increase_debugging();
 
@@ -98,7 +107,7 @@ class import_grades_users extends external_api {
         $userids = $userlist;
         $importcount = 0;
 
-        // Track progress
+        // Track progress.
         $count = 0;
 
         foreach ($userids as $userid) {

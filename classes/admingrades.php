@@ -240,7 +240,7 @@ class admingrades {
     public static function get_displaygrade_from_name($admingrade) {
         $default = self::validate_admingrade($admingrade);
 
-        // Admingrade details from settings
+        // Admingrade details from settings.
         $tag = self::get_setting_tag($admingrade);
         $setting = get_config('local_gugrades', $tag);
         if (!$setting) {
@@ -310,7 +310,7 @@ class admingrades {
 
         $admingrades = [];
         foreach ($defaults as $name => $default) {
-            // Work out if this is ok for this level / grandtotal
+            // Work out if this is ok for this level / grandtotal?
             $send = false;
             if ($grandtotal && self::flag_set($default, 'grandtotal')) {
                 $send = true;

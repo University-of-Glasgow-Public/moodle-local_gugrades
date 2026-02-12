@@ -28,6 +28,11 @@ namespace local_gugrades\task;
  * Cleanup old data
  */
 class cleanup extends \core\task\scheduled_task {
+
+    /**
+     * Get task name
+     * @return string
+     */
     public function get_name() {
         // Shown in admin screens.
         return get_string('cleanuptask', 'local_gugrades');

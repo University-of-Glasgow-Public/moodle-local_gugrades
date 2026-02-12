@@ -75,7 +75,7 @@ class export {
         // Get the year from the course start date.
         $year = date('Y', $course->startdate);
 
-        // Get any records for this course from gudatabase,
+        // Get any records for this course from gudatabase.
         if (self::is_enrol_gudatabase_enabled()) {
             $codes = array_values($DB->get_records('enrol_gudatabase_codes', ['courseid' => $courseid]));
         } else {

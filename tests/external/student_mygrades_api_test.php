@@ -158,7 +158,7 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
         $this->assertEquals(0.0, $fred['rawgrade']);
         $this->assertEquals(33, $fred['completed']);
 
-        // Change question 3 to 07 admingrade/
+        // Change question 3 to 07 admingrade.
         $this->apply_admingrade('Question 3', $this->student->id, '07');
 
         // Get aggregation page for above.
