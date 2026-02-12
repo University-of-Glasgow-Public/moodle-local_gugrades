@@ -98,8 +98,7 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
      * @covers \local_gugrades\external\get_aggregation_export_plugins::execute
      */
     public function test_get_aggregation_export_form(): void {
-
-        global $DB;
+        global $DB, $CFG;
 
         $courseid = $this->course->id;
         $categoryid = $this->get_grade_category('Summative');
