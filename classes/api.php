@@ -2171,7 +2171,7 @@ class api {
     public static function get_aggregation_user(int $courseid, int $gradecategoryid, int $userid) {
         global $DB;
 
-        // (Re-)aggregate this user. Regardless.
+        // ...(Re-)aggregate this user. Regardless.
         \local_gugrades\aggregation::aggregate_user_helper($courseid, $gradecategoryid, $userid, true);
 
         // Get categories and items at this level.
@@ -2477,7 +2477,7 @@ class api {
 
         self::more_time();
 
-        // Re-aggregate single user
+        // Re-aggregate single user.
         if ($userid) {
             \local_gugrades\aggregation::aggregate_user_helper($courseid, $gradecategoryid, $userid);
         } else {

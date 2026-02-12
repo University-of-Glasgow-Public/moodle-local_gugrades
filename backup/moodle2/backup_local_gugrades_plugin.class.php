@@ -127,7 +127,7 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
                     'auditcomment',
                     'dropped',
                     'catoverride',
-                    'normalisedweight'
+                    'normalisedweight',
                 ]
             );
             $grade->annotate_ids('user', 'userid');

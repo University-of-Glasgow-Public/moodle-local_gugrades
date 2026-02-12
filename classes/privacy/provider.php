@@ -27,7 +27,6 @@ namespace local_gugrades\privacy;
 use context;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist, approved_userlist, userlist};
-use \core_privacy\local\request\core_userlist_provider;
 
 use stdClass;
 
@@ -35,7 +34,10 @@ use stdClass;
  * Privacy provider class
  */
 class provider implements
-    \core_privacy\local\metadata\provider, core_userlist_provider, \core_privacy\local\request\plugin\provider {
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider,
+    \core_privacy\local\request\core_userlist_provider
+    {
     /**
      * Returns meta data about this system.
      *

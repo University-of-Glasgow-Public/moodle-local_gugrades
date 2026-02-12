@@ -216,7 +216,7 @@ class custom extends base {
      */
     protected function process_item(string $identifier, int $courseid, int $userid, array $options) {
 
-        // CSV items to return
+        // CSV items to return.
         $csvitems = [];
 
         // We need this all over the place.
@@ -230,7 +230,7 @@ class custom extends base {
             throw new \moodle_exception('Invalid identifier - "' . $identifier . '"');
         }
 
-        // Get the gradeitem
+        // Get the gradeitem.
         $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
         $iscategory = $gradeitem->itemtype == 'category';
 
@@ -240,12 +240,12 @@ class custom extends base {
         // Is this IN a weighted category?
         $isweighted = $this->is_weighted_category($gradeitemid);
 
-        // If category...
+        // If it's a category.
         if ($iscategory) {
-            // get the aggregated category grades
+            // Get the aggregated category grades.
             [$category, $released] = \local_gugrades\grades::get_category_grades($gradeitemid, $userid);
 
-            // Add aggregated category if there is one
+            // Add aggregated category if there is one.
             if ($category) {
                 $csvitems[$identifier] = $category->displaygrade;
             } else {
@@ -261,14 +261,14 @@ class custom extends base {
                 }
             }
 
-            // If showing strategy for category
+            // If showing strategy for category.
             if ($options['strategy']) {
                 $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
                 $strategy = \local_gugrades\aggregation::get_formatted_strategy($gradecategoryid);
                 $csvitems[$identifier . '_strategy'] = $strategy;
             }
 
-            // Warnings (only applies to category)
+            // Warnings (only applies to category).
             if ($isreleased && $options['warnings']) {
                 if ($category && $released && ($category->displaygrade != $released->displaygrade)) {
                     $warning = get_string('mismatch', 'local_gugrades');
@@ -286,7 +286,7 @@ class custom extends base {
                 $csvitems[$identifier] = get_string('nodata', 'local_gugrades');
             }
 
-            // If option for released grades
+            // If option for released grades.
             if ($options['released'] && $isreleased) {
                 $released = \local_gugrades\grades::get_released_grade($courseid, $gradeitemid, $userid);
                 if ($provisional) {
@@ -336,7 +336,7 @@ class custom extends base {
 
         $originalform = $this->get_form_fields($courseid, $gradecategoryid);
 
-        // Convert original form to simple(r) ident => description
+        // Convert original form to simple(r) ident => description.
         $descriptions = [];
         foreach ($originalform as $record) {
             $descriptions[$record['identifier']] = $record['description'];
@@ -345,7 +345,12 @@ class custom extends base {
         $headings = [];
 
         foreach ($line as $ident => $value) {
-            if (str_ends_with($ident, '_weights') || str_ends_with($ident, '_strategy') || str_ends_with($ident, '_released') || str_ends_with($ident, '_warnings')) {
+            if (
+                str_ends_with($ident, '_weights') ||
+                str_ends_with($ident, '_strategy') ||
+                str_ends_with($ident, '_released') ||
+                str_ends_with($ident, '_warnings')
+            ) {
                 $parts = explode('_', $ident);
                 if (count($parts) !== 3) {
                     throw new \moodle_exception('Incorrectly formatted option identifier - "' . $ident . '"');
@@ -398,17 +403,17 @@ class custom extends base {
     }
 
     /**
-     * Separate out the numerical and letter grade after aggregation to show numerical/letter values for additional exported columns.
+     * Separate the numerical and letter grade after aggregation to show numerical/letter values for additional exported columns.
      * @param object $user
      * @return string
      */
     protected function sanitise_grade($user) {
 
-        // Sanatise the user grade to export scale value only
+        // Sanatise the user grade to export scale value only.
         if ($user->rawgrade) {
             $grade = $user->displaygrade;
 
-            // Remove the bracketted value
+            // Remove the bracketted value.
             $parts = explode(' ', $grade);
 
             return $parts[0];
@@ -435,7 +440,6 @@ class custom extends base {
         $users = \local_gugrades\aggregation::get_users($courseid, $gradecategoryid, '', '', $groupid);
 
         // Aggregate all the users.
-        // \local_gugrades\aggregation::aggregate($courseid, $gradecategoryid, $users);
         [$columns] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid);
         [$users] = \local_gugrades\aggregation::add_aggregation_fields_to_users($courseid, $gradecategoryid, $users, $columns);
 
@@ -475,7 +479,7 @@ class custom extends base {
                     continue;
                 }
 
-                // Deal with basic data
+                // Deal with basic data.
                 if ($ident == 'studentname') {
                     $line[$ident] = $user->displayname;
                 } else if ($ident == 'idnumber') {

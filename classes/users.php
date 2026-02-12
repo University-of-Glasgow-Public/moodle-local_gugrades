@@ -45,7 +45,7 @@ class users {
             return false;
         }
 
-        // ..."Set to -1 to avoid calculation of dynamic user-depended data".
+        // Set to -1 to avoid calculation of dynamic user-depended data.
         $modinfo = get_fast_modinfo($courseid, -1);
         if (!$cm = $modinfo->instances[$item->itemmodule][$item->iteminstance]) {
             throw new \moodle_exception('Unable to find course module for gradeitemid = ' . $gradeitemid);
