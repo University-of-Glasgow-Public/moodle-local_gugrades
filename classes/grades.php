@@ -400,7 +400,7 @@ class grades {
      * Get the category/item tree beneath the selected depth==2 category.
      * @param int $courseid
      * @param int $categoryid
-     * £param bool $detailed
+     * @param bool $detailed
      * @return object
      */
     public static function get_activitytree(int $courseid, int $categoryid, bool $detailed = false) {
@@ -1349,7 +1349,7 @@ class grades {
      * Are all grades / scales supported in the current category tree?
      * e.g. if a scale, is it one we support?
      * @param int $courseid
-     * @param int $gradecategoryid
+     * @param int $gradeitemid
      * @return boolean
      */
     public static function are_all_grades_supported(int $courseid, int $gradeitemid) {

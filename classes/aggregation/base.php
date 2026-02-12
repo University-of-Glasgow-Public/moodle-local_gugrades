@@ -158,7 +158,7 @@ class base {
      * determine what the category total should be.
      * This is mostly an issue for Level 1
      * @param int $level
-     * @return [$admingrade, $error, $displaygrade]
+     * @return array
      */
     public function all_unavailable_total(int $level) {
 

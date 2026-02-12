@@ -109,6 +109,11 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
 
     /**
      * Write a new grade
+     * @param int $gradeitemid
+     * @param int $userid
+     * @param string $scale
+     * @param string $admingrade
+     * @param bool $iscategory
      */
     protected function write_grade($gradeitemid, $userid, $scale, $admingrade, $iscategory = false) {
         $schedulea = $this->get_map();

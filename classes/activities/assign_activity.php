@@ -118,7 +118,7 @@ class assign_activity extends base {
 
     /**
      * Get (and check) single user
-     * @param int $user
+     * @param int $userid
      * @return object
      */
     public function get_user(int $userid) {
@@ -191,6 +191,8 @@ class assign_activity extends base {
 
     /**
      * Modify assignment workflow state
+     * @param int $userid
+     * @param string $workflowstate
      */
     private function set_marking_workflow($userid, $workflowstate) {
         global $DB;

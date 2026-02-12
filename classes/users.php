@@ -150,7 +150,7 @@ class users {
     /**
      * Get user record from userid
      * Check that user is a valid "student" in the course
-     * @param \context $connext
+     * @param \context $context
      * @param int $userid
      * @return object
      */
@@ -205,7 +205,7 @@ class users {
 
     /**
      * Add picture to single user record
-     * @param int $couseid
+     * @param int $courseid
      * @param object $user
      * @param return object
      */

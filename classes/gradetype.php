@@ -103,8 +103,8 @@ class gradetype {
     /**
      * Get grade description from OTHER fields.
      * Where gradetype is OTHER_nnn (nnn is id of column table)
-     * @param $gradetype
-     * @return $description
+     * @param string $gradetype
+     * @return string
      */
     public static function get_other_description(string $gradetype) {
         global $DB;

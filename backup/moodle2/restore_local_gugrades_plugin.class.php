@@ -60,6 +60,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process config data
+     * @param array $data
      */
     public function process_gugrades_config($data) {
         global $DB;
@@ -73,6 +74,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process conversion map
+     * @param array $data
      */
     public function process_gugrades_map($data) {
         global $DB;
@@ -88,6 +90,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process resit category
+     * @param array $data
      */
     public function process_gugrades_resitcat($data) {
         global $DB;
@@ -103,6 +106,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process conversion map items
+     * @param array $data
      */
     public function process_gugrades_map_value($data) {
         global $DB;
@@ -115,6 +119,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process map items
+     * @param array $data
      */
     public function process_gugrades_map_item($data) {
         global $DB;
@@ -129,6 +134,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process columns
+     * @param array $data
      */
     public function process_gugrades_column($data) {
         global $DB;
@@ -143,6 +149,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process grades
+     * @param array $data
      */
     public function process_gugrades_grade($data) {
         global $DB;
@@ -158,6 +165,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process altered weights
+     * @param array $data
      */
     public function process_gugrades_weight($data) {
         global $DB;
@@ -175,6 +183,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process audit trail
+     * @param array $data
      */
     public function process_gugrades_audit($data) {
         global $DB;
@@ -189,6 +198,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process hidden items
+     * @param array $data
      */
     public function process_gugrades_hidden($data) {
         global $DB;
@@ -203,6 +213,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
 
     /**
      * Process resits
+     * @param array $data
      */
     public function process_gugrades_resit($data) {
         global $DB;

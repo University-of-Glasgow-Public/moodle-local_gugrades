@@ -50,7 +50,7 @@ class get_progress extends external_api {
     /**
      * Execute function
      * @param int $courseid
-     * @param int uniqueid
+     * @param int $uniqueid
      * @param string $progresstype
      * @param int $staffuserid
      * @return array

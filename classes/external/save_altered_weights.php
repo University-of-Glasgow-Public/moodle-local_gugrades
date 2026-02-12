@@ -61,7 +61,7 @@ class save_altered_weights extends external_api {
      * @param int $userid
      * @param bool $revert
      * @param string $reason
-     * @param array $settings
+     * @param array $items
      * @return array
      */
     public static function execute($courseid, $categoryid, $userid, $revert, $reason, $items) {

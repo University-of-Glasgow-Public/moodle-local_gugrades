@@ -71,7 +71,6 @@ class aggregation {
     /**
      * Get aggregation strategy formatted for display
      * @param int $gradecategoryid
-     * @param int $level
      * @return string
      *
      */
@@ -450,7 +449,7 @@ class aggregation {
     /**
      * Add aggregation data for a single user
      * @param int $courseid
-     * @param int gradecategoryid
+     * @param int $gradecategoryid
      * @param object $user
      * @param array $columns
      * @return object
@@ -777,7 +776,7 @@ class aggregation {
 
     /**
      * Invalidate the cache data
-     * @param int courseid
+     * @param int $courseid
      */
     public static function invalidate_cache(int $courseid) {
         global $DB;
@@ -925,8 +924,8 @@ class aggregation {
     /**
      * Record dropped items in grade table
      * Also sets normalised weight to null (as unused)
-     * @param int $userid
      * @param array $items
+     * @param int $userid
      */
     private static function flag_dropped_items(array $items, int $userid) {
         global $DB;
@@ -1348,6 +1347,8 @@ class aggregation {
     /**
      * Is droplow set for any items in this course?
      * If not, we can ignore checks for it
+     * @param int $courseid
+     * @return boolean
      */
     protected static function any_droplow(int $courseid) {
         global $DB;

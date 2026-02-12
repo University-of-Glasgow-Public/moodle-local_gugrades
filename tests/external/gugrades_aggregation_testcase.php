@@ -309,7 +309,7 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
 
     /**
      * Apply admingrade - grade needs to be imported / exist first
-     * @param string $gradeitemname
+     * @param string $itemname
      * @param int $userid
      * @param string $admingrade
      */

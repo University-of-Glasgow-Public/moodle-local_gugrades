@@ -165,7 +165,7 @@ class api {
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
-     * @param bool $viewfullnames
+     * @param int $viewfullnames
      * @return array
      */
     public static function get_capture_user(int $courseid, int $gradeitemid, int $userid, int $viewfullnames) {
@@ -2266,7 +2266,6 @@ class api {
     /**
      * Check options array for selected state.
      * @param string $gradetype
-     * @param string $other
      * @param array $options
      * @return bool
      */
@@ -2551,7 +2550,7 @@ class api {
      * @param int $userid
      * @param bool $revert
      * @param string $reason
-     * @param array $settings
+     * @param array $items
      * @return array
      */
     public static function save_altered_weights(

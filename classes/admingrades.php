@@ -234,7 +234,7 @@ class admingrades {
 
     /**
      * Get displaygrade and description from name
-     * @param string $name
+     * @param string $admingrade
      * @return array
      */
     public static function get_displaygrade_from_name($admingrade) {

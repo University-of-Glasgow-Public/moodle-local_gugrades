@@ -48,7 +48,6 @@ class is_mygrades_available extends external_api {
     /**
      * Execute function
      * @param int $courseid
-     * @param string $capability
      * @return array
      */
     public static function execute($courseid) {

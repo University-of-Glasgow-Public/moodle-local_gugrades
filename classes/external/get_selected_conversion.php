@@ -50,7 +50,7 @@ class get_selected_conversion extends external_api {
      * Execute function
      * @param int $courseid
      * @param int $gradeitemid
-     * @param int gradecategoryid
+     * @param int $gradecategoryid
      * @return array
      */
     public static function execute($courseid, $gradeitemid, $gradecategoryid) {
