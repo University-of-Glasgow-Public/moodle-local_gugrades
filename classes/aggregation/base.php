@@ -718,12 +718,8 @@ class base {
         $roundindex = intval(round($medianindex, PHP_ROUND_HALF_UP));
 
         if ($roundindex == 0) {
-            var_dump('INDEX ZERO');
-            var_dump($items);
-            return 0;
-        }
-
-        if ($roundindex != $medianindex) {
+            return $this->round_float($grades[0]);
+        } else if ($roundindex != $medianindex) {
             return $this->round_float($grades[$medianindex]);
         } else {
             // It's the mean of the two middle values.
