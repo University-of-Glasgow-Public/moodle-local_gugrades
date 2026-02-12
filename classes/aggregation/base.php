@@ -716,6 +716,13 @@ class base {
         // If odd number of grades it's just the middle value.
         $medianindex = intval(count($grades) / 2);
         $roundindex = intval(round($medianindex, PHP_ROUND_HALF_UP));
+
+        if ($roundindex == 0) {
+            var_dump('INDEX ZERO');
+            var_dump($items);
+            return 0;
+        }
+
         if ($roundindex != $medianindex) {
             return $this->round_float($grades[$medianindex]);
         } else {
