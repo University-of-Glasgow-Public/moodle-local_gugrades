@@ -28,7 +28,6 @@ namespace local_gugrades\task;
  * Cleanup old data
  */
 class cleanup extends \core\task\scheduled_task {
-
     /**
      * Get task name
      * @return string

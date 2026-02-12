@@ -810,7 +810,7 @@ class aggregation {
         $cachetag = 'CATEGORY_' . $courseid . '_' . $gradecategoryid;
 
         // If this category is already stored in the cache then there's nothing to do.
-        // (assuming recalculation is not forced),
+        // (assuming recalculation is not forced).
         if (!$force && ($categorynode = $cache->get($cachetag))) {
             return $categorynode;
         }
@@ -1131,7 +1131,7 @@ class aggregation {
                 return [0, 0, $admingrade, $displaygrade, $completion, '', $explain, false];
             }
 
-            // "drop lowest" items.
+            // ..."drop lowest" items.
             // NOTE: droplow is NOT supported for level 1.
             if (($droplow > 0) && ($level > 1)) {
                 [$items, $droppeditems] = $aggregation->droplow($items, $droplow);
@@ -1392,7 +1392,7 @@ class aggregation {
         $children = $category->children;
         $items = [];
         foreach ($children as $child) {
-            // Clear droplow flag. We'll put it back later if required
+            // Clear droplow flag. We'll put it back later if required.
             if (!$skipdroplow) {
                 self::clear_droplow($child->itemid, $userid);
             }
@@ -1410,16 +1410,17 @@ class aggregation {
             if ($child->iscategory) {
                 // Is the category overridden? Nothing more to do if it is.
                 if ($overriddencategory = self::get_overridden_category($child->itemid, $userid)) {
-                    [$childcategorytotal, $rawgrade, $admingrade, $display, $completion, $error, $notavailable] = $overriddencategory;
+                    [$childcategorytotal, $rawgrade, $admingrade, $display, $completion, $error, $notavailable] =
+                        $overriddencategory;
                 } else {
                     [$childcategorytotal, $rawgrade, $admingrade, $display, $completion, $error, $explain, $notavailable] =
                         self::aggregate_user(
-                        $courseid,
-                        $child,
-                        $userid,
-                        $level + 1,
-                        $skipdroplow
-                    );
+                            $courseid,
+                            $child,
+                            $userid,
+                            $level + 1,
+                            $skipdroplow
+                        );
                 }
                 $item = (object)[
                     'itemid' => $child->itemid,
@@ -1466,7 +1467,7 @@ class aggregation {
                 }
             }
 
-            // Construct items array for aggregation
+            // Construct items array for aggregation.
             $items[$child->itemid] = $item;
         }
 
@@ -1478,7 +1479,7 @@ class aggregation {
         // If this is a points grade, level 2 or deeper, a grade is returned and a map exists then
         // we need to deal with this as a converted grade.
         if (($level >= 2) && ($mapid = \local_gugrades\conversion::get_mapid_for_category($category->categoryid)) && $rawgrade) {
-            // Get original maximum grade for conversion
+            // Get original maximum grade for conversion.
             $grademax = $category->grademax;
 
             // Sanity check for conversion.
@@ -1542,9 +1543,9 @@ class aggregation {
         }
 
         // Aggregate this user.
-        $aggregated_result = self::aggregate_user($courseid, $toplevel, $userid, 1, $skipdroplow);
+        $aggregatedresult = self::aggregate_user($courseid, $toplevel, $userid, 1, $skipdroplow);
 
-        return $aggregated_result;
+        return $aggregatedresult;
     }
 
     /**
@@ -1575,8 +1576,8 @@ class aggregation {
         $level = \local_gugrades\grades::get_category_level($gradecategoryid);
 
         // Aggregate this user.
-        $aggregated_result = self::aggregate_user($courseid, $tree, $userid, $level, $skipdroplow);
-        [, , , , , , $explain] = $aggregated_result;
+        $aggregatedresult = self::aggregate_user($courseid, $tree, $userid, $level, $skipdroplow);
+        [, , , , , , $explain] = $aggregatedresult;
 
         return $explain;
     }
@@ -1602,7 +1603,7 @@ class aggregation {
             self::clear_course_droplow($courseid);
         }
 
-        // Counts for progress
+        // Counts for progress.
         $count = 0;
         $numberofusers = count($users);
 

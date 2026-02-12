@@ -81,7 +81,7 @@ function scale_setting_updated($name) {
         }
     }
 
-    // Reset caches
+    // Reset caches.
     \local_gugrades\api::reset_all_caches();
 }
 
@@ -91,7 +91,7 @@ function scale_setting_updated($name) {
 function custom_course_field() {
     global $DB;
 
-    // Check if the category exists
+    // Check if the category exists.
     if (!$category = $DB->get_record('customfield_category', ['name' => 'Student MyGrades'])) {
         $category = new stdClass();
         $category->name = 'Student MyGrades';
@@ -108,7 +108,7 @@ function custom_course_field() {
         $categoryid = $category->id;
     }
 
-    // Check if the customfield exists in some other category
+    // Check if the customfield exists in some other category.
     $allfields = $DB->get_records('customfield_field', ['shortname' => 'studentmygrades']);
     foreach ($allfields as $allfield) {
         if ($allfield->categoryid != $categoryid) {
@@ -116,7 +116,7 @@ function custom_course_field() {
         }
     }
 
-    // Check if the customfield exists
+    // Check if the customfield exists.
     if (!$field = $DB->get_record('customfield_field', ['shortname' => 'studentmygrades', 'categoryid' => $categoryid])) {
         $field = new stdClass();
         $field->shortname = 'studentmygrades';
@@ -138,6 +138,6 @@ function custom_course_field() {
         $DB->insert_record('customfield_field', $field);
     }
 
-    // Reset caches
+    // Reset caches.
     \local_gugrades\api::reset_all_caches();
 }

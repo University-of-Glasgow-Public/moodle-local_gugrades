@@ -74,7 +74,7 @@ class import_grades_users extends external_api {
         string $other,
         bool $dryrun,
         array $userlist
-        ) {
+    ) {
 
         \local_gugrades\development::increase_debugging();
 

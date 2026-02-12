@@ -144,7 +144,7 @@ abstract class base {
         foreach ($users as $user) {
             $user->displayname = fullname($user);
 
-            // Initials
+            // Initials.
             [$user->firstinitial, $user->lastinitial] = \local_gugrades\users::get_initials($user);
         }
 
@@ -161,14 +161,6 @@ abstract class base {
 
         // Unique cache tag for course and gradeitem.
         $cachetag = 'AVAILABLE_' . $this->courseid . '_' . $this->gradeitemid;
-
-        // README: Disable cache for now as may be causing problems - MGU-1171
-        /*
-        if (!$userids = $cache->get($cachetag)) {
-            $users = $this->get_users();
-            $userids = array_column($users, 'id');
-            $cache->set($cachetag, $userids);
-        }*/
 
         $users = $this->get_users();
         $userids = array_column($users, 'id');
@@ -188,7 +180,7 @@ abstract class base {
         // Add displayname.
         $user->displayname = \core_user::get_fullname($user);
 
-        // Initials
+        // Initials.
         [$user->firstinitial, $user->lastinitial] = \local_gugrades\users::get_initials($user);
 
         return $user;
@@ -196,7 +188,7 @@ abstract class base {
 
     /**
      * Should the student names be hidden to normal users?
-     * Probabl mostly applies to Assignment
+     * Probably mostly applies to Assignment
      * @return boolean
      */
     public function is_names_hidden() {
@@ -221,7 +213,7 @@ abstract class base {
     public function get_first_grade(int $userid) {
         global $DB;
 
-        // MGU-1293: If there's no grade return null (No grade)
+        // MGU-1293: If there's no grade return null (No grade).
         if ($grade = $DB->get_record('grade_grades', ['itemid' => $this->gradeitemid, 'userid' => $userid])) {
             return $grade->finalgrade;
         } else {

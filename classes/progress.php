@@ -25,8 +25,9 @@
 
 namespace local_gugrades;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Record progress for long running activities
+ */
 class progress {
     /**
      * Create progress cache tag

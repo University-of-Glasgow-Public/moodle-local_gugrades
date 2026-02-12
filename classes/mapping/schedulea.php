@@ -48,7 +48,7 @@ class schedulea extends base {
         if (!$converted) {
             // If converted, use the built-in grade.
 
-            // Get scale. If it doesn't exist, use the internal map
+            // Get scale. If it doesn't exist, use the internal map.
             if (!$scale = $DB->get_record('scale', ['id' => $this->gradeitem->scaleid])) {
                 $map = $this->get_map();
                 $this->items = array_flip($map);

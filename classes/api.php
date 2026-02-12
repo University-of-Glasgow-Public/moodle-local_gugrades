@@ -1668,7 +1668,7 @@ class api {
     public static function release_user_grade(int $courseid, int $gradeitemid, int $userid, object $activity = null) {
         global $DB;
 
-        // Look up actvity object if we need to
+        // Look up actvity object if we need to.
         if (!$activity) {
             $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
         }
@@ -1768,7 +1768,7 @@ class api {
      * @param int $courseid
      */
     public static function reset(int $courseid) {
-        global $DB, $GRADEITEMS;
+        global $DB;
 
         // Delete grades.
         $DB->delete_records('local_gugrades_grade', ['courseid' => $courseid]);
@@ -1795,9 +1795,6 @@ class api {
 
         // Delete resits.
         $DB->delete_records('local_gugrades_resit', ['courseid' => $courseid]);
-
-        // "Cached" gradeitems.
-        $GRADEITEMS = [];
 
         // As this will be a rarely used function we will take the liberty of purging the caches.
         self::reset_all_caches();
@@ -1995,7 +1992,7 @@ class api {
         // Get categories and items at this level.
         [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid);
 
-        // Get user aggregation data
+        // Get user aggregation data.
         $context = \context_course::instance($courseid);
         $user = \local_gugrades\aggregation::get_user($courseid, $gradecategoryid, $userid);
         $user = \local_gugrades\aggregation::add_aggregation_fields_to_user($courseid, $gradecategoryid, $user, $columns);
@@ -2039,7 +2036,7 @@ class api {
 
         global $CFG, $USER;
 
-        // I know :(
+        // I know :(.
         self::more_time();
 
         // Is aggregation supported (at all)?
@@ -2108,7 +2105,8 @@ class api {
         $istoplevel = \local_gugrades\aggregation::is_top_level($gradecategoryid);
 
         // Add the columns to the user fields.
-        [$users, $addaggdebug] = \local_gugrades\aggregation::add_aggregation_fields_to_users($courseid, $gradecategoryid, $users, $columns);
+        [$users, $addaggdebug] =
+            \local_gugrades\aggregation::add_aggregation_fields_to_users($courseid, $gradecategoryid, $users, $columns);
         $timeaddfields = microtime(true);
 
         // Get breadcrumb trail.
@@ -2173,14 +2171,8 @@ class api {
     public static function get_aggregation_user(int $courseid, int $gradecategoryid, int $userid) {
         global $DB;
 
-        // Get the level 1 parent category.
-        // $level1id = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
-
         // (Re-)aggregate this user. Regardless.
         \local_gugrades\aggregation::aggregate_user_helper($courseid, $gradecategoryid, $userid, true);
-
-        // Build (and cache) grade structure (whole tree).
-        // \local_gugrades\aggregation::recurse_tree($courseid, $level1id, false);
 
         // Get categories and items at this level.
         [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid);
@@ -2498,7 +2490,7 @@ class api {
             // Get the level 1 parent category.
             $level1id = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
 
-            // Run over users running aggregation
+            // Run over users running aggregation.
             \local_gugrades\aggregation::aggregate($courseid, $level1id, $users);
         }
     }
@@ -2517,10 +2509,10 @@ class api {
         // (courseid forces proper check).
         $category = $DB->get_record('grade_categories', ['id' => $categoryid, 'courseid' => $courseid], '*', MUST_EXIST);
 
-        // Get gradeitemid
+        // Get gradeitemid.
         $gradeitemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($categoryid);
 
-        // Get the columns for this grade category
+        // Get the columns for this grade category.
         $columns = \local_gugrades\aggregation::get_columns($courseid, $categoryid);
 
         // Ensure aggregation data for this user is current.
@@ -2568,8 +2560,8 @@ class api {
         int $userid,
         bool $revert,
         string $reason,
-        array $items)
-    {
+        array $items
+    ) {
 
         // If revert == true then delete the altered grades.
         if ($revert) {

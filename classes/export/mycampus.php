@@ -48,7 +48,7 @@ class mycampus extends base {
         if ($user->admingrade) {
             $grade = $user->admingrade;
 
-            // Change MV0 to MV
+            // Change MV0 to MV.
             if ($grade == 'MV0') {
                 $grade = 'MV';
             }
@@ -61,7 +61,7 @@ class mycampus extends base {
         if ($user->rawgrade) {
             $grade = $user->displaygrade;
 
-            // Remove the bracketted value
+            // Remove the bracketted value.
             $parts = explode(' ', $grade);
 
             return $parts[0];
@@ -90,7 +90,7 @@ class mycampus extends base {
         // Array holds CSV lines.
         $lines = [];
 
-        // Header
+        // Header.
         $lines[] = [
             'EMPLID',
             'Name',
@@ -101,13 +101,13 @@ class mycampus extends base {
         foreach ($users as $user) {
             $line = [];
 
-            // EMPLID
+            // EMPLID.
             $line[] = $user->idnumber;
 
-            // Name
+            // Name.
             $line[] = $user->lastname . ',' . $user->firstname;
 
-            // Grade
+            // Grade.
             $line[] = $this->sanitise_grade($user);
 
             $lines[] = $line;

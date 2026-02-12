@@ -19,6 +19,7 @@
  *
  * @package     local_gugrades
  * @author      Howard Miller
+ * @copyright   Howard Miller
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -41,7 +42,11 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $paths[] = new restore_path_element('gugrades_config', $coursepath . '/gugrades_config');
         $paths[] = new restore_path_element('gugrades_map', $coursepath . '/gugrades_maps/gugrades_map');
         $paths[] = new restore_path_element('gugrades_resitcat', $coursepath . '/gugrades_resitcats/gugrades_resitcat');
-        $paths[] = new restore_path_element('gugrades_map_value', $coursepath . '/gugrades_map_values/gugrades_map_value/gm_values/gm_value');
+        $paths[] = new restore_path_element(
+            'gugrades_map_value',
+            $coursepath .
+            '/gugrades_map_values/gugrades_map_value/gm_values/gm_value'
+        );
         $paths[] = new restore_path_element('gugrades_map_item', $coursepath . '/gugrades_map_items/gugrades_map_item');
         $paths[] = new restore_path_element('gugrades_column', $coursepath . '/gugrades_columns/gugrades_column');
         $paths[] = new restore_path_element('gugrades_grade', $coursepath . '/gugrades_grades/gugrades_grade');
@@ -260,7 +265,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
             $DB->update_record('local_gugrades_audit', $audit);
         }
 
-        // Hidden items
+        // Hidden items.
         $hiddens = $DB->get_recordset('local_gugrades_hidden', ['courseid' => $this->task->get_courseid()]);
         foreach ($hiddens as $hidden) {
             $hidden->gradeitemid = $this->get_mappingid('grade_item', 0 - $hidden->gradeitemid);

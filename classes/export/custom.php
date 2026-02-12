@@ -20,6 +20,9 @@
  * @copyright  2024
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameLowerCase
+ * @phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
  */
 
 namespace local_gugrades\export;
@@ -57,7 +60,7 @@ class custom extends base {
 
         $prefixes[] = $segment->name;
 
-        // Add top level of segment to list
+        // Add top level of segment to list.
         $list[] = [
             'description' => implode(' > ', $prefixes),
             'identifier' => 'ITEM_' . $segment->itemid,
@@ -126,7 +129,7 @@ class custom extends base {
         $tree = \local_gugrades\aggregation::recurse_tree($courseid, $gradecategoryid);
         $form = self::walk_tree($tree, $form);
 
-        // Add additional options
+        // Add additional options.
         $form[] = [
             'identifier' => 'weights',
             'description' => get_string('showweights', 'local_gugrades'),
@@ -148,7 +151,7 @@ class custom extends base {
             'category' => false,
         ];
 
-        // Stored preferences
+        // Stored preferences.
         $preferencename = 'local_gugrades_customaggregationexportselect_' . $gradecategoryid;
         $preferences = get_user_preferences($preferencename);
         if ($preferences) {

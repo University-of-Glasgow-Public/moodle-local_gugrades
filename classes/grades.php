@@ -312,7 +312,8 @@ class grades {
         return true;
     }
 
-    /* Get the gradeitem given the gradecategoryid
+    /**
+     * Get the gradeitem given the gradecategoryid
      * @param int $gradecategoryid
      * @return object
      */
@@ -752,7 +753,7 @@ class grades {
             return;
         }
 
-        // Sanity
+        // Sanity.
         if ($catoverride && ($gradetype != 'CATEGORY')) {
             throw new \moodle_exception('catoverride true when gradetype sis not CATEGORY');
         }
@@ -762,7 +763,7 @@ class grades {
             \local_gugrades\admingrades::validate_admingrade($admingrade);
         }
 
-        // Invalidate provisionalgrade cache
+        // Invalidate provisionalgrade cache.
         self::invalidate_provisionalgrade_cache($gradeitemid, $userid);
 
         // Get/create the column entry.
@@ -820,7 +821,7 @@ class grades {
                 'gradeitemid' => $gradeitemid,
                 'userid' => $userid,
                 'columnid' => $column->id,
-                'iscurrent' => 1
+                'iscurrent' => 1,
             ];
             if ($gugrade = $DB->get_record('local_gugrades_grade', $params)) {
                 $gugrade->rawgrade = $rawgrade;
@@ -1286,7 +1287,7 @@ class grades {
 
         // Is it a category?
         if ($gradeitem->itemtype == 'category') {
-            // Get the aggregated category
+            // Get the aggregated category.
             $category = \local_gugrades\aggregation::get_enhanced_grade_category($courseid, $gradeitem->iteminstance);
 
             // Use the category 'atype' to determine correct class.
@@ -1462,7 +1463,7 @@ class grades {
         $DB->delete_records('local_gugrades_agg_conversion', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_config', ['courseid' => $courseid]);
 
-        // Delete conversion maps
+        // Delete conversion maps.
         $maps = $DB->get_records('local_gugrades_map', ['courseid' => $courseid]);
         foreach ($maps as $map) {
             $DB->delete_records('local_gugrades_map_item', ['mapid' => $map->id]);
@@ -1523,7 +1524,7 @@ class grades {
             'gradeitemid' => $gradeitemid,
             'userid' => $userid,
             'gradetype' => 'RELEASED',
-            'iscurrent' => 1
+            'iscurrent' => 1,
         ];
         if ($grade = $DB->get_record('local_gugrades_grade', $params)) {
             return $grade;
@@ -1637,13 +1638,13 @@ class grades {
     public static function get_aggregated_from_gradeitemid(int $gradeitemid, int $userid) {
         global $DB;
 
-        // Is this definitely a category
+        // Is this definitely a category?
         $item = self::get_gradeitem($gradeitemid);
         if ($item->itemtype != 'category') {
             return false;
         }
 
-        // Get current corresponding gugrades_grade
+        // Get current corresponding gugrades_grade.
         $params = ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'gradetype' => 'CATEGORY', 'iscurrent' => 1];
         if ($grade = $DB->get_record('local_gugrades_grade', $params)) {
             return $grade;
@@ -1676,7 +1677,7 @@ class grades {
     public static function get_altered_weight(int $gradeitemid, int $userid) {
         global $DB;
 
-        // Get original weight
+        // Get original weight.
         $gradeitem = self::get_gradeitem($gradeitemid);
         $originalweight = $gradeitem->aggregationcoef;
         $alteredweight = $originalweight;

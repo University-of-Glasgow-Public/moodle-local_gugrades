@@ -199,7 +199,7 @@ class assign_activity extends base {
         $userflags->workflowstate = $workflowstate;
         $this->assign->update_user_flags($userflags);
 
-        // Update grade
+        // Update grade.
         $grade = $this->assign->get_user_grade($userid, true);
 
         // Is there any feedback comment for this grade?

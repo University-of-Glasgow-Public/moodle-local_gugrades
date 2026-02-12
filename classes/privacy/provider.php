@@ -27,9 +27,15 @@ namespace local_gugrades\privacy;
 use context;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist, approved_userlist, userlist};
+use \core_privacy\local\request\core_userlist_provider;
+
 use stdClass;
 
-class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider {
+/**
+ * Privacy provider class
+ */
+class provider implements
+    \core_privacy\local\metadata\provider, core_userlist_provider, \core_privacy\local\request\plugin\provider {
     /**
      * Returns meta data about this system.
      *
@@ -100,7 +106,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
     public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new \core_privacy\local\request\contextlist();
 
-        // All course contexts for which this user has any data
+        // All course contexts for which this user has any data.
         $sql = "SELECT DISTINCT c.id FROM {context} c
                     JOIN {local_gugrades_grade} ggg ON ggg.courseid = c.instanceid
                     WHERE ggg.userid = :userid
@@ -156,28 +162,28 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
             $courseid = $context->instanceid;
 
-            // local_gugrades_audit
+            // ...local_gugrades_audit.
             $records = $DB->get_records('local_gugrades_audit', ['relateduserid' => $userid, 'courseid' => $courseid]);
             foreach ($records as $record) {
                 writer::with_context($context)
                     ->export_data([], $record);
             }
 
-            // local_gugrades_grade
+            // ...local_gugrades_grade.
             $records = $DB->get_records('local_gugrades_grade', ['userid' => $userid, 'courseid' => $courseid]);
             foreach ($records as $record) {
                 writer::with_context($context)
                     ->export_data([], $record);
             }
 
-            // local_gugrades_hidden
+            // ...local_gugrades_hidden.
             $records = $DB->get_records('local_gugrades_hidden', ['userid' => $userid, 'courseid' => $courseid]);
             foreach ($records as $record) {
                 writer::with_context($context)
                     ->export_data([], $record);
             }
 
-            // local_gugrades_resitrequired
+            // ...local_gugrades_resitrequired.
             $records = $DB->get_records('local_gugrades_resitrequired', ['userid' => $userid, 'courseid' => $courseid]);
             foreach ($records as $record) {
                 writer::with_context($context)
