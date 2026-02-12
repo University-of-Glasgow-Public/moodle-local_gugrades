@@ -109,7 +109,10 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
 
         // Check student mygrades API returns correct data.
         $user = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $this->gradecatsummative->id, $this->student->id);
+            $this->course->id,
+            $this->gradecatsummative->id,
+            $this->student->id
+        );
 
         $this->assertEquals('33.33333', $user->fields[0]['normalisedweight']);
         $this->assertEquals('Summer exam', $user->fields[0]['itemname']);
@@ -133,7 +136,10 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
 
         // Check student mygrades API returns correct data.
         $user = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $this->gradecatsummative->id, $this->student->id);
+            $this->course->id,
+            $this->gradecatsummative->id,
+            $this->student->id
+        );
 
         return;
 

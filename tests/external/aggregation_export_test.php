@@ -144,19 +144,18 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
             $data
         );
 
-        $expected = '"Student name","ID number","Email","Reassessment required","Completed","Letter Grade","Numerical Grade","Summative","Summative Strategy","Summative > Summer exam","Summative > Summer exam Strategy","Summative > Summer exam Weight","Summative > Summer exam > Question 1","Summative > Summer exam > Question 1 Weight","Summative > Summer exam > Question 2","Summative > Summer exam > Question 2 Weight","Summative > Summer exam > Question 3","Summative > Summer exam > Question 3 Weight","Summative > Scale exam","Summative > Scale exam Strategy","Summative > Scale exam Weight","Summative > Scale exam > Schedule B exam","Summative > Scale exam > Schedule B exam Strategy","Summative > Scale exam > Schedule B exam Weight","Summative > Scale exam > Schedule B exam > Question X","Summative > Scale exam > Schedule B exam > Question X Weight","Summative > Scale exam > Schedule B exam > Question Y","Summative > Scale exam > Schedule B exam > Question Y Weight","Summative > Scale exam > Schedule B exam > Question Z","Summative > Scale exam > Schedule B exam > Question Z Weight","Summative > Scale exam > Question A","Summative > Scale exam > Question A Weight","Summative > Scale exam > Question B","Summative > Scale exam > Question B Weight","Summative > Scale exam > Question C","Summative > Scale exam > Question C Weight","Summative > Item 1","Summative > Item 1 Weight","Summative > Item 2","Summative > Item 2 Weight","Summative > Item 3","Summative > Item 3 Weight"
-"Fred Bloggs","1234567","username2@example.com","No","0","","","Cannot aggregate","Weighted mean of grades","Grades missing","Weighted mean of grades","100.00%","No data","100.00%","No data","100.00%","No data","100.00%","Grades missing","Weighted mean of grades","100.00%","Grades missing","Weighted mean of grades","25.00%","No data","75.00%","No data","65.00%","No data","30.00%","No data","75.00%","No data","65.00%","No data","30.00%","No data","50.00%","No data","50.00%","No data","50.00%"
-"Juan Perez","1234560","username3@example.com","No","0","","","Cannot aggregate","Weighted mean of grades","Grades missing","Weighted mean of grades","100.00%","No data","100.00%","No data","100.00%","No data","100.00%","Grades missing","Weighted mean of grades","100.00%","Grades missing","Weighted mean of grades","25.00%","No data","75.00%","No data","65.00%","No data","30.00%","No data","75.00%","No data","65.00%","No data","30.00%","No data","50.00%","No data","50.00%","No data","50.00%"
-';
+        // Get expected data.
+        $path = $CFG->dirroot . '/local/gugrades/tests/external/gradedata/aggregation_export.csv';
+        $expected = file_get_contents($path);
 
         $this->assertEquals($expected, $data['csv']);
 
-        // Check user preferences have been set
+        // Check user preferences have been set.
         $preferences = explode(',', get_user_preferences('local_gugrades_customaggregationexportselect_' . $categoryid));
         $this->assertCount(27, $preferences);
         $this->assertEquals('idnumber', $preferences[1]);
 
-        // Get form again, to check saved settings
+        // Get form again, to check saved settings.
         $form = get_aggregation_export_form::execute($courseid, $categoryid, 'custom');
         $form = external_api::clean_returnvalue(
             get_aggregation_export_form::execute_returns(),

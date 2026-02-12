@@ -110,7 +110,7 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
             'enddate' => time() - (30 * 86400), // Last possible day!
         ]);
 
-        // set 'startdateafter' config setting to allow past courses.
+        // Set 'startdateafter' config setting to allow past courses.
         set_config('startdateafter', strtotime('2019-01-01'), 'local_gugrades');
 
         // Enrol student on all of the above
@@ -234,7 +234,7 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
         $this->assertCount(3, $courses);
         $this->assertFalse($courses[2]['gugradesenabled']);
 
-        // set 'startdateafter' config setting to default to block past courses.
+        // Set 'startdateafter' config setting to default to block past courses.
         set_config('startdateafter', strtotime('2024-08-05'), 'local_gugrades');
         $courses = dashboard_get_courses::execute($studentid, false, true, '');
         $courses = external_api::clean_returnvalue(

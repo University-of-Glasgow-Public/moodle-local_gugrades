@@ -563,7 +563,8 @@ class conversion {
 
         if (!$scalegrade) {
             throw new \moodle_exception(
-                'Unable to convert aggregated grade. Rawgrade = ' . $rawgrade . ' Maxgrade = ' . $maxgrade . ' MapID = ' . $mapid);
+                'Unable to convert aggregated grade. Rawgrade = ' . $rawgrade . ' Maxgrade = ' . $maxgrade . ' MapID = ' . $mapid
+            );
         }
 
         return [$scalegrade->band, $scalegrade->scalevalue];

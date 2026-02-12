@@ -85,15 +85,6 @@ class save_altered_weights extends external_api {
 
         \local_gugrades\api::save_altered_weights($courseid, $categoryid, $userid, $revert, $reason, $items);
 
-        // Log.
-        /*
-        $event = \local_gugrades\event\settings_updated::create([
-            'objectid' => $gradeitemid,
-            'context' => \context_course::instance($courseid),
-        ]);
-        $event->trigger();
-        */
-
         // Audit.
         $gradeitemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($categoryid);
         if ($revert) {

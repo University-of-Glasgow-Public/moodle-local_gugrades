@@ -44,7 +44,7 @@ class import_grades_recursive extends external_api {
             'gradeitemid' => new external_value(PARAM_INT, 'Grade item id number - import peers and children'),
             'groupid' => new external_value(PARAM_INT, 'Group to import for'),
             'additional' => new external_value(PARAM_ALPHA, 'Import additional grades type. Options are admin, missing, update'),
-            'fillns' => new external_value(PARAM_ALPHANUM, 'Users with no submission given NS admin grade. Can be none, fillns or fillns0'),
+            'fillns' => new external_value(PARAM_ALPHANUM, 'Fill when nosubmission. Can be none, fillns or fillns0'),
             'reason' => new external_value(PARAM_TEXT, 'Reason for grade - SECOND, AGREED etc.'),
             'other' => new external_value(PARAM_TEXT, 'Detail if reason == OTHER'),
             'dryrun' => new external_value(PARAM_BOOL, 'Dry run if true, only return numbers'),
@@ -63,7 +63,16 @@ class import_grades_recursive extends external_api {
      * @param bool $dryrun
      * @return array
      */
-    public static function execute(int $courseid, int $gradeitemid, int $groupid, string $additional, string $fillns, string $reason, string $other, bool $dryrun) {
+    public static function execute(
+        int $courseid,
+        int $gradeitemid,
+        int $groupid,
+        string $additional,
+        string $fillns,
+        string $reason,
+        string $other,
+        bool $dryrun
+    ) {
 
         \local_gugrades\development::increase_debugging();
 

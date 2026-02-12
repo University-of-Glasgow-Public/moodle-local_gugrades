@@ -154,7 +154,7 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         );
         $mapid = $mapid['mapid'];
 
-        // Add conversion map to summer exam category,
+        // Add conversion map to summer exam category.
         $nothing = select_conversion::execute($this->course->id, 0, $gradecatsummer->id, $mapid);
         $nothing = external_api::clean_returnvalue(
             select_conversion::execute_returns(),
@@ -191,9 +191,13 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         $this->assertEquals(17.8, $users[0]['rawgrade']);
         $this->assertEquals(18, $users[0]['total']);
 
-        // Get corresponding itemid for summerexam,
+        // Get corresponding itemid for summerexam.
         $summerexamitem = $DB->get_record(
-            'grade_items', ['itemtype' => 'category', 'iteminstance' => $gradecatsummer->id], '*', MUST_EXIST);
+            'grade_items',
+            ['itemtype' => 'category', 'iteminstance' => $gradecatsummer->id],
+            '*',
+            MUST_EXIST
+        );
 
         // Override category grade for gradecatsummer.
         $nothing = write_additional_grade::execute(

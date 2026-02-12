@@ -44,6 +44,7 @@ require_once($CFG->dirroot . '/grade/lib.php');
 class aggregation {
     /**
      * Store instance(s)
+     * @var array $instances
      */
     private $instances = [];
 
@@ -292,7 +293,7 @@ class aggregation {
 
         $user = \local_gugrades\users::add_picture_and_profile_to_user_record($courseid, $user);
 
-        // Initials
+        // Initials.
         [$user->firstinitial, $user->lastinitial] = \local_gugrades\users::get_initials($user);
 
         return $user;
@@ -328,7 +329,7 @@ class aggregation {
             $user->completed = 0;
             $user->error = get_string('gradesmissing', 'local_gugrades');
 
-            // Initials
+            // Initials.
             [$user->firstinitial, $user->lastinitial] = \local_gugrades\users::get_initials($user);
         }
 
@@ -429,13 +430,13 @@ class aggregation {
             ]
         );
 
-        // There must be at least one
+        // There must be at least one.
         $nitems = count($items);
         if ($nitems == 0) {
             throw new \moodle_exception('No CATEGORY record found');
         }
 
-        // Get the item we are going to return
+        // Get the item we are going to return.
         $returnitem = array_shift($items);
 
         // If there are any left...
@@ -466,14 +467,12 @@ class aggregation {
             return $cacheduser;
         }
 
-        // Get any hidden gradeitems
+        // Get any hidden gradeitems.
         $hiddenids = self::get_user_hidden($courseid, $user->id);
 
         // Get the grade item corresponding to this category.
         $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
         $gradecatitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
-        // $gradecatitem = $DB->get_record('grade_items',
-        // ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
 
         $fields = [];
         $items = [];
@@ -493,7 +492,6 @@ class aggregation {
                 'isscale' => $column->isscale,
                 'dropped' => false,
                 'isadmin' => false,
-                // 'hidden' => self::is_grade_hidden($column->gradeitemid, $user->id),
                 'hidden' => in_array($column->gradeitemid, $hiddenids),
                 'overridden' => false,
                 'available' => true,
@@ -518,7 +516,7 @@ class aggregation {
             }
 
             // If a module, check for visibility/availability.
-            // MGU-1350, incorrect check for column type (userids can be empty) if ($column->userids) {
+            // MGU-1350, incorrect check for column type (userids can be empty) if ($column->userids) {.
             if (!$column->categoryid) {
                 $available = in_array($user->id, $column->userids);
                 $data['available'] = $available;
@@ -543,21 +541,13 @@ class aggregation {
         [$atype, $warnings] = self::get_aggregation_type($items, $gradecategoryid);
         $aggregation = self::aggregation_factory($courseid, $atype);
 
-        // Has grade been converted
+        // Has grade been converted.
         $converted = \local_gugrades\conversion::is_category_conversion_applied($courseid, $gradecategoryid);
 
         // Get original data for "aggregated category" as we may not have got it elsewhere.
         // This is needed if no aggregation is performed.
         // This is messy :( but check for duplicate CATEGORY grades here and fix.
         $item = self::get_check_category($courseid, $gradecatitem->id, $user->id);
-        // $item = $DB->get_record('local_gugrades_grade',
-        // [
-        // 'courseid' => $courseid,
-        // 'gradeitemid' => $gradecatitem->id,
-        // 'gradetype' => 'CATEGORY',
-        // 'userid' => $user->id,
-        // 'iscurrent' => 1,
-        // ], '*', MUST_EXIST);
         $user->rawgrade = $item->rawgrade;
         $user->total = $item->convertedgrade;
         $user->displaygrade = $converted && empty($item->admingrade) ? $item->displaygrade . ' (' . $item->rawgrade . ')' : $item->displaygrade;
@@ -566,7 +556,6 @@ class aggregation {
         $user->admingrade = $item->admingrade;
         $weighted = $aggregation->is_strategy_weighted($gcat->aggregation);
         $user->completed = $aggregation->completion($items, $weighted);
-        // $user->error = $item->auditcomment;
         $user->error = '';
         $user->overridden = $item->catoverride;
         $user->itemname = $gcat->fullname;
@@ -574,7 +563,7 @@ class aggregation {
         // Mismatch (can possibly do better).
         $released = \local_gugrades\grades::is_grades_released($courseid, $gradecatitem->id);
 
-        // Cache result
+        // Cache result,
         $cache->set($cachetag, $user);
 
         return $user;
@@ -593,14 +582,10 @@ class aggregation {
     public static function add_aggregation_fields_to_users(int $courseid, int $gradecategoryid, array $users, array $columns) {
         global $DB;
 
-        // xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
-
         $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
 
         // Get the grad item corresponding to this category.
         $gradecatitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
-        // $gradecatitem = $DB->get_record('grade_items',
-        // ['itemtype' => 'category', 'iteminstance' => $gradecategoryid], '*', MUST_EXIST);
 
         // Debugging stuff.
         $userhelpercount = 0;
@@ -624,8 +609,6 @@ class aggregation {
         // Debug stuff.
         $debug = [];
         $debug[]['line'] = "$userhelpercount User helper calls count.";
-
-        // file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
 
         return [$users, $debug];
     }

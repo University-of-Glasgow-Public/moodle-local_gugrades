@@ -57,7 +57,10 @@ class get_activities extends external_api {
         \local_gugrades\development::increase_debugging();
 
         // Security.
-        $params = self::validate_parameters(self::execute_parameters(), ['courseid' => $courseid, 'categoryid' => $categoryid, 'detailed' => $detailed]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['courseid' => $courseid, 'categoryid' => $categoryid, 'detailed' => $detailed]
+        );
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 

@@ -279,7 +279,7 @@ class api {
         array_shift($lines);
 
         // If existing "other" then reason will look like OTHER_xxx,
-        // where xxx is the columnid
+        // where xxx is the columnid.
         if (str_starts_with($reason, 'OTHER_')) {
             $other = \local_gugrades\grades::unpack_other($courseid, $reason);
             $reason = 'OTHER';
@@ -594,7 +594,7 @@ class api {
 
         $fillns = self::check_fillns($fillns);
 
-        // If reason is empty then assume FIRST
+        // If reason is empty then assume FIRST.
         if (!$reason) {
             $reason = 'FIRST';
         }
@@ -607,7 +607,7 @@ class api {
         // Check for additional.
         // admin - skip either missing or admin grade
         // missing - skip only missing grades (not admin)
-        // update - just carry on and replace anything
+        // update - just carry on and replace anything.
         if ($additional != 'update') {
             if (\local_gugrades\grades::skip_update($gradeitemid, $userid, $additional)) {
                 return false;
@@ -632,7 +632,7 @@ class api {
 
             [$convertedgrade, $displaygrade] = $mapping->import($rawgrade);
 
-            // don't write or aggregate if it's a dry run
+            // Don't write or aggregate if it's a dry run.
             if (!$dryrun) {
                 // TODO: Is rawgrade correct? For scheduleB this will be completely
                 // unrelated. E.g. rawgrade 6 = converted grade = 14.
@@ -641,7 +641,6 @@ class api {
                     gradeitemid:    $gradeitemid,
                     userid:         $userid,
                     admingrade:     '',
-                    // rawgrade:       $rawgrade,
                     rawgrade:       $convertedgrade,
                     convertedgrade: $convertedgrade,
                     displaygrade:   $displaygrade,
@@ -654,7 +653,7 @@ class api {
                     ispoints:       !$mapping->is_scale(),
                 );
 
-                // Re-aggregate this user
+                // Re-aggregate this user.
                 if (!$noaggregation && $aggregationsupported) {
                     \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $userid);
                 }
@@ -685,7 +684,7 @@ class api {
                 );
             }
 
-            // Re-aggregate this user
+            // Re-aggregate this user.
             if (!$noaggregation) {
                 \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $userid);
             }
@@ -855,7 +854,16 @@ class api {
      * @param bool $dryrun
      * @return array [itemcount, gradecount]
      */
-    public static function import_grades_recursive(int $courseid, int $gradeitemid, int $groupid, string $additional, string $fillns, string $reason, string $other, bool $dryrun) {
+    public static function import_grades_recursive(
+        int $courseid,
+        int $gradeitemid,
+        int $groupid,
+        string $additional,
+        string $fillns,
+        string $reason,
+        string $other,
+        bool $dryrun
+    ) {
         global $DB;
 
         // This could legitimately take forever

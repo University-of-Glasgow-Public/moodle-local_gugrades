@@ -148,7 +148,7 @@ class usercapture {
             return false;
         }
 
-        // Create a list of grades that are valid from 1st, 2nd, 3rd
+        // Create a list of grades that are valid from 1st, 2nd, 3rd.
         $indexes = ['FIRST', 'SECOND', 'THIRD'];
         $compare = [];
         foreach ($indexes as $index) {
@@ -157,7 +157,7 @@ class usercapture {
             }
         }
 
-        // If there's none or one then not an alert
+        // If there's none or one then not an alert.
         if (count($compare) <= 1) {
             return false;
         }
@@ -249,7 +249,7 @@ class usercapture {
 
         $this->provisional = null;
 
-        // Get the gradeitem to sanity check grade, MGU-1344
+        // Get the gradeitem to sanity check grade, MGU-1344.
         $gradeitem = \local_gugrades\grades::get_gradeitem($this->gradeitemid);
 
         // ...id is a proxy for time added.
@@ -267,8 +267,11 @@ class usercapture {
 
             // MGU-1344: If points grade, check for over-range. Can happen if grade item edited after import.
             if ($provisional->points && ($provisional->rawgrade > $gradeitem->grademax)) {
-                throw new \moodle_exception('Out of range grade detected for ' . $gradeitem->itemname .
-                    '. gradeitemid = ' . $this->gradeitemid . ', userid = ' . $this->userid . ', rawgrade = ' . $provisional->rawgrade . ', grademax = ' . $gradeitem->grademax);
+                throw new \moodle_exception(
+                    'Out of range grade detected for ' . $gradeitem->itemname .
+                    '. gradeitemid = ' . $this->gradeitemid . ', userid = ' . $this->userid .
+                    ', rawgrade = ' . $provisional->rawgrade . ', grademax = ' . $gradeitem->grademax
+                );
             }
             $provisionalcolumn = \local_gugrades\grades::get_column(
                 $this->courseid,

@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  * Test importing grades multiple times into 'other'
  */
 final class MGU_1365_test extends \local_gugrades\external\gugrades_advanced_testcase {
-
     /**
      * Import grades
      *

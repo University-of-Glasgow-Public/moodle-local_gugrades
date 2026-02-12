@@ -43,7 +43,7 @@ class import_grades_users extends external_api {
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'gradeitemid' => new external_value(PARAM_INT, 'Grade item id number'),
             'additional' => new external_value(PARAM_ALPHA, 'Import additional grades type. Options are admin, missing, update'),
-            'fillns' => new external_value(PARAM_ALPHANUM, 'Users with no submission given NS admin grade. Can be none, fillns or fillns0'),
+            'fillns' => new external_value(PARAM_ALPHANUM, 'Fill on no submission. Can be none, fillns or fillns0'),
             'reason' => new external_value(PARAM_TEXT, 'Reason for grade - SECOND, AGREED etc.'),
             'other' => new external_value(PARAM_TEXT, 'Detail if reason == OTHER'),
             'dryrun' => new external_value(PARAM_BOOL, 'Dry run if true, only return numbers'),
@@ -98,16 +98,10 @@ class import_grades_users extends external_api {
         $userids = $userlist;
         $importcount = 0;
 
-        // \local_gugrades\development::xhprof_start();
-
         // Track progress
         $count = 0;
 
         foreach ($userids as $userid) {
-            // If additional selected then skip users who already have data.
-            // if ($additional && \local_gugrades\grades::user_has_grades($gradeitemid, $userid)) {
-            // continue;
-            // }
             if (
                 \local_gugrades\api::import_grade(
                     courseid:       $courseid,
@@ -131,8 +125,6 @@ class import_grades_users extends external_api {
             $progress = 100 * $count / count($userids);
             \local_gugrades\progress::record($courseid, 0, 'import', intval($progress));
         }
-
-        // \local_gugrades\development::xhprof_stop();
 
         // Log.
         if (!$dryrun) {

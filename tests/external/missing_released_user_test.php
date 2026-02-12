@@ -62,11 +62,15 @@ final class missing_released_user_test extends \local_gugrades\external\gugrades
 
         // Enrol a new student into the course.
         $newstudent = $this->getDataGenerator()->create_user(
-            ['idnumber' => '1234569', 'firstname' => 'Greg', 'lastname' => 'Pedder']);
+            ['idnumber' => '1234569', 'firstname' => 'Greg', 'lastname' => 'Pedder']
+        );
         $this->getDataGenerator()->enrol_user($newstudent->id, $this->course->id, 'student');
 
         // Try to get data for this student.
         $newuserdata = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $this->gradecatsumm->id, $newstudent->id);
+            $this->course->id,
+            $this->gradecatsumm->id,
+            $newstudent->id
+        );
     }
 }

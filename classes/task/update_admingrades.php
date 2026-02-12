@@ -25,6 +25,9 @@
 
 namespace local_gugrades\task;
 
+/**
+ * Update admin grades when edited in settings
+ */
 class update_admingrades extends \core\task\adhoc_task {
     /**
      * Create the task

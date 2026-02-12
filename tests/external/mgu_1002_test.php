@@ -153,7 +153,7 @@ final class mgu_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_is_cos7_EC_admin_grade(): void {
+    public function test_is_cos7_ec_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);

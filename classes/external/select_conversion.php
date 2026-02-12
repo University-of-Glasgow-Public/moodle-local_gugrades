@@ -80,7 +80,6 @@ class select_conversion extends external_api {
         }
 
         // Log.
-        // TODO: Improve for gradecategoryid
         $event = \local_gugrades\event\select_conversion::create([
             'objectid' => $gradeitemid,
             'context' => \context_course::instance($courseid),

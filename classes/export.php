@@ -75,26 +75,26 @@ class export {
         // Get the year from the course start date.
         $year = date('Y', $course->startdate);
 
-        // Get any records for this course from gudatabase
+        // Get any records for this course from gudatabase,
         if (self::is_enrol_gudatabase_enabled()) {
             $codes = array_values($DB->get_records('enrol_gudatabase_codes', ['courseid' => $courseid]));
         } else {
             $codes = [];
         }
 
-        // Create standard "MyCampus" format ONLY if there is a single code
+        // Create standard "MyCampus" format ONLY if there is a single code.
         if (count($codes) == 1) {
             $code = $codes[0]->code;
 
             // Split the code into the alpha and numeric parts
-            // e.g. BIOL1001 is BIOL and 1001
+            // e.g. BIOL1001 is BIOL and 1001.
             preg_match('#([A-Z]+)(\d+)([A-Z]*)#', $code, $match);
             $subject = $match[1];
             $catnumber = $match[2];
 
             return $subject . '_' . $catnumber . '_' . $year;
         } else {
-             // Make up some name
+             // Make up some name.
              return 'MyGrades_' . $course->shortname . '_' . $year;
         }
     }
@@ -108,7 +108,7 @@ class export {
     public static function get_aggregation_export_plugins(int $courseid, int $gradecategoryid) {
         global $CFG;
 
-        // Get all the php files in export directory
+        // Get all the php files in export directory.
         $dirpath = $CFG->dirroot . '/local/gugrades/classes/export/';
         $paths = glob($dirpath . '*.php');
 
@@ -119,12 +119,12 @@ class export {
             if ($file = end($parts)) {
                 $nameparts = explode('.', $file);
                 if ($name = reset($nameparts)) {
-                    // 'base' is not for use
+                    // ...'base' is not for use/
                     if ($name == 'base') {
                         continue;
                     }
 
-                    // Instantiate class
+                    // Instantiate class.
                     $classname = 'local_gugrades\\export\\' . $name;
                     $export = new $classname();
                     $description = $export->get_name();
@@ -137,7 +137,7 @@ class export {
             }
         }
 
-        // Get proposed filename
+        // Get proposed filename.
         $filename = self::get_filename($courseid);
 
         return [
@@ -180,7 +180,13 @@ class export {
      * @param array $form
      * @return array
      */
-    public static function get_aggregation_export_data(int $courseid, int $gradecategoryid, int $groupid, string $pluginname, array $form) {
+    public static function get_aggregation_export_data(
+        int $courseid,
+        int $gradecategoryid,
+        int $groupid,
+        string $pluginname,
+        array $form
+    ) {
 
         $plugin = self::get_export_plugin($pluginname);
 

@@ -67,7 +67,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
         $this->gradecatsummative = $DB->get_record('grade_categories', ['fullname' => 'Summative'], '*', MUST_EXIST);
         $this->gradecatquizzes = $DB->get_record('grade_categories', ['fullname' => 'Quizzes'], '*', MUST_EXIST);
 
-        // Get the itemids
+        // Get the itemids.
         $itemids['Quizzes'] = $this->get_gradeitemid_for_category('Quizzes');
         $itemids['Labs'] = $DB->get_record('grade_items', ['itemname' => 'Labs'], '*', MUST_EXIST)->id;
         $itemids['ExamA'] = $DB->get_record('grade_items', ['itemname' => 'Exam A'], '*', MUST_EXIST)->id;
@@ -134,9 +134,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
         );
     }
 
-    // ==================================================================
-    // TESTS FROM LEVEL 2+ TAB
-    // ==================================================================
+    // TESTS FROM LEVEL 2+ TAB.
 
     /**
      * Test "With DFR deferred grade"
@@ -630,9 +628,7 @@ final class aggregation_examples_test extends \local_gugrades\external\gugrades_
         $this->assertEquals('NS', $fred['displaygrade']);
     }
 
-    // ==================================================================
-    // TESTS FROM LEVEL 1 TAB
-    // ==================================================================
+    // TESTS FROM LEVEL 1 TAB.
 
     /**
      * Test "With DFR deferred grade"

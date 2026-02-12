@@ -64,10 +64,21 @@ class write_additional_grade extends external_api {
      * @param int $scale
      * @param float $grade
      * @param string $notes
-     * @parm bool $delete
+     * @param bool $delete
      * @return array
      */
-    public static function execute($courseid, $gradeitemid, $userid, $reason, $other, $admingrade, $scale, $grade, $notes, $delete = false) {
+    public static function execute(
+        $courseid,
+        $gradeitemid,
+        $userid,
+        $reason,
+        $other,
+        $admingrade,
+        $scale,
+        $grade,
+        $notes,
+        $delete = false
+    ) {
         global $DB;
 
         \local_gugrades\development::increase_debugging();

@@ -24,9 +24,12 @@
 
 namespace local_gugrades\task;
 
+/**
+ * Cleanup old data
+ */
 class cleanup extends \core\task\scheduled_task {
     public function get_name() {
-        // Shown in admin screens
+        // Shown in admin screens.
         return get_string('cleanuptask', 'local_gugrades');
     }
 
@@ -36,7 +39,7 @@ class cleanup extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        // Delete unused intermediate category grades after 6 months
+        // Delete unused intermediate category grades after 6 months.
         $cutoff = time() - (183 * 86400);
 
         $select = 'gradetype="CATEGORY"

@@ -25,6 +25,9 @@
 
 namespace local_gugrades\task;
 
+/**
+ * Recalculate in the background
+ */
 class recalculate extends \core\task\adhoc_task {
     /**
      * Create the task

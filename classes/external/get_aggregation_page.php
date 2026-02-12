@@ -77,8 +77,6 @@ class get_aggregation_page extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        // \local_gugrades\development::xhprof_start();
-
         $page = \local_gugrades\api::get_aggregation_page(
             $courseid,
             $gradecategoryid,
@@ -87,8 +85,6 @@ class get_aggregation_page extends external_api {
             $groupid,
             $aggregate
         );
-
-        // \local_gugrades\development::xhprof_stop();
 
         return $page;
     }

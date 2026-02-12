@@ -23,6 +23,8 @@
  * @copyright  2024
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameLowerCase
  */
 
 namespace local_gugrades\aggregation;
@@ -115,8 +117,6 @@ class base {
      * @return array
      */
     public function availability(array $items, int $userid) {
-        // return $items;
-        // $this->availableuserids = [];
 
         $filtereditems = [];
         foreach ($items as $id => $item) {
@@ -136,7 +136,7 @@ class base {
             }
 
             // MGU-1351
-            // A missing grade that is tagged as a resit is a proxy for not available
+            // A missing grade that is tagged as a resit is a proxy for not available.
             if (\local_gugrades\grades::is_resit_gradeitem($item->itemid) && $item->grademissing) {
                 continue;
             }
@@ -163,7 +163,7 @@ class base {
 
         $strnotavailable = get_string('notavailable', 'local_gugrades');
 
-        // MGU-1349: At level 1, return CW and no error
+        // MGU-1349: At level 1, return CW and no error.
         if ($level == 1) {
             $admingrade = 'CREDITWITHHELD';
             [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
@@ -182,7 +182,7 @@ class base {
      */
     public function pre_process_items(array $items) {
 
-        // Drop any GOODCAUSE_NR
+        // Drop any GOODCAUSE_NR.
         $newitems = [];
         foreach ($items as $item) {
             if ($item->admingrade != 'GOODCAUSE_NR') {
@@ -193,7 +193,7 @@ class base {
         }
 
         // If this has resulted in ALL items being removed then the
-        // result is also GOODCAUSE_NR
+        // result is also GOODCAUSE_NR.
         if (count($newitems) == 0) {
             $this->explain = get_string('explain_allmv0', 'local_gugrades');
             $agrade = 'GOODCAUSE_NR';
@@ -243,7 +243,7 @@ class base {
         $notdropitems = array_slice($items, $n);
 
         // Find gradeitems that are being dropped
-        // (So that they can be marked as such)
+        // (So that they can be marked as such).
         $droppeditems = array_slice($items, 0, $n);
 
         return [$notdropitems, $droppeditems];
@@ -260,7 +260,7 @@ class base {
      */
     public function admin_grade_precheck(int $level, array $items) {
 
-        // Any '07' admin grades means aggregation is 07
+        // Any '07' admin grades means aggregation is 07.
         foreach ($items as $item) {
             if ($item->admingrade == 'DEFERRED') {
                 $this->explain = get_string('explain_any07', 'local_gugrades');
@@ -271,7 +271,7 @@ class base {
         // If there is a mix of MV and NS then aggregation is MV (Good Cause Withheld)
         // See MGU-1009
         // Replaced by: MGU-1210
-        // Level 1 only
+        // Level 1 only.
         if ($level == 1) {
             $nsfound = false;
             $mvfound = false;
@@ -289,7 +289,7 @@ class base {
             }
         }
 
-        // Any 'INTERRUPTIONOFSTUDIES' admin grades potentially means aggregation is IS (MGU-1002)
+        // Any 'INTERRUPTIONOFSTUDIES' admin grades potentially means aggregation is IS (MGU-1002).
         foreach ($items as $item) {
             if ($item->admingrade == 'INTERRUPTIONOFSTUDIES') {
                 $this->explain = get_string('explain_anyis', 'local_gugrades');
@@ -297,7 +297,7 @@ class base {
             }
         }
 
-        // Any 'MV' admin grades means aggregation is MV
+        // Any 'MV' admin grades means aggregation is MV.
         foreach ($items as $item) {
             if ($item->admingrade == 'GOODCAUSE_FO') {
                 $this->explain = get_string('explain_anymv', 'local_gugrades');
@@ -305,7 +305,7 @@ class base {
             }
         }
 
-        // If ALL grades are NS/NS0, then return NS (MGU-1191)
+        // If ALL grades are NS/NS0, then return NS (MGU-1191).
         $allns = true;
         foreach ($items as $item) {
             if (($item->admingrade != 'NOSUBMISSION') && ($item->admingrade != 'NOSUBMISSION_0')) {
@@ -323,7 +323,7 @@ class base {
             }
         }
 
-        // No admin grade found
+        // No admin grade found.
         return '';
     }
 
@@ -365,11 +365,11 @@ class base {
         // ...unless one of the items is MV0, then it's MV
         // MGU-1110 CoS11
         // UNLESS there is any NS - CoS12
-        // Superceded by MGU-1213
+        // Superceded by MGU-1213.
         if ($completion < 75.0) {
-            // Check for MV0
+            // Check for MV0.
             if ($this->mv0found) {
-                // If there is an NS, then it's CW
+                // If there is an NS, then it's CW.
                 foreach ($items as $item) {
                     if ($item->admingrade == 'NOSUBMISSION') {
                         $this->explain = get_string('explain_lessthan75mv0level1ns', 'local_gugrades');
@@ -418,7 +418,7 @@ class base {
             return [$norm, $item->admingrade, $explain];
         }
 
-        // Which item (index) is the resit item
+        // Which item (index) is the resit item.
         $resitindex = false;
         $firstindex = false;
         foreach ($items as $index => $item) {
@@ -447,7 +447,7 @@ class base {
             }
         }
 
-        // If there are any admin grades, then the resit item is the result
+        // If there are any admin grades, then the resit item is the result.
         if ($items[0]->admingrade || $items[1]->admingrade) {
             $explain = get_string('explain_resitadmingrade', 'local_gugrades');
             $item = $items[$resitindex];
@@ -526,7 +526,7 @@ class base {
      */
     public function round_float(float $value) {
 
-        // MGU-1236
+        // MGU-1236.
         return round($value, 5, PHP_ROUND_HALF_DOWN);
     }
 
