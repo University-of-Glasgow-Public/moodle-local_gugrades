@@ -207,7 +207,7 @@ class users {
      * Add picture to single user record
      * @param int $courseid
      * @param object $user
-     * @param return object
+     * @return object
      */
     public static function add_picture_and_profile_to_user_record(int $courseid, object $user) {
         global $PAGE;

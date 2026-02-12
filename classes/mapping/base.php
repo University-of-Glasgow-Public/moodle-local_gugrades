@@ -154,7 +154,7 @@ abstract class base {
     /**
      * Handle imported grade
      * Create both converted grade (actual value) and display grade
-     * @param float|null $grade
+     * @param float|null $floatgrade
      * @return [float, string]
      */
     public function import(float|null $floatgrade) {
