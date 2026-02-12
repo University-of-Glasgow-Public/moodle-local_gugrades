@@ -84,7 +84,7 @@ final class get_capture_user_test extends \local_gugrades\external\gugrades_adva
             $page
         );
 
-        // Now get data for individual user
+        // Now get data for individual user.
         $user = get_capture_user::execute($this->course->id, $this->gradeitemidassign2, $this->student->id, false);
         $user = external_api::clean_returnvalue(
             get_capture_user::execute_returns(),

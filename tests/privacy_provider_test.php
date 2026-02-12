@@ -37,6 +37,7 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
      * Set up.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
     }
 
@@ -69,6 +70,8 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
 
     /**
      * Ensure that get_metadata exports valid content.
+     *
+     * @covers \local_gugrades\privacy\provider
      */
     public function test_get_metadata(): void {
         $items = new collection('local_gugrades');
@@ -79,10 +82,12 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
 
     /**
      * Test that user who has no grades is not returned
+     *
+     * @covers \local_gugrades\privacy\provider
      */
     public function test_user_no_grades(): void {
 
-        // Basic course and user set up
+        // Basic course and user set up.
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_user(['idnumber' => '1234567', 'firstname' => 'Fred', 'lastname' => 'Bloggs']);
         $teacher = $this->getDataGenerator()->create_user(['idnumber' => '123', 'firstname' => 'Jim', 'lastname' => 'Smith']);
@@ -99,10 +104,12 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
 
     /**
      * Test that user who HAS grades IS returned
+     *
+     * @covers \local_gugrades\privacy\provider
      */
     public function test_user_with_grades(): void {
 
-        // Basic course and user set up
+        // Basic course and user set up.
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_user(['idnumber' => '1234567', 'firstname' => 'Fred', 'lastname' => 'Bloggs']);
         $teacher = $this->getDataGenerator()->create_user(['idnumber' => '123', 'firstname' => 'Jim', 'lastname' => 'Smith']);
@@ -111,7 +118,7 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
         $this->setUser($teacher);
         $gradeitem = $this->getDataGenerator()->create_grade_item(['courseid' => $course->id]);
 
-        // Write grade to MyGrades
+        // Write grade to MyGrades.
         $this->write_mygrades_grade($course->id, $student->id, $gradeitem->id, 50.0);
 
         // Test that no contexts were retrieved.
@@ -123,10 +130,12 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
 
     /**
      * Test for provider::get_users_in_context().
+     *
+     * @covers \local_gugrades\privacy\provider
      */
     public function test_get_users_in_context(): void {
 
-        // Basic course and user set up
+        // Basic course and user set up.
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_user(['idnumber' => '1234567', 'firstname' => 'Fred', 'lastname' => 'Bloggs']);
         $teacher = $this->getDataGenerator()->create_user(['idnumber' => '123', 'firstname' => 'Jim', 'lastname' => 'Smith']);
@@ -135,7 +144,7 @@ final class privacy_provider_test extends \core_privacy\tests\provider_testcase 
         $this->setUser($teacher);
         $gradeitem = $this->getDataGenerator()->create_grade_item(['courseid' => $course->id]);
 
-        // Write grade to MyGrades
+        // Write grade to MyGrades.
         $this->write_mygrades_grade($course->id, $student->id, $gradeitem->id, 50.0);
 
         $context = \context_course::instance($course->id);

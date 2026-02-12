@@ -153,6 +153,7 @@ final class get_aggregation_user_test extends \local_gugrades\external\gugrades_
     /**
      * Check API call when there is no data
      *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
      */
     public function test_direct_no_data(): void {
         global $DB;

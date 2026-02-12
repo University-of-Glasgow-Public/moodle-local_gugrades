@@ -263,7 +263,7 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         // Launch change of precision for field admingrade.
         $dbman->change_field_precision($table, $field);
 
-        // Update setting defaults
+        // Update setting defaults.
         \local_gugrades\admingrades::setting_defaults();
 
         // Map old admin codes (in db) to new names.

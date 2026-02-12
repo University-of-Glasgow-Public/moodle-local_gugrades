@@ -44,12 +44,12 @@ final class get_image_urls_test extends \local_gugrades\external\gugrades_advanc
      */
     public function test_urls(): void {
 
-        // Get URL for some images
+        // Get URL for some images.
         $images = [
             ['imagename' => 'MyGradesLogoSmall', 'component' => 'local_gugrades'],
         ];
 
-        // Call external function
+        // Call external function.
         $urls = get_image_urls::execute($this->course->id, $images);
         $urls = external_api::clean_returnvalue(
             get_image_urls::execute_returns(),

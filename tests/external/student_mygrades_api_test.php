@@ -107,8 +107,9 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
         $this->assertEquals(50, $columns[1]['weight']);
         $this->assertEquals(50, $columns[2]['weight']);
 
-        // Check student mygrades API returns correct data
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsummative->id, $this->student->id);
+        // Check student mygrades API returns correct data.
+        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $this->gradecatsummative->id, $this->student->id);
 
         $this->assertEquals('33.33333', $user->fields[0]['normalisedweight']);
         $this->assertEquals('Summer exam', $user->fields[0]['itemname']);
@@ -130,17 +131,16 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
             );
         }
 
-        // Check student mygrades API returns correct data
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsummative->id, $this->student->id);
-
-        // var_dump($user);
+        // Check student mygrades API returns correct data.
+        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $this->gradecatsummative->id, $this->student->id);
 
         return;
 
-        // Change item 1 to an MV
+        // Change item 1 to an MV.
         $this->apply_admingrade('Item 1', $this->student->id, 'MV');
 
-        // This should result in a GCW (MGU-1009)
+        // This should result in a GCW (MGU-1009).
         $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, false);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),
@@ -152,7 +152,7 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
         $this->assertEquals(0.0, $fred['rawgrade']);
         $this->assertEquals(33, $fred['completed']);
 
-        // Change question 3 to 07 admingrade
+        // Change question 3 to 07 admingrade/
         $this->apply_admingrade('Question 3', $this->student->id, '07');
 
         // Get aggregation page for above.

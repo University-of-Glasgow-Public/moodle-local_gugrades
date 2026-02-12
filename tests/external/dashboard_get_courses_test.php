@@ -47,10 +47,10 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
 
         $context = \context_course::instance($courseid);
 
-        // Find the custom field
+        // Find the custom field.
         $field = $DB->get_record('customfield_field', ['shortname' => 'studentmygrades'], '*', MUST_EXIST);
 
-        // does the field exist
+        // Does the field exist?
         if (!$data = $DB->get_record('customfield_data', ['fieldid' => $field->id, 'instanceid' => $courseid])) {
             $data = new \stdClass();
             $data->fieldid = $field->id;
@@ -80,7 +80,7 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
     public function test_filter_courses_by_date(): void {
         global $DB;
 
-        // Staff for next bit
+        // Staff for next bit.
         $this->setUser($this->teacher->id);
 
         // Create some courses with suitable end dates.
@@ -110,7 +110,7 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
             'enddate' => time() - (30 * 86400), // Last possible day!
         ]);
 
-        // set 'startdateafter' config setting to allow past courses
+        // set 'startdateafter' config setting to allow past courses.
         set_config('startdateafter', strtotime('2019-01-01'), 'local_gugrades');
 
         // Enrol student on all of the above
@@ -145,7 +145,7 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
         $this->assertIsArray($courses);
         $this->assertCount(2, $courses);
 
-        // Just enable the rest
+        // Just enable the rest.
         $this->enable_course($currentcourse2->id, true);
         $this->enable_course($pastcourse1->id, true);
         $this->enable_course($this->course->id, true);
@@ -195,7 +195,7 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
         $this->assertCount(3, $courses);
         $this->assertEquals('Current Course Two', $courses[1]['fullname']);
 
-        // Staff for next bit
+        // Staff for next bit.
         $this->setUser($this->teacher->id);
 
         // MyGrades is enabled by releasing grades for a course.

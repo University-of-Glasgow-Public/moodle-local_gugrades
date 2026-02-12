@@ -33,7 +33,7 @@ $PAGE->set_url($url);
 $PAGE->add_body_class("gugrades");
 $PAGE->set_pagelayout('report');
 
-// Set docroot to our own location
+// Set docroot to our own location.
 $helpurl = get_config('local_gugrades', 'helpurl');
 $helptext = get_config('local_gugrades', 'helptext');
 $CFG->docroot = $helpurl;
@@ -50,7 +50,7 @@ require_login($course);
 $context = context_course::instance($courseid);
 require_capability('local/gugrades:view', $context);
 
-// Navigation
+// Navigation.
 $coursenode = $PAGE->navigation->find($courseid, navigation_node::TYPE_COURSE);
 $mygradesnode = $coursenode->add(get_string('staffmygrades', 'local_gugrades'));
 $mygradesnode->make_active();
@@ -62,7 +62,7 @@ $event = \local_gugrades\event\view_gugrades::create([
 ]);
 $event->trigger();
 
-// Check that the MyGrade custom course field exists
+// Check that the MyGrade custom course field exists.
 custom_course_field();
 
 // VueJS stuff gets injected here.
@@ -70,7 +70,7 @@ echo $OUTPUT->header();
 
 echo "<div id=\"app\"></div>";
 
-// LISU Link
+// LISU Link.
 $lisuurl = "https://gla.sharepoint.com/sites/learning-innovation/SitePages/LISU-Guides-MyGrades.aspx";
 echo '<div class="text-center my-3">
           <a class="btn btn-info px-5" href="' . $helpurl . '" target="_blank">' . $helptext . '</a>

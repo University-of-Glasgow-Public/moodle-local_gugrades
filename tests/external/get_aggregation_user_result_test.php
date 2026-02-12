@@ -111,7 +111,7 @@ final class get_aggregation_user_result_test extends \local_gugrades\external\gu
 
         $this->assertEquals('D1 (10.8)', $user['displaygrade']);
 
-        // Change a grade and see what happens
+        // Change a grade and see what happens.
         $item2id = $this->get_gradeitemid('Item 2');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,

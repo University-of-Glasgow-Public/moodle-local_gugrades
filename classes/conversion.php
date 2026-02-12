@@ -98,7 +98,7 @@ class conversion {
         // Get scale.
         $scaleitems = self::get_scale($schedule);
 
-        // MGU_1293: Get rid of No Grade option
+        // MGU_1293: Get rid of No Grade option.
         unset($scaleitems[-1]);
 
         // Unpack defaults.
@@ -390,7 +390,7 @@ class conversion {
         if ($mapid == 0) {
             $DB->delete_records('local_gugrades_map_item', $params);
 
-            // If category, remove any overridden grades
+            // If category, remove any overridden grades.
             if ($gradecategoryid) {
                 $gradeitemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($gradecategoryid);
                 $sql = "DELETE FROM {local_gugrades_grade}
@@ -399,7 +399,7 @@ class conversion {
                 $DB->execute($sql, ['gradeitemid' => $gradeitemid]);
             }
 
-            // Un-current all grades if a gradeitem (i.e. capture page)
+            // Un-current all grades if a gradeitem (i.e. capture page).
             if ($gradeitemid) {
                 $sql = 'UPDATE {local_gugrades_grade}
                     SET iscurrent = 0
@@ -440,8 +440,8 @@ class conversion {
             $DB->insert_record('local_gugrades_map_item', $mapitem);
         } else {
             if ($courseid != $mapitem->courseid) {
-                throw new \moodle_exception('courseid does not match ' . $courseid . ' (courseid in record is ' . $mapitem->courseid .
-                    ', mapitem id is ' . $mapitem->id . ')');
+                throw new \moodle_exception('courseid does not match ' . $courseid . ' (courseid in record is ' .
+                $mapitem->courseid . ', mapitem id is ' . $mapitem->id . ')');
             }
             $mapitem->mapid = $mapid;
             $mapitem->userid = $USER->id;
@@ -456,7 +456,7 @@ class conversion {
             $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
             \local_gugrades\api::recalculate($courseid, $gradeitem->categoryid);
         } else {
-            // Recalculate everything :(
+            // Recalculate everything :(.
             \local_gugrades\api::recalculate($courseid, $gradecategoryid);
         }
     }
@@ -562,7 +562,8 @@ class conversion {
         $scalegrade = self::convert_grade($rawgrade, $maxgrade, $mapvalues);
 
         if (!$scalegrade) {
-            throw new \moodle_exception('Unable to convert aggregated grade. Rawgrade = ' . $rawgrade . ' Maxgrade = ' . $maxgrade . ' MapID = ' . $mapid);
+            throw new \moodle_exception(
+                'Unable to convert aggregated grade. Rawgrade = ' . $rawgrade . ' Maxgrade = ' . $maxgrade . ' MapID = ' . $mapid);
         }
 
         return [$scalegrade->band, $scalegrade->scalevalue];
@@ -592,7 +593,6 @@ class conversion {
 
         // Iterate over users converting grades.
         foreach ($users as $user) {
-            // $usercapture = new usercapture($courseid, $gradeitemid, $user->id);
             $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $user->id);
             $provisional = $usercapture->get_provisional();
 
@@ -620,7 +620,7 @@ class conversion {
                     ispoints:           false,
                 );
             } else {
-                // MGU-1293: A null grade (No grade) just stays as No Grade
+                // MGU-1293: A null grade (No grade) just stays as No Grade.
                 if (!is_null($provisional->rawgrade)) {
                     $convertedgrade = self::convert_grade($provisional->rawgrade, $gradeitem->grademax, $mapvalues);
                     if (!$convertedgrade) {

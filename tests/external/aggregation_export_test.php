@@ -35,6 +35,7 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 
 /**
  * Test(s) aggregation export
+ *
  */
 final class aggregation_export_test extends \local_gugrades\external\gugrades_aggregation_testcase {
     /**
@@ -51,6 +52,8 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
 
     /**
      * Test get_aggregation_export_plugins
+     *
+     * @covers \local_gugrades\external\get_aggregation_export_plugins::execute
      */
     public function test_get_aggregation_export_plugins(): void {
 
@@ -91,6 +94,8 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
 
     /**
      * Test get_aggregation_export_form
+     *
+     * @covers \local_gugrades\external\get_aggregation_export_plugins::execute
      */
     public function test_get_aggregation_export_form(): void {
 
@@ -165,6 +170,8 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
 
     /**
      * Tests for mycampus plugin
+     *
+     * @covers \local_gugrades\external\get_aggregation_export_plugins::execute
      */
     public function test_mycampus_export(): void {
 

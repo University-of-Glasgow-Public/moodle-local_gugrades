@@ -25,10 +25,11 @@
 
 namespace local_gugrades;
 
-defined('MOODLE_INTERNAL') || die();
-
 define('XHPROF_PATH', '/profiles/');
 
+/**
+ * Functions used for development tasks.
+ */
 class development {
     /**
      * Start XHPROF profile

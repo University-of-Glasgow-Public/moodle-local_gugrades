@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/gugrades/locallib.php');
 
+/**
+ * Install callback
+ */
 function xmldb_local_gugrades_install() {
     global $CFG, $DB;
 

@@ -94,7 +94,7 @@ final class mgu_1222_test extends \local_gugrades\external\gugrades_advanced_tes
         $this->assertEquals('21.00000', $mgrades[0]->finalgrade);
         $this->assertEquals('Your work is terrible', $mgrades[0]->feedback);
 
-        // ...(un)release grade for $assignment2.
+        // ...(un)release grade for assignment2.
         $status = release_grades::execute($this->course->id, $this->gradeitemidassign2, 0, true);
         $status = external_api::clean_returnvalue(
             release_grades::execute_returns(),

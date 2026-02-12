@@ -103,7 +103,7 @@ final class import_grades_recursive_test extends \local_gugrades\external\gugrad
         $this->assertEquals(2, $counts['itemcount']);
         $this->assertEquals(4, $counts['gradecount']);
 
-        // Get the capture page
+        // Get the capture page.
         $page = get_capture_page::execute($this->course->id, $this->gradeitemsecond1, '', '', 0, false);
         $page = external_api::clean_returnvalue(
             get_capture_page::execute_returns(),

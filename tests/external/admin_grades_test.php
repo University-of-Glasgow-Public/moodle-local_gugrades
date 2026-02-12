@@ -70,7 +70,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_DFR_admin_grade(): void {
+    public function test_dfr_admin_grade(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -82,7 +82,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
         ];
 
         // Install test data for student.
-        // Question 2 is missing
+        // Question 2 is missing.
         $this->load_data('data8b', $this->student->id);
 
         foreach ($this->gradeitemids as $gradeitemid) {
@@ -99,7 +99,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
         $DB->update_record('grade_categories', $category);
 
         // Set DFR for question 3.
-        // This is technically the lowest value grade but DFR should override the drop low
+        // This is technically the lowest value grade but DFR should override the drop low.
         $this->apply_admingrade('Question 3', $this->student->id, 'DEFERRED');
 
         // Get aggregation page for sub-category.
@@ -133,7 +133,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_EC_admin_grade(): void {
+    public function test_ec_admin_grade(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -145,7 +145,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
         ];
 
         // Install test data for student.
-        // Question 2 is missing
+        // Question 2 is missing.
         $this->load_data('data8b', $this->student->id);
 
         foreach ($this->gradeitemids as $gradeitemid) {
@@ -162,7 +162,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
         $DB->update_record('grade_categories', $category);
 
         // Set EC for question 3.
-        // This is technically the lowest value grade but the MV should override the drop low
+        // This is technically the lowest value grade but the MV should override the drop low.
         $this->apply_admingrade('Question 3', $this->student->id, 'GOODCAUSE_FO');
 
         // Get aggregation page for sub-category.
@@ -213,7 +213,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_admin_grade(): void {
+    public function test_is_admin_grade(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -225,7 +225,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
         ];
 
         // Install test data for student.
-        // Question 2 is missing
+        // Question 2 is missing.
         $this->load_data('data8b', $this->student->id);
 
         foreach ($this->gradeitemids as $gradeitemid) {

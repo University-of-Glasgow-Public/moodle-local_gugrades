@@ -66,7 +66,6 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
 
         $userlist = [
             $this->student->id,
-            // $this->student2->id,
         ];
 
         // Assign2 (which is useing scale).
@@ -79,7 +78,7 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
             $page
         );
 
-        // Check for first grades
+        // Check for first grades.
         $fred = $page['users'][0];
         $this->assertEquals('FIRST', $fred['grades'][0]['gradetype']);
         $this->assertEquals('A3:20', $fred['grades'][0]['displaygrade']);
@@ -94,7 +93,7 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
             $page
         );
 
-        // Check for second grades
+        // Check for second grades.
         $fred = $page['users'][0];
         $this->assertEquals('FIRST', $fred['grades'][0]['gradetype']);
         $this->assertEquals('A3:20', $fred['grades'][0]['displaygrade']);
@@ -130,7 +129,7 @@ final class import_reload_test extends \local_gugrades\external\gugrades_advance
         $this->assertEquals('PROVISIONAL', $fred['grades'][2]['gradetype']);
         $this->assertEquals('EC', $fred['grades'][2]['displaygrade']);
 
-        // Re-import but only if valid missing grade
+        // Re-import but only if valid missing grade.
         $this->import_grades(
             courseid:           $this->course->id,
             gradeitemid:        $this->gradeitemidassign2,

@@ -206,7 +206,7 @@ final class aggregation_schema2_test extends \local_gugrades\external\gugrades_a
         $this->load_data('data2c', $this->student->id);
 
         // Set aggregation strategy.
-        // (has to be before import, otherwise there's no re-aggregation)
+        // (has to be before import, otherwise there's no re-aggregation).
         $this->set_strategy($this->gradecatsummative->id, \GRADE_AGGREGATE_WEIGHTED_MEAN2);
 
         foreach ($this->gradeitemids as $gradeitemid) {

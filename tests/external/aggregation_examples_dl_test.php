@@ -131,8 +131,8 @@ final class aggregation_examples_dl_test extends \local_gugrades\external\gugrad
     }
 
     /**
-     * TESTS FROM DROP LOWEST PRIORITY TAB
-    */
+     * TESTS FROM DROP LOWEST PRIORITY TAB.
+     */
 
     /**
      * Test "With NS grade and 0 grade both present"

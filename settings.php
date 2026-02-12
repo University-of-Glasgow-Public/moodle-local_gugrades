@@ -46,7 +46,7 @@ if ($hassiteconfig) {
             $default = '';
             $typedefault = '';
 
-            // Scale MUST have either 23 or 8 items exactly to be valid
+            // Scale MUST have either 23 or 8 items exactly to be valid.
             if ((count($items) != 23) && (count($items) != 8)) {
                 continue;
             }
@@ -123,9 +123,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($mapbsetting);
 
-    /**
-     * General settings
-     */
+    // GENERAL SETTINGS.
     $settingspage->add(new admin_setting_heading(
         'local_gugrades/headinggeneral',
         new lang_string('generalsettings', 'local_gugrades'),
@@ -142,7 +140,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($maxparticipants);
 
-    // Start date after for past tab
+    // Start date after for past tab.
     $startdateafter = new \local_gugrades\adminsetting\admin_setting_configdate(
         'local_gugrades/startdateafter',
         get_string('startdateafter', 'local_gugrades'),
@@ -151,12 +149,10 @@ if ($hassiteconfig) {
     );
     $settingspage->add($startdateafter);
 
-    // Make sure defaults are set for admin grades
+    // Make sure defaults are set for admin grades.
     \local_gugrades\admingrades::setting_defaults();
 
-    /**
-     * Admingrades definitions
-     */
+    // ADMINGRADES DEFINITIONS.
     $settingspage->add(new admin_setting_heading(
         'local_gugrades/headingadmingrades',
         new lang_string('admingrades', 'local_gugrades'),
@@ -178,10 +174,7 @@ if ($hassiteconfig) {
         $settingspage->add($admingradeconfig);
     }
 
-    /**
-     * Help
-     *
-     */
+    // HELP.
     $settingspage->add(new admin_setting_heading(
         'local_gugrades/headinghelp',
         new lang_string('helpsettings', 'local_gugrades'),

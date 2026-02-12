@@ -53,21 +53,20 @@ final class missing_released_user_test extends \local_gugrades\external\gugrades
         // Assign2 (which is useing scale).
         $this->import_grades($this->course->id, $this->gradeitemidassign2, $userlist);
 
-        // Release the grade
+        // Release the grade.
         $status = release_grades::execute($this->course->id, $this->gradeitemidassign2, 0, false);
         $status = external_api::clean_returnvalue(
             release_grades::execute_returns(),
             $status
         );
 
-        // Get aggregated data for this category
-        // $userdata = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $this->student->id);
-
         // Enrol a new student into the course.
-        $newstudent = $this->getDataGenerator()->create_user(['idnumber' => '1234569', 'firstname' => 'Greg', 'lastname' => 'Pedder']);
+        $newstudent = $this->getDataGenerator()->create_user(
+            ['idnumber' => '1234569', 'firstname' => 'Greg', 'lastname' => 'Pedder']);
         $this->getDataGenerator()->enrol_user($newstudent->id, $this->course->id, 'student');
 
         // Try to get data for this student.
-        $newuserdata = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $newstudent->id);
+        $newuserdata = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $this->gradecatsumm->id, $newstudent->id);
     }
 }

@@ -154,7 +154,7 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         );
         $mapid = $mapid['mapid'];
 
-        // Add conversion map to summer exam category
+        // Add conversion map to summer exam category,
         $nothing = select_conversion::execute($this->course->id, 0, $gradecatsummer->id, $mapid);
         $nothing = external_api::clean_returnvalue(
             select_conversion::execute_returns(),
@@ -176,7 +176,7 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         $this->assertEquals(18.75704, $users[0]['rawgrade']);
         $this->assertEquals(22, $users[0]['total']);
 
-        // Now check page at Level 1 (Summative)
+        // Now check page at Level 1 (Summative).
         $gradecatsummative = $DB->get_record('grade_categories', ['fullname' => 'Summative'], '*', MUST_EXIST);
         $page = get_aggregation_page::execute($this->course->id, $gradecatsummative->id, '', '', 0, false);
         $page = external_api::clean_returnvalue(
@@ -191,10 +191,11 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         $this->assertEquals(17.8, $users[0]['rawgrade']);
         $this->assertEquals(18, $users[0]['total']);
 
-        // Get corresponding itemid for summerexam
-        $summerexamitem = $DB->get_record('grade_items', ['itemtype' => 'category', 'iteminstance' => $gradecatsummer->id], '*', MUST_EXIST);
+        // Get corresponding itemid for summerexam,
+        $summerexamitem = $DB->get_record(
+            'grade_items', ['itemtype' => 'category', 'iteminstance' => $gradecatsummer->id], '*', MUST_EXIST);
 
-        // Override category grade for gradecatsummer
+        // Override category grade for gradecatsummer.
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
             gradeitemid:    $summerexamitem->id,
@@ -224,7 +225,6 @@ final class aggregation_schema4_test extends \local_gugrades\external\gugrades_a
         $this->assertEquals(11, $fred['rawgrade']);
 
         $grades = $DB->get_records('local_gugrades_grade', ['gradeitemid' => $summerexamitem->id, 'userid' => $this->student->id]);
-        // var_dump($grades); die;
 
         // Remove the grade mapping.
         // Removing the mapping should also remove any overridden grades.

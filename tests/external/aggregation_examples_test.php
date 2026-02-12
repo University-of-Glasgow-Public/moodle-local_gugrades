@@ -37,10 +37,19 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Specific tests for list of examples in the Excel file on Teams somewhere.
  */
 final class aggregation_examples_test extends \local_gugrades\external\gugrades_aggregation_testcase {
+    /**
+     * @var object $gradecatsummative
+     */
     protected $gradecatsummative;
 
+    /**
+     * @var object $gradecatquizzes
+     */
     protected $gradecatquizzes;
 
+    /**
+     * @var array $itemids
+     */
     protected $itemids = [];
 
     /**

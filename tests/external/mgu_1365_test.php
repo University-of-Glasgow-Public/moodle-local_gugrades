@@ -57,9 +57,9 @@ final class MGU_1365_test extends \local_gugrades\external\gugrades_advanced_tes
 
         // Import users for first time.
         $status = import_grades_users::execute(
-            courseid:       $this->course->id, 
-            gradeitemid:    $this->gradeitemidassign1, 
-            additional:     'update', 
+            courseid:       $this->course->id,
+            gradeitemid:    $this->gradeitemidassign1,
+            additional:     'update',
             fillns:         '',
             reason:         'FIRST',
             other:          '',
@@ -87,9 +87,9 @@ final class MGU_1365_test extends \local_gugrades\external\gugrades_advanced_tes
 
         // Import again, this time to a (new) "other" column.
         $status = import_grades_users::execute(
-            courseid:       $this->course->id, 
-            gradeitemid:    $this->gradeitemidassign1, 
-            additional:     'update', 
+            courseid:       $this->course->id,
+            gradeitemid:    $this->gradeitemidassign1,
+            additional:     'update',
             fillns:         '',
             reason:         'OTHER',
             other:          'new column',
@@ -141,9 +141,9 @@ final class MGU_1365_test extends \local_gugrades\external\gugrades_advanced_tes
         // Re-import this grade to existing other grade.
         // It SHOULD NOT create a new column.
         $status = import_grades_users::execute(
-            courseid:       $this->course->id, 
-            gradeitemid:    $this->gradeitemidassign1, 
-            additional:     'update', 
+            courseid:       $this->course->id,
+            gradeitemid:    $this->gradeitemidassign1,
+            additional:     'update',
             fillns:         '',
             reason:         $newreason,
             other:          '',

@@ -36,8 +36,7 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 /**
  * The main class.
  */
-final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
+final class mgu_1002_test extends \local_gugrades\external\gugrades_aggregation_testcase {
     /**
      * @var object $gradecatsummer
      */
@@ -71,7 +70,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS5_admin_grade(): void {
+    public function test_is_cos5_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -111,7 +110,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS6_admin_grade(): void {
+    public function test_is_cos6_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -154,7 +153,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS7_EC_admin_grade(): void {
+    public function test_is_cos7_EC_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -197,7 +196,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS7_NS_admin_grade(): void {
+    public function test_is_cos7_ns_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -240,7 +239,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS10_admin_grade(): void {
+    public function test_is_cos10_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -266,7 +265,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
         $itemstocheck = [
             'Question 1' => 'D1:11',
             'Question 2' => 'B1:17',
-            'Question 4' => 'C3:12'
+            'Question 4' => 'C3:12',
         ];
 
         $gradehaschanged = false;
@@ -278,14 +277,13 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
             $user
         );
         foreach ($user['fields'] as $usergrade) {
-            // Check that the above Question's grade hasn't been changed
+            // Check that the above Question's grade hasn't been changed.
             if (array_key_exists($usergrade['itemname'], $itemstocheck)) {
                 $itemtocheck = $itemstocheck[$usergrade['itemname']];
                 if ($usergrade['display'] != $itemtocheck) {
                     $gradehaschanged = true;
                 }
             }
-
         }
 
         $this->assertFalse($gradehaschanged);
@@ -296,7 +294,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS11_admin_grade(): void {
+    public function test_is_cos11_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -334,7 +332,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS12_admin_grade(): void {
+    public function test_is_cos12_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -375,7 +373,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS13_EC_admin_grade(): void {
+    public function test_is_cos13_ec_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -416,7 +414,7 @@ final class MGU_1002_test extends \local_gugrades\external\gugrades_aggregation_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_IS_CoS13_NS0_admin_grade(): void {
+    public function test_is_cos13_ns0_admin_grade(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);

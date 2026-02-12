@@ -56,7 +56,7 @@ class api {
 
         $error = '';
 
-        // Is aggegation supported (is it configured properly)
+        // Is aggegation supported (is it configured properly).
         $gradeitemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($categoryid);
         [$aggregationsupported, $error] = \local_gugrades\grades::are_all_grades_supported($courseid, $gradeitemid);
         if (!$aggregationsupported) {
@@ -90,8 +90,6 @@ class api {
 
         self::more_time();
 
-        // xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
-
         // Is aggregation supported for this gradeitem / is gradeitem supported?
         $gradeitemsupported = \local_gugrades\grades::is_grade_supported($gradeitemid);
         [$aggregationsupported, $unsupportedscales] = \local_gugrades\grades::are_all_grades_supported($courseid, $gradeitemid);
@@ -118,9 +116,6 @@ class api {
             ];
         }
 
-        // Cleanup unused columns for grade item.
-        // \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
-
         // Hidden or locked in gradebook?
         [$gradehidden, $gradelocked] = \local_gugrades\grades::is_grade_hidden_locked($gradeitemid);
 
@@ -144,12 +139,9 @@ class api {
         $released = \local_gugrades\grades::is_grades_released($courseid, $gradeitemid);
         $showcsvimport = \local_gugrades\users::showcsvimport($users);
 
-        // file_put_contents('/profiles/'.time().'.application.xhprof', serialize(xhprof_disable()));
-
         return [
             'users' => $users,
             'columns' => $columns,
-            // 'hidden' => $activity->is_names_hidden() || self::is_gradeitem_hidden($gradeitemid),
             'hidden' => $activity->is_names_hidden(),
             'itemtype' => $activity->get_itemtype(),
             'itemname' => $activity->get_itemname(),
@@ -190,10 +182,10 @@ class api {
         // Add/update the grades.
         $user = \local_gugrades\grades::add_grades_for_user($courseid, $gradeitemid, $user, $gradehidden);
 
-        // Add/update picture
+        // Add/update picture.
         $user = \local_gugrades\users::add_picture_and_profile_to_user_record($courseid, $user);
 
-        // Add/update gradehidden
+        // Add/update gradehidden.
         $user = \local_gugrades\users::add_gradehidden_to_user_record($user, $gradeitemid);
 
         return $user;
@@ -313,7 +305,7 @@ class api {
         $addcount = 0;
         $errorcount = 0;
 
-        // Specific errors
+        // Specific errors.
         $errors = [
             'csvtoofewitems' => 0,
             'csvidinvalid' => 0,
@@ -423,16 +415,10 @@ class api {
                     ispoints:       !$mapping->is_scale(),
                 );
                 $addcount++;
-
-                // Re-aggregate this user
-                // DON'T, we'll do it in one hit at the end.
-                // if ($aggregationsupported) {
-                // \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $user->id);
-                // }
             }
         }
 
-        // Convert errors so web service friendly
+        // Convert errors so web service friendly.
         $errorlist = [];
         foreach ($errors as $str => $count) {
             if ($count) {
@@ -443,7 +429,7 @@ class api {
             }
         }
 
-        // Progress complete. Show aggregation as normal spinner
+        // Progress complete. Show aggregation as normal spinner.
         \local_gugrades\progress::terminate($courseid, 0, 'csvimport');
 
         if ($aggregationsupported && !$testrun) {
