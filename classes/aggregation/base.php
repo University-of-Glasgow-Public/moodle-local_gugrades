@@ -92,6 +92,9 @@ class base {
      */
     private function get_valid_userids(int $courseid, int $gradeitemid) {
 
+        // Don't try to remember grades if unit test
+        $isunittest = \local_gugrades\api::is_unit_test();
+
         // Putting lists of valid users into global space.
         // Not ideal, but better than looking them up millions of times.
         global $GUGRADES_VALIDUSERS;
@@ -100,7 +103,7 @@ class base {
             $GUGRADES_VALIDUSERS = [];
         }
 
-        if (array_key_exists($gradeitemid, $GUGRADES_VALIDUSERS)) {
+        if (!$isunittest && array_key_exists($gradeitemid, $GUGRADES_VALIDUSERS)) {
             return $GUGRADES_VALIDUSERS[$gradeitemid];
         } else {
             $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
