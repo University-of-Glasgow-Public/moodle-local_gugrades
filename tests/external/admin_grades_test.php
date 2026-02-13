@@ -173,6 +173,7 @@ final class admin_grades_test extends \local_gugrades\external\gugrades_aggregat
             $page
         );
 
+        var_dump($page);
         $fred = $page['users'][0];
         $this->assertEquals('EC', $fred['displaygrade']);
         $this->assertEquals(0, $fred['rawgrade']);

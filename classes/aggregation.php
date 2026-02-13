@@ -460,12 +460,12 @@ class aggregation {
         // We're assuming that this user is fully aggregated and no further checks are required.
 
         // Skip caching for unit tests.
-        $is_unit_test = \local_gugrades\api::is_unit_test();
+        $isunittest = \local_gugrades\api::is_unit_test();
 
         // Establish if this user is already in the cache.
         $cache = \cache::make('local_gugrades', 'useraggdata');
         $cachetag = self::get_aggdata_cachetag($courseid, $gradecategoryid, $user->id);
-        if (($cacheduser = $cache->get($cachetag)) && !$is_unit_test) {
+        if (($cacheduser = $cache->get($cachetag)) && !$isunittest) {
             return $cacheduser;
         }
 
@@ -567,7 +567,7 @@ class aggregation {
         $released = \local_gugrades\grades::is_grades_released($courseid, $gradecatitem->id);
 
         // Cache result.
-        if (!$is_unit_test) {
+        if (!$isunittest) {
             $cache->set($cachetag, $user);
         }
 
@@ -809,7 +809,7 @@ class aggregation {
         global $DB;
 
         // Skip caching for unit tests.
-        $is_unit_test = \local_gugrades\api::is_unit_test();
+        $isunittest = \local_gugrades\api::is_unit_test();
 
         // Cache the data if possible.
         // Construct a reasonably unique tag for this categoryid.
@@ -818,7 +818,7 @@ class aggregation {
 
         // If this category is already stored in the cache then there's nothing to do.
         // (assuming recalculation is not forced).
-        if (!$is_unit_test && !$force && ($categorynode = $cache->get($cachetag))) {
+        if (!$isunittest && !$force && ($categorynode = $cache->get($cachetag))) {
             return $categorynode;
         }
 
@@ -865,7 +865,7 @@ class aggregation {
             }
 
             // Get the conversion object, so we can tell what sort of grade we're dealing with.
-            if (!($node = $cache->get($item->id)) || $force || $is_unit_test) {
+            if (!($node = $cache->get($item->id)) || $force || $isunittest) {
                 $mapping = \local_gugrades\grades::mapping_factory($courseid, $item->id);
                 $node = (object)[
                     'itemid' => $item->id,
@@ -895,7 +895,7 @@ class aggregation {
         $categorynode->gradetype = self::translate_atype($atype);
 
         // Write the completed node to the cache.
-        if (!$is_unit_test) {
+        if (!$isunittest) {
             $cache->set($cachetag, $categorynode);
         }
 
@@ -915,7 +915,7 @@ class aggregation {
         global $DB;
 
         // Skip caching for unit tests.
-        $is_unit_test = \local_gugrades\api::is_unit_test();
+        $isunittest = \local_gugrades\api::is_unit_test();
 
         // The cache uses the corresponding grade item id.
         $gradeitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
@@ -927,7 +927,7 @@ class aggregation {
         // Is the category in the cache. If not (re)build
         // (and cache) that part of the category tree.
         return self::recurse_tree($courseid, $gradecategoryid, false);
-        if (!$is_unit_test && $gradecategory = $cache->get($cachetag . $gradeitem->id)) {
+        if (!$isunittest && $gradecategory = $cache->get($cachetag . $gradeitem->id)) {
             return $gradecategory;
         } else {
             return self::recurse_tree($courseid, $gradecategoryid, false);

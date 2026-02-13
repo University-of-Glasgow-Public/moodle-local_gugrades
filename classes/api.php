@@ -48,9 +48,9 @@ class api {
      */
     public static function is_unit_test() {
 
-        $is_test = !empty(PHPUNIT_TEST);
+        $istest = !empty(PHPUNIT_TEST);
 
-        return $is_test;
+        return $istest;
     }
 
     /**
