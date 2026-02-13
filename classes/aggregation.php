@@ -1056,6 +1056,9 @@ class aggregation {
         // MGU-1349: If there are now no 'available' items left, the
         // aggregated category is 'not available'.
         if (count($items) == 0) {
+
+            var_dump($items); die;
+
             $explain = get_string('explain_notavailable', 'local_gugrades');
             [$admingrade, $error, $displaygrade] = $aggregation->all_unavailable_total($level);
 
