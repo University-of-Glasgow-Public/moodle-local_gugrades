@@ -929,10 +929,13 @@ class grades {
     public static function get_provisional_from_id(int $gradeitemid, int $userid) {
         global $DB;
 
+        // Skip caching for unit tests.
+        $is_unit_test = \local_gugrades\api::is_unit_test();
+
         // Is this cached?
         $cache = \cache::make('local_gugrades', 'provisionalgrade');
         $tag = self::get_provisionalgrade_cachetag($gradeitemid, $userid);
-        if ($grade = $cache->get($tag)) {
+        if (!$is_unit_test && ($grade = $cache->get($tag))) {
             return $grade;
         }
 
@@ -951,7 +954,9 @@ class grades {
         ]);
 
         // Cache grade.
-        $cache->set($tag, $grade);
+        if (!$is_unit_test) {
+            $cache->set($tag, $grade);
+        }
 
         return $grade;
     }

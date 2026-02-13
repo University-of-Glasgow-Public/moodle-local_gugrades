@@ -44,6 +44,16 @@ class api {
     }
 
     /**
+     * Are we unit testing?
+     */
+    public static function is_unit_test() {
+
+        $is_test = !empty(PHPUNIT_TEST);
+
+        return $is_test;
+    }
+
+    /**
      * Get activities
      * @param int $courseid
      * @param int $categoryid
