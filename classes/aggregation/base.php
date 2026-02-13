@@ -92,7 +92,7 @@ class base {
      */
     private function get_valid_userids(int $courseid, int $gradeitemid) {
 
-        // Don't try to remember grades if unit test
+        // Don't try to remember grades if unit test.
         $isunittest = \local_gugrades\api::is_unit_test();
 
         // Putting lists of valid users into global space.
