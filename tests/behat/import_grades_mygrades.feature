@@ -1,8 +1,8 @@
 @local @local_gugrades @javascript
-Feature: Testing import_grades_mygrades in local_gugrades
+  Feature: Testing import_grades_mygrades in local_gugrades
     In order to view staff Mygrades
     I need to be logged in
-Background:
+  Background:
     Given the following "custom field categories" exist:
         | name              | component   | area   | itemid |
         | Student MyGrades  | core_course | course | 0      |
@@ -41,7 +41,7 @@ Background:
     And I go to "Student 1" "Test assignment 1" activity advanced grading page
     And I set the field "Grade" to "A4"
     And I press "Save changes"
-Scenario: Import Grades
+  Scenario: Import Grades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades (Beta)" in current page administration
@@ -50,4 +50,3 @@ Scenario: Import Grades
     And I click on "Import grades" "button" in the "vm-46-content" "region"
     And I click on "Import grades" "button" in the "vm-46-content" "region"
     Then I should see "A4"
-    

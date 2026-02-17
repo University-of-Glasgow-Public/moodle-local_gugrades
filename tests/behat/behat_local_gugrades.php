@@ -21,24 +21,13 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 /**
  * Behat steps in plugin local_gugrades
  *
+ * @version    1.0
  * @package    local_gugrades
  * @category   test
  * @copyright  2025 YOUR NAME <your@email.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_gugrades extends behat_base {
-     /**
-      * Selects option in select field with specified id|name|label|value
-      * Example: When I select "Bats" from "user_fears"
-      * Example: And I select "Bats" from "user_fears"
-      *
-      * @When /^(?:|I )select "(?P<option>(?:[^"]|\\")*)" from "(?P<select>(?:[^"]|\\")*)"$/
-      */
-    public function selectOption($select, $option) {
-        $select = $this->fixStepArgument($select);
-        $option = $this->fixStepArgument($option);
-        $this->getSession()->getPage()->selectFieldOption($select, $option);
-    }
     protected function resolve_page_url(string $type): moodle_url {
         switch ($type) {
             case 'Settings':
@@ -54,7 +43,7 @@ class behat_local_gugrades extends behat_base {
       *
       * @return string
       */
-    protected function fixStepArgument($argument) {
+    protected function fixstepargument($argument) {
         return str_replace('\\"', '"', $argument);
     }
 }

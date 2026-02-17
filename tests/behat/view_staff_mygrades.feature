@@ -1,8 +1,8 @@
 @local @local_gugrades @javascript
-Feature: Testing view_staff_mygrades in local_gugrades
+  Feature: Testing view_staff_mygrades in local_gugrades
     In order to view staff Mygrades
     I need to be logged in
-Background:
+  Background:
     Given the following "custom field categories" exist:
         | name              | component   | area   | itemid |
         | Student MyGrades  | core_course | course | 0      |
@@ -41,7 +41,7 @@ Background:
     And the following "mod_assign > submissions" exist:
         | assign                | user      | onlinetext                       |
         | Test assignment 1     | student1  | I'm the student first submission |
-Scenario: View MyGrades menu items
+  Scenario: View MyGrades menu items
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades (Beta)" in current page administration
@@ -58,7 +58,7 @@ Scenario: View MyGrades menu items
     Then "Download to CSV" "button" should exist
     And I click on "Settings" "button" in the "tabmenu" "region"
     Then I should see "Hide MyGrades on student dashboard for this course. Moodle Gradebook will be used, instead."
-Scenario: View Assignment MyGrades
+  Scenario: View Assignment MyGrades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades (Beta)" in current page administration
