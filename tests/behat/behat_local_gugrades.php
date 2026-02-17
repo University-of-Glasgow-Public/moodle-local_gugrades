@@ -21,13 +21,17 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 /**
  * Behat steps in plugin local_gugrades
  *
- * @version    1.0
  * @package    local_gugrades
  * @category   test
  * @copyright  2025 YOUR NAME <your@email.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_gugrades extends behat_base {
+     /**
+      * Creates URLS
+      * 
+      * @return string
+      */
     protected function resolve_page_url(string $type): moodle_url {
         switch ($type) {
             case 'Settings':

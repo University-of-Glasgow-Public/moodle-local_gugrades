@@ -1,5 +1,5 @@
 @local @local_gugrades @javascript
-  Feature: Testing import_grades_mygrades in local_gugrades
+Feature: Testing import_grades_mygrades in local_gugrades
     In order to view staff Mygrades
     I need to be logged in
   Background:
