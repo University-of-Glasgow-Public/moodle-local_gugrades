@@ -29,7 +29,9 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 class behat_local_gugrades extends behat_base {
      /**
       * Creates URLS
-      * 
+      *
+      * @param string
+      *  
       * @return string
       */
     protected function resolve_page_url(string $type): moodle_url {
