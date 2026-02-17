@@ -28,20 +28,18 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  */
 class behat_local_gugrades extends behat_base {
      /**
-     * Selects option in select field with specified id|name|label|value
-     * Example: When I select "Bats" from "user_fears"
-     * Example: And I select "Bats" from "user_fears"
-     *
-     * @When /^(?:|I )select "(?P<option>(?:[^"]|\\")*)" from "(?P<select>(?:[^"]|\\")*)"$/
-     */
-        public function selectOption($select, $option)
-    {
+      * Selects option in select field with specified id|name|label|value
+      * Example: When I select "Bats" from "user_fears"
+      * Example: And I select "Bats" from "user_fears"
+      *
+      * @When /^(?:|I )select "(?P<option>(?:[^"]|\\")*)" from "(?P<select>(?:[^"]|\\")*)"$/
+      */
+    public function selectOption($select, $option) {
         $select = $this->fixStepArgument($select);
         $option = $this->fixStepArgument($option);
         $this->getSession()->getPage()->selectFieldOption($select, $option);
     }
-
-        protected function resolve_page_url(string $type): moodle_url {
+    protected function resolve_page_url(string $type): moodle_url {
         switch ($type) {
             case 'Settings':
                 return new moodle_url('/admin/settings.php?section=managelocalgugrades');
@@ -49,16 +47,14 @@ class behat_local_gugrades extends behat_base {
                 throw new Exception('Unrecognised page type "' . $type . '."');
         }
     }
-    
-       /**
-     * Returns fixed step argument (with \\" replaced back to ")
-     *
-     * @param string $argument
-     *
-     * @return string
-     */
-    protected function fixStepArgument($argument)
-    {
+     /**
+      * Returns fixed step argument (with \\" replaced back to ")
+      *
+      * @param string $argument
+      *
+      * @return string
+      */
+    protected function fixStepArgument($argument) {
         return str_replace('\\"', '"', $argument);
     }
 }
