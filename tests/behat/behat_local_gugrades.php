@@ -31,7 +31,7 @@ class behat_local_gugrades extends behat_base {
       * Creates URLS
       *
       * @param string $type
-      * 
+      *
       * @return string
       */
     protected function resolve_page_url(string $type): moodle_url {
