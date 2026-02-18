@@ -12,25 +12,23 @@ jobs:
     runs-on: ubuntu-22.04
     
     services:
-      postgres:
-        image: postgres:13
+      mariadb:
+        image: mariadb:10
         env:
-          POSTGRES_USER: 'postgres'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
+          MYSQL_USER: 'root'
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
+          MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
         ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
-    
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.1', '8.2']
+        php: ['8.3']
         moodle-branch: ['MOODLE_405_STABLE']
-        database: ['pgsql']
+        database: [mariadb]
     
     steps:
       - name: Checkout plugin
@@ -45,14 +43,6 @@ jobs:
           extensions: ${{ matrix.database }}, gd, zip, soap, intl
           ini-values: max_input_vars=5000
           coverage: none
-      
-      - name: Wait for PostgreSQL
-        run: |
-          until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
-            echo "Waiting for PostgreSQL..."
-            sleep 2
-          done
-          echo "PostgreSQL is ready!"
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -87,27 +77,6 @@ jobs:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
       
-      - name: Debug on failure
-        if: failure()
-        run: |
-          echo "=== Moodle installation directory ==="
-          ls -la moodle/ || echo "Moodle directory not found"
-          echo "=== Config.php content ==="
-          cat moodle/config.php || echo "config.php not found"
-          echo "=== Database tables ==="
-          PGPASSWORD=moodle psql -h 127.0.0.1 -U moodle -d moodle -c "\dt" || echo "Cannot list tables"
-          echo "=== PHP errors ==="
-          cat moodle/error.log || echo "No error log found"
-          echo "=== Install log ==="
-          cat moodledata/install.log || echo "No install log found"
-      
-      - name: PHP Debug Info
-        if: failure()
-        run: |
-          php -v
-          php -m
-          php -i | grep pgsql
-      
       - name: Run Behat tests
         run: moodle-plugin-ci behat --profile chrome
       
@@ -117,10 +86,3 @@ jobs:
         with:
           name: behat-screenshots-${{ matrix.php }}-${{ matrix.moodle-branch }}
           path: ${{ github.workspace }}/moodledata/behat_dump/**/*.png
-      
-      - name: Upload Behat HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: behat-report-${{ matrix.php }}-${{ matrix.moodle-branch }}
-          path: ${{ github.workspace }}/moodle/behat-report.html
