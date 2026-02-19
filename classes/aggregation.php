@@ -362,10 +362,13 @@ class aggregation {
     private static function get_user_hidden(int $courseid, int $userid) {
         global $DB;
 
-        $hiddengrades = $DB->get_records('local_gugrades_hidden', ['courseid' => $courseid, 'userid' => $userid]);
-        $hiddenids = [];
-        foreach ($hiddengrades as $hidden) {
-            $hiddenids[] = $hidden->gradeitemid;
+        static $hiddenids = [];
+
+        if (!$hiddenids) {
+            $hiddengrades = $DB->get_records('local_gugrades_hidden', ['courseid' => $courseid, 'userid' => $userid]);
+            foreach ($hiddengrades as $hidden) {
+                $hiddenids[] = $hidden->gradeitemid;
+            }
         }
 
         return $hiddenids;
@@ -595,15 +598,18 @@ class aggregation {
         // Debugging stuff.
         $userhelpercount = 0;
 
+        // The agregated 'CATEGORY' field should already be in the grades table.
+        // If it's not, we need to aggregate this user.
+        $sql = "SELECT id, userid FROM {local_gugrades_grade}
+            WHERE gradeitemid = :gradeitemid
+            AND gradetype = 'CATEGORY'
+            AND iscurrent = 1";
+        $existing = $DB->get_records_sql($sql, ['gradeitemid' => $gradecatitem->id]);
+        $existingids = array_column($existing, 'userid');
+
         foreach ($users as $id => $user) {
-            // The agregated 'CATEGORY' field should already be in the grades table.
-            // If it's not, we need to aggregate this user.
-            if (
-                !$DB->record_exists(
-                    'local_gugrades_grade',
-                    ['gradeitemid' => $gradecatitem->id, 'gradetype' => 'CATEGORY', 'userid' => $user->id, 'iscurrent' => 1]
-                )
-            ) {
+
+            if (!in_array($user->id, $existingids)) {
                 self::aggregate_user_helper($courseid, $gradecategoryid, $user->id);
                 $userhelpercount++;
             }

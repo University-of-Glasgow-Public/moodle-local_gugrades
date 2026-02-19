@@ -238,7 +238,7 @@ class admingrades {
      * @return array
      */
     public static function get_displaygrade_from_name($admingrade) {
-        $default = self::validate_admingrade($admingrade);
+        self::validate_admingrade($admingrade);
 
         // Admingrade details from settings.
         $tag = self::get_setting_tag($admingrade);
@@ -375,7 +375,7 @@ class admingrades {
                 continue;
             }
 
-            [$displaygrade, $description] = self::get_displaygrade_from_name($name);
+            [$displaygrade, ] = self::get_displaygrade_from_name($name);
             $admingrades[$displaygrade] = $name;
         }
 

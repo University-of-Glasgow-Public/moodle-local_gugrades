@@ -59,8 +59,6 @@ class assign_activity extends base {
      * @return object
      */
     private function get_assign($cm) {
-        global $DB;
-
         $course = get_course($this->courseid);
         $coursemodulecontext = \context_module::instance($cm->id);
         $assign = new \assign($coursemodulecontext, $cm, $course);
