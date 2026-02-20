@@ -321,5 +321,55 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025111700, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026022001) {
+
+        // Define field isprovisional to be added to local_gugrades_grade.
+        $table = new xmldb_table('local_gugrades_grade');
+        $field = new xmldb_field('isprovisional', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'iserror');
+
+        // Conditionally launch add field isprovisional.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define index local_gugrades_giuiip (not unique) to be added to local_gugrades_grade.
+        $table = new xmldb_table('local_gugrades_grade');
+        $index = new xmldb_index('local_gugrades_giuiip', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid', 'userid', 'isprovisional']);
+
+        // Conditionally launch add index local_gugrades_giuiip.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026022001, 'local', 'gugrades');
+    }
+
+    if ($oldversion < 2026022002) {
+
+        // Define table local_gugrades_latest to be created.
+        $table = new xmldb_table('local_gugrades_latest');
+
+        // Adding fields to table local_gugrades_latest.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('gradeitemid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('gugradeid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table local_gugrades_latest.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Adding indexes to table local_gugrades_latest.
+        $table->add_index('local_gugrades_latgiui', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid', 'userid']);
+
+        // Conditionally launch create table for local_gugrades_latest.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026022002, 'local', 'gugrades');
+    }
+
     return true;
 }

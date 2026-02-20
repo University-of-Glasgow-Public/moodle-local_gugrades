@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/gugrades/db" VERSION="20251117" COMMENT="XMLDB file for Moodle local/gugrades"
+<XMLDB PATH="local/gugrades/db" VERSION="20260220" COMMENT="XMLDB file for Moodle local/gugrades"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -59,6 +59,7 @@
         <FIELD NAME="columnid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="Link to column table"/>
         <FIELD NAME="iscurrent" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="is this the latest grade?"/>
         <FIELD NAME="iserror" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Applies to categories than cannot be aggregated for some reason"/>
+        <FIELD NAME="isprovisional" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flagged as provisional/latest grade"/>
         <FIELD NAME="notavailable" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Notavailable flag used for categories (items worked out on the fly)"/>
         <FIELD NAME="auditby" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="Who did this? Link to user.id"/>
         <FIELD NAME="audittimecreated" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp"/>
@@ -75,6 +76,7 @@
         <INDEX NAME="logugradesgigtuiic" UNIQUE="false" FIELDS="gradeitemid, gradetype, userid, iscurrent"/>
         <INDEX NAME="localgugrade_cigiuici" UNIQUE="false" FIELDS="courseid, gradeitemid, userid, columnid"/>
         <INDEX NAME="local_gugrades_giuiic" UNIQUE="false" FIELDS="id, gradeitemid, userid, iscurrent"/>
+        <INDEX NAME="local_gugrades_giuiip" UNIQUE="false" FIELDS="gradeitemid, userid, isprovisional" COMMENT="gradeitemid, userid, isprovisional"/>
         <INDEX NAME="local_gugrades_prov" UNIQUE="false" FIELDS="gradeitemid, userid, iscurrent"/>
       </INDEXES>
     </TABLE>
@@ -238,6 +240,20 @@
       <INDEXES>
         <INDEX NAME="gures_cat" UNIQUE="false" FIELDS="gradecategoryid"/>
         <INDEX NAME="gures_item" UNIQUE="false" FIELDS="gradeitemid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_gugrades_latest" COMMENT="Identifies &quot;latest grade&quot; for each graditemid, userid combination.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="gradeitemid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="gugradeid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key - local_gugrades_grade.id"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="local_gugrades_latgiui" UNIQUE="false" FIELDS="gradeitemid, userid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

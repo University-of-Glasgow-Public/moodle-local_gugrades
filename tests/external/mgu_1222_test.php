@@ -106,9 +106,9 @@ final class mgu_1222_test extends \local_gugrades\external\gugrades_advanced_tes
             'gradeitemid' => $this->gradeitemidassign2,
             'userid' => $this->student->id,
         ]));
-        $this->assertEquals('RELEASED', $grades[0]->gradetype);
+        $this->assertEquals('FIRST', $grades[0]->gradetype);
         $this->assertEquals('A3:20', $grades[0]->displaygrade);
-        $this->assertEquals('0', $grades[0]->iscurrent);
+        $this->assertEquals('1', $grades[0]->iscurrent);
 
         // Check assignment user flags.
         $flags = array_values($DB->get_records('assign_user_flags', ['userid' => $this->student->id]));

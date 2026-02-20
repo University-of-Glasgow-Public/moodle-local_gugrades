@@ -49,6 +49,24 @@ class aggregation {
     private $instances = [];
 
     /**
+     * Bulk data variable for resit_required.
+     * @var array $resitids
+     */
+    private static $resitids = [];
+
+    /**
+     * Bulk data variable for hidden IDs.
+     * @var array $hiddenids
+     */
+    private static $hiddenids = [];
+
+    /**
+     * Bulk data variable for provisional grades
+     * @var array $provisionalgrades
+     */
+    private static $provisionalgrades = [];
+
+    /**
      * Constructor is protected to prevent new()
      */
     protected function __construct() {
@@ -259,9 +277,10 @@ class aggregation {
      * @return boolean
      */
     protected static function is_resit_required(int $courseid, int $userid) {
-        global $DB;
 
-        return $DB->record_exists('local_gugrades_resitrequired', ['courseid' => $courseid, 'userid' => $userid]);
+        $required = in_array($userid, self::$resitids);
+
+        return $required;
     }
 
     /**
@@ -299,6 +318,27 @@ class aggregation {
     }
 
     /**
+     * Get raw user accounts before we add stuff.
+     * @param int $courseid
+     * @param string $firstname
+     * @param string $lastname
+     * @param int $groupid
+     * @return array
+     */
+    public static function get_raw_users(int $courseid, string $firstname, string $lastname, int $groupid) {
+        $context = \context_course::instance($courseid);
+        $users = \local_gugrades\users::get_gradeable_users(
+            $context,
+            $firstname,
+            $lastname,
+            $groupid
+        );
+
+        return $users;
+    }
+
+
+    /**
      * Get students - with some filtering
      * $firstname and $lastname are single initial character only.
      * @param int $courseid
@@ -309,13 +349,7 @@ class aggregation {
      * @return array
      */
     public static function get_users(int $courseid, int $categoryid, string $firstname, string $lastname, int $groupid) {
-        $context = \context_course::instance($courseid);
-        $users = \local_gugrades\users::get_gradeable_users(
-            $context,
-            $firstname,
-            $lastname,
-            $groupid
-        );
+        $users = self::get_raw_users($courseid, $firstname, $lastname, $groupid);
 
         // Add aditional fields.
         foreach ($users as $user) {
@@ -360,18 +394,11 @@ class aggregation {
      * @return array
      */
     private static function get_user_hidden(int $courseid, int $userid) {
-        global $DB;
-
-        static $hiddenids = [];
-
-        if (!$hiddenids) {
-            $hiddengrades = $DB->get_records('local_gugrades_hidden', ['courseid' => $courseid, 'userid' => $userid]);
-            foreach ($hiddengrades as $hidden) {
-                $hiddenids[] = $hidden->gradeitemid;
-            }
+        if (array_key_exists($userid, self::$hiddenids)) {
+            return self::$hiddenids;
+        } else {
+            return [];
         }
-
-        return $hiddenids;
     }
 
     /**
@@ -506,7 +533,11 @@ class aggregation {
             ];
 
             // Field identifier based on gradeitemid (which is unique even for categories).
-            $provisional = \local_gugrades\grades::get_provisional_from_id($column->gradeitemid, $user->id);
+            if (array_key_exists($user->id, self::$provisionalgrades) && array_key_exists($column->gradeitemid, self::$provisionalgrades)) {
+                $provisional = self::$provisionalgrades[$user->id][$column->gradeitemid];
+            } else {
+                $provisional = \local_gugrades\grades::get_provisional_from_id($column->gradeitemid, $user->id);
+            }
             if ($provisional) {
                 $data['rawgrade'] = $provisional->rawgrade;
                 $data['display'] = $provisional->displaygrade;
@@ -598,6 +629,7 @@ class aggregation {
         // Debugging stuff.
         $userhelpercount = 0;
 
+        // MGU-1415 (moved out of loop)
         // The agregated 'CATEGORY' field should already be in the grades table.
         // If it's not, we need to aggregate this user.
         $sql = "SELECT id, userid FROM {local_gugrades_grade}
@@ -1535,40 +1567,6 @@ class aggregation {
     }
 
     /**
-     * Helper function to aggregate a single user when updating any user grades.
-     * @param int $courseid
-     * @param int $gradecategoryid
-     * @param int $userid
-     * @param bool $force
-     */
-    public static function aggregate_user_helper(int $courseid, int $gradecategoryid, int $userid, bool $force = false) {
-
-        // As $gradecategoryid could be second level + then we first need to find the 1st level
-        // categoryid (as we're aggregating everything).
-        $level1categoryid = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
-
-        // Invalidate their cached data.
-        self::invalidate_aggdata($courseid, $gradecategoryid, $userid);
-        self::invalidate_aggdata($courseid, $level1categoryid, $userid);
-
-        // We need the recursed category tree for this categoryid. Hopefully, this should be cached.
-        $toplevel = self::recurse_tree($courseid, $level1categoryid, $force);
-
-        // Basic user object.
-        $user = self::get_user($courseid, $gradecategoryid, $userid);
-
-        // Is there any need to do droplow checks?
-        if (!$skipdroplow = !self::any_droplow($courseid)) {
-            self::clear_course_droplow($courseid);
-        }
-
-        // Aggregate this user.
-        $aggregatedresult = self::aggregate_user($courseid, $toplevel, $userid, 1, $skipdroplow);
-
-        return $aggregatedresult;
-    }
-
-    /**
      * Get explain.
      * Somewhat like the above but only returns the aggregated result for the requested category.
      * @param int $courseid
@@ -1603,6 +1601,89 @@ class aggregation {
     }
 
     /**
+     * MGU-1415: Aggregation bulk data.
+     * This is stuff that we don't want to be accessing inside huge loops
+     * Sets static variables on this class, but needs to be reset when
+     * an aggregation is performed as something may have changed.
+     * @param int $courseid
+     * @param int $level1id
+     * @param array $users
+     */
+    public static function build_bulk_data(int $courseid, int $level1id, array $users) {
+        global $DB;
+
+        // If users is empty, just get *everyone*.
+        if (!$users) {
+            $users = self::get_raw_users($courseid, '', '', 0);
+            $users = array_column($users, 'id');
+        }
+
+        // Resit ids.
+        $resits = $DB->get_records('local_gugrades_resitrequired', ['courseid' => $courseid]);
+        self::$resitids = array_column($resits, 'userid');
+
+        // Hidden IDs.
+        // ...[userids][gradeitemids].
+        self::$hiddenids = [];
+        $hiddengrades = $DB->get_records('local_gugrades_hidden', ['courseid' => $courseid]);
+        foreach ($hiddengrades as $hidden) {
+            self::$hiddenids[$hidden->userid][] = $hidden->gradeitemid;
+        }
+
+        // Load provisional grades into array.
+        $gradeitems = \local_gugrades\grades::get_gradeitems_recursive($level1id);
+        $gradeitemids = array_column($gradeitems, 'id');
+        [$gradeitemssql, $gradeitemssparams] = $DB->get_in_or_equal($gradeitemids, SQL_PARAMS_NAMED, 'gid');
+        [$useridsql, $useridparams] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'uid');
+        $params = array_merge($gradeitemssparams, $useridparams);
+        $sql = 'SELECT gr.* FROM {local_gugrades_grade} gr
+            JOIN {local_gugrades_latest} gl ON gl.gugradeid = gr.id
+            WHERE gl.gugradeid ' . $gradeitemssql . '
+            AND gl.userid ' . $useridsql;
+        $provisionals = $DB->get_records_sql($sql, $params);
+        foreach ($provisionals as $provisional) {
+            self::$provisionalgrades[$provisional->userid][$provisional->gradeitemid] = $provisional;
+        }
+    }
+
+    /**
+     * Helper function to aggregate a single user when updating any user grades.
+     * @param int $courseid
+     * @param int $gradecategoryid
+     * @param int $userid
+     * @param bool $force
+     */
+    public static function aggregate_user_helper(int $courseid, int $gradecategoryid, int $userid, bool $force = false) {
+
+        // As $gradecategoryid could be second level + then we first need to find the 1st level
+        // categoryid (as we're aggregating everything).
+        $level1categoryid = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
+
+        // Get bulk database data.
+        self::build_bulk_data($courseid, $level1categoryid, [$userid]);
+
+        // Invalidate their cached data.
+        self::invalidate_aggdata($courseid, $gradecategoryid, $userid);
+        self::invalidate_aggdata($courseid, $level1categoryid, $userid);
+
+        // We need the recursed category tree for this categoryid. Hopefully, this should be cached.
+        $toplevel = self::recurse_tree($courseid, $level1categoryid, $force);
+
+        // Basic user object.
+        $user = self::get_user($courseid, $gradecategoryid, $userid);
+
+        // Is there any need to do droplow checks?
+        if (!$skipdroplow = !self::any_droplow($courseid)) {
+            self::clear_course_droplow($courseid);
+        }
+
+        // Aggregate this user.
+        $aggregatedresult = self::aggregate_user($courseid, $toplevel, $userid, 1, $skipdroplow);
+
+        return $aggregatedresult;
+    }
+
+    /**
      * Entry point for calculating complete aggregations of array of users.
      * @param int $courseid
      * @param int $gradecategoryid
@@ -1614,6 +1695,9 @@ class aggregation {
         // As $gradecategoryid could be second level + then we first need to find the 1st level
         // categoryid (as we're aggregating everything).
         $level1categoryid = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
+
+        // Get bulk database data.
+        self::build_bulk_data($courseid, $level1categoryid, array_column($users, 'id'));
 
         // We need the recursed category tree for this categoryid. Hopefully, this should be cached.
         $toplevel = self::recurse_tree($courseid, $level1categoryid, true);

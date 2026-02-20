@@ -508,11 +508,15 @@ class grades {
      * and in an child categories (recursively)
      * (a bit like recurse_activitytree but only items)
      * We don't actually recurse - just use the path
-     * @param object $gradecategory
+     * @param object|int $gradecategory
      * @return array (of grade_items)
      */
-    public static function get_gradeitems_recursive(object $gradecategory) {
+    public static function get_gradeitems_recursive(object|int $gradecategory) {
         global $DB;
+
+        if (is_int($gradecategory)) {
+            $gradecategory = $DB->get_record('grade_categories', ['id' => $gradecategory], '*', MUST_EXIST);
+        }
 
         // Whatever path this has will be the start of all other paths that we want.
         $path = $gradecategory->path;
@@ -705,6 +709,50 @@ class grades {
     }
 
     /**
+     * MGU-1415: Update latest grade in DB.
+     * Latest grade for any graditemid, userid combo is the highest id in the
+     * grades table.
+     * This makes it much faster to find.
+     * @param int $gradeitemid
+     * @param int $userid
+     * @return object|null
+     */
+    public static function set_latest_grade(int $gradeitemid, int $userid) {
+        global $DB;
+
+        // ...id is a proxy for time added.
+        // Cannot use the timestamp as the unit tests write the test grades all in the
+        // same second (potentially).
+        $sql = 'SELECT * FROM {local_gugrades_grade}
+            WHERE id = (SELECT max(id) FROM {local_gugrades_grade}
+                WHERE gradeitemid = :gradeitemid
+                AND userid = :userid
+                AND gradetype<>"RELEASED"
+                AND iscurrent = 1)';
+        if (!$grade = $DB->get_record_sql($sql, [
+            'gradeitemid' => $gradeitemid,
+            'userid' => $userid,
+        ])) {
+            return null;
+        }
+
+        // Update/create entry in latest grade table.
+        if ($latest = $DB->get_record('local_gugrades_latest', ['gradeitemid' => $gradeitemid, 'userid' => $userid])) {
+            $latest->gugradeid = $grade->id;
+            $DB->update_record('local_gugrades_latest', $latest);
+        } else {
+            $latest = (object)[
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+                'gugradeid' => $grade->id,
+            ];
+            $DB->insert_record('local_gugrades_latest', $latest);
+        }
+
+        return $grade;
+    }
+
+    /**
      * Write grade to local_gugrades_grade table
      * NOTE: $overwrite means that we don't make multiple copies (for aggregated categories)
      *
@@ -841,6 +889,7 @@ class grades {
                 $gugrade->catoverride = $catoverride;
 
                 $DB->update_record('local_gugrades_grade', $gugrade);
+                self::set_latest_grade($gradeitemid, $userid);
 
                 return;
             }
@@ -867,6 +916,7 @@ class grades {
         $gugrade->points = $ispoints;
         $gugrade->catoverride = $catoverride;
         $DB->insert_record('local_gugrades_grade', $gugrade);
+        self::set_latest_grade($gradeitemid, $userid);
     }
 
     /**
@@ -929,36 +979,9 @@ class grades {
     public static function get_provisional_from_id(int $gradeitemid, int $userid) {
         global $DB;
 
-        // Skip caching for unit tests.
-        $is_unit_test = \local_gugrades\api::is_unit_test();
+        $provisional = self::set_latest_grade($gradeitemid, $userid);
 
-        // Is this cached?
-        $cache = \cache::make('local_gugrades', 'provisionalgrade');
-        $tag = self::get_provisionalgrade_cachetag($gradeitemid, $userid);
-        if (!$is_unit_test && ($grade = $cache->get($tag))) {
-            return $grade;
-        }
-
-        // ...id is a proxy for time added.
-        // Cannot use the timestamp as the unit tests write the test grades all in the
-        // same second (potentially).
-        $sql = 'SELECT * FROM {local_gugrades_grade}
-            WHERE id = (SELECT max(id) FROM {local_gugrades_grade}
-                WHERE gradeitemid = :gradeitemid
-                AND userid = :userid
-                AND gradetype<>"RELEASED"
-                AND iscurrent = 1)';
-        $grade = $DB->get_record_sql($sql, [
-            'gradeitemid' => $gradeitemid,
-            'userid' => $userid,
-        ]);
-
-        // Cache grade.
-        if (!$is_unit_test) {
-            $cache->set($tag, $grade);
-        }
-
-        return $grade;
+        return $provisional;
     }
 
     /**
