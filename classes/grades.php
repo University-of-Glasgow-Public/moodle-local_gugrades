@@ -36,6 +36,25 @@ require_once($CFG->dirroot . '/grade/lib.php');
  * Class to store and manipulate grade structures for course
  */
 class grades {
+
+    /**
+     * Bulk data variable for resit_required.
+     * @var array $resitids
+     */
+    private static $resitids = [];
+
+    /**
+     * Bulk data variable for hidden IDs.
+     * @var array $hiddenids
+     */
+    private static $hiddenids = [];
+
+    /**
+     * Bulk data variable for provisional grades
+     * @var array $provisionalgrades
+     */
+    private static $provisionalgrades = [];
+
     /**
      * Get a grade item.
      * As we can constantly look up the same grade item over and over
@@ -713,11 +732,12 @@ class grades {
      * Latest grade for any graditemid, userid combo is the highest id in the
      * grades table.
      * This makes it much faster to find.
+     * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
      * @return object|null
      */
-    public static function set_latest_grade(int $gradeitemid, int $userid) {
+    public static function set_latest_grade(int $courseid, int $gradeitemid, int $userid) {
         global $DB;
 
         // ...id is a proxy for time added.
@@ -742,6 +762,7 @@ class grades {
             $DB->update_record('local_gugrades_latest', $latest);
         } else {
             $latest = (object)[
+                'courseid' => $courseid,
                 'gradeitemid' => $gradeitemid,
                 'userid' => $userid,
                 'gugradeid' => $grade->id,
@@ -889,7 +910,7 @@ class grades {
                 $gugrade->catoverride = $catoverride;
 
                 $DB->update_record('local_gugrades_grade', $gugrade);
-                self::set_latest_grade($gradeitemid, $userid);
+                self::set_latest_grade($courseid, $gradeitemid, $userid);
 
                 return;
             }
@@ -916,7 +937,7 @@ class grades {
         $gugrade->points = $ispoints;
         $gugrade->catoverride = $catoverride;
         $DB->insert_record('local_gugrades_grade', $gugrade);
-        self::set_latest_grade($gradeitemid, $userid);
+        self::set_latest_grade($courseid, $gradeitemid, $userid);
     }
 
     /**
@@ -977,9 +998,13 @@ class grades {
      * @return oject|bool
      */
     public static function get_provisional_from_id(int $gradeitemid, int $userid) {
-        global $DB;
 
-        $provisional = self::set_latest_grade($gradeitemid, $userid);
+        if (array_key_exists($userid, self::$provisionalgrades) && array_key_exists($gradeitemid, self::$provisionalgrades[$userid])
+            ) {
+            $provisional = self::$provisionalgrades[$userid][$gradeitemid];
+        } else {
+            $provisional = null;
+        }
 
         return $provisional;
     }
@@ -1476,20 +1501,19 @@ class grades {
         $DB->delete_records('local_gugrades_hidden', ['gradeitemid' => $gradeitemid]);
         $DB->delete_records('local_gugrades_altered_weight', ['gradeitemid' => $gradeitemid]);
         $DB->delete_records('local_gugrades_map_item', ['gradeitemid' => $gradeitemid]);
+        $DB->delete_records('local_gugrades_latest', ['gradeitemid' => $gradeitemid]);
+        $DB->delete_records('local_gugrades_resit', ['gradeitemid' => $gradeitemid]);
 
         \local_gugrades\aggregation::invalidate_cache($courseid);
     }
 
     /**
-     * Delete all data for gradeitemid
+     * Delete all data for course
      * TODO: Don't forget to add anything new that we add in db.
      * @param int $courseid
      */
     public static function delete_course(int $courseid) {
         global $DB;
-
-        $DB->delete_records('local_gugrades_agg_conversion', ['courseid' => $courseid]);
-        $DB->delete_records('local_gugrades_config', ['courseid' => $courseid]);
 
         // Delete conversion maps.
         $maps = $DB->get_records('local_gugrades_map', ['courseid' => $courseid]);
@@ -1499,6 +1523,16 @@ class grades {
         }
         $DB->delete_records('local_gugrades_map', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_resitrequired', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_audit', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_column', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_hidden', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_altered_weight', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_map_item', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_resit', ['gradeitemid' => $gradeitemid]);
+        $DB->delete_records('local_gugrades_agg_conversion', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_config', ['courseid' => $courseid]);
     }
 
     /**
@@ -1957,5 +1991,86 @@ class grades {
         }
 
         return $erroritems;
+    }
+
+    /**
+     * Is resit required?
+     * @param int $courseid
+     * @param int $userid
+     * @return boolean
+     */
+    public static function is_resit_required(int $courseid, int $userid) {
+
+        $required = in_array($userid, self::$resitids);
+
+        return $required;
+    }
+
+    /**
+     * Get any hidden grades for user and re-organise by gradeitemid
+     * @param int $courseid
+     * @param int $userid
+     * @return array
+     */
+    public static function get_user_hidden(int $courseid, int $userid) {
+        if (array_key_exists($userid, self::$hiddenids)) {
+            return self::$hiddenids;
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * MGU-1415: Aggregation bulk data.
+     * This is stuff that we don't want to be accessing inside huge loops
+     * Sets static variables on this class, but needs to be reset when
+     * an aggregation is performed as something may have changed.
+     * @param int $courseid
+     * @param array $users
+     */
+    public static function build_bulk_data(int $courseid, array $users) {
+        global $DB;
+
+        // If users is empty, just get *everyone*.
+        if (!$users) {
+            $users = \local_gugrades\aggregation::get_raw_users($courseid, '', '', 0);
+            $users = array_column($users, 'id');
+        }
+
+        // Resit ids.
+        $resits = $DB->get_records('local_gugrades_resitrequired', ['courseid' => $courseid]);
+        self::$resitids = array_column($resits, 'userid');
+
+        // Hidden IDs.
+        // ...[userids][gradeitemids].
+        self::$hiddenids = [];
+        $hiddengrades = $DB->get_records('local_gugrades_hidden', ['courseid' => $courseid]);
+        foreach ($hiddengrades as $hidden) {
+            self::$hiddenids[$hidden->userid][] = $hidden->gradeitemid;
+        }
+
+        // Check that there are no missing grades in local_gugrades_latest.
+        // Any grade_items represented in local_gugrades_grade should have a
+        // corresponding entry in local_gugrades_latest.
+        $sql = 'SELECT gr.* FROM {local_gugrades_grade} gr
+            LEFT JOIN {local_gugrades_latest} gl ON gl.gugradeid = gr.id
+            WHERE gl.id IS NULL
+            AND gr.courseid = :courseid
+            AND gradetype <> "RELEASED"
+            AND iscurrent = 1';
+        $missinggrades = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        foreach ($missinggrades as $grade) {
+            \local_gugrades\grades::set_latest_grade($courseid, $grade->gradeitemid, $grade->userid);
+        }
+
+        // Load provisional grades into array for the current course.
+        self::$provisionalgrades = [];
+        $sql = 'SELECT gr.* FROM {local_gugrades_grade} gr
+            JOIN {local_gugrades_latest} gl ON gl.gugradeid = gr.id
+            WHERE gl.courseid = :courseid';
+        $provisionals = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        foreach ($provisionals as $provisional) {
+            self::$provisionalgrades[$provisional->userid][$provisional->gradeitemid] = $provisional;
+        }
     }
 }

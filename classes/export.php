@@ -190,6 +190,9 @@ class export {
 
         $plugin = self::get_export_plugin($pluginname);
 
+        // Get bulk database data.
+        \local_gugrades\grades::build_bulk_data($courseid, []);
+
         $course = get_course($courseid);
         $filename = $course->shortname . '_' . date('Y-m-d_G:i:s');
 

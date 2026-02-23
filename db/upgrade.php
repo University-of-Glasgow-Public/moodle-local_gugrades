@@ -371,5 +371,28 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026022002, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026022300) {
+
+        // Define field courseid to be added to local_gugrades_latest.
+        $table = new xmldb_table('local_gugrades_latest');
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0', 'id');
+
+        // Conditionally launch add field courseid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Update any existing fields.
+        $latests = $DB->get_records('local_gugrades_latest');
+        foreach ($latests as $latest) {
+            $gradeitem = $DB->get_record('grade_items', ['id' => $latest->gradeitemid], 'id, courseid', MUST_EXIST);
+            $latest->courseid = $gradeitem->courseid;
+            $DB->update_record('local_gugrades_latest', $latest);
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026022300, 'local', 'gugrades');
+    }
+
     return true;
 }

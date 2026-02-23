@@ -2079,7 +2079,7 @@ class api {
 
         // Setup aggregation data.
         // ...empty users array forces function to simply load the whole lot.
-        \local_gugrades\aggregation::build_bulk_data($courseid, $level1id, []);
+        \local_gugrades\grades::build_bulk_data($courseid, []);
 
         // Get all the students.
         $users = \local_gugrades\aggregation::get_users($courseid, $gradecategoryid, $firstname, $lastname, $groupid);

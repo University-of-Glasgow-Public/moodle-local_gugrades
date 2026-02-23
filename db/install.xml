@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/gugrades/db" VERSION="20260220" COMMENT="XMLDB file for Moodle local/gugrades"
+<XMLDB PATH="local/gugrades/db" VERSION="20260223" COMMENT="XMLDB file for Moodle local/gugrades"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -245,6 +245,7 @@
     <TABLE NAME="local_gugrades_latest" COMMENT="Identifies &quot;latest grade&quot; for each graditemid, userid combination.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="gradeitemid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="gugradeid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key - local_gugrades_grade.id"/>
