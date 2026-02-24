@@ -2049,6 +2049,11 @@ class api {
         // I know :(.
         self::more_time();
 
+        // Setup aggregation data.
+        // ...empty users array forces function to simply load the whole lot.
+        \local_gugrades\grades::build_bulk_data($courseid, []);
+        \local_gugrades\aggregation::reset_bulk_data($courseid);
+
         // Is aggregation supported (at all)?
         $gradeitemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($gradecategoryid);
         [$aggregationsupported, $unsupportedscales] = \local_gugrades\grades::are_all_grades_supported($courseid, $gradeitemid);
@@ -2076,11 +2081,6 @@ class api {
 
         // Get the level 1 parent category.
         $level1id = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
-
-        // Setup aggregation data.
-        // ...empty users array forces function to simply load the whole lot.
-        \local_gugrades\grades::build_bulk_data($courseid, []);
-        \local_gugrades\aggregation::reset_bulk_data($courseid);
 
         // Get all the students.
         $users = \local_gugrades\aggregation::get_users($courseid, $gradecategoryid, $firstname, $lastname, $groupid);
