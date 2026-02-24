@@ -378,11 +378,9 @@ class grades {
 
         if (array_key_exists($gradecategoryid, self::$gradeitemsbycategoryid)) {
             return self::$gradeitemsbycategoryid[$gradecategoryid];
-        } else {
-            return null;
         }
 
-        // MGU-1392: Make sure properly indexed.
+        // Otherwise, old-fashioned method.
         $sql = "SELECT * FROM {grade_items}
             WHERE itemtype = 'category'
             AND iteminstance = :iteminstance
