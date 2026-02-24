@@ -131,6 +131,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
         // Clear cache.
         $cache = \cache::make('local_gugrades', 'gradeitems');
         $cache->purge();
+        \local_gugrades\aggregation::reset_bulk_data($this->course->id);
 
         // Category to test with scales.
         $gradecategoryid = $this->gradecatsecond->id;

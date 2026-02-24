@@ -2080,6 +2080,7 @@ class api {
         // Setup aggregation data.
         // ...empty users array forces function to simply load the whole lot.
         \local_gugrades\grades::build_bulk_data($courseid, []);
+        \local_gugrades\aggregation::reset_bulk_data($courseid);
 
         // Get all the students.
         $users = \local_gugrades\aggregation::get_users($courseid, $gradecategoryid, $firstname, $lastname, $groupid);
@@ -2669,5 +2670,16 @@ class api {
      */
     public static function save_resit_item(int $courseid, int $itemid, bool $set) {
         return \local_gugrades\grades::save_resit_item($courseid, $itemid, $set);
+    }
+
+    /**
+     * Reset bulk data.
+     * This is important if you need to reset the cached/bulk data acquired in the grades
+     * class. Particularly in unit tests that don't reset static/global variables.
+     * @param int $courseid
+     */
+    public static function reset_bulk_data(int $courseid) {
+        \local_gugrades\grades::build_bulk_data($courseid, []);
+        \local_gugrades\aggregation::reset_bulk_data($courseid);
     }
 }

@@ -167,6 +167,8 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
                 }
             }
         }
+
+        \local_gugrades\api::reset_bulk_data($this->course->id);
     }
 
     /**
@@ -186,6 +188,7 @@ class gugrades_aggregation_testcase extends gugrades_base_testcase {
 
         // Get gradeitems.
         $gradeitems = $DB->get_records('grade_items', ['itemtype' => 'manual']);
+
         return array_column($gradeitems, 'id');
     }
 

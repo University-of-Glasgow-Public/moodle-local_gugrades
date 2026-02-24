@@ -56,6 +56,25 @@ class grades {
     private static $provisionalgrades = [];
 
     /**
+     * Bulk data variable for grade categories
+     * @var array $gradecategories
+     */
+    private static $gradecategories = [];
+
+    /**
+     * Bulk data variable for grade items
+     * @var array $gradeitems
+     */
+    private static $gradeitems = [];
+
+    /**
+     * Bulk data foor grade items indexed by corresponding
+     * category id
+     * @var array $gradeitemsbycategoryid
+     */
+    private static $gradeitemsbycategoryid = [];
+
+    /**
      * Get a grade item.
      * As we can constantly look up the same grade item over and over
      * @param int $gradeitemid
@@ -82,6 +101,24 @@ class grades {
         $GRADEITEMS[$gradeitemid] = $gradeitem;
 
         return $gradeitem;
+    }
+
+    /**
+     * Get gradecategory from bulk data
+     * @param int $gradecategoryid
+     * @param bool $mustexist
+     * @return object|null
+     */
+    public static function get_gradecategory(int $gradecategoryid, bool $mustexist = false) {
+        if (array_key_exists($gradecategoryid, self::$gradecategories)) {
+            return self::$gradecategories[$gradecategoryid];
+        }
+
+        if ($mustexist) {
+            throw new \moodle_exception('Grade category does not exist. Gradecategoryid = ' . $gradecategoryid);
+        }
+
+        return null;
     }
 
     /**
@@ -338,6 +375,12 @@ class grades {
      */
     public static function get_gradeitem_from_gradecategoryid(int $gradecategoryid) {
         global $DB;
+
+        if (array_key_exists($gradecategoryid, self::$gradeitemsbycategoryid)) {
+            return self::$gradeitemsbycategoryid[$gradecategoryid];
+        } else {
+            return null;
+        }
 
         // MGU-1392: Make sure properly indexed.
         $sql = "SELECT * FROM {grade_items}
@@ -832,9 +875,6 @@ class grades {
             \local_gugrades\admingrades::validate_admingrade($admingrade);
         }
 
-        // Invalidate provisionalgrade cache.
-        self::invalidate_provisionalgrade_cache($gradeitemid, $userid);
-
         // Get/create the column entry.
         $column = self::get_column($courseid, $gradeitemid, $gradetype, $other, $ispoints);
 
@@ -950,44 +990,6 @@ class grades {
         $grade = array_column($grades, null, 'reasonshortname')[$reason] ?? false;
 
         return $grade->grade;
-    }
-
-    /**
-     * Work out provisional grade
-     * TODO: This is just a 'dummy' - needs lots more logic
-     * @param array $grades
-     * @return float
-     */
-    private static function get_provisional_grade($grades) {
-
-        // ATM provision grade is the same as FIRST grade.
-        if ($grade = self::get_grade_by_reason($grades, 'FIRST')) {
-            return $grade->grade;
-        }
-
-        return false;
-    }
-
-    /**
-     * Create tag for provisionalgrade cache
-     * @param int $gradeitemid
-     * @param int $userid
-     * @return string
-     */
-    public static function get_provisionalgrade_cachetag(int $gradeitemid, int $userid) {
-
-        return 'PROVISIONAL_' . $gradeitemid . '_' . $userid;
-    }
-
-    /**
-     * Invalidate provisionalgrade cache entry
-     * @param int $gradeitemid
-     * @param int $userid
-     */
-    public static function invalidate_provisionalgrade_cache(int $gradeitemid, int $userid) {
-        $cache = \cache::make('local_gugrades', 'provisionalgrade');
-        $tag = self::get_provisionalgrade_cachetag($gradeitemid, $userid);
-        $cache->delete($tag);
     }
 
     /**
@@ -1779,8 +1781,6 @@ class grades {
             $altered->timealtered = time();
             $DB->insert_record('local_gugrades_altered_weight', $altered);
         }
-
-        self::invalidate_provisionalgrade_cache($gradeitemid, $userid);
     }
 
     /**
@@ -2036,6 +2036,20 @@ class grades {
             $users = \local_gugrades\aggregation::get_raw_users($courseid, '', '', 0);
             $users = array_column($users, 'id');
         }
+
+        // Grade categories.
+        self::$gradecategories = $DB->get_records('grade_categories', ['courseid' => $courseid]);
+
+        // Grade items.
+        self::$gradeitems = $DB->get_records('grade_items', ['courseid' => $courseid]);
+
+        // Grade items by grade category.
+         $sql = "SELECT * FROM {grade_items}
+            WHERE itemtype = 'category'
+            AND courseid = :courseid
+            AND itemmodule IS NULL";
+        $gradeitems = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        self::$gradeitemsbycategoryid = array_column($gradeitems, null, 'iteminstance');
 
         // Resit ids.
         $resits = $DB->get_records('local_gugrades_resitrequired', ['courseid' => $courseid]);

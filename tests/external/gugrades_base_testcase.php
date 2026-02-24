@@ -332,6 +332,8 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
         $this->teacher = $teacher;
         $this->student = $student;
         $this->student2 = $student2;
+
+        \local_gugrades\api::reset_bulk_data($course->id);
     }
 
     /**

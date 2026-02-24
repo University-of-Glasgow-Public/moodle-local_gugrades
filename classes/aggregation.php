@@ -46,9 +46,13 @@ class aggregation {
      * Store instance(s)
      * @var array $instances
      */
-    private $instances = [];
+    //private $instances = [];
 
-
+    /**
+     * "Cache" aggregation type data.
+     * @var array $aggregationtypes
+     */
+    private static $aggregationtypes = [];
 
     /**
      * Constructor is protected to prevent new()
@@ -459,7 +463,7 @@ class aggregation {
         $hiddenids = \local_gugrades\grades::get_user_hidden($courseid, $user->id);
 
         // Get the grade item corresponding to this category.
-        $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
+        $gcat = \local_gugrades\grades::get_gradecategory($gradecategoryid, MUST_EXIST);
         $gradecatitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
 
         $fields = [];
@@ -672,6 +676,14 @@ class aggregation {
     public static function get_aggregation_type(array $items, $gradecategoryid) {
         global $DB;
 
+        // Is this locally cached?
+        // ...it won't change once it's been worked out.
+        if (array_key_exists($gradecategoryid, self::$aggregationtypes)) {
+            $aggregationtype = self::$aggregationtypes[$gradecategoryid];
+
+            return [$aggregationtype->atype, $aggregationtype->warnings];
+        }
+
         $gradecategory = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
 
         $istoplevel = self::is_top_level($gradecategoryid);
@@ -721,6 +733,10 @@ class aggregation {
 
         // If we have found an error by this point then give up.
         if ($atype == \local_gugrades\GRADETYPE_ERROR) {
+            self::$aggregationtypes[$gradecategoryid] = (object)[
+                'atype' => $atype,
+                'warnings' => $warnings,
+            ];
             return [$atype, $warnings];
         }
 
@@ -746,6 +762,10 @@ class aggregation {
             $atype = $map->scale == 'schedulea' ? \local_gugrades\GRADETYPE_SCHEDULEA : \local_gugrades\GRADETYPE_SCHEDULEB;
         }
 
+        self::$aggregationtypes[$gradecategoryid] = (object)[
+            'atype' => $atype,
+            'warnings' => [],
+        ];
         return [$atype, []];
     }
 
@@ -943,7 +963,6 @@ class aggregation {
                 $grade->dropped = 1;
                 $grade->normalisedweight = null;
                 $DB->update_record('local_gugrades_grade', $grade);
-                \local_gugrades\grades::invalidate_provisionalgrade_cache($itemid, $userid);
             }
         }
     }
@@ -973,7 +992,6 @@ class aggregation {
             foreach ($grades as $grade) {
                 $grade->normalisedweight = $normalisedweight;
                 $DB->update_record('local_gugrades_grade', $grade);
-                \local_gugrades\grades::invalidate_provisionalgrade_cache($itemid, $userid);
             }
         }
     }
@@ -1567,6 +1585,7 @@ class aggregation {
 
         // Get bulk database data.
         \local_gugrades\grades::build_bulk_data($courseid, [$userid]);
+        self::reset_bulk_data($courseid);
 
         // Invalidate their cached data.
         self::invalidate_aggdata($courseid, $gradecategoryid, $userid);
@@ -1604,6 +1623,7 @@ class aggregation {
 
         // Get bulk database data.
         \local_gugrades\grades::build_bulk_data($courseid, array_column($users, 'id'));
+        self::reset_bulk_data($courseid);
 
         // We need the recursed category tree for this categoryid. Hopefully, this should be cached.
         $toplevel = self::recurse_tree($courseid, $level1categoryid, true);
@@ -1632,5 +1652,14 @@ class aggregation {
             // as call recurses.
             self::aggregate_user($courseid, $toplevel, $user->id, 1, $skipdroplow);
         }
+    }
+
+    /**
+     * Reset any static bulk-data.
+     * This is particularly important for unit tests that don't reset such data.
+     * @param int $courseid
+     */
+    public static function reset_bulk_data(int $courseid) {
+        self::$aggregationtypes = [];
     }
 }

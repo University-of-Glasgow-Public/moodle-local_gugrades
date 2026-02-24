@@ -221,5 +221,7 @@ class gugrades_advanced_testcase extends gugrades_base_testcase {
         $this->gradecatsecond = $gradecatsecond;
         $this->gradeitemsecond1 = $seconditem1->id;
         $this->gradeitemsecond2 = $seconditem2->id;
+
+         \local_gugrades\api::reset_bulk_data($course->id);
     }
 }
