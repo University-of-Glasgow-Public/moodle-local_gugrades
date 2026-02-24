@@ -322,7 +322,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026022001) {
-
         // Define field isprovisional to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
         $field = new xmldb_field('isprovisional', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'iserror');
@@ -346,7 +345,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026022002) {
-
         // Define table local_gugrades_latest to be created.
         $table = new xmldb_table('local_gugrades_latest');
 
@@ -372,7 +370,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026022300) {
-
         // Define field courseid to be added to local_gugrades_latest.
         $table = new xmldb_table('local_gugrades_latest');
         $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0', 'id');

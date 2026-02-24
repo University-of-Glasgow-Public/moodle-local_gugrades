@@ -43,12 +43,6 @@ require_once($CFG->dirroot . '/grade/lib.php');
  */
 class aggregation {
     /**
-     * Store instance(s)
-     * @var array $instances
-     */
-    //private $instances = [];
-
-    /**
      * "Cache" aggregation type data.
      * @var array $aggregationtypes
      */
@@ -596,7 +590,6 @@ class aggregation {
         $existingids = array_column($existing, 'userid');
 
         foreach ($users as $id => $user) {
-
             if (!in_array($user->id, $existingids)) {
                 self::aggregate_user_helper($courseid, $gradecategoryid, $user->id);
                 $userhelpercount++;

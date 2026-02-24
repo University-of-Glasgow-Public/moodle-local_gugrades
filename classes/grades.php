@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/grade/lib.php');
  * Class to store and manipulate grade structures for course
  */
 class grades {
-
     /**
      * Bulk data variable for resit_required.
      * @var array $resitids
@@ -790,10 +789,13 @@ class grades {
                 AND userid = :userid
                 AND gradetype<>"RELEASED"
                 AND iscurrent = 1)';
-        if (!$grade = $DB->get_record_sql($sql, [
-            'gradeitemid' => $gradeitemid,
-            'userid' => $userid,
-        ])) {
+        if (!$grade = $DB->get_record_sql(
+            $sql,
+            [
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+            ]
+        )) {
             return null;
         }
 
@@ -999,8 +1001,8 @@ class grades {
      */
     public static function get_provisional_from_id(int $gradeitemid, int $userid) {
 
-        if (array_key_exists($userid, self::$provisionalgrades) && array_key_exists($gradeitemid, self::$provisionalgrades[$userid])
-            ) {
+        $useridexists = array_key_exists($userid,  self::$provisionalgrades);
+        if ($useridexists && array_key_exists($gradeitemid, self::$provisionalgrades[$userid])) {
             $provisional = self::$provisionalgrades[$userid][$gradeitemid];
         } else {
             $provisional = null;
@@ -2072,7 +2074,7 @@ class grades {
             AND iscurrent = 1';
         $missinggrades = $DB->get_records_sql($sql, ['courseid' => $courseid]);
         foreach ($missinggrades as $grade) {
-            \local_gugrades\grades::set_latest_grade($courseid, $grade->gradeitemid, $grade->userid);
+            self::set_latest_grade($courseid, $grade->gradeitemid, $grade->userid);
         }
 
         // Load provisional grades into array for the current course.
