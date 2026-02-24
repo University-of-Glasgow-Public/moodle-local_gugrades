@@ -789,13 +789,7 @@ class grades {
                 AND userid = :userid
                 AND gradetype<>"RELEASED"
                 AND iscurrent = 1)';
-        if (!$grade = $DB->get_record_sql(
-            $sql,
-            [
-                'gradeitemid' => $gradeitemid,
-                'userid' => $userid,
-            ]
-        )) {
+        if (!$grade = $DB->get_record_sql($sql, ['gradeitemid' => $gradeitemid, 'userid' => $userid])) {
             return null;
         }
 
@@ -1001,7 +995,7 @@ class grades {
      */
     public static function get_provisional_from_id(int $gradeitemid, int $userid) {
 
-        $useridexists = array_key_exists($userid,  self::$provisionalgrades);
+        $useridexists = array_key_exists($userid, self::$provisionalgrades);
         if ($useridexists && array_key_exists($gradeitemid, self::$provisionalgrades[$userid])) {
             $provisional = self::$provisionalgrades[$userid][$gradeitemid];
         } else {
