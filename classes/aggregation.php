@@ -1126,7 +1126,8 @@ class aggregation {
 
                         return [$parentgrade, $parentgrade, '', $displaygrade, 0, '', $explain, false];
                     } else {
-                        return [$rawgrade, $rawgrade, '', $rawgrade, 0, '', $explain, false];
+                        $roundpoints = $aggregation->round_float($rawgrade);
+                        return [$roundpoints, $roundpoints, '', $roundpoints, 0, '', $explain, false];
                     }
                 }
             }
