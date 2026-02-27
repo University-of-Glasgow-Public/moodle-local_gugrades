@@ -516,7 +516,7 @@ class conversion {
      * @param array $mapvalues
      * @return object
      */
-    protected static function convert_grade(float $rawgrade, float $maxgrade, array $mapvalues) {
+    protected static function old_convert_grade(float $rawgrade, float $maxgrade, array $mapvalues) {
 
         $values = array_values($mapvalues);
 
@@ -547,6 +547,46 @@ class conversion {
 
         return null;
     }
+
+    /** Convert a point grade according to map values
+     * Note that we only use the percentage value and that as a fraction
+     * of the maxgrade recorded in the grade item.
+     * @param float $rawgrade
+     * @param float $maxgrade
+     * @param array $mapvalues
+     * @return object
+     */
+    protected static function convert_grade(float $rawgrade, float $maxgrade, array $mapvalues) {
+
+    $values = array_values($mapvalues);
+
+    // Scale factor to preserve 5 decimal places.
+    $scale = 100000;
+
+    // Use epsilon to avoid float equality issues.
+    if (abs($rawgrade - $maxgrade) < 1e-10) {
+        return end($values);
+    }
+
+    // Convert to integer percent.
+    $percentgrade = (int) floor((100 * $rawgrade / $maxgrade) * $scale);
+
+    for ($i = 0; $i < count($values); $i++) {
+        $lower = (int) floor($values[$i]->percentage * $scale);
+
+        if ($i == count($values) - 1) {
+            $upper = 100 * $scale;
+        } else {
+            $upper = (int) floor($values[$i + 1]->percentage * $scale);
+        }
+
+        if ($percentgrade >= $lower && $percentgrade < $upper) {
+            return $values[$i];
+        }
+    }
+
+    return null;
+}
 
     /**
      * Helper for aggregation page conversion
