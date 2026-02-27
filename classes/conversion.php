@@ -332,7 +332,7 @@ class conversion {
      * @return boolean
      * @see /ui/src/components/conversion/EditMap.vue for the JS inspiration.
      */
-    public static function order_validated(array $map) {
+    public static function old_order_validated(array $map) {
         $currentbound = -1;
         $currentgrade = -1;
         $inorder = true;
@@ -360,6 +360,59 @@ class conversion {
         }
 
         return $inorder;
+    }
+
+    /**
+     * Validate the order of the map.
+     * Ensures:
+     *  - Bounds are strictly increasing
+     *  - Grades are strictly increasing
+     *  - All numeric comparisons are float-safe
+     *
+     * @param array $map
+     * @return bool
+     */
+    public static function order_validated(array $map): bool {
+
+        $scale = 100000; // Must match convert_grade precision
+
+        $lastBound = null;
+        $lastGrade = null;
+
+        foreach ($map as $item) {
+
+            // Skip the 'H' band (first row rule handled elsewhere)
+            if ($item['band'] === 'H') {
+                continue;
+            }
+
+            // --- Validate bound ordering ---
+            if (isset($item['bound']) && is_numeric($item['bound'])) {
+
+                // Convert to scaled integer for stable comparison
+                $bound = (int) round((float)$item['bound'] * $scale);
+
+                if ($lastBound !== null && $bound <= $lastBound) {
+                    return false; // Not strictly increasing
+                }
+
+                $lastBound = $bound;
+            }
+
+            // --- Validate grade ordering ---
+            if (isset($item['grade']) && is_numeric($item['grade'])) {
+
+                $grade = (int) $item['grade'];
+
+                if ($lastGrade !== null && $grade <= $lastGrade) {
+                    return false; // Not strictly increasing
+                }
+
+                $lastGrade = $grade;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -507,47 +560,6 @@ class conversion {
         }
     }
 
-    /**
-     * Convert a point grade according to map values
-     * Note that we only use the percentage value and that as a fraction
-     * of the maxgrade recorded in the grade item.
-     * @param float $rawgrade
-     * @param float $maxgrade
-     * @param array $mapvalues
-     * @return object
-     */
-    protected static function old_convert_grade(float $rawgrade, float $maxgrade, array $mapvalues) {
-
-        $values = array_values($mapvalues);
-
-        // ...rawgrade == maxgrade is an "edge" condition.
-        if ($rawgrade == $maxgrade) {
-            return end($values);
-        }
-
-        // Convert rawgrade to a percentage.
-        // 5 decimal places to "match" rounding of map percentages
-        // (important for boundary cases).
-        $percentgrade = round(100 * $rawgrade / $maxgrade, 5, PHP_ROUND_HALF_DOWN);
-
-        // Otherwise, loop over values.
-        for ($i = 0; $i < count($values); $i++) {
-            $lower = $values[$i]->percentage;
-
-            // There's no 100% in the array, so assume this if final item.
-            if ($i == count($values) - 1) {
-                $upper = 100.0;
-            } else {
-                $upper = $values[$i + 1]->percentage;
-            }
-            if (($percentgrade >= $lower) && ($percentgrade < $upper)) {
-                return $values[$i];
-            }
-        }
-
-        return null;
-    }
-
     /** Convert a point grade according to map values
      * Note that we only use the percentage value and that as a fraction
      * of the maxgrade recorded in the grade item.
@@ -558,35 +570,35 @@ class conversion {
      */
     protected static function convert_grade(float $rawgrade, float $maxgrade, array $mapvalues) {
 
-    $values = array_values($mapvalues);
+        $values = array_values($mapvalues);
 
-    // Scale factor to preserve 5 decimal places.
-    $scale = 100000;
+        // Scale factor to preserve 5 decimal places.
+        $scale = 100000;
 
-    // Use epsilon to avoid float equality issues.
-    if (abs($rawgrade - $maxgrade) < 1e-10) {
-        return end($values);
-    }
-
-    // Convert to integer percent.
-    $percentgrade = (int) floor((100 * $rawgrade / $maxgrade) * $scale);
-
-    for ($i = 0; $i < count($values); $i++) {
-        $lower = (int) floor($values[$i]->percentage * $scale);
-
-        if ($i == count($values) - 1) {
-            $upper = 100 * $scale;
-        } else {
-            $upper = (int) floor($values[$i + 1]->percentage * $scale);
+        // Use epsilon to avoid float equality issues.
+        if (abs($rawgrade - $maxgrade) < 1e-10) {
+            return end($values);
         }
 
-        if ($percentgrade >= $lower && $percentgrade < $upper) {
-            return $values[$i];
-        }
-    }
+        // Convert to integer percent.
+        $percentgrade = (int) floor((100 * $rawgrade / $maxgrade) * $scale);
 
-    return null;
-}
+        for ($i = 0; $i < count($values); $i++) {
+            $lower = (int) floor($values[$i]->percentage * $scale);
+
+            if ($i == count($values) - 1) {
+                $upper = 100 * $scale;
+            } else {
+                $upper = (int) floor($values[$i + 1]->percentage * $scale);
+            }
+
+            if ($percentgrade >= $lower && $percentgrade < $upper) {
+                return $values[$i];
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Helper for aggregation page conversion
