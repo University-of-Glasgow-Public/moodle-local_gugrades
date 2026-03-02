@@ -387,7 +387,6 @@ class conversion {
 
             // Validate bound ordering.
             if (isset($item['bound']) && is_numeric($item['bound'])) {
-
                 // Convert to scaled integer for stable comparison.
                 $bound = (int) round((float)$item['bound'] * $scale);
 
@@ -400,7 +399,6 @@ class conversion {
 
             // Validate grade ordering.
             if (isset($item['grade']) && is_numeric($item['grade'])) {
-
                 $grade = (int) $item['grade'];
 
                 if ($lastgrade !== null && $grade <= $lastgrade) {
