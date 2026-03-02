@@ -1,0 +1,56 @@
+[
+
+    {
+        "name": "Summative",
+        "category": true,
+        "weight": 1.0,
+        "children": [
+            {
+                "name": "Summer exam",
+                "category": true,
+                "weight": 0.8,
+                "aggregation": "max",
+                "grademax": 100,
+                "children": [
+                    {
+                        "name": "Exam",
+                        "category": false,
+                        "type": "points",
+                        "grademax": 60,
+                        "weight": 1.0
+                    },
+                    {
+                        "name": "Resit",
+                        "category": false,
+                        "type": "points",
+                        "grademax": 60,
+                        "weight": 1.0
+                    }
+                ]
+            },
+            {
+                "name": "Aggregated category",
+                "category": true,
+                "weight": 0.8,
+                "aggregation": "mean",
+                "grademax": 100,
+                "children": [
+                    {
+                        "name": "ItemA",
+                        "category": false,
+                        "type": "points",
+                        "grademax": 60,
+                        "weight": 1.0
+                    },
+                    {
+                        "name": "ItemB",
+                        "category": false,
+                        "type": "points",
+                        "grademax": 60,
+                        "weight": 1.0
+                    }
+                ]
+            }
+        ]
+    }
+]
