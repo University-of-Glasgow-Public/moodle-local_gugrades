@@ -96,7 +96,7 @@
                         <div v-if="header.resititem" class="badge badge-pill badge-success">{{ mstrings.resitselected }}</div>
                     </div>
                     <div class="py-1" v-if="header.strategy">
-                        <i>{{ header.strategy }}</i> 
+                        <i>{{ header.strategy }}</i>
                     </div>
                     <div v-if="header.categoryid">
                         <a href="#" @click="expand_clicked(header.categoryid)">
@@ -164,7 +164,7 @@
                 </a>
                 <span v-if="!caneditgrades">
                     <span v-if="item.resitrequired" class="gug_pill badge badge-pill badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="gug_pill badge badge-pill badge-secondary">{{ mstrings.no }}</span>    
+                    <span v-else class="gug_pill badge badge-pill badge-secondary">{{ mstrings.no }}</span>
                 </span>
             </template>
 
@@ -218,7 +218,7 @@
         </EasyDataTable>
 
         <!-- Implementation of our own accessible footer. -->
-        <CustomPagination 
+        <CustomPagination
             v-if="!loading"
             v-bind="props"
         />
@@ -474,7 +474,7 @@
         } else if (atype.value == 'B') {
             return 'Schedule B';
         } else if (atype.value == 'P') {
-            return mstrings.points;
+            return mstrings.points + ' 100';
         } else if (atype.value == 'C') {
             return mstrings.converted;
         } else if (atype.value == 'E') {
@@ -563,6 +563,7 @@
             heads.push({
                 text: mstrings.subcattotal,
                 atype: atype.value,
+                grademax: 100,
                 value: "total",
                 infocol: true,
                 strategy: headerstrategy,
