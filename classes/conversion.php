@@ -374,41 +374,40 @@ class conversion {
      */
     public static function order_validated(array $map): bool {
 
-        $scale = 100000; // Must match convert_grade precision
+        $scale = 100000; // Must match convert_grade precision.
 
-        $lastBound = null;
-        $lastGrade = null;
+        $lastbound = null;
+        $lastgrade = null;
 
         foreach ($map as $item) {
-
-            // Skip the 'H' band (first row rule handled elsewhere)
+            // Skip the 'H' band (first row rule handled elsewhere).
             if ($item['band'] === 'H') {
                 continue;
             }
 
-            // --- Validate bound ordering ---
+            // Validate bound ordering.
             if (isset($item['bound']) && is_numeric($item['bound'])) {
 
-                // Convert to scaled integer for stable comparison
+                // Convert to scaled integer for stable comparison.
                 $bound = (int) round((float)$item['bound'] * $scale);
 
-                if ($lastBound !== null && $bound <= $lastBound) {
-                    return false; // Not strictly increasing
+                if ($lastbound !== null && $bound <= $lastbound) {
+                    return false; // Not strictly increasing.
                 }
 
-                $lastBound = $bound;
+                $lastbound = $bound;
             }
 
-            // --- Validate grade ordering ---
+            // Validate grade ordering.
             if (isset($item['grade']) && is_numeric($item['grade'])) {
 
                 $grade = (int) $item['grade'];
 
-                if ($lastGrade !== null && $grade <= $lastGrade) {
-                    return false; // Not strictly increasing
+                if ($lastgrade !== null && $grade <= $lastgrade) {
+                    return false; // Not strictly increasing.
                 }
 
-                $lastGrade = $grade;
+                $lastgrade = $grade;
             }
         }
 

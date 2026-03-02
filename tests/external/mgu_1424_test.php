@@ -268,7 +268,7 @@ final class mgu_1424_test extends \local_gugrades\external\gugrades_aggregation_
         // Get the grade category 'Summer exam'.
         $gradecatsummer = $DB->get_record('grade_categories', ['fullname' => 'Summer exam'], '*', MUST_EXIST);
 
-        // Get aggregation page for above resit
+        // Get aggregation page for above resit.
         $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, true);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),
@@ -295,7 +295,6 @@ final class mgu_1424_test extends \local_gugrades\external\gugrades_aggregation_
         // G1 returned here (which is wrong).
         $fred = $page['users'][0];
         $this->assertEquals('F3 (4.40000)', $fred['displaygrade']);
-
 
         // Write grade 12 for ItemA.
         $itemaid = $this->get_gradeitemid('ItemA');
@@ -362,7 +361,5 @@ final class mgu_1424_test extends \local_gugrades\external\gugrades_aggregation_
 
         $fred = $page['users'][0];
         $this->assertEquals('F3 (4.40000)', $fred['displaygrade']);
-
     }
-
 }
