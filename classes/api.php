@@ -789,13 +789,18 @@ class api {
             return [];
         }
 
+        // Get audit user accounts.
+        $audituserids = array_unique(array_column($grades, 'auditby'));
+        $auditusers = $DB->get_records_list('user', 'id', $audituserids);
+
         // Additional info.
         $newgrades = [];
         foreach ($grades as $grade) {
             $grade->description = gradetype::get_description($grade->gradetype);
             $grade->time = userdate($grade->audittimecreated);
             $grade->current = $grade->iscurrent ? get_string('yes') : get_string('no');
-            if ($audituser = $DB->get_record('user', ['id' => $grade->auditby])) {
+            if (array_key_exists($grade->auditby, $auditusers)) {
+                $audituser = $auditusers[$grade->auditby];
                 $grade->auditbyname = fullname($audituser);
             } else {
                 $grade->auditbyname = '-';
