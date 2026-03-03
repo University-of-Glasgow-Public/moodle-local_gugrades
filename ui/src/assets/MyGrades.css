@@ -1,3 +1,5 @@
+@import "tailwindcss" prefix(tw) important;
+
 /* form legends are huge in Bootstrap */
 legend {
     font-size: inherit;
