@@ -52,4 +52,32 @@ class behat_local_gugrades extends behat_base {
     protected function fixstepargument($argument) {
         return str_replace('\\"', '"', $argument);
     }
+     /**
+      * @When I click the element with class :class
+      * 
+      * @param string $class
+      * 
+      * @return string
+      */
+    public function iClickElementWithClass($class) {
+        $element = $this->getSession()->getPage()->find('css', '.' . $class);
+            if (!$element) {
+                throw new \Exception("Element with class '$class' not found");
+            }
+        $element->click();
+    }
+     /**
+     * @Then I should see :text in the total cell
+     */
+    public function totalCellShouldContain($text) {
+        $cell = $this->getSession()->getPage()->find('xpath', '//tbody//tr[1]//td[last()]');
+
+        if (!$cell) {
+            throw new \Exception("Could not find total cell");
+        }
+
+        if (strpos($cell->getText(), $text) === false) {
+            throw new \Exception("Total cell contains '{$cell->getText()}' not '$text'");
+        }
+    }
 }
