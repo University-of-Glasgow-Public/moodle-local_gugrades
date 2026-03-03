@@ -49,18 +49,6 @@ jobs:
         with:
           node-version: '16'
       
-      - name: Install Chrome and ChromeDriver
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
-          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
-          wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-          chromedriver --version
-      
       - name: Initialise moodle-plugin-ci
         run: |
           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
@@ -78,7 +66,7 @@ jobs:
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
       
       - name: Run Behat tests
-        run: moodle-plugin-ci behat --profile chrome
+        run: moodle-plugin-ci behat --profile firefox
       
       - name: Upload Behat screenshots on failure
         if: failure()
