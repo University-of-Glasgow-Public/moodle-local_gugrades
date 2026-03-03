@@ -122,7 +122,7 @@ class import_grades_users extends external_api {
                     fillns:         $fillns,
                     reason:         $reason,
                     other:          $other,
-                    noaggregation:  false,
+                    noaggregation:  true,
                     dryrun:         $dryrun,
                 )
             ) {
@@ -134,6 +134,10 @@ class import_grades_users extends external_api {
             $progress = 100 * $count / count($userids);
             \local_gugrades\progress::record($courseid, 0, 'import', intval($progress));
         }
+
+        // Aggregate everything.
+        $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
+        \local_gugrades\aggregation::aggregate($courseid, $gradecategoryid, $userids);
 
         // Log.
         if (!$dryrun) {

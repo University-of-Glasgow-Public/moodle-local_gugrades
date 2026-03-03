@@ -1611,12 +1611,17 @@ class aggregation {
      */
     public static function aggregate(int $courseid, int $gradecategoryid, array $users) {
 
+        // If $users is array of objects, convert to array of ids.
+        if (is_object($users[0])) {
+            $users = array_column($users, 'id');
+        }
+
         // As $gradecategoryid could be second level + then we first need to find the 1st level
         // categoryid (as we're aggregating everything).
         $level1categoryid = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
 
         // Get bulk database data.
-        \local_gugrades\grades::build_bulk_data($courseid, array_column($users, 'id'));
+        \local_gugrades\grades::build_bulk_data($courseid, $users);
         self::reset_bulk_data($courseid);
 
         // We need the recursed category tree for this categoryid. Hopefully, this should be cached.
@@ -1632,19 +1637,19 @@ class aggregation {
         $numberofusers = count($users);
 
         // Run through each user and aggregate their grades.
-        foreach ($users as $user) {
+        foreach ($users as $userid) {
             // Progress.
             $progress = 100 * $count / $numberofusers;
             $count++;
             \local_gugrades\progress::record($courseid, 0, 'aggregate', intval($progress));
 
             // Invalidate any stored data.
-            self::invalidate_aggdata($courseid, $gradecategoryid, $user->id);
-            self::invalidate_aggdata($courseid, $level1categoryid, $user->id);
+            self::invalidate_aggdata($courseid, $gradecategoryid, $userid);
+            self::invalidate_aggdata($courseid, $level1categoryid, $userid);
 
             // 1 = level 1 (we need to know what level we're at). Level is incremented
             // as call recurses.
-            self::aggregate_user($courseid, $toplevel, $user->id, 1, $skipdroplow);
+            self::aggregate_user($courseid, $toplevel, $userid, 1, $skipdroplow);
         }
     }
 
