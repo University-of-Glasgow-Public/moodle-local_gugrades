@@ -53,6 +53,7 @@ class behat_local_gugrades extends behat_base {
         return str_replace('\\"', '"', $argument);
     }
      /**
+      * Adding the ability to select elements using class and id
       * @When I click the element with class :class
       *
       * @param string $class $element
@@ -67,10 +68,11 @@ class behat_local_gugrades extends behat_base {
         $element->click();
     }
      /**
+      * Finding the last cell in the table
       * @Then I should see :text in the total cell
-      * 
+      *
       * @param string $text $cell
-      * 
+      *
       * @return string
       */
     public function totalcellshouldcontain($text) {
@@ -83,5 +85,16 @@ class behat_local_gugrades extends behat_base {
         if (strpos($cell->getText(), $text) === false) {
             throw new \Exception("Total cell contains '{$cell->getText()}' not '$text'");
         }
+    }
+     /**
+      * Use this to wait for Vue
+      * @When I wait :seconds seconds
+      *
+      * @param int $seconds
+      *
+      * @return int
+      */
+    public function iWaitSeconds(int $seconds): void {
+        sleep($seconds);
     }
 }

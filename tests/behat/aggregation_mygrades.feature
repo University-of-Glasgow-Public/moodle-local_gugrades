@@ -111,6 +111,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I set the following fields to these values:
         | Reason for additional grade | 2nd grade                    |
         | Admin grade                 | IS - Interruption of Studies |
+    And I wait 3 seconds
     And I click on "Submit" "button" in the ".vm-content" "css_element"
     And I click on "Course grade aggregation" "button"
     Then I should see "IS" in the total cell
