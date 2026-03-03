@@ -108,6 +108,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I click on "Test assignment 2" "link" in the "captureselect" "region"
     And I click on "Action" "button"
     And I click on "Add grade" "link"
+    And I wait 3 seconds
     And I set the following fields to these values:
         | Reason for additional grade | 2nd grade                    |
         | Admin grade                 | IS - Interruption of Studies |

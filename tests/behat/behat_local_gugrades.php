@@ -94,7 +94,7 @@ class behat_local_gugrades extends behat_base {
       *
       * @return int
       */
-    public function iWaitSeconds(int $seconds): void {
+    public function iwaitseconds(int $seconds): void {
         sleep($seconds);
     }
 }
