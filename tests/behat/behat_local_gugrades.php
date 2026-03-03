@@ -54,22 +54,26 @@ class behat_local_gugrades extends behat_base {
     }
      /**
       * @When I click the element with class :class
-      * 
-      * @param string $class
-      * 
+      *
+      * @param string $class $element
+      *
       * @return string
       */
-    public function iClickElementWithClass($class) {
+    public function iclickelementwithclass($class) {
         $element = $this->getSession()->getPage()->find('css', '.' . $class);
-            if (!$element) {
+        if (!$element) {
                 throw new \Exception("Element with class '$class' not found");
-            }
+        }
         $element->click();
     }
      /**
-     * @Then I should see :text in the total cell
-     */
-    public function totalCellShouldContain($text) {
+      * @Then I should see :text in the total cell
+      * 
+      * @param string $text $cell
+      * 
+      * @return string
+      */
+    public function totalcellshouldcontain($text) {
         $cell = $this->getSession()->getPage()->find('xpath', '//tbody//tr[1]//td[last()]');
 
         if (!$cell) {
