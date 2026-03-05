@@ -451,11 +451,48 @@ class conversion {
 
             // Un-current all grades if a gradeitem (i.e. capture page).
             if ($gradeitemid) {
+                // Before marking converted grades as not current, restore admin grades (e.g. NS)
+                // to points format so they are preserved when switching back from Schedule A/B.
+                $admingrades = $DB->get_records_sql(
+                    'SELECT userid, admingrade, displaygrade, rawgrade, convertedgrade
+                     FROM {local_gugrades_grade}
+                     WHERE gradeitemid = :gradeitemid
+                     AND points = 0
+                     AND iscurrent = 1
+                     AND admingrade != :empty
+                     AND admingrade IS NOT NULL',
+                    ['gradeitemid' => $gradeitemid, 'empty' => '']
+                );
+                foreach ($admingrades as $grade) {
+                    \local_gugrades\grades::write_grade(
+                        courseid:           $courseid,
+                        gradeitemid:        $gradeitemid,
+                        userid:             $grade->userid,
+                        admingrade:         $grade->admingrade,
+                        rawgrade:           $grade->rawgrade,
+                        convertedgrade:     $grade->convertedgrade,
+                        displaygrade:       $grade->displaygrade,
+                        weightedgrade:      0,
+                        gradetype:          'FIRST',
+                        other:              '',
+                        iscurrent:          true,
+                        iserror:            false,
+                        auditcomment:       '',
+                        ispoints:           true,
+                    );
+                }
                 $sql = 'UPDATE {local_gugrades_grade}
                     SET iscurrent = 0
                     WHERE points = 0
                     AND gradeitemid = :gradeitemid';
                 $DB->execute($sql, ['gradeitemid' => $gradeitemid]);
+
+                // Restore provisional column to points mode.
+                if ($provisionalcolumn = $DB->get_record('local_gugrades_column',
+                    ['gradeitemid' => $gradeitemid, 'gradetype' => 'PROVISIONAL'])) {
+                    $provisionalcolumn->points = true;
+                    $DB->update_record('local_gugrades_column', $provisionalcolumn);
+                }
                 \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
             }
 
