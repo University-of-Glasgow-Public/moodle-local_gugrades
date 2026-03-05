@@ -488,8 +488,7 @@ class conversion {
                 $DB->execute($sql, ['gradeitemid' => $gradeitemid]);
 
                 // Restore provisional column to points mode.
-                if ($provisionalcolumn = $DB->get_record('local_gugrades_column',
-                    ['gradeitemid' => $gradeitemid, 'gradetype' => 'PROVISIONAL'])) {
+                if ($provisionalcolumn = $DB->get_record('local_gugrades_column', ['gradeitemid' => $gradeitemid, 'gradetype' => 'PROVISIONAL'])) {
                     $provisionalcolumn->points = true;
                     $DB->update_record('local_gugrades_column', $provisionalcolumn);
                 }
