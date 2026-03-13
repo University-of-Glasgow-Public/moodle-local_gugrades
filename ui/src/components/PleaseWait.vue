@@ -1,14 +1,9 @@
 <template>
-    <VueModal v-model="showmodal" :enableClose="false" modalClass="col-3 col-lg-2 rounded vm_container" :title="mstrings.pleasewait">
-        <div class="d-flex justify-content-center" >
-            <div class="border rounded m-1 p-2 text-center" style="min-width: 300px">
-                <p>{{ props.message }}</p>
-                <VueSpinnerOrbit v-if="!showprogress" size="50" color="#005c8a"></VueSpinnerOrbit>
-                <div v-if="showprogress" class="progress" style="min-width: 250px">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" :class="progressclass" role="progressbar" :style="'width: ' + progress + '%'" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
-                        {{ progress }}%
-                    </div>
-                </div>
+    <VueModal v-model="showmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-xl" :title="titletext">
+        <div class="tw:flex tw:justify-center" >
+            <div class="tw:border-solid tw:rounded-md tw:m-1 tw:p-2 tw:flex tw:justify-center" style="min-width: 300px">
+                <span v-if="!showprogress" class="tw:loading tw:loading-ring tw:loading-xl"></span>
+                <RadialProgress v-if="showprogress" diameter="100" totalSteps="100" :completedSteps="progress">{{ progress }}%</RadialProgress>
             </div>
         </div>
     </VueModal>
@@ -16,8 +11,8 @@
 
 <script setup>
     import {ref, inject, onMounted, onUnmounted, defineProps, computed} from '@vue/runtime-core';
-    import { VueSpinnerOrbit } from 'vue3-spinners';
     import { useIntervalFn } from '@vueuse/core';
+    import RadialProgress from "vue3-radial-progress";
 
     const mstrings = inject('mstrings');
     const showmodal = ref(false);
@@ -42,6 +37,10 @@
             type: String,
             default: '',
         },
+    });
+
+    const titletext = computed(() => {
+        return (props.message != '') ? props.message : mstrings.pleasewait;
     });
 
     const showprogress = computed(() => {

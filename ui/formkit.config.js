@@ -9,11 +9,11 @@ const config = {
   config: {
     classes: generateClasses({
       global: { // classes
-        outer: '$reset my-1',
-        input: 'form-control',
-        label: '$reset mb-0 mt-2 font-weight-bold',
-        legend: '$reset mb-0 fs-1',
-        help: 'form-text',
+        outer: '$reset tw:my-1',
+        input: 'tw:fieldset',
+        label: '$reset tw:fieldset-legend',
+        legend: '$reset tw:fieldset-legend',
+        help: 'tw:text-sm',
         messages: 'list-unstyled mt-1',
         message: 'text-danger',
       },
@@ -39,8 +39,11 @@ const config = {
         options: '$reset list-unstyled mb-0',
         option: '$reset pr-3'
       },
+      select: {
+        input: '$reset tw:select',
+      }
     })
-  } 
+  }
 }
 
 export default config

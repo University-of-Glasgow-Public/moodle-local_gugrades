@@ -1,4 +1,7 @@
 @import "tailwindcss" prefix(tw) important;
+@plugin "daisyui" {
+    themes: corporate  --default;
+}
 
 /* form legends are huge in Bootstrap */
 legend {
