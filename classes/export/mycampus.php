@@ -46,12 +46,13 @@ class mycampus extends base {
 
         // First check if there is an admin grade.
         if ($user->admingrade) {
-            $grade = $user->admingrade;
+            $admingrade = $user->admingrade;
 
-            // Change MV0 to MV.
-            if ($grade == 'MV0') {
-                $grade = 'MV';
+            // Change GOODCAUSE_NR to GOODCAUSE_FO.
+            if ($admingrade == 'GOODCAUSE_NR') {
+                $admingrade = 'GOODCAUSE_FO';
             }
+            [$grade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
 
             return $grade;
         }
