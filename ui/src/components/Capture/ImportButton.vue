@@ -1,66 +1,54 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" @click="import_button_click()">
+    <TwButton color="primary" @click="import_button_click()">
         <span v-if="groupimport">{{ mstrings.importgradesgroup }}</span>
         <span v-else>{{ mstrings.importgrades }}</span>
-    </button>
+    </TwButton>
 
-    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="mstrings.importgrades">
+    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.importgrades">
 
         <div v-if="loading">
             <PleaseWait progresstype="import" :staffuserid="props.staffuserid"></PleaseWait>
         </div>
 
-        <div v-if="showdryrun" class="text-center">
+        <div v-if="showdryrun" class="tw:text-center">
 
             <p v-if="dryruncount > 0" v-html="mstrings.importdryrun"></p>
             <p v-else v-html="mstrings.importdryrunzero"></p>
-            <p v-if="dryruncount > 0" class="display-4">{{ dryruncount }}</p>
+            <p v-if="dryruncount > 0" class="tw:text-[56px]/17 tw:font-light">{{ dryruncount }}</p>
 
-            <div class="mt-2 pt-2 border-top">
-                <button
-                        v-if="dryruncount > 0"
-                        class="btn btn-primary mr-1"
-                        @click="importgrades()"
-                        >{{ mstrings.yesimport }}
-                </button>
-                <button
-                    class="btn btn-warning"
-                    @click="showimportmodal = false"
-                    >{{ mstrings.cancel }}
-                </button>
+            <div class="tw:divider"></div>
+
+            <div class="tw:mt-2 tw:pt-2">
+                <TwButton v-if="dryruncount > 0" color="primary" @click="importgrades()">{{ mstrings.yesimport }}</TwButton>
+                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>
 
         <div v-if="!loading && !showdryrun">
 
             <!-- already imported warning-->
-            <div class="alert" :class="importclass">
-                <div class="row">
-                    <div v-if="is_importgrades" class="col-md-10 col">
-                        {{ mstrings.gradesimported }}
-                        <p v-if="groupimport" class="mt-1"><b>{{ mstrings.importinfogroup }}</b></p>
-                    </div>
-                    <div v-else class="col-md-10 col">
-                        {{ mstrings.importinfo }}
-                        <p v-if="groupimport" class="mt-1"><b>{{ mstrings.importinfogroup }}</b></p>
-                    </div>
-                    <div class="col-md-2 col">
-                        <button
-                            class="btn btn-warning"
-                            @click="showimportmodal = false"
-                            >{{ mstrings.cancel }}
-                        </button>
-                    </div>
+            <div class="tw:alert tw:alert-soft tw:alert-vertical tw:sm:alert-horizontal">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="tw:stroke-info tw:h-6 tw:w-6 tw:shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div v-if="is_importgrades">
+                    {{ mstrings.gradesimported }}
+                    <p v-if="groupimport"><b>{{ mstrings.importinfogroup }}</b></p>
                 </div>
+                <div v-else>
+                    {{ mstrings.importinfo }}
+                    <p v-if="groupimport"><b>{{ mstrings.importinfogroup }}</b></p>
+                </div>
+                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
 
-            <FormKit type="form" class="bg-light" :actions="false">
+            <FormKit type="form" :actions="false">
 
                 <!-- Recursive options -->
                 <div v-if="recursiveavailable">
-                    <div v-if="!allgradesvalid" class="alert alert-danger">
+                    <div v-if="!allgradesvalid" class="tw:alert tw:alert-danger">
                         {{ mstrings.invalidgradetype }}
                     </div>
                     <div v-else>
@@ -76,7 +64,8 @@
                             >
                         </FormKit>
                     </div>
-                    <hr></hr>
+
+                    <div class="tw:divider"></div>
                 </div>
 
                 <!-- NS fill options -->
@@ -88,7 +77,8 @@
                     v-model="importfillns"
                     >
                 </FormKit>
-                <hr></hr>
+
+                <div class="tw:divider"></div>
 
                 <!-- If there are existing grades then show all the options for importing extra grades -->
                 <div v-if="is_importgrades">
@@ -104,7 +94,7 @@
                         v-model="importadditional"
                         >
                     </FormKit>
-                    <hr></hr>
+                    <div class="tw:divider"></div>
                     <FormKit
                         type="select"
                         :label="mstrings.reasonforadditionalimport"
@@ -125,21 +115,15 @@
                 </div>
             </FormKit>
 
-            <div v-if="recursiveavailable && (recursiveselect=='recursive') && !recursivematch" class="alert alert-warning">
+            <div v-if="recursiveavailable && (recursiveselect=='recursive') && !recursivematch" class="tw:mt-2 tw:alert tw:alert-warning">
                 {{ mstrings.importnomatch }}
             </div>
 
-            <div class="mt-2 pt-2 border-top">
-                <button
-                        class="btn btn-primary mr-1"
-                        @click="dryrungrades()"
-                        >{{ mstrings.yesimport }}
-                </button>
-                <button
-                    class="btn btn-warning"
-                    @click="showimportmodal = false"
-                    >{{ mstrings.cancel }}
-                </button>
+            <div class="tw:divider"></div>
+
+            <div class="tw:mt-2 tw:pt-2">
+                <TwButton color="primary" @click="dryrungrades()">{{ mstrings.yesimport }}</TwButton>
+                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>
     </VueModal>
@@ -148,6 +132,7 @@
 <script setup>
     import {ref, defineProps, defineEmits, inject, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
+    import TwButton from '../Tailwind/TwButton.vue';
     import PleaseWait from '@/components/PleaseWait.vue';
     import DebugDisplay from '@/components/DebugDisplay.vue';
 
@@ -188,8 +173,8 @@
      * What kind of alert do you get?
      */
     const importclass = computed(() => ({
-        'alert-warning' : is_importgrades.value,
-        'alert-info' : !is_importgrades.value,
+        'tw:alert-error' : is_importgrades.value,
+        'tw:alert-info' : !is_importgrades.value,
     }));
 
     /**

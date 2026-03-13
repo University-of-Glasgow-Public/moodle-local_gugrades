@@ -1,9 +1,5 @@
 <template>
     <div id="mygrades_container">
-          <h1 class="tw:text-3xl tw:font-bold tw:underline tw:text-red-300">
-    Hello world!
-  </h1>
-
         <TabMenu />
     </div>
 </template>

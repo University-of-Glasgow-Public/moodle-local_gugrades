@@ -12,7 +12,7 @@ import { usePreload } from '../src/js/preload.js';
 import '../src/assets/VueModal.css';
 import '../src/assets/MyGrades.css';
 
-import customConfig from '../formkit.config.js'
+import customConfig from '../formkit.config.js';
 
 // This stuff makes sure that the window.GU variable
 // exists.
@@ -58,9 +58,7 @@ ensureGUIsSet(timeout)
     const mstrings = reactive([]);
     app.provide('mstrings', mstrings);
     app.use(Toast, toastoptions);
-    app.use(plugin, defaultConfig({
-        config: customConfig.config
-    }));
+    app.use(plugin, defaultConfig(customConfig));
     app.component('EasyDataTable', Vue3EasyDataTable);
     app.component('VueModal', Modal);
     app.mount('#app');
