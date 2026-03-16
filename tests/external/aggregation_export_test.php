@@ -97,11 +97,20 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
      *
      * @covers \local_gugrades\external\get_aggregation_export_plugins::execute
      */
-    public function xtest_get_aggregation_export_form(): void {
+    public function test_get_aggregation_export_form(): void {
         global $DB, $CFG;
 
         $courseid = $this->course->id;
         $categoryid = $this->get_grade_category('Summative');
+
+        // Install test data for student.
+        $userlist = [
+            $this->student->id,
+        ];
+        $this->load_data('data2c', $this->student->id);
+        foreach ($this->gradeitemids as $gradeitemid) {
+            $this->import_grades($this->course->id, $gradeitemid, $userlist);
+        }
 
         // Get form for 'mycampus' plugin
         // (which doesn't have a form).
@@ -127,8 +136,8 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         $this->assertEquals('studentname', $form[0]['identifier']);
         $this->assertEquals(get_string('studentname', 'local_gugrades'), $form[0]['description']);
         $this->assertEquals('Summative', $form[7]['description']);
-        $this->assertEquals('strategy', $form[25]['identifier']);
-        $this->assertEquals(get_string('showstrategy', 'local_gugrades'), $form[25]['description']);
+        $this->assertEquals('warnings', $form[15]['identifier']);
+        $this->assertEquals(get_string('showwarnings', 'local_gugrades'), $form[15]['description']);
 
         // Set *everything* for initial test.
         foreach ($form as $key => $record) {
@@ -151,7 +160,7 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
 
         // Check user preferences have been set.
         $preferences = explode(',', get_user_preferences('local_gugrades_customaggregationexportselect_' . $categoryid));
-        $this->assertCount(27, $preferences);
+        $this->assertCount(16, $preferences);
         $this->assertEquals('idnumber', $preferences[1]);
 
         // Get form again, to check saved settings.
@@ -164,6 +173,38 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         $this->assertTrue($form['hasform']);
         $form = $form['form'];
         $this->assertTrue($form[0]['selected']);
+
+        // Write admin grade for aggregated category.
+        $itemid = $this->get_gradeitemid_for_category('Summative');
+        $nothing = write_additional_grade::execute(
+            courseid:       $this->course->id,
+            gradeitemid:    $itemid,
+            userid:         $this->student->id,
+            reason:         'CATEGORY',
+            other:          '',
+            admingrade:     'GOODCAUSE_NR',
+            scale:          0,
+            grade:          0,
+            notes:          'Test notes'
+        );
+        $nothing = external_api::clean_returnvalue(
+            write_additional_grade::execute_returns(),
+            $nothing
+        );
+
+        // Get CSV data.
+        $form = $this->clean_form($form);
+        $data = get_aggregation_export_data::execute($courseid, $categoryid, 0, 'custom', $form);
+        $data = external_api::clean_returnvalue(
+            get_aggregation_export_data::execute_returns(),
+            $data
+        );
+
+        // Get expected data.
+        $path = $CFG->dirroot . '/local/gugrades/tests/external/gradedata/aggregation_export_admin.csv';
+        $expected = file_get_contents($path);
+
+        $this->assertEquals($expected, $data['csv']);
     }
 
     /**
