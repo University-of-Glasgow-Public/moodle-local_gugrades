@@ -1,48 +1,35 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" :disabled="!props.show" @click="showcsvmodal = true">{{ mstrings.csvimport }}</button>
+    <TwButton color="primary" :disabled="!props.show" @click="showcsvmodal = true">
+        {{ mstrings.csvimport }}
+    </TwButton>
 
-    <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="col-11 col-lg-6 rounded" :title="mstrings.csvimport">
+    <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.csvimport">
 
         <PleaseWait v-if="waiting" progresstype="csvimport" :staffuserid="props.staffuserid"></PleaseWait>
 
         <!-- Doesn't appear to be a CSV -->
-        <div v-if="incorrectfiletype" class="alert alert-danger">
+        <TwAlert v-if="incorrectfiletype" color="danger">
             {{ mstrings.incorrectfiletype }}
-        </div>
+        </TwAlert>
 
         <div v-if="!incorrectfiletype">
 
             <!-- Initial download/upload page -->
             <div v-if="pagestate == 'showuploadpage'">
-                <div class="border rounded p-5">
-                    <p><b>{{  mstrings.csvdownloadhelp }}</b></p>
+                <p><b>{{  mstrings.csvdownloadhelp }}</b></p>
 
-                    <button class="btn btn-primary" type="button" @click="csv_download()">{{  mstrings.csvdownload }}</button>
-                </div>
+                <TwButton color="primary" @click="csv_download()">{{  mstrings.csvdownload }}</TwButton>
+
+                <div class="tw:divider"></div>
 
                 <!-- select file / upload bit -->
-                <div class="mt-3 p-4 mb-3 border rounded">
-                    <p><b>{{ mstrings.csvuploadhelp }}</b></p>
-                    <div>
-                        <button class="btn btn-primary mr-1" type="button" @click="open()">
-                            Choose files
-                        </button>
-                        <button class="btn btn-warning" type="button" :disabled="!files" @click="reset()">
-                            Reset
-                        </button>
-                        <div class="mt-2" v-if="files">
-                            <p>You have selected: <b>{{ `${files.length} ${files.length === 1 ? 'file' : 'files'}` }}</b></p>
-                            <li v-for="file of files" :key="file.name">
-                                {{ file.name }}
-                            </li>
-                        </div>
-                    </div>
-                    <div class="mt-2">
-                        <button :disabled="!files" class="btn btn-info mr-1" @click="process_selected">{{ mstrings.upload }}</button>
-                    </div>
-                </div>
+                <p><b>{{ mstrings.csvuploadhelp }}</b></p>
+
+                <TwDropzone :mimetypes="['text/csv']" @onchange="uploadfilechange">CSV files only</TwDropzone>
+
+                <TwButton :disabled="file == null" color="primary" @click="process_selected">{{ mstrings.next }}</TwButton>
             </div>
 
             <!-- Test-run / confirm page -->
@@ -59,16 +46,17 @@
                         {{ item.error }}
                     </template>
                 </EasyDataTable>
-                <p v-if="errorcount" class="text-danger mt-1">{{ mstrings.lineswitherrors }}: {{ errorcount }}:</p>
-                <ul class="text-danger">
+                <p v-if="errorcount" class="tw:text-red tw:mt-1">{{ mstrings.lineswitherrors }}: {{ errorcount }}:</p>
+                <ul class="tw:text-red">
                     <li v-for="error in errorlist" v-key="error.error">
                         <span>{{ error.error }}</span>: <b>{{ error.count }} line(s)</b>
                     </li>
                 </ul>
 
                 <!-- submit bit (if no errors) -->
-                <div v-if="!errorcount" class="mt-2">
-                    <FormKit class="border rounded" type="form" @submit="submit_reason_form">
+                <div v-if="!errorcount" class="tw:mt-2">
+                    <div class="tw:divider"></div>
+                    <FormKit type="form" @submit="submit_reason_form">
                         <FormKit
                             type="select"
                             :label="mstrings.reasonforadditionalgrade"
@@ -92,12 +80,8 @@
 
         </div> <!-- incorrectfiletype -->
 
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="float-right">
-                    <button class="btn btn-warning" type="button" @click="close_modal()">{{  mstrings.cancel }}</button>
-                </div>
-            </div>
+        <div class="tw:flex tw:justify-end">
+            <TwButton color="warning" @click="close_modal()">{{ mstrings.cancel }}</TwButton>
         </div>
     </VueModal>
 </template>
@@ -108,7 +92,9 @@
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import { saveAs } from 'file-saver';
     import PleaseWait from '@/components/PleaseWait.vue';
-    import { useFileDialog } from '@vueuse/core';
+    import TwButton from '../Tailwind/TwButton.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwDropzone from '../Tailwind/TwDropzone.vue';
 
     const showcsvmodal = ref(false);
     const pagestate = ref('showuploadpage');
@@ -128,14 +114,9 @@
         return lines.value.slice(0, 10);
     });
     const mstrings = inject('mstrings');
+    const file = ref(null);
 
     const toast = useToast();
-
-    const { files, open, reset } = useFileDialog({
-        accept: 'text/csv', // Set to accept only csv files
-        multiple: false,
-        directory: false, // Select directories instead of files if set true
-    });
 
     const props = defineProps({
         itemid: Number,
@@ -146,6 +127,14 @@
     });
 
     const emits = defineEmits(['uploaded']);
+
+    /**
+     * Uploaded file has changed
+     */
+    function uploadfilechange(newfile) {
+        file.value = newfile;
+        console.log(newfile);
+    }
 
     /**
      * Download the pro-forma csv file
@@ -269,13 +258,12 @@
      * Process selected file.
      */
      function process_selected() {
-        if (!files.value) {
+        if (file == null) {
             toast.warning('No file to import');
             return;
         }
 
-        const file = files.value[0];
-        const type = file.type;
+        const type = file.value.type;
         incorrectfiletype.value = type != 'text/csv';
 
         if (!incorrectfiletype.value) {
@@ -286,7 +274,7 @@
                 process_uploaded(true);
                 get_gradetypes();
             });
-            reader.readAsText(file);
+            reader.readAsText(file.value);
         }
     }
 
@@ -313,7 +301,6 @@
      */
     function close_modal() {
         incorrectfiletype.value = false;
-        reset();
         showcsvmodal.value = false;
         pagestate.value = 'showuploadpage';
     }
