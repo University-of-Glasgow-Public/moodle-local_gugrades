@@ -18,14 +18,14 @@ const config = {
         message: 'text-danger',
       },
       form: {
-        form: "mt-5 mx-auto p-5 border rounded"
+        //form: "mt-5 mx-auto p-5 border rounded"
       },
       range: {
         input: '$reset form-range',
       },
       submit: {
-        outer: '$reset mt-3',
-        input: '$reset btn btn-primary'
+        outer: '$reset tw:mt-3',
+        input: '$reset tw:btn tw:btn-primary'
       },
       checkbox: {
         outer: '$reset form-check',
