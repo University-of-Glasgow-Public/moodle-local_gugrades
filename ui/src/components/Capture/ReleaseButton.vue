@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary mr-1" @click="release_button_clicked">
+    <TwButton color="primary" @click="release_button_clicked">
         <span v-if="props.released">
             <span v-if="grouprelease">{{ mstrings.unreleasegradesgroup }}</span>
             <span v-else>{{ mstrings.unreleasegrades }}</span>
@@ -10,53 +10,44 @@
             <span v-if="grouprelease">{{ mstrings.releasegradesgroup }}</span>
             <span v-else>{{ mstrings.releasegrades }}</span>
         </span>
-    </button>
+    </TwButton>
 
-    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="mstrings.releasegrades">
+    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.releasegrades">
 
         <div v-if="loading">
             <PleaseWait></PleaseWait>
         </div>
 
-        <div class="p-2 border rounded">
-            <h4>{{ mstrings.releasegrades }}</h4>
-            <div v-if="!props.released" class="alert alert-warning">
+        <!-- Show if NOT already released -->
+        <div v-if="!props.released">
+            <TwAlert v-if="!props.released" color="warning">
                 {{ mstrings.releaseconfirm }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
-            </div>
-            <div v-if="props.released" class="alert alert-danger">
+                <p v-if="grouprelease" class="tw:mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+            </TwAlert>
+
+            <TwAlert v-if="props.released" color="warning">
                 {{ mstrings.releaseconfirmstern }}
                 <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+            </TwAlert>
+
+            <div class="tw:mt-5 flex justify-start">
+                <TwButton color="primary" @click="release_grades">{{ mstrings.yesrelease }}</TwButton>
+                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
-            <button
-                class="btn btn-primary mr-1"
-                @click="release_grades()"
-                >{{ mstrings.yesrelease }}
-            </button>
-            <button
-                class="btn btn-warning"
-                @click="showreleasemodal = false"
-                >{{ mstrings.cancel }}
-            </button>
         </div>
 
-        <!-- display if already released -->
-        <div v-if="props.released" class="border rounded mt-4 p-2">
+        <!-- Show if already released -->
+        <div v-if="props.released">
             <h4>Revert release of grades</h4>
-            <div class="alert alert-danger">
+            <TwAlert color="warning">
                 {{ mstrings.removerelease }}
                 <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.removereleasegroup }}</b></p>
+            </TwAlert>
+
+            <div class="tw:mt-5 flex justify-start">
+                <TwButton color="primary" @click="revert_release">{{ mstrings.yesunrelease }}</TwButton>
+                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
-            <button
-                class="btn btn-danger mr-1"
-                @click="revert_release()"
-                >{{ mstrings.yesunrelease }}
-            </button>
-            <button
-                class="btn btn-warning"
-                @click="showreleasemodal = false"
-                >{{ mstrings.cancel }}
-            </button>
         </div>
     </VueModal>
 </template>
@@ -66,6 +57,8 @@
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import PleaseWait from '@/components/PleaseWait.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
     import { useLogo } from '@/js/monochromelogo.js';
 
     const showreleasemodal = ref(false);
