@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="add_multiple_button_click()">
+    <TwButton color="primary" @click="add_multiple_button_click()" :disabled="!enable">
         {{ mstrings.addmultiple }}
     </TwButton>
 
@@ -64,6 +64,10 @@
     const toast = useToast();
 
     const props = defineProps({
+        enable: {
+            type: Boolean,
+            default: true,
+        },
         itemid: Number,
     });
 

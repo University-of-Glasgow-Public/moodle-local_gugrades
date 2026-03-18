@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="import_button_click()">
+    <TwButton color="primary" @click="import_button_click" :disabled="!enable">
         <span v-if="groupimport">{{ mstrings.importgradesgroup }}</span>
         <span v-else>{{ mstrings.importgrades }}</span>
     </TwButton>
@@ -137,6 +137,10 @@
     import DebugDisplay from '@/components/DebugDisplay.vue';
 
     const props = defineProps({
+        enable: {
+            type: Boolean,
+            default: false,
+        },
         userids: Array,
         itemid: Number,
         groupid: Number,

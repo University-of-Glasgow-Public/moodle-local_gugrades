@@ -1,16 +1,17 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button v-if="hascapability" type="button" class="btn btn-outline-primary  mr-1" @click="toggle_view()">
+    <TwButton color="primary" @click="toggle_view">
         <span v-if="!togglereveal">{{ mstrings.viewfullnames }}</span>
         <span v-if="togglereveal">{{ mstrings.hidefullnames }}</span>
-    </button>
+    </TwButton>
 </template>
 
 <script setup>
     import {ref, onMounted, inject, defineEmits} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
 
     const hascapability = ref(false);
     const togglereveal = ref(false);

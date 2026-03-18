@@ -1,8 +1,8 @@
 <template>
     <!-- Refresh button -->
-    <a href="#" id="refresh_button" class="ml-3" data-toggle="tooltip" :title="mstrings.refreshpage" @click="refresh_clicked">
+    <div href="#" id="refresh_button" class="tw:ml-3 tw:tooltip" data-toggle="tooltip" :data-tip="mstrings.refreshpage" @click="refresh_clicked">
         <i class="fa fa-refresh fa-Xl align-middle" :class="[fasizeclass]" aria-hidden="true"></i>
-    </a>
+    </div>
 </template>
 
 <script setup>
