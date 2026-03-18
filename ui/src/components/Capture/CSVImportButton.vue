@@ -34,20 +34,20 @@
 
             <!-- Test-run / confirm page -->
             <div v-if="pagestate == 'showtestrun'">
-                <p>{{ mstrings.csvtestrun }}</p>
+                <p><b>{{ mstrings.csvtestrun }}</b></p>
                 <EasyDataTable :headers="headers" :items="lines10">
                     <template #item-gradevalue="item">
                         <span v-if="item.grade">{{ item.gradevalue }}</span>
                     </template>
                     <template #item-error="item">
-                        <i v-if="item.state < 0" class="text-danger fa fa-times" aria-hidden="true"></i>
-                        <i v-if="item.state > 0" class="text-success fa fa-check" aria-hidden="true"></i>
-                        <i v-if="item.state == 0" class="text-warning fa fa-info" aria-hidden="true"></i>
+                        <i v-if="item.state < 0" class="tw:text-red-500 fa fa-times" aria-hidden="true"></i>
+                        <i v-if="item.state > 0" class="tw:text-green-500 fa fa-check" aria-hidden="true"></i>
+                        <i v-if="item.state == 0" class="tw:text-yellow-500 fa fa-info" aria-hidden="true"></i>
                         {{ item.error }}
                     </template>
                 </EasyDataTable>
-                <p v-if="errorcount" class="tw:text-red tw:mt-1">{{ mstrings.lineswitherrors }}: {{ errorcount }}:</p>
-                <ul class="tw:text-red">
+                <p v-if="errorcount" class="tw:text-red-500 tw:mt-1">{{ mstrings.lineswitherrors }}: {{ errorcount }}:</p>
+                <ul class="tw:text-red-500">
                     <li v-for="error in errorlist" v-key="error.error">
                         <span>{{ error.error }}</span>: <b>{{ error.count }} line(s)</b>
                     </li>
