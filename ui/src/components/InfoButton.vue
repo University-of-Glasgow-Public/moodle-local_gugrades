@@ -2,15 +2,15 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <!-- info button -->
-    <a href="#" class="ml-2"  @click="info_clicked" data-toggle="tooltip" :title="mstrings.gradeiteminfo">
+    <div class="tw:ml-2 tw:tooltip"  @click="info_clicked" :data-tip="mstrings.gradeiteminfo">
         <span v-if="props.text" class="text-light"><u>{{ props.text }}</u></span>
         <i v-else class="fa fa-info-circle align-middle text-warning" :class="customclasses" aria-hidden="true"></i>
-    </a>
+    </div>
 
     <!-- modal to show info-->
-    <VueModal v-model="showinfomodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="itemname">
+    <VueModal v-model="showinfomodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="itemname">
 
-        <table class="table">
+        <table class="tw:table">
             <tbody>
                 <tr>
                     <th>{{ mstrings.name }}</th>
@@ -45,11 +45,9 @@
             </tbody>
         </table>
 
-        <button
-            class="btn btn-warning"
-            @click="showinfomodal = false"
-            >{{ mstrings.close }}
-        </button>
+        <div class="tw:flex tw:justify-end tw:mt-5">
+            <TwButton color="warning" @click="showinfomodal = false">{{ mstrings.close }}</TwButton>
+        </div>
     </VueModal>
 </template>
 
@@ -57,6 +55,7 @@
     import {ref, inject, defineProps, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import TwButton from './Tailwind/TwButton.vue';
 
     const showinfomodal = ref(false);
     const itemname = ref('');

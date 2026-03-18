@@ -1,9 +1,10 @@
 <template>
-    <div class="col-12 mt-2">
-        <ImportButton v-if="!converted && caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :userids="props.userids" :staffuserid="props.staffuserid" @imported="emit('refreshtable')"></ImportButton>
-        <CSVImportButton v-if="caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :show="props.showcsvimport" :staffuserid="props.staffuserid" @uploaded="emit('refreshtable')"></CSVImportButton>
-        <AddMultipleButton v-if="caneditgrades" :itemid="props.itemid"  @editcolumn="multipleclicked"></AddMultipleButton>
-        <ReleaseButton v-if="props.gradesimported && caneditgrades" :gradeitemid="props.itemid" :groupid="props.groupid" :released="props.released" @released="emit('refreshtable')"></ReleaseButton>
+    <div v-if="!loaded" class="tw:w-full tw:h-[40px] tw:skeleton"></div>
+    <div v-else class="flex justify-start">
+        <ImportButton :enable="!converted && caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :userids="props.userids" :staffuserid="props.staffuserid" @imported="emit('refreshtable')"></ImportButton>
+        <CSVImportButton :enable="caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :show="props.showcsvimport" :staffuserid="props.staffuserid" @uploaded="emit('refreshtable')"></CSVImportButton>
+        <AddMultipleButton :enable="caneditgrades" :itemid="props.itemid"  @editcolumn="multipleclicked"></AddMultipleButton>
+        <ReleaseButton :enable="props.gradesimported && caneditgrades" :gradeitemid="props.itemid" :groupid="props.groupid" :released="props.released" @released="emit('refreshtable')"></ReleaseButton>
         <ViewFullNamesButton v-if="props.usershidden"  @viewfullnames="viewfullnames"></ViewFullNamesButton>
         <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" @converted="emit('refreshtable')"></ConversionButton>
         <ExportCaptureButton :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :revealnames="revealnames"></ExportCaptureButton>
@@ -25,6 +26,10 @@
     import ExportCaptureButton from '@/components/Capture/ExportCaptureButton.vue';
 
     const props = defineProps({
+        loaded: {
+            type: Boolean,
+            default: false,
+        },
         itemid: Number,
         groupid: Number,
         userids: Array,

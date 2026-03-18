@@ -26,6 +26,7 @@
 
                     <CaptureButtons
                         v-if="gradesupported"
+                        :loaded="loaded"
                         :itemid="itemid"
                         :groupid="groupid"
                         :userids="userids"

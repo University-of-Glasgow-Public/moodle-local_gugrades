@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="release_button_clicked">
+    <TwButton color="primary" @click="release_button_clicked" :disabled="!enable">
         <span v-if="props.released">
             <span v-if="grouprelease">{{ mstrings.unreleasegradesgroup }}</span>
             <span v-else>{{ mstrings.unreleasegrades }}</span>
@@ -73,6 +73,10 @@
     const {monochrome, updateLogo} = useLogo();
 
     const props = defineProps({
+        enable: {
+            type: Boolean,
+            default: true,
+        },
         gradeitemid: Number,
         groupid: Number,
         released: Boolean,

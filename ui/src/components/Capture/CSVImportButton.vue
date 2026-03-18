@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" :disabled="!props.show" @click="showcsvmodal = true">
+    <TwButton color="primary" :disabled="!props.show || !enable" @click="showcsvmodal = true">
         {{ mstrings.csvimport }}
     </TwButton>
 
@@ -119,6 +119,10 @@
     const toast = useToast();
 
     const props = defineProps({
+        enable: {
+            type: Boolean,
+            default: true,
+        },
         itemid: Number,
         groupid: Number,
         itemname: String,
