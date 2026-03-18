@@ -1,42 +1,38 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" @click="open_modal()">{{ mstrings.exportcapture }}</button>
+    <TwButton color="primary" @click="open_modal">{{ mstrings.exportcapture }}</TwButton>
 
-    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="col-11 col-lg-6 rounded" :title="mstrings.exportcapture">
+    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.exportcapture">
 
-        <div class="alert alert-info">
-            {{  mstrings.exportcapturehelp }}
-        </div>
+        <TwAlert color="info">{{  mstrings.exportcapturehelp }}</TwAlert>
 
         <PleaseWait v-if="pleasewait"></PleaseWait>
 
-        <FormKit
-            v-if="!pleasewait"
-            type="form"
-            :submit-label="mstrings.export"
-            @submit="submit_export_form"
-        >
+        <div class="tw:pl-8 tw:mt-5">
             <FormKit
-                v-model="allnone"
-                type="checkbox"
-                :label="mstrings.allnone"
-            />
-            <div class="mb-1">&nbsp;</div>
-            <FormKit
-                v-for="option in options"
-                type="checkbox"
-                v-model="option.selected"
-                :label="option.description"
-            />
-        </FormKit>
+                v-if="!pleasewait"
+                type="form"
+                :submit-label="mstrings.export"
+                @submit="submit_export_form"
+            >
+                <FormKit
+                    v-model="allnone"
+                    type="checkbox"
+                    :label="mstrings.allnone"
+                />
+                <div class="mb-1">&nbsp;</div>
+                <FormKit
+                    v-for="option in options"
+                    type="checkbox"
+                    v-model="option.selected"
+                    :label="option.description"
+                />
+            </FormKit>
+        </div>
 
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="float-right">
-                    <button class="btn btn-warning" type="button" @click="close_modal()">{{  mstrings.cancel }}</button>
-                </div>
-            </div>
+        <div class="tw:flex tw:justify-end">
+            <TwButton color="warning" @click="close_modal">{{ mstrings.cancel }}</TwButton>
         </div>
     </VueModal>
 </template>
@@ -44,6 +40,8 @@
 <script setup>
     import {ref, defineProps, inject, watch} from '@vue/runtime-core';
     import PleaseWait from '@/components/PleaseWait.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/DebugDisplay.vue';

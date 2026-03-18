@@ -1,6 +1,6 @@
 @import "tailwindcss" prefix(tw) important;
 @plugin "daisyui" {
-    themes: corporate  --default;
+    themes: cupcake  --default;
 }
 
 /* form legends are huge in Bootstrap */

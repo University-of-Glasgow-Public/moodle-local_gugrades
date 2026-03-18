@@ -28,8 +28,9 @@ const config = {
         input: '$reset tw:btn tw:btn-primary'
       },
       checkbox: {
-        outer: '$reset form-check',
-        input: '$reset form-check-input',
+        outer: '$reset tw:fieldset',
+        input: '$reset tw:checkbox',
+        wrapper: '$reset tw:label',
       },
       radio: {
         legend: '$reset mb-0 font-weight-bold',
