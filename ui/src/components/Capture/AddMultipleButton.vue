@@ -1,15 +1,15 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" @click="add_multiple_button_click()">
+    <TwButton color="primary" @click="add_multiple_button_click()">
         {{ mstrings.addmultiple }}
-    </button>
+    </TwButton>
 
-    <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="mstrings.addmultiple">
-        <FormKit class="border rounded" type="form" @submit="submit_form">
+    <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.addmultiple">
+        <FormKit type="form" @submit="submit_form">
             <FormKit
                 type="select"
-                :label="mstrings.reasonforadditionalgrade"
+                :label="mstrings.reasonforadditionalgrades"
                 name="reason"
                 v-model="reason"
                 :options="gradetypes"
@@ -37,12 +37,8 @@
             />
         </FormKit>
 
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="float-right">
-                    <button class="btn btn-warning" type="button" @click="showaddmultiplemodal = false">{{  mstrings.cancel }}</button>
-                </div>
-            </div>
+        <div class="tw:flex tw:justify-end">
+            <TwButton color="warning" @click="showaddmultiplemodal = false">{{ mstrings.cancel }}</TwButton>
         </div>
     </VueModal>
 </template>
@@ -51,6 +47,7 @@
     import {ref, defineProps, defineEmits, inject} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
 
     const showaddmultiplemodal = ref(false);
     const mstrings = inject('mstrings');

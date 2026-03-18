@@ -41,6 +41,12 @@ const config = {
       },
       select: {
         input: '$reset tw:select',
+      },
+      text: {
+        input: '$reset tw:input',
+      },
+      textarea: {
+        input: '$reset tw:textarea',
       }
     })
   }

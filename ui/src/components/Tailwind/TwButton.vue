@@ -1,5 +1,5 @@
 <template>
-    <button v-if="disabled" disabled="disabled" class="tw:btn tw:mr-1 tw:btn-disabled" tabindex="-1" role="button" aria-disabled="true">
+    <button v-if="disabled" disabled="disabled" class="tw:btn tw:mr-1 tw:btn-disabled tw:btn-dash" tabindex="-1" role="button" aria-disabled="true">
         <slot></slot>
     </button>
     <button v-else class="tw:btn tw:mr-1" :class="btnclasses" v-bind="$attrs">
