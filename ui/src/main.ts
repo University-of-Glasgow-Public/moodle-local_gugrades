@@ -10,17 +10,11 @@ import { createPinia } from 'pinia';
 import { usePopulateTrees } from './js/setuptrees.js';
 import { usePreload } from './js/preload.js';
 import { useMstrings } from './stores/mstrings';
+import { moodleFetch } from '@/js/moodlefetch';
 import '../src/assets/VueModal.css';
 import '../src/assets/MyGrades.css';
 
 import customConfig from '../formkit.config.js';
-
-declare global {
-  interface Window {
-    GU: object;
-    fetchMany: object;
-  }
-}
 
 // This stuff makes sure that the window.GU variable
 // exists.
@@ -76,17 +70,13 @@ ensureGUIsSet(timeout)
     app.mount('#app');
 
     // Read strings
-    // Strings are pushed to individual components using provide() / inject()
-    const GU = <Window>window.GU;
-    const fetchMany = <CallableFunction>GU.fetchMany;
-
+    // Strings are pushed to individual components using provide() / inject(
     const mstringstore = useMstrings();
 
-    fetchMany([{
-        methodname: 'local_gugrades_get_all_strings',
-        args: {
-        }
-    }])[0]
+    moodleFetch(
+        'local_gugrades_get_all_strings',
+        {}
+    )
     .then((result) => {
         const strings = result;
         strings.forEach((string) => {
