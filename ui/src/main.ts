@@ -16,6 +16,13 @@ import '../src/assets/MyGrades.css';
 
 import customConfig from '../formkit.config.js';
 
+declare global {
+  interface Window {
+    GU: object;
+    fetchMany: object;
+  }
+}
+
 // This stuff makes sure that the window.GU variable
 // exists.
 // This can take some time as Moodle runs this once the page
