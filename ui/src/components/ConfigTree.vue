@@ -1,6 +1,6 @@
 <template>
     <tr v-for="item in props.nodes.items" :key="item.id" :class="resitclass">
-        <td v-if="resitconfig" class="px-2 resit_select">
+        <td v-if="resitconfig" class="px-2 resit_select tw:border-none">
             <ResitCheckbox  v-if="!resitfade" :itemid="item.id" :checkeditemid="resititemid" @checked="resit_clicked" :depth="depth"></ResitCheckbox>
         </td>
         <td :style="indentstyle">
@@ -8,7 +8,7 @@
             {{ item.itemname }}
         </td>
         <td class="resit_select px-2" >
-            <span v-if="item.id == resititemid" class="badge badge-pill badge-success">{{ mstrings.resitselected }}</span>
+            <span v-if="item.id == resititemid" class="badge badge-pill badge-success">{{ mstrings['resitselected'] }}</span>
         </td>
         <td>&nbsp;</td> <!-- holder for strategy -->
         <td>
@@ -26,13 +26,13 @@
             </td>
             <td :style="indentstyle">
                 <b>
-                    <i v-if="props.depth == 1" class="fa fa-folder icon itemicon" :title="mstrings.gradecategory" aria-hidden="true"></i>
-                    <i v-else class="fa fa-folder-o" :title="mstrings.gradecategory" aria-hidden="true"></i>
+                    <i v-if="props.depth == 1" class="fa fa-folder icon itemicon" :title="mstrings['gradecategory']" aria-hidden="true"></i>
+                    <i v-else class="fa fa-folder-o" :title="mstrings['gradecategory']" aria-hidden="true"></i>
                     {{ category.category.fullname }}
                 </b>
             </td>
             <td class="resit_select px-2" >
-                <span v-if="category.category.itemid == resititemid" class="badge badge-pill badge-success">{{ mstrings.resitselected }}</span>
+                <span v-if="category.category.itemid == resititemid" class="badge badge-pill badge-success">{{ mstrings['resitselected'] }}</span>
             </td>
             <td>
                 {{ category.category.strategy }}
@@ -46,10 +46,13 @@
     </template>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject, computed, onMounted} from 'vue';
+<script setup lang="ts">
+    import {ref, inject, computed, onMounted} from 'vue';
+    import { storeToRefs } from 'pinia';
     import ConfigTreeIcon from './ConfigTreeIcon.vue';
     import ResitCheckbox from './ResitCheckbox.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
 
     /**
      * resitconfig = enable display of resit radio boxes etc.
@@ -62,9 +65,10 @@
         resitfade: Boolean,
     });
 
-    const mstrings = inject('mstrings');
     const emit = defineEmits(['activityselected', 'saverror']);
     const resititemid = ref();
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     /**
      * get prop change
@@ -77,7 +81,7 @@
      * Pass up save error
      */
     function handle_saveerror(error) {
-        emit('saveerror', error);
+        emit('saverror', error);
     }
 
     /**
@@ -108,7 +112,7 @@
         const padding = props.depth * 30;
 
         return {
-            'padding-left': padding + 'px',
+            'padding-left': padding + 'px !important',
         }
     });
 
@@ -116,22 +120,17 @@
      * Save selected/deselected resit item
      */
     function save_resit_item(itemid, set) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_save_resit_item',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_save_resit_item',
+            {
                 itemid: itemid,
                 set: set,
             }
-        }])[0]
+        )
         .catch((error) => {
             window.console.log(error);
             emit('saverror', error);
-        });        
+        });
     }
 
     /**

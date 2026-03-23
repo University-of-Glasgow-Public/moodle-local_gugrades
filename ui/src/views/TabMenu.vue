@@ -6,9 +6,9 @@
     <div v-if="!waiting">
         <GreyLogo></GreyLogo>
 
-        <div v-if="!available" class="alert alert-danger">
+        <TWAlert v-if="!available" color="error">
             MyGrades cannot be used in this course as it has too many enrolled participants.
-        </div>
+        </TWAlert>
         <div v-else id="tabmenu">
             <TabsNav @tabchange="tabChange" :viewaggregation="viewaggregation"></TabsNav>
 
@@ -42,6 +42,7 @@
 <script setup>
     import {ref, onMounted, computed} from '@vue/runtime-core';
     import TabsNav from '@/components/TabsNav.vue';
+    import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import ConfigPage from '@/views/ConfigPage.vue';
     import CaptureTable from '@/views/CaptureTable.vue';
     import AggregationTable from '@/views/AggregationTable.vue';

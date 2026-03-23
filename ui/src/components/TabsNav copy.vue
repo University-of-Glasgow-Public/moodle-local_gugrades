@@ -1,18 +1,52 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark rounded mb-2">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div role="tablist" class="tw:tabs tw:tabs-box tw:text-black">
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'configure'}" @click="clickTab('configure')">{{ mstrings.configure }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'capture'}" @click="clickTab('capture')">{{ mstrings.assessmentgradecapture }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'conversion'}" @click="clickTab('conversion')">{{ mstrings.manageconversion }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'aggregation'}" @click="clickTab('aggregation')">{{ mstrings.coursegradeaggregation }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'audit'}" @click="clickTab('audit')">{{ mstrings.auditlog }}</a>
-            <a v-if="settingscapability" role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'settings'}" @click="clickTab('settings')">{{ mstrings.settings }}</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" :class="{active: activetab == 'configure'}">
+                    <a class="nav-link" role="button" @click="clickTab('configure')" @keyup.enter="clickTab('configure')" @keyup.left="handleKeyNavigation('settings', $event)" @keyup.right="handleKeyNavigation('capture', $event)" name="configure" :aria-label="mstrings.configure" tabindex="0">
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>&nbsp;
+                        {{ mstrings.configure }}
+                    </a>
+                </li>
+                <li class="nav-item" :class="{active: activetab == 'capture'}">
+                    <a class="nav-link" role="button" @click="clickTab('capture')" @keyup.enter="clickTab('capture')" @keyup.left="handleKeyNavigation('configure', $event)" @keyup.right="handleKeyNavigation('conversion', $event)" name="capture" :aria-label="mstrings.assessmentgradecapture" tabindex="0">
+                        <i class="fa fa-download" aria-hidden="true"></i>&nbsp;
+                        {{ mstrings.assessmentgradecapture }}
+                    </a>
+                </li>
+                <li class="nav-item" :class="{active: activetab == 'conversion'}">
+                    <a class="nav-link" role="button" @click="clickTab('conversion')" @keyup.enter="clickTab('conversion')" @keyup.left="handleKeyNavigation('capture', $event)" @keyup.right="handleKeyNavigation('aggregation', $event)" name="conversion" :aria-label="mstrings.manageconversion" tabindex="0">
+                        <i class="fa fa-exchange" aria-hidden="true"></i>&nbsp;
+                        {{ mstrings.manageconversion }}
+                    </a>
+                </li>
+                <li class="nav-item" v-if="props.viewaggregation" :class="{active: activetab == 'aggregation'}">
+                    <a class="nav-link" role="button" @click="clickTab('aggregation')" @keyup.enter="clickTab('aggregation')" @keyup.left="handleKeyNavigation('conversion', $event)" @keyup.right="handleKeyNavigation('audit', $event)" name="aggregation" :aria-label="mstrings.coursegradeaggregation" tabindex="0">
+                        <i class="fa fa-compress" aria-hidden="true"></i>&nbsp;
+                        {{ mstrings.coursegradeaggregation }}
+                    </a>
+                </li>
+                <li class="nav-item" :class="{active: activetab == 'audit'}">
+                    <a class="nav-link" role="button" @click="clickTab('audit')" @keyup.enter="clickTab('audit')" @keyup.left="handleKeyNavigation('aggregation', $event)" @keyup.right="handleKeyNavigation('settings', $event)" name="audit" :aria-label="mstrings.auditlog" tabindex="0">
+                        <i class="fa fa-history" aria-hidden="true"></i>&nbsp;
+                        {{ mstrings.auditlog }}
+                    </a>
+                </li>
+                <li class="nav-item" v-if="settingscapability" :class="{active: activetab == 'settings'}">
+                    <a class="nav-link" role="button" @click="clickTab('settings')" @keyup.enter="clickTab('settings')" @keyup.left="handleKeyNavigation('audit', $event)" @keyup.right="handleKeyNavigation('capture', $event)" name="settings" :aria-label="mstrings.settings" tabindex="0">
+                        <i class="fa fa-cog" aria-hidden="true"></i>&nbsp;
+                        {{ mstrings.settings }}
+                    </a>
+                </li>
+            </ul>
         </div>
+    </nav>
 </template>
 
 <script setup>
