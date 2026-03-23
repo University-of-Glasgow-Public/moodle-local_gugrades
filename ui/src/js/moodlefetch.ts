@@ -9,7 +9,7 @@ interface GUType {
     fetchMany: CallableFunction,
 }
 
-export const moodleFetch = (methodname: string, args: object) => {
+export const moodleFetch = (methodname: string, args: object): Promise<object> => {
 
     const GU = window.GU;
     const fetchMany = GU.fetchMany;
