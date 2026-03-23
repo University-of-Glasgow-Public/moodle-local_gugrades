@@ -7,12 +7,20 @@ import 'vue3-easy-data-table/dist/style.css';
 import { plugin, defaultConfig } from '@formkit/vue';
 import { Modal } from '@kouts/vue-modal';
 import { createPinia } from 'pinia';
-import { usePopulateTrees } from '../src/js/setuptrees.js';
-import { usePreload } from '../src/js/preload.js';
+import { usePopulateTrees } from './js/setuptrees.js';
+import { usePreload } from './js/preload.js';
+import { useMstrings } from './stores/mstrings';
 import '../src/assets/VueModal.css';
 import '../src/assets/MyGrades.css';
 
 import customConfig from '../formkit.config.js';
+
+declare global {
+  interface Window {
+    GU: object;
+    fetchMany: object;
+  }
+}
 
 // This stuff makes sure that the window.GU variable
 // exists.
@@ -48,6 +56,10 @@ const pinia = createPinia();
 // Trees.
 const populatetrees = usePopulateTrees();
 
+// MStrings - moving from provide/inject to Pinia.
+// Currently using both.
+
+
 // Preload
 const preload = usePreload();
 
@@ -63,13 +75,12 @@ ensureGUIsSet(timeout)
     app.component('VueModal', Modal);
     app.mount('#app');
 
-    // Remove tiles course format class
-    // Document.body.classList.remove('format-tiles');
-
     // Read strings
     // Strings are pushed to individual components using provide() / inject()
-    const GU = window.GU;
-    const fetchMany = GU.fetchMany;
+    const GU = <Window>window.GU;
+    const fetchMany = <CallableFunction>GU.fetchMany;
+
+    const mstringstore = useMstrings();
 
     fetchMany([{
         methodname: 'local_gugrades_get_all_strings',
@@ -81,6 +92,7 @@ ensureGUIsSet(timeout)
         strings.forEach((string) => {
             mstrings[string.tag] = string.stringvalue;
         });
+        mstringstore.mstrings = mstrings;
     })
     .catch((error) => {
         window.console.error(error);
