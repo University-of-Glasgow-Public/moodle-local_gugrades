@@ -40,17 +40,23 @@ class get_all_strings extends external_api {
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            // No parameters.
+            'courseid' => new external_value(PARAM_INT, 'Course ID'),
         ]);
     }
 
     /**
      * Execute function
+     * @param int $courseid
      * @return array
      */
-    public static function execute() {
+    public static function execute($courseid) {
 
         \local_gugrades\development::increase_debugging();
+
+        // Security.
+        $params = self::validate_parameters(self::execute_parameters(), [
+            'courseid' => $courseid,
+        ]);
 
         return \local_gugrades\api::get_all_strings();
     }
