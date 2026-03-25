@@ -2,39 +2,39 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <TwButton color="primary" :disabled="!props.show || !enable" @click="showcsvmodal = true">
-        {{ mstrings.csvimport }}
+        {{ mstrings['csvimport'] }}
     </TwButton>
 
-    <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.csvimport">
+    <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['csvimport']">
 
         <PleaseWait v-if="waiting" progresstype="csvimport" :staffuserid="props.staffuserid"></PleaseWait>
 
         <!-- Doesn't appear to be a CSV -->
         <TwAlert v-if="incorrectfiletype" color="danger">
-            {{ mstrings.incorrectfiletype }}
+            {{ mstrings['incorrectfiletype'] }}
         </TwAlert>
 
         <div v-if="!incorrectfiletype">
 
             <!-- Initial download/upload page -->
             <div v-if="pagestate == 'showuploadpage'">
-                <p><b>{{  mstrings.csvdownloadhelp }}</b></p>
+                <p><b>{{  mstrings['csvdownloadhelp'] }}</b></p>
 
-                <TwButton color="primary" @click="csv_download()">{{  mstrings.csvdownload }}</TwButton>
+                <TwButton color="primary" @click="csv_download()">{{  mstrings['csvdownload'] }}</TwButton>
 
                 <div class="tw:divider"></div>
 
                 <!-- select file / upload bit -->
-                <p><b>{{ mstrings.csvuploadhelp }}</b></p>
+                <p><b>{{ mstrings['csvuploadhelp'] }}</b></p>
 
-                <TwDropzone :mimetypes="['text/csv']" @onchange="uploadfilechange">CSV files only</TwDropzone>
+                <TwDropzone :mimetypes="['text/csv']" accept="text/csv" @onchange="uploadfilechange">CSV files only</TwDropzone>
 
-                <TwButton :disabled="file == null" color="primary" @click="process_selected">{{ mstrings.next }}</TwButton>
+                <TwButton :disabled="file == null" color="primary" @click="process_selected">{{ mstrings['next'] }}</TwButton>
             </div>
 
             <!-- Test-run / confirm page -->
             <div v-if="pagestate == 'showtestrun'">
-                <p><b>{{ mstrings.csvtestrun }}</b></p>
+                <p><b>{{ mstrings['csvtestrun'] }}</b></p>
                 <EasyDataTable :headers="headers" :items="lines10">
                     <template #item-gradevalue="item">
                         <span v-if="item.grade">{{ item.gradevalue }}</span>
@@ -46,7 +46,7 @@
                         {{ item.error }}
                     </template>
                 </EasyDataTable>
-                <p v-if="errorcount" class="tw:text-red-500 tw:mt-1">{{ mstrings.lineswitherrors }}: {{ errorcount }}:</p>
+                <p v-if="errorcount" class="tw:text-red-500 tw:mt-1">{{ mstrings['lineswitherrors'] }}: {{ errorcount }}:</p>
                 <ul class="tw:text-red-500">
                     <li v-for="error in errorlist" v-key="error.error">
                         <span>{{ error.error }}</span>: <b>{{ error.count }} line(s)</b>
@@ -59,18 +59,18 @@
                     <FormKit type="form" @submit="submit_reason_form">
                         <FormKit
                             type="select"
-                            :label="mstrings.reasonforadditionalgrade"
+                            :label="mstrings['reasonforadditionalgrade']"
                             name="reason"
                             v-model="reason"
                             :options="gradetypes"
-                            :placeholder="mstrings.selectareason"
+                            :placeholder="mstrings['selectareason']"
                             validation="required"
                         />
                         <FormKit
                             v-if = 'reason == "OTHER"'
-                            :label="mstrings.pleasespecify"
+                            :label="mstrings['pleasespecify']"
                             type="text"
-                            :placeholder="mstrings.pleasespecify"
+                            :placeholder="mstrings['pleasespecify']"
                             name="other"
                             v-model="other"
                         />
@@ -81,13 +81,14 @@
         </div> <!-- incorrectfiletype -->
 
         <div class="tw:flex tw:justify-end">
-            <TwButton color="warning" @click="close_modal()">{{ mstrings.cancel }}</TwButton>
+            <TwButton color="warning" @click="close_modal()">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject, onMounted, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, onMounted, computed} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import { saveAs } from 'file-saver';
@@ -95,6 +96,7 @@
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwDropzone from '../Tailwind/TwDropzone.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const showcsvmodal = ref(false);
     const pagestate = ref('showuploadpage');
@@ -113,8 +115,9 @@
     const lines10 = computed(() =>{
         return lines.value.slice(0, 10);
     });
-    const mstrings = inject('mstrings');
     const file = ref(null);
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
 
@@ -137,7 +140,6 @@
      */
     function uploadfilechange(newfile) {
         file.value = newfile;
-        console.log(newfile);
     }
 
     /**
@@ -204,7 +206,7 @@
             pagestate.value = 'showtestrun';
             waiting.value = false;
             if (!testrun) {
-                toast.success(mstrings.csvgradesadded + ' (' + addcount.value + ')');
+                toast.success(mstrings.value['csvgradesadded'] + ' (' + addcount.value + ')');
                 emits('uploaded');
                 close_modal();
             }
@@ -242,22 +244,6 @@
     }
 
     /**
-     * Handle the submitted upload form
-     * Got working more by luck....
-     */
-    function submit_csv_form(data) {
-        const reader = new FileReader();
-        reader.addEventListener('load', (event) => {
-            csvcontent.value = event.target.result;
-
-            // Get all the stuffs for the next page
-            process_uploaded(true);
-            get_gradetypes();
-        });
-        reader.readAsText(data.csvupload[0].file);
-    }
-
-    /**
      * Button clicked to upload CSV
      * Process selected file.
      */
@@ -273,7 +259,7 @@
         if (!incorrectfiletype.value) {
             const reader = new FileReader();
             reader.addEventListener('load', (event) => {
-                csvcontent.value = event.target.result;
+                csvcontent.value = event.target.result as string;
 
                 process_uploaded(true);
                 get_gradetypes();
@@ -292,11 +278,11 @@
     onMounted(() => {
         incorrectfiletype.value = false;
         headers.value = [
-            {text: mstrings.name, value: 'name'},
-            {text: mstrings.idnumber, value: 'idnumber'},
-            {text: mstrings.grade, value: 'grade'},
-            {text: mstrings.gradevalue, value: 'gradevalue'},
-            {text: mstrings.status, value: 'error'},
+            {text: mstrings.value['name'], value: 'name'},
+            {text: mstrings.value['idnumber'], value: 'idnumber'},
+            {text: mstrings.value['grade'], value: 'grade'},
+            {text: mstrings.value['gradevalue'], value: 'gradevalue'},
+            {text: mstrings.value['status'], value: 'error'},
         ];
     });
 

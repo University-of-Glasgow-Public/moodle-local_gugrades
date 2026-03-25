@@ -1,11 +1,11 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="open_modal">{{ mstrings.exportcapture }}</TwButton>
+    <TwButton color="primary" @click="open_modal">{{ mstrings['exportcapture'] }}</TwButton>
 
-    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.exportcapture">
+    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['exportcapture']">
 
-        <TwAlert color="info">{{  mstrings.exportcapturehelp }}</TwAlert>
+        <TwAlert color="info">{{  mstrings['exportcapturehelp'] }}</TwAlert>
 
         <PleaseWait v-if="pleasewait"></PleaseWait>
 
@@ -13,14 +13,13 @@
             <FormKit
                 v-if="!pleasewait"
                 type="form"
-                :submit-label="mstrings.export"
+                :submit-label="mstrings['export']"
                 @submit="submit_export_form"
             >
-                <FormKit
-                    v-model="allnone"
-                    type="checkbox"
-                    :label="mstrings.allnone"
-                />
+                <TwButton @click.prevent="clickallnone">
+                    <span v-if="allnone">Select none</span>
+                    <span v-else>Select all</span>
+                </TwButton>
                 <div class="mb-1">&nbsp;</div>
                 <FormKit
                     v-for="option in options"
@@ -32,25 +31,29 @@
         </div>
 
         <div class="tw:flex tw:justify-end">
-            <TwButton color="warning" @click="close_modal">{{ mstrings.cancel }}</TwButton>
+            <TwButton color="warning" @click="close_modal">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, inject, watch} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref } from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import PleaseWait from '@/components/PleaseWait.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const showexportmodal = ref(false);
+    const debug = ref({});
     const allnone = ref(false);
     const pleasewait = ref(false);
     const options = ref([]);
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
 
@@ -91,13 +94,14 @@
     }
 
     /**
-     * Watch for all/none changing
+     * Allnone has been clicked
      */
-    watch(allnone, (newallnone) => {
+    function clickallnone() {
+        allnone.value = !allnone.value;
         options.value.forEach((option) => {
-            option.selected = newallnone;
+            option.selected = allnone.value;
         });
-    });
+    }
 
     /**
      * Convert options to version required
