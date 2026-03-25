@@ -20,12 +20,12 @@
 
         <!-- Show if NOT already released -->
         <div v-if="!props.released">
-            <TwAlert v-if="!props.released" color="warning">
+            <TwAlert v-if="!props.released">
                 {{ mstrings.releaseconfirm }}
                 <p v-if="grouprelease" class="tw:mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
             </TwAlert>
 
-            <TwAlert v-if="props.released" color="warning">
+            <TwAlert v-if="props.released">
                 {{ mstrings.releaseconfirmstern }}
                 <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
             </TwAlert>
@@ -39,7 +39,7 @@
         <!-- Show if already released -->
         <div v-if="props.released">
             <h4>Revert release of grades</h4>
-            <TwAlert color="warning">
+            <TwAlert>
                 {{ mstrings.removerelease }}
                 <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.removereleasegroup }}</b></p>
             </TwAlert>
@@ -52,8 +52,8 @@
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, inject, defineProps, defineEmits, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, inject, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import PleaseWait from '@/components/PleaseWait.vue';

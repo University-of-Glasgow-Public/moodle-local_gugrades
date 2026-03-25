@@ -29,7 +29,7 @@
         <div v-if="!loading && !showdryrun">
 
             <!-- already imported warning-->
-            <div class="tw:alert tw:alert-soft tw:alert-vertical tw:sm:alert-horizontal">
+            <div class="tw:alert tw:alert-soft tw:alert-vertical tw:sm:alert-horizontal tw:mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="tw:stroke-info tw:h-6 tw:w-6 tw:shrink-0">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
@@ -78,10 +78,11 @@
                     >
                 </FormKit>
 
-                <div class="tw:divider"></div>
-
                 <!-- If there are existing grades then show all the options for importing extra grades -->
                 <div v-if="is_importgrades">
+
+                    <div class="tw:divider"></div>
+
                     <FormKit
                         type="radio"
                         :label="mstrings.importadditional"

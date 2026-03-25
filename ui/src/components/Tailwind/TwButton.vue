@@ -1,5 +1,5 @@
 <template>
-    <button v-if="disabled" disabled="disabled" class="tw:btn tw:mr-1 tw:btn-disabled tw:btn-dash" tabindex="-1" role="button" aria-disabled="true">
+    <button v-if="disabled" :disabled="disabled" class="tw:btn tw:mr-1 tw:btn-disabled tw:btn-dash" tabindex="-1" role="button" aria-disabled="true">
         <slot></slot>
     </button>
     <button v-else class="tw:btn tw:mr-1" :class="btnclasses" v-bind="$attrs">
@@ -7,7 +7,7 @@
     </button>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import { computed } from 'vue';
 
     const colorclasses = {
@@ -35,7 +35,7 @@
     const btnclasses = computed(() => {
         let classes = [];
         if (props.color in colorclasses) {
-            classes.push(colorclasses[props.color]);
+            classes.push(colorclasses[props.color as keyof typeof colorclasses]);
         } else {
             classes.push(colorclasses['default']);
         }
