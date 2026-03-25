@@ -2,11 +2,11 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <TwButton color="primary" @click="import_button_click" :disabled="!enable">
-        <span v-if="groupimport">{{ mstrings.importgradesgroup }}</span>
-        <span v-else>{{ mstrings.importgrades }}</span>
+        <span v-if="groupimport">{{ mstrings['importgradesgroup'] }}</span>
+        <span v-else>{{ mstrings['importgrades'] }}</span>
     </TwButton>
 
-    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.importgrades">
+    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['importgrades']">
 
         <div v-if="loading">
             <PleaseWait progresstype="import" :staffuserid="props.staffuserid"></PleaseWait>
@@ -14,15 +14,15 @@
 
         <div v-if="showdryrun" class="tw:text-center">
 
-            <p v-if="dryruncount > 0" v-html="mstrings.importdryrun"></p>
-            <p v-else v-html="mstrings.importdryrunzero"></p>
+            <p v-if="dryruncount > 0" v-html="mstrings['importdryrun']"></p>
+            <p v-else v-html="mstrings['importdryrunzero']"></p>
             <p v-if="dryruncount > 0" class="tw:text-[56px]/17 tw:font-light">{{ dryruncount }}</p>
 
             <div class="tw:divider"></div>
 
             <div class="tw:mt-2 tw:pt-2">
-                <TwButton v-if="dryruncount > 0" color="primary" @click="importgrades()">{{ mstrings.yesimport }}</TwButton>
-                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
+                <TwButton v-if="dryruncount > 0" color="primary" @click="importgrades()">{{ mstrings['yesimport'] }}</TwButton>
+                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
         </div>
 
@@ -34,14 +34,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <div v-if="is_importgrades">
-                    {{ mstrings.gradesimported }}
-                    <p v-if="groupimport"><b>{{ mstrings.importinfogroup }}</b></p>
+                    {{ mstrings['gradesimported'] }}
+                    <p v-if="groupimport"><b>{{ mstrings['importinfogroup'] }}</b></p>
                 </div>
                 <div v-else>
-                    {{ mstrings.importinfo }}
-                    <p v-if="groupimport"><b>{{ mstrings.importinfogroup }}</b></p>
+                    {{ mstrings['importinfo'] }}
+                    <p v-if="groupimport"><b>{{ mstrings['importinfogroup'] }}</b></p>
                 </div>
-                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
+                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
 
             <FormKit type="form" :actions="false">
@@ -49,15 +49,15 @@
                 <!-- Recursive options -->
                 <div v-if="recursiveavailable">
                     <div v-if="!allgradesvalid" class="tw:alert tw:alert-danger">
-                        {{ mstrings.invalidgradetype }}
+                        {{ mstrings['invalidgradetype'] }}
                     </div>
                     <div v-else>
                         <FormKit
                             type="radio"
-                            :label="mstrings.recursiveimport"
+                            :label="mstrings['recursiveimport']"
                             :options="{
-                                single: mstrings.recursive_single,
-                                recursive: mstrings.recursive_recursive
+                                single: mstrings['recursive_single'],
+                                recursive: mstrings['recursive_recursive']
                             }",
                             name="recursiveimport"
                             v-model="recursiveselect"
@@ -71,7 +71,7 @@
                 <!-- NS fill options -->
                 <FormKit
                     type="radio"
-                    :label="mstrings.importfillns"
+                    :label="mstrings['importfillns']"
                     :options="nsoptions"
                     name="importfillns"
                     v-model="importfillns"
@@ -85,12 +85,12 @@
 
                     <FormKit
                         type="radio"
-                        :label="mstrings.importadditional"
+                        :label="mstrings['importadditional']"
                         name="importadditional"
                         :options="{
-                            admin: mstrings.importadditional_admin,
-                            missing: mstrings.importadditional_missing,
-                            update: mstrings.importadditional_update
+                            admin: mstrings['importadditional_admin'],
+                            missing: mstrings['importadditional_missing'],
+                            update: mstrings['importadditional_update']
                         }"
                         v-model="importadditional"
                         >
@@ -98,18 +98,18 @@
                     <div class="tw:divider"></div>
                     <FormKit
                         type="select"
-                        :label="mstrings.reasonforadditionalimport"
+                        :label="mstrings['reasonforadditionalimport']"
                         name="reason"
                         v-model="reason"
                         :options="gradetypes"
-                        :placeholder="mstrings.selectareason"
+                        :placeholder="mstrings['selectareason']"
                         validation="required"
                     />
                     <FormKit
                         v-if = 'reason == "OTHER"'
-                        :label="mstrings.pleasespecify"
+                        :label="mstrings['pleasespecify']"
                         type="text"
-                        :placeholder="mstrings.pleasespecify"
+                        :placeholder="mstrings['pleasespecify']"
                         name="other"
                         v-model="other"
                     />
@@ -117,25 +117,27 @@
             </FormKit>
 
             <div v-if="recursiveavailable && (recursiveselect=='recursive') && !recursivematch" class="tw:mt-2 tw:alert tw:alert-warning">
-                {{ mstrings.importnomatch }}
+                {{ mstrings['importnomatch'] }}
             </div>
 
             <div class="tw:divider"></div>
 
             <div class="tw:mt-2 tw:pt-2">
-                <TwButton color="primary" @click="dryrungrades()">{{ mstrings.yesimport }}</TwButton>
-                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
+                <TwButton color="primary" @click="dryrungrades()">{{ mstrings['yesimport'] }}</TwButton>
+                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, inject, computed} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import TwButton from '../Tailwind/TwButton.vue';
     import PleaseWait from '@/components/PleaseWait.vue';
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const props = defineProps({
         enable: {
@@ -160,10 +162,10 @@
     const is_importgrades = ref(false);
     const recursiveavailable = ref(false);
     const recursivematch = ref(false);
-    const recursiveselect = ref('single');
+    const recursiveselect = ref<'single' | 'recursive'>('single');
     const reason = ref('SECOND');
-    const importadditional = ref('admin');
-    const importfillns = ref('none');
+    const importadditional = ref<'admin' | 'missing' | 'update'>('admin');
+    const importfillns = ref<'none' | 'fillns'>('none');
     const allgradesvalid = ref(false);
     const gradetypes = ref([]);
     const other = ref('');
@@ -172,7 +174,8 @@
     const showdryrun = ref(false);
     const loading = ref(false);
     const debug = ref({});
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     /**
      * What kind of alert do you get?
@@ -186,14 +189,15 @@
      * Options for NS/NS0 dropdown
      */
     const nsoptions = computed(() => {
-        const options = {
-            none: mstrings.donotfill,
-            fillns: mstrings.fillns,
+        const options: Record<string, string> = {
+            none: mstrings.value['donotfill'],
+            fillns: mstrings.value['fillns'],
+
         };
 
         // NS0 only available level >=2
         if (level.value > 1) {
-            options.fillns0 = mstrings.fillns0;
+            options.fillns0 = mstrings.value['fillns0'];
         }
 
         return options;
@@ -283,9 +287,9 @@
             if (showdryrun.value) {
                 emit('imported');
                 if (dryruncount) {
-                    toast.success(mstrings.gradesimportedsuccess);
+                    toast.success(mstrings.value['gradesimportedsuccess']);
                 } else {
-                    toast.warning(mstrings.nogradestoimport);
+                    toast.warning(mstrings.value['nogradestoimport']);
                 }
 
                 showimportmodal.value = false;
@@ -331,9 +335,9 @@
             if (showdryrun.value) {
                 emit('imported');
                 if (dryruncount) {
-                    toast.success(mstrings.gradesimportedsuccess);
+                    toast.success(mstrings.value['gradesimportedsuccess']);
                 } else {
-                    toast.warning(mstrings.nogradestoimport);
+                    toast.warning(mstrings.value['nogradestoimport']);
                 }
 
                 showimportmodal.value = false;
