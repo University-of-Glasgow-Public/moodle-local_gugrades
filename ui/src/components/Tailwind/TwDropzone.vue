@@ -11,20 +11,18 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang='ts'>
     import { useDropZone, useFileDialog } from '@vueuse/core';
-    import { useTemplateRef, ref, defineEmits } from 'vue'
+    import { useTemplateRef, ref } from 'vue'
 
     const dropZoneRef = useTemplateRef('dropZoneRef');
 
     const filename = ref('');
 
-    const props = defineProps({
-        mimetypes: {
-            type: Array,
-            default: [],
-        },
-    });
+    const props = defineProps<{
+        mimetypes: string[],
+        accept: string,
+    }>();
 
     const emits = defineEmits(['onchange']);
 
@@ -39,7 +37,7 @@
     });
 
     const { files, open, reset, onCancel, onChange } = useFileDialog({
-        accept: props.mimetypes,
+        accept: props.accept,
     });
 
     function onDrop(file) {

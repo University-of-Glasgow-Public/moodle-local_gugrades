@@ -5,8 +5,8 @@
         <div class="border rounded p-2 mt-2">
             <div class="col-12 mb-2">
                 <button class="badge badge-primary" @click="selectcollapse">
-                    <span v-if="collapsed"><i class="fa fa-arrow-right"></i> {{ mstrings.showcategories }}</span>
-                    <span v-else><i class="fa fa-arrow-down"></i> {{ mstrings.hidecategories }}</span>
+                    <span v-if="collapsed"><i class="fa fa-arrow-right"></i> {{ mstrings['showcategories'] }}</span>
+                    <span v-else><i class="fa fa-arrow-down"></i> {{ mstrings['hidecategories'] }}</span>
                 </button>
             </div>
 
@@ -61,8 +61,8 @@
 
                 <!-- button for saving cell edits -->
                 <div class="pb-1 clearfix" v-if="ineditcellmode">
-                    <button class="btn btn-warning float-right mr-1" @click="edit_cell_cancelled">{{ mstrings.cancel }}</button>
-                    <button class="btn btn-primary float-right mr-1" @click="edit_cell_saved">{{ mstrings.save }}</button>
+                    <button class="btn btn-warning float-right mr-1" @click="edit_cell_cancelled">{{ mstrings['cancel'] }}</button>
+                    <button class="btn btn-primary float-right mr-1" @click="edit_cell_saved">{{ mstrings['save'] }}</button>
                 </div>
 
                 <!-- Note. The array 'users' contains the lines of data. One record for each user -->
@@ -153,15 +153,15 @@
                     <!-- show warning if grades do not agree -->
                     <template #item-alert="item">
                         <div class="capture-warning">
-                            <div v-if="item.alert" class="badge badge-pill badge-danger mb-1 mr-1">{{ mstrings.discrepancy }}</div>
-                            <div v-if="item.gradebookhidden" class="badge badge-pill badge-success mb-1 mr-1">{{ mstrings.hiddengradebook }}</div>
-                            <div v-if="item.gradehidden" class="badge badge-pill badge-warning mb-1">{{ mstrings.hiddenmygrades }}</div>
+                            <div v-if="item.alert" class="badge badge-pill badge-danger mb-1 mr-1">{{ mstrings['discrepancy'] }}</div>
+                            <div v-if="item.gradebookhidden" class="badge badge-pill badge-success mb-1 mr-1">{{ mstrings['hiddengradebook'] }}</div>
+                            <div v-if="item.gradehidden" class="badge badge-pill badge-warning mb-1">{{ mstrings['hiddenmygrades'] }}</div>
                         </div>
                     </template>
 
                     <!-- Override pagination if bulk editing -->
                     <template #pagination v-if="ineditcellmode">
-                        {{ mstrings.pleasesavefirst }}
+                        {{ mstrings['pleasesavefirst'] }}
                     </template>
                 </EasyDataTable>
 
@@ -173,18 +173,19 @@
 
                 <!-- button for saving cell edits -->
                 <div class="pb-1 clearfix mt-2" v-if="ineditcellmode">
-                    <button class="btn btn-warning float-right mr-1" @click="edit_cell_cancelled">{{ mstrings.cancel }}</button>
-                    <button class="btn btn-primary float-right mr-1" @click="edit_cell_saved">{{ mstrings.save }}</button>
+                    <button class="btn btn-warning float-right mr-1" @click="edit_cell_cancelled">{{ mstrings['cancel'] }}</button>
+                    <button class="btn btn-primary float-right mr-1" @click="edit_cell_saved">{{ mstrings['save'] }}</button>
                 </div>
             </div>
 
-            <h2 v-if="!showtable">{{ mstrings.nothingtodisplay }}</h2>
+            <h2 v-if="!showtable">{{ mstrings['nothingtodisplay'] }}</h2>
         </div>
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import {ref, computed, inject, watch, onMounted} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import NameFilter from '@/components/NameFilter.vue';
     import CaptureSelect from '@/components/CaptureSelect.vue';
     import CaptureMenu from '@/components/CaptureMenu.vue';
@@ -198,13 +199,15 @@
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import CustomPagination from '@/components/CustomPagination.vue';
     import { useLogo } from '@/js/monochromelogo.js';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import TwButton from '@/components/Tailwind/TwButton.vue';
+    import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
     const users = ref([]);
     const userids = ref([]);
     const itemid = ref(0);
     const categoryid = ref(0);
     const groupid = ref(0);
-    const mstrings = inject('mstrings');
     const totalrows = ref(0);
     const currentpage = ref(1);
     const usershidden = ref(false);
@@ -247,6 +250,8 @@
     const collapseclasses = ref(['collapse', 'show']);
     const caneditgrades = ref(false);
     const toast = useToast();
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
     // pagination related.
     const dataTable = ref();
     const props = {
@@ -495,14 +500,14 @@
         if (!usershidden.value) {
             heads.push({text: 'firstinitial', value: 'firstinitial'}),
             heads.push({text: 'lastinitial', value: 'firstinitial'}),
-            heads.push({text: mstrings.userpicture, value: "slotuserpicture"});
-            heads.push({text: mstrings.firstnamelastname, value: "displayname", sortable: true})
+            heads.push({text: mstrings.value['userpicture'], value: "slotuserpicture"});
+            heads.push({text: mstrings.value['firstnamelastname'], value: "displayname", sortable: true})
         } else {
-            heads.push({text: mstrings.participant, value: "displayname", sortable: true});
+            heads.push({text: mstrings.value['participant'], value: "displayname", sortable: true});
         }
-        heads.push({text: mstrings.idnumber, value: "idnumber", sortable: true});
+        heads.push({text: mstrings.value['idnumber'], value: "idnumber", sortable: true});
         if (showalert.value) {
-            heads.push({text: mstrings.warnings, value: "alert"});
+            heads.push({text: mstrings.value['warnings'], value: "alert"});
         }
 
         // Add the grades columns
@@ -527,7 +532,7 @@
         });
 
         // Space for the buttons column
-        heads.push({text: mstrings.actions, value: "actions"});
+        heads.push({text: mstrings.value['actions'], value: "actions"});
 
         return heads;
     });
@@ -566,7 +571,7 @@
                 }
                 user[columnname] = grade.displaygrade;
             } else if (column.gradetype == 'FIRST') {
-                user[columnname] = mstrings.awaitingcapture;
+                user[columnname] = mstrings.value['awaitingcapture'];
             } else {
                 user[columnname] = '';
             }

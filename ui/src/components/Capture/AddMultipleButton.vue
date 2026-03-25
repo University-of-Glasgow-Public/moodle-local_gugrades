@@ -2,25 +2,25 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <TwButton color="primary" @click="add_multiple_button_click()" :disabled="!enable">
-        {{ mstrings.addmultiple }}
+        {{ mstrings['addmultiple'] }}
     </TwButton>
 
-    <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.addmultiple">
+    <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['addmultiple']">
         <FormKit type="form" @submit="submit_form">
             <FormKit
                 type="select"
-                :label="mstrings.reasonforadditionalgrades"
+                :label="mstrings['reasonforadditionalgrades']"
                 name="reason"
                 v-model="reason"
                 :options="gradetypes"
-                :placeholder="mstrings.selectareason"
+                :placeholder="mstrings['selectareason']"
                 validation="required"
             />
             <FormKit
                 v-if = 'reason == "OTHER"'
-                :label="mstrings.pleasespecify"
+                :label="mstrings['pleasespecify']"
                 type="text"
-                :placeholder="mstrings.pleasespecify"
+                :placeholder="mstrings['pleasespecify']"
                 name="other"
                 v-model="other"
                 validation="required"
@@ -31,31 +31,39 @@
             <FormKit
                 type="textarea"
                 label="Notes"
-                :placeholder="mstrings.reasonforammendment"
+                :placeholder="mstrings['reasonforammendment']"
                 name="notes"
                 v-model="notes"
             />
         </FormKit>
 
         <div class="tw:flex tw:justify-end">
-            <TwButton color="warning" @click="showaddmultiplemodal = false">{{ mstrings.cancel }}</TwButton>
+            <TwButton color="warning" @click="showaddmultiplemodal = false">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
+
+    interface GradeType {
+        label: string;
+        value: string;
+    }
 
     const showaddmultiplemodal = ref(false);
-    const mstrings = inject('mstrings');
-    const gradetypes = ref({});
+    const gradetypes = ref<GradeType[]>([]);
     const reason = ref('');
     const notes = ref('');
     const other = ref('');
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emits = defineEmits([
         'editcolumn'
@@ -128,7 +136,7 @@
             // Add 'use grade' option onto front of adminmenu
             adminmenu.unshift({
                 value: 'GRADE',
-                label: mstrings.selectnormalgradeshort,
+                label: mstrings.value['selectnormalgradeshort'],
             });
 
             // send all this stuff back

@@ -1,80 +1,73 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" @click="conversion_clicked()">
-        {{ mstrings.convertgrades }}
-    </button>
+    <TwButton color="primary" @click="conversion_clicked">{{ mstrings['convertgrades'] }}</TwButton>
 
-    <VueModal v-model="showselectmodal" :enableClose="false" modalClass="col-11 col-lg-6 rounded" :title="mstrings.conversionselect">
+    <VueModal v-model="showselectmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['conversionselect']">
 
         <PleaseWait v-if="waiting"></PleaseWait>
 
         <div v-if="showmismatch">
-            <div class="alert alert-warning">{{ mstrings.conversionmismatch }}</div>
-            <button class="btn btn-primary mr-1" @click="save_clicked" :disabled="mapid == 0">{{ mstrings.yes }}</button>
-            <button class="btn btn-warning" @click="showselectmodal = false">{{ mstrings.cancel }}</button>
+            <div class="alert alert-warning">{{ mstrings['conversionmismatch'] }}</div>
+            <TwAlert class="tw:mb-3">{{ mstrings['conversionmismatch'] }}</TwAlert>
+            <TwButton color="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['yes'] }}</TwButton>
+            <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
         </div>
 
 
         <div v-if="!showmismatch">
 
             <!-- Show the selected map name (if there is one)-->
-            <p v-if="mapname" class="mb-2">
-                {{ mstrings.selectedmap }}: <b>{{ mapname }}</b>
+            <p v-if="mapname" class="tw:mb-2">
+                {{ mstrings['selectedmap'] }}: <b>{{ mapname }}</b>
             </p>
 
             <!--  If no map is currently selected, show the selection dialogue -->
             <div v-if="!selection">
 
                 <!-- if there are no grades then don't try to convert -->
-                <div v-if="!anygrades" class="alert alert-warning">
-                    {{ mstrings.nogradestoconvert }}
-                    <button class="btn btn-warning" @click="showselectmodal = false">{{ mstrings.cancel }}</button>
-                </div>
+                <TwAlert v-if="!anygrades">
+                    {{ mstrings['nogradestoconvert'] }}
+                    <TwButton @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
+                </TwAlert>
 
                 <div v-if="anygrades">
-                    <div v-if="nomaps && loaded" class="alert alert-warning">
-                        {{ mstrings.nomaps }}
-                    </div>
+                    <TwAlert v-if="nomaps && loaded">{{ mstrings['nomaps'] }}</TwAlert>
+                    <TwAlert v-else>{{ mstrings['noimportafterconversion'] }}</TwAlert>
 
-                    <div v-else class="alert alert-warning">
-                        {{ mstrings.noimportafterconversion }}
-                    </div>
-
-                    <EasyDataTable v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true">
+                    <EasyDataTable v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true" class="tw:my-4">
                         <template #item-select="item">
                             <input type="radio" :value="item.id" v-model="mapid"/>
                         </template>
                     </EasyDataTable>
 
                     <div>
-                        <button class="btn btn-primary mr-1" @click="save_clicked" :disabled="mapid == 0">{{ mstrings.save }}</button>
-                        <button class="btn btn-warning" @click="showselectmodal = false">{{ mstrings.cancel }}</button>
+                        <TwButton color="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['save'] }}</TwButton>
+                        <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
                     </div>
                 </div>
             </div>
 
             <!-- if a map is selected then show warning message and option to remove -->
             <div v-if="selection">
-                <div class="alert alert-danger">
-                    {{ mstrings.conversionremovewarning }}
-                </div>
-                <div class="mt-1 mb-4">
-                    <button class="btn btn-danger rounded mr-1" @click="remove_clicked">{{ mstrings.remove }}</button>
-                    <button class="btn btn-warning" @click="showselectmodal = false">{{ mstrings.cancel }}</button>
-                </div>
+                <TwAlert class="tw:mb-3">{{ mstrings['conversionremovewarning'] }}</TwAlert>
+                <TwButton color="danger" @click="remove_clicked">{{ mstrings['remove'] }}</TwButton>
+                <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, inject, defineProps, defineEmits} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref } from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import PleaseWait from '@/components/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import TwButton from '../Tailwind/TwButton.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
 
-    const mstrings = inject('mstrings');
     const maps = ref([]);
     const nomaps = ref(true);
     const loaded = ref(false);
@@ -87,13 +80,15 @@
     const waiting = ref(false);
     const gradeitem = ref(null);
     const showmismatch = ref(false);
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
 
     const headers = ref([
-        {text: mstrings.select, value: 'select'},
-        {text: mstrings.name, value: 'name'},
-        {text: mstrings.scale, value: 'scale'},
+        {text: mstrings.value['select'], value: 'select'},
+        {text: mstrings.value['name'], value: 'name'},
+        {text: mstrings.value['scale'], value: 'scale'},
     ]);
 
     const props = defineProps({
@@ -167,8 +162,8 @@
     function get_grade_item() {
         const GU = window.GU;
         const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;     
-        
+        const fetchMany = GU.fetchMany;
+
         fetchMany([{
             methodname: 'local_gugrades_get_grade_item',
             args: {

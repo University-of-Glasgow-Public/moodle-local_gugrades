@@ -3,16 +3,16 @@
 
     <TwButton color="primary" @click="release_button_clicked" :disabled="!enable">
         <span v-if="props.released">
-            <span v-if="grouprelease">{{ mstrings.unreleasegradesgroup }}</span>
-            <span v-else>{{ mstrings.unreleasegrades }}</span>
+            <span v-if="grouprelease">{{ mstrings['unreleasegradesgroup'] }}</span>
+            <span v-else>{{ mstrings['unreleasegrades'] }}</span>
         </span>
         <span v-if="!props.released">
-            <span v-if="grouprelease">{{ mstrings.releasegradesgroup }}</span>
-            <span v-else>{{ mstrings.releasegrades }}</span>
+            <span v-if="grouprelease">{{ mstrings['releasegradesgroup'] }}</span>
+            <span v-else>{{ mstrings['releasegrades'] }}</span>
         </span>
     </TwButton>
 
-    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.releasegrades">
+    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['releasegrades']">
 
         <div v-if="loading">
             <PleaseWait></PleaseWait>
@@ -21,18 +21,18 @@
         <!-- Show if NOT already released -->
         <div v-if="!props.released">
             <TwAlert v-if="!props.released">
-                {{ mstrings.releaseconfirm }}
-                <p v-if="grouprelease" class="tw:mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+                {{ mstrings['releaseconfirm'] }}
+                <p v-if="grouprelease" class="tw:mt-1"><b>{{ mstrings['releaseconfirmgroup'] }}</b></p>
             </TwAlert>
 
             <TwAlert v-if="props.released">
-                {{ mstrings.releaseconfirmstern }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+                {{ mstrings['releaseconfirmstern'] }}
+                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['releaseconfirmgroup'] }}</b></p>
             </TwAlert>
 
             <div class="tw:mt-5 flex justify-start">
-                <TwButton color="primary" @click="release_grades">{{ mstrings.yesrelease }}</TwButton>
-                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
+                <TwButton color="primary" @click="release_grades">{{ mstrings['yesrelease'] }}</TwButton>
+                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
         </div>
 
@@ -40,13 +40,13 @@
         <div v-if="props.released">
             <h4>Revert release of grades</h4>
             <TwAlert>
-                {{ mstrings.removerelease }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.removereleasegroup }}</b></p>
+                {{ mstrings['removerelease'] }}
+                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['removereleasegroup'] }}</b></p>
             </TwAlert>
 
             <div class="tw:mt-5 flex justify-start">
-                <TwButton color="primary" @click="revert_release">{{ mstrings.yesunrelease }}</TwButton>
-                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
+                <TwButton color="primary" @click="revert_release">{{ mstrings['yesunrelease'] }}</TwButton>
+                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
         </div>
     </VueModal>
@@ -54,17 +54,20 @@
 
 <script setup lang="ts">
     import {ref, inject, computed} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import PleaseWait from '@/components/PleaseWait.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import { useLogo } from '@/js/monochromelogo.js';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const showreleasemodal = ref(false);
     const loading = ref(false);
-    const mstrings = inject('mstrings');
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emit = defineEmits(['released']);
 
@@ -117,7 +120,7 @@
             emit('released');
             showreleasemodal.value = false;
             updateLogo();
-            toast.success(mstrings.gradesreleased);
+            toast.success(mstrings.value['gradesreleased']);
         })
         .catch((error) => {
             window.console.error(error);
@@ -149,7 +152,7 @@
             emit('released');
             showreleasemodal.value = false;
             updateLogo();
-            toast.success(mstrings.gradesunreleased);
+            toast.success(mstrings.value['gradesunreleased']);
         })
         .catch((error) => {
             showreleasemodal.value = false;
