@@ -2,9 +2,11 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <!-- info button -->
-    <div class="tw:ml-2 tw:tooltip"  @click="info_clicked" :data-tip="mstrings.gradeiteminfo">
-        <span v-if="props.text" class="text-light"><u>{{ props.text }}</u></span>
-        <i v-else class="fa fa-info-circle align-middle text-warning" :class="customclasses" aria-hidden="true"></i>
+    <div class="tw:ml-2 tw:tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
+        <button class="tw:btn">
+            <span v-if="props.text" class="tw:text-black-500"><u>{{ props.text }}</u></span>
+            <InformationCircleIcon v-else class="tw:size-6 tw:text-black-500"></InformationCircleIcon>
+        </button>
     </div>
 
     <!-- modal to show info-->
@@ -13,49 +15,52 @@
         <table class="tw:table">
             <tbody>
                 <tr>
-                    <th>{{ mstrings.name }}</th>
+                    <th>{{ mstrings['name'] }}</th>
                     <td v-if="link == ''">{{ itemname }}</td>
                     <td v-else><a :href="link" target="_blank">{{ itemname }}</a></td>
                 </tr>
                 <tr>
-                    <th>{{ mstrings.type }}</th>
+                    <th>{{ mstrings['type'] }}</th>
                     <td>{{ itemtype }}</td>
                 </tr>
                 <tr>
-                    <th>{{ mstrings.module }}</th>
+                    <th>{{ mstrings['module'] }}</th>
                     <td>{{ itemmodule }}</td>
                 </tr>
                 <tr v-if="isscale">
-                    <th>{{  mstrings.scale }}</th>
+                    <th>{{  mstrings['scale'] }}</th>
                     <td>{{ scalename }}</td>
                 </tr>
                 <tr v-if="!isscale && grademax">
-                    <th>{{ mstrings.maxgrade }}</th>
+                    <th>{{ mstrings['maxgrade'] }}</th>
                     <td>{{ grademax }}</td>
                 </tr>
                 <tr>
-                    <th>{{ mstrings.weight }}</th>
+                    <th>{{ mstrings['weight'] }}</th>
                     <td>{{  weight }}</td>
                 </tr>
                 <tr v-if="categoryerror">
                     <div class="alert alert-warning">
-                        {{ mstrings.categoryerror }}
+                        {{ mstrings['categoryerror'] }}
                     </div>
                 </tr>
             </tbody>
         </table>
 
         <div class="tw:flex tw:justify-end tw:mt-5">
-            <TwButton color="warning" @click="showinfomodal = false">{{ mstrings.close }}</TwButton>
+            <TwButton color="warning" @click="showinfomodal = false">{{ mstrings['close'] }}</TwButton>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, inject, defineProps, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, computed} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import TwButton from './Tailwind/TwButton.vue';
+    import { InformationCircleIcon } from '@heroicons/vue/24/outline'
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const showinfomodal = ref(false);
     const itemname = ref('');
@@ -68,7 +73,8 @@
     const categoryerror = ref(false);
     const link = ref('');
     const debug = ref({});
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const props = defineProps({
         itemid: Number,
@@ -78,24 +84,6 @@
     });
 
     const toast = useToast();
-
-    const customclasses = computed(() => {
-        var sizeclass = '';
-        var colorclass;
-        if (props.size == '') {
-            sizeclass = 'fa-sm';
-        } else {
-            sizeclass = 'fa-' + props.size;
-        }
-
-        if (props.color = '') {
-            colorclass = 'text-primary';
-        } else {
-            colorclass = props.color;
-        }
-
-        return [sizeclass, colorclass];
-    })
 
     /**
      * Info button clicked
