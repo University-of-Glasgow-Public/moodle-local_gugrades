@@ -1543,6 +1543,10 @@ class aggregation {
         // Invalidate their cached data.
         self::invalidate_aggdata($courseid, $gradecategoryid, $userid);
 
+        // Get bulk database data.
+        \local_gugrades\grades::build_bulk_data($courseid, [$userid]);
+        self::reset_bulk_data($courseid);
+
         // We need the recursed category tree for this categoryid. Hopefully, this should be cached.
         $tree = self::recurse_tree($courseid, $gradecategoryid, false);
 
