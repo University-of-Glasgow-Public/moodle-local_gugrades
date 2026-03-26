@@ -12,40 +12,42 @@
     <!-- modal to show info-->
     <VueModal v-model="showinfomodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="itemname">
 
-        <table class="tw:table">
-            <tbody>
-                <tr>
-                    <th>{{ mstrings['name'] }}</th>
-                    <td v-if="link == ''">{{ itemname }}</td>
-                    <td v-else><a :href="link" target="_blank">{{ itemname }}</a></td>
-                </tr>
-                <tr>
-                    <th>{{ mstrings['type'] }}</th>
-                    <td>{{ itemtype }}</td>
-                </tr>
-                <tr>
-                    <th>{{ mstrings['module'] }}</th>
-                    <td>{{ itemmodule }}</td>
-                </tr>
-                <tr v-if="isscale">
-                    <th>{{  mstrings['scale'] }}</th>
-                    <td>{{ scalename }}</td>
-                </tr>
-                <tr v-if="!isscale && grademax">
-                    <th>{{ mstrings['maxgrade'] }}</th>
-                    <td>{{ grademax }}</td>
-                </tr>
-                <tr>
-                    <th>{{ mstrings['weight'] }}</th>
-                    <td>{{  weight }}</td>
-                </tr>
-                <tr v-if="categoryerror">
-                    <div class="alert alert-warning">
-                        {{ mstrings['categoryerror'] }}
-                    </div>
-                </tr>
-            </tbody>
-        </table>
+        <div class="tw:overflow-x-auto">
+            <table class="tw:table">
+                <tbody>
+                    <tr>
+                        <th>{{ mstrings['name'] }}</th>
+                        <td v-if="link == ''">{{ itemname }}</td>
+                        <td v-else><a :href="link" target="_blank">{{ itemname }}</a></td>
+                    </tr>
+                    <tr>
+                        <th>{{ mstrings['type'] }}</th>
+                        <td>{{ itemtype }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ mstrings['module'] }}</th>
+                        <td>{{ itemmodule }}</td>
+                    </tr>
+                    <tr v-if="isscale">
+                        <th>{{  mstrings['scale'] }}</th>
+                        <td>{{ scalename }}</td>
+                    </tr>
+                    <tr v-if="!isscale && grademax">
+                        <th>{{ mstrings['maxgrade'] }}</th>
+                        <td>{{ grademax }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ mstrings['weight'] }}</th>
+                        <td>{{  weight }}</td>
+                    </tr>
+                    <tr v-if="categoryerror">
+                        <div class="alert alert-warning">
+                            {{ mstrings['categoryerror'] }}
+                        </div>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <div class="tw:flex tw:justify-end tw:mt-5">
             <TwButton color="warning" @click="showinfomodal = false">{{ mstrings['close'] }}</TwButton>
@@ -54,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed} from '@vue/runtime-core';
+    import { ref } from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
