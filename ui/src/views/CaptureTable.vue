@@ -184,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, inject, watch, onMounted} from '@vue/runtime-core';
+    import {ref, computed, watch, onMounted} from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
     import NameFilter from '@/components/NameFilter.vue';
     import CaptureSelect from '@/components/CaptureSelect.vue';

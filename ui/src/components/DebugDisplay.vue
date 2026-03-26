@@ -1,6 +1,6 @@
 <template>
-    <VueModal v-model="showdebugmodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" title="A serious error has occurred">
-        <div class="alert alert-danger">A serious error has occurred and MyGrades cannot continue.</div>
+    <VueModal v-model="showdebugmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" title="A serious error has occurred">
+        <TwAlert class="tw:my-4" color="error">A serious error has occurred and MyGrades cannot continue.</TwAlert>
         <ul>
             <li>
                 CourseID: <pre>{{ moodlecourseid }}</pre>
@@ -9,19 +9,20 @@
                 {{ index }}: <pre>{{ item }}</pre>
             </li>
         </ul>
-        <div class="alert alert-primary">
+        <TwAlert class="tw:my-4">
             <b>Please copy all of this data and send to IT Services / Help Desk for attention</b><br />
             You can then continue.
-        </div>
-        <div class="mt-2 text-center">
-            <a class="btn btn-primary" href="javascript:window.location.reload(true)">Close and continue</a>
+        </TwAlert>
+        <div class="tw:mt-2 tw:text-center">
+            <a class="tw:btn tw:btn-primary" href="javascript:window.location.reload(true)">Close and continue</a>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {computed} from '@vue/runtime-core';
     import  * as _ from 'underscore';
+    import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
     const props = defineProps({
         debug: Object,
@@ -41,7 +42,7 @@
         if (typeof props.debug === "string") {
             return {
                 message: props.debug,
-            } 
+            }
         } else {
             return props.debug;
         }

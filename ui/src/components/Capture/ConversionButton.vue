@@ -8,7 +8,6 @@
         <PleaseWait v-if="waiting"></PleaseWait>
 
         <div v-if="showmismatch">
-            <div class="alert alert-warning">{{ mstrings['conversionmismatch'] }}</div>
             <TwAlert class="tw:mb-3">{{ mstrings['conversionmismatch'] }}</TwAlert>
             <TwButton color="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['yes'] }}</TwButton>
             <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
