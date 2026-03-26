@@ -5,7 +5,7 @@
 '`:g&&(a+=`';
 `+g+`
 __p+='`),c}),a+=`';
-`;var i=t.variable;if(i){if(!tb.test(i))throw new Error("variable is not a bare identifier: "+i)}else a=`with(obj||{}){
+`;var i=t.variable;if(i){if(!nb.test(i))throw new Error("variable is not a bare identifier: "+i)}else a=`with(obj||{}){
 `+a+`}
 `,i="obj";a=`var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 `+a+`return __p;
