@@ -16,6 +16,7 @@
     "@formkit/icons": "latest",
     "@formkit/themes": "latest",
     "@formkit/vue": "latest",
+    "@heroicons/vue": "^2.2.0",
     "@kouts/vue-modal": "^5.0.1",
     "@kyvg/vue3-notification": "^3.4.2",
     "@tailwindcss/vite": "^4.2.1",

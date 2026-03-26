@@ -1,6 +1,6 @@
 <template>
     <div v-if="!loaded" class="tw:w-full tw:h-[40px] tw:skeleton"></div>
-    <div v-else class="flex justify-start">
+    <div v-else class="tw:flex tw:justify-start">
         <ImportButton :enable="!converted && caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :userids="props.userids" :staffuserid="props.staffuserid" @imported="emit('refreshtable')"></ImportButton>
         <CSVImportButton :enable="caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :show="props.showcsvimport" :staffuserid="props.staffuserid" @uploaded="emit('refreshtable')"></CSVImportButton>
         <AddMultipleButton :enable="caneditgrades" :itemid="props.itemid"  @editcolumn="multipleclicked"></AddMultipleButton>
@@ -13,8 +13,7 @@
     </div>
 </template>
 
-<script setup>
-    import {defineProps, defineEmits} from '@vue/runtime-core';
+<script setup lang="ts">
     import ImportButton from '@/components/Capture/ImportButton.vue';
     import CSVImportButton from '@/components/Capture/CSVImportButton.vue';
     import ReleaseButton from '@/components/Capture/ReleaseButton.vue';
