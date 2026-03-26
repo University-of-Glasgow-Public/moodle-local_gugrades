@@ -110,6 +110,7 @@
     const mstrings = inject('mstrings');
     const loaded = ref(false);
     const mapname = ref('');
+    const tmpmapname = ref(mapname);
     const maxgrade = ref(100);
     const rawmap = ref([]);
     const items = ref([]);
@@ -326,7 +327,7 @@
             }
         }])[0]
         .then((result) => {
-            mapname.value = result.name;
+            mapname.value = ((tmpmapname.value) ? tmpmapname.value : result.name);
             scaletype.value = result.schedule;
             maxgrade.value = result.maxgrade;
             rawmap.value = result.map;
