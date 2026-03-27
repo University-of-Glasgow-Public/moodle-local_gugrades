@@ -61,7 +61,7 @@
                 capability: 'local/gugrades:editgrades'
             }
         )
-        .then((result) => {
+        .then((result: any) => {
             caneditgrades.value = result.hascapability;
         })
         .catch((error) => {

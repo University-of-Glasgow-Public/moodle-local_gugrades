@@ -53,15 +53,16 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, inject, computed} from '@vue/runtime-core';
+    import {ref, computed} from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import PleaseWait from '@/components/PleaseWait.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
-    import { useLogo } from '@/js/monochromelogo.js';
+    import { useLogo } from '@/js/monochromelogo';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
 
     const showreleasemodal = ref(false);
     const loading = ref(false);
@@ -81,7 +82,10 @@
             default: true,
         },
         gradeitemid: Number,
-        groupid: Number,
+        groupid: {
+            type: Number,
+            default: 0,
+        },
         released: Boolean,
     });
 
@@ -101,21 +105,16 @@
      * Release grades on button click
      */
     function release_grades() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         loading.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_release_grades',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_release_grades',
+            {
                 gradeitemid: props.gradeitemid,
                 groupid: props.groupid,
                 revert: false,
             }
-        }])[0]
+        )
         .then(() => {
             emit('released');
             showreleasemodal.value = false;
@@ -123,7 +122,7 @@
             toast.success(mstrings.value['gradesreleased']);
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             showreleasemodal.value = false;
             debug.value = error;
         });
@@ -133,21 +132,16 @@
      * Revert release grades on button click
      */
      function revert_release() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         loading.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_release_grades',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_release_grades',
+            {
                 gradeitemid: props.gradeitemid,
                 groupid: props.groupid,
                 revert: true,
             }
-        }])[0]
+        )
         .then(() => {
             emit('released');
             showreleasemodal.value = false;

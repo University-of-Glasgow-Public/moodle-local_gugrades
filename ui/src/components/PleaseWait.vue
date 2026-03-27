@@ -3,18 +3,22 @@
         <div class="tw:flex tw:justify-center" >
             <div class="tw:border-solid tw:rounded-md tw:m-1 tw:p-2 tw:flex tw:justify-center" style="min-width: 300px">
                 <span v-if="!showprogress" class="tw:loading tw:loading-ring tw:loading-xl"></span>
-                <RadialProgress v-if="showprogress" diameter="100" totalSteps="100" :completedSteps="progress">{{ progress }}%</RadialProgress>
+                <RadialProgress v-if="showprogress" :diameter="100" :totalSteps="100" :completedSteps="progress">{{ progress }}%</RadialProgress>
             </div>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, inject, onMounted, onUnmounted, defineProps, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, inject, onMounted, onUnmounted, computed} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import { useIntervalFn } from '@vueuse/core';
+    import { useMstrings } from '@/stores/mstrings.js';
     import RadialProgress from "vue3-radial-progress";
+    import { moodleFetch } from '@/js/moodlefetch';
 
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
     const showmodal = ref(false);
     const progress = ref(0);
 
@@ -40,7 +44,7 @@
     });
 
     const titletext = computed(() => {
-        return (props.message != '') ? props.message : mstrings.pleasewait;
+        return (props.message != '') ? props.message : mstrings.value['pleasewait'];
     });
 
     const showprogress = computed(() => {
@@ -70,16 +74,17 @@
             // Without loginrequired we'd hit moodle sessions which would stop this returning.
             // We also have to pass around the staff userid as that would not be available
             // outside a session.
-            fetchMany([{
-                methodname: 'local_gugrades_get_progress',
-                args: {
+            moodleFetch(
+                'local_gugrades_get_progress',
+                {
                     courseid: courseid,
                     uniqueid: props.uniqueid,
                     progresstype: props.progresstype,
                     staffuserid: props.staffuserid,
-                }
-            }], true, false)[0]
-            .then((result) => {
+                },
+                true,
+                false)
+            .then((result: any) => {
                 progress.value = result.progress;
             })
             .catch((error) => {

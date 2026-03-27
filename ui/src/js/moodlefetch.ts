@@ -5,11 +5,11 @@ declare global {
 }
 
 interface GUType {
-    courseid: BigInteger,
+    courseid: number,
     fetchMany: CallableFunction,
 }
 
-export const moodleFetch = (methodname: string, args: object): Promise<object> => {
+export const moodleFetch = (methodname: string, args: Record<string, any>, async=true, loginrequired=true ): Promise<object> => {
 
     const GU = window.GU;
     const fetchMany = GU.fetchMany;
@@ -20,5 +20,5 @@ export const moodleFetch = (methodname: string, args: object): Promise<object> =
     return fetchMany([{
         methodname: methodname,
         args: args
-    }])[0];
+    }], async, loginrequired)[0];
 }
