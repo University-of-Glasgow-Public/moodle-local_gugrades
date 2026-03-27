@@ -1,21 +1,17 @@
 import { ref } from 'vue';
+import { moodleFetch } from '@/js/moodlefetch';
 
 const monochrome = ref(false);
 
 export function useLogo() {
 
     const updateLogo = () => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_dashboard_enabled',
-            args: {
-                courseid: courseid,
-            }
-        }])[0]
-        .then((result) => {
+        moodleFetch(
+            'local_gugrades_get_dashboard_enabled',
+            {}
+        )
+        .then((result: any) => {
             const enabled = result.enabled;
             monochrome.value = !enabled;
         })

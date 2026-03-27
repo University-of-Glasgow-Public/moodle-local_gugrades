@@ -66,8 +66,10 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import type { IMap, IGradeitem } from '@/js/Interfaces';
 
-    const maps = ref([]);
+    const maps = ref<IMap[]>([]);
     const nomaps = ref(true);
     const loaded = ref(false);
     const selection = ref(0);
@@ -77,7 +79,7 @@
     const mapname = ref('');
     const debug = ref({});
     const waiting = ref(false);
-    const gradeitem = ref(null);
+    const gradeitem =ref<IGradeitem | null>(null);
     const showmismatch = ref(false);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
@@ -90,9 +92,9 @@
         {text: mstrings.value['scale'], value: 'scale'},
     ]);
 
-    const props = defineProps({
-        itemid: Number,
-    });
+    const props = defineProps<{
+        itemid: number;
+    }>();
 
     const emits = defineEmits(['converted']);
 
@@ -100,21 +102,18 @@
      * Get maps
      */
      function get_maps() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_get_conversion_maps',
-            args: {
-                courseid: courseid,
-            }
-        }])[0]
-        .then((result) => {
+        moodleFetch(
+            'local_gugrades_get_conversion_maps',
+            {}
+        )
+        .then((result: any) => {
             maps.value = result;
             nomaps.value = maps.value.length == 0;
             if (!nomaps.value) {
-                mapid.value = maps.value[0].id;
+                const map = maps.value[0];
+                if (map != undefined) {
+                    mapid.value = map['id'];
+                }
             }
             loaded.value = true;
         })
@@ -129,19 +128,14 @@
      * Get currently selected map (if any)
      */
     function get_selected() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_get_selected_conversion',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_selected_conversion',
+            {
                 gradeitemid: props.itemid,
                 gradecategoryid: 0,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
 
             // id==0 if no selection (which is fine).
             selection.value = result.id;
@@ -159,17 +153,13 @@
      * Get grade item/
      */
     function get_grade_item() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_get_grade_item',
-            args: {
+        moodleFetch(
+            'local_gugrades_get_grade_item',
+            {
                 itemid: props.itemid,
             }
-        }])[0]
-        .then(result => {
+        )
+        .then((result: any) => {
             gradeitem.value = result;
         })
         .catch((error) => {
@@ -200,9 +190,11 @@
         const map = maps.value.find(m => m.id == mapid.value);
 
         // Get maximum grade for grade item
-        const grademax = gradeitem.value.grademax;
+        let grademax: number = 0;
 
-        return grademax != map.maxgrade;
+        gradeitem.value ? grademax = gradeitem.value.grademax : 0;
+
+        return map ? grademax != map.maxgrade : false;
     }
 
     /**
@@ -217,21 +209,16 @@
             return;
         }
 
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         waiting.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_select_conversion',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_select_conversion',
+            {
                 gradeitemid: props.itemid,
                 gradecategoryid: 0,
                 mapid: mapid.value,
             }
-        }])[0]
+        )
         .then(() => {
             waiting.value = false;
             toast.success('Map selection saved');
@@ -251,21 +238,16 @@
      *
      */
     function remove_clicked() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         waiting.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_select_conversion',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_select_conversion',
+            {
                 gradeitemid: props.itemid,
                 gradecategoryid: 0,
                 mapid: 0,
             }
-        }])[0]
+        )
         .then(() => {
             waiting.value = false;
             toast.success('Map selection removed');

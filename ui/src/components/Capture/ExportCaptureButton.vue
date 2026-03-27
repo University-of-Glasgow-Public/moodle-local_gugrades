@@ -46,43 +46,40 @@
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import type { ICaptureExportOptions } from '@/js/Interfaces';
 
     const showexportmodal = ref(false);
     const debug = ref({});
     const allnone = ref(false);
     const pleasewait = ref(false);
-    const options = ref([]);
+    const options = ref< ICaptureExportOptions[] >([]);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
 
-    const props = defineProps({
-        itemid: Number,
-        groupid: Number,
-        itemname: String,
-        revealnames: Boolean,
-    });
+    const props = defineProps<{
+        itemid: number;
+        groupid: number;
+        itemname: string;
+        revealnames: boolean;
+    }>();
 
     /**
      * Load initial options
      */
     function open_modal() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         pleasewait.value = false;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_capture_export_options',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_capture_export_options',
+            {
                 gradeitemid: props.itemid,
                 groupid: props.groupid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             options.value = result;
         })
         .catch((error) => {
@@ -107,12 +104,11 @@
      * Convert options to version required
      * for web service
      */
-    function get_data_options(options) {
-        let newoptions = [];
+    function get_data_options(options: ICaptureExportOptions[] ) {
+        let newoptions: ICaptureExportOptions[] = [];
         options.forEach((option) => {
             newoptions.push({
                 gradetype: option.gradetype,
-                other: option.other,
                 selected: option.selected
             });
         });
@@ -124,23 +120,18 @@
      * Download the pro-forma csv file
      */
     function submit_export_form() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         pleasewait.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_capture_export_data',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_capture_export_data',
+            {
                 gradeitemid: props.itemid,
                 groupid: props.groupid,
                 viewfullnames: props.revealnames,
                 options: get_data_options(options.value),
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const csv = result['csv'];
             const d = new Date();
             const filename = props.itemname + '_' + d.toLocaleString() + '.csv';

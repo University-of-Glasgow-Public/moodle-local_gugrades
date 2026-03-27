@@ -97,17 +97,24 @@
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwDropzone from '../Tailwind/TwDropzone.vue';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import type { IErrorList, IGradetype } from '@/js/Interfaces';
+
+    interface IHeader {
+        text: string;
+        value: string;
+    }
 
     const showcsvmodal = ref(false);
     const pagestate = ref('showuploadpage');
     const csvcontent = ref('');
     const errorcount = ref(0);
-    const errorlist = ref([]);
+    const errorlist = ref<IErrorList[]>([]);
     const addcount = ref(0);
     const lines = ref([]);
-    const headers = ref([]);
-    const gradetypes = ref([]);
-    const reason = ref('');
+    const headers = ref<IHeader[]>([]);
+    const gradetypes = ref<IGradetype[]>([]);
+    const reason = ref<string>('');
     const other = ref('');
     const debug = ref({});
     const incorrectfiletype = ref(false);
@@ -115,7 +122,7 @@
     const lines10 = computed(() =>{
         return lines.value.slice(0, 10);
     });
-    const file = ref(null);
+    const file = ref<File | null>(null);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
@@ -138,7 +145,7 @@
     /**
      * Uploaded file has changed
      */
-    function uploadfilechange(newfile) {
+    function uploadfilechange(newfile: File) {
         file.value = newfile;
     }
 
@@ -146,21 +153,17 @@
      * Download the pro-forma csv file
      */
     function csv_download() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         waiting.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_csv_download',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_csv_download',
+            {
                 gradeitemid: props.itemid,
                 groupid: props.groupid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const csv = result['csv'];
             const d = new Date();
             const filename = props.itemname + '_' + d.toLocaleString() + '.csv';
@@ -179,17 +182,13 @@
      * Process the uploaded CSV data
      * @param testrun true = don't save the data
      */
-    function process_uploaded(testrun) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
+    function process_uploaded(testrun: boolean) {
 
         waiting.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_upload_csv',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_upload_csv',
+            {
                 gradeitemid: props.itemid,
                 groupid: props.groupid,
                 testrun: testrun,
@@ -197,8 +196,8 @@
                 other: other.value,
                 csv: csvcontent.value,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             lines.value = result.lines;
             errorcount.value = result.errorcount;
             addcount.value = result.addcount;
@@ -222,18 +221,14 @@
      * Get the add grade form stuff
      */
     function get_gradetypes() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_gradetypes',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_gradetypes',
+            {
                 gradeitemid: props.itemid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             gradetypes.value = result.gradetypes;
         })
         .catch((error) => {
@@ -248,7 +243,7 @@
      * Process selected file.
      */
      function process_selected() {
-        if (file == null) {
+        if (file.value == null) {
             toast.warning('No file to import');
             return;
         }
@@ -259,10 +254,12 @@
         if (!incorrectfiletype.value) {
             const reader = new FileReader();
             reader.addEventListener('load', (event) => {
-                csvcontent.value = event.target.result as string;
+                if (event.target) {
+                    csvcontent.value = event.target.result as string;
 
-                process_uploaded(true);
-                get_gradetypes();
+                    process_uploaded(true);
+                    get_gradetypes();
+                }
             });
             reader.readAsText(file.value);
         }
@@ -278,11 +275,11 @@
     onMounted(() => {
         incorrectfiletype.value = false;
         headers.value = [
-            {text: mstrings.value['name'], value: 'name'},
-            {text: mstrings.value['idnumber'], value: 'idnumber'},
-            {text: mstrings.value['grade'], value: 'grade'},
-            {text: mstrings.value['gradevalue'], value: 'gradevalue'},
-            {text: mstrings.value['status'], value: 'error'},
+            {text: mstrings.value['name']!, value: 'name'},
+            {text: mstrings.value['idnumber']!, value: 'idnumber'},
+            {text: mstrings.value['grade']!, value: 'grade'},
+            {text: mstrings.value['gradevalue']!, value: 'gradevalue'},
+            {text: mstrings.value['status']!, value: 'error'},
         ];
     });
 
