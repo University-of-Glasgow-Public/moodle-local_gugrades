@@ -12,15 +12,18 @@
     </div>
 </template>
 
-<script setup>
-    import {ref, defineEmits, defineExpose, inject} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref} from '@vue/runtime-core';
     import InitialBar from '@/components/InitialBar.vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const emit = defineEmits(['selected']);
 
     const first = ref('all');
     const last = ref('all');
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
     const showreset = ref(false);
 
     defineExpose({
@@ -30,13 +33,13 @@
     /**
      * Process letter selected in one of the bars
      */
-    function first_selected(letter) {
+    function first_selected(letter: string) {
         first.value = letter;
         showreset.value = (first.value != 'all') || (last.value != 'all');
         emit('selected', first.value, last.value);
     }
 
-    function last_selected(letter) {
+    function last_selected(letter: string) {
         last.value = letter;
         showreset.value = (first.value != 'all') || (last.value != 'all');
         emit('selected', first.value, last.value);

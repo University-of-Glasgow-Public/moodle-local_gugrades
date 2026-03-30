@@ -5,25 +5,27 @@
         <nav class="initialbargroups d-flex flex-wrap justify-content-center justify-content-md-start">
             <ul class="pagination pagination-sm">
                 <li class="initialbarall page-item" :class="{active: is_active('all')}">
-                    <a data-initial="" class="page-link" href="#" @click="letterclicked('all', $event)">{{ mstrings.all }}</a>
+                    <a data-initial="" class="page-link" href="#" @click="letterclicked('all')">{{ mstrings.all }}</a>
                 </li>
             </ul>
             <ul class="pagination pagination-sm">
                 <li v-for="letter in letters1" :key="letter" class="page-item" :class="{active: is_active(letter)}">
-                    <a class="page-link" href="#" @click="letterclicked(letter, $event)">{{letter}}</a>
+                    <a class="page-link" href="#" @click.prevent="letterclicked(letter)">{{letter}}</a>
                 </li>
             </ul>
             <ul class="pagination pagination-sm">
                 <li v-for="letter in letters2" :key="letter" class="page-item" :class="{active: is_active(letter)}">
-                    <a class="page-link" href="#" @click="letterclicked(letter, $event)">{{letter}}</a>
+                    <a class="page-link" href="#" @click.prevent="letterclicked(letter)">{{letter}}</a>
                 </li>
-            </ul>            
+            </ul>
         </nav>
-    </div>    
+    </div>
 </template>
 
-<script setup>
-    import {ref, computed, defineProps, defineEmits, watch, inject} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, computed, watch } from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const props = defineProps({
         'label': String,
@@ -33,7 +35,8 @@
     const emit = defineEmits(['selected']);
 
     const activeletter = ref('all');
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const letters1 = computed(() => {
         return Array.from("ABCDEFGHIJKLM");
@@ -41,20 +44,21 @@
 
     const letters2 = computed(() => {
         return Array.from("NOPQRSTUVWXYZ");
-    });    
+    });
 
-    function letterclicked(letter, event) {
-        event.preventDefault();
+    function letterclicked(letter: string) {
         activeletter.value = letter;
         emit('selected', letter);
     }
 
-    function is_active(letter) {
+    function is_active(letter: string) {
         return activeletter.value == letter;
     }
 
     watch(() => props.selected, (selected) => {
-        activeletter.value = selected;
-        emit('selected', activeletter.value);
+        if (selected) {
+            activeletter.value = selected;
+            emit('selected', activeletter.value);
+        }
     })
 </script>

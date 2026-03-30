@@ -22,8 +22,8 @@
     </div>
 </template>
 
-<script setup>
-    import {ref, onMounted, defineEmits, inject} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, onMounted, inject} from '@vue/runtime-core';
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import { setlevel1, getlevel1 } from '@/js/level1.js';
 
@@ -61,7 +61,7 @@
                 emit('levelchange', selected.value);
             }
 
-            // if there's only one then might as well select it. 
+            // if there's only one then might as well select it.
             if ((level1categories.value.length == 1) && !itemerror.value && !notsetup.value) {
                 selected.value = level1categories.value[0].id;
                 emit('levelchange', selected.value);

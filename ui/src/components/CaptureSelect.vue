@@ -8,8 +8,8 @@
     </div>
 </template>
 
-<script setup>
-    import {ref, defineEmits} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref } from '@vue/runtime-core';
     import LevelOneSelect from '@/components/LevelOneSelect.vue';
     import ActivitySelect from '@/components/ActivitySelect.vue';
     import GroupSelect from '@/components/GroupSelect.vue'
