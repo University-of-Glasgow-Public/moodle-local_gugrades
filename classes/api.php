@@ -1684,48 +1684,9 @@ class api {
         global $DB;
 
         // Look up actvity object if we need to.
-        if (!$activity) {
-            $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
-        }
+        $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
 
-        // Can we aggregate?
-        [$aggregationsupported, $unsupportedscales] = \local_gugrades\grades::are_all_grades_supported($courseid, $gradeitemid);
-
-        // Is it an aggregated category?
-        if (!$released = \local_gugrades\grades::get_aggregated_from_gradeitemid($gradeitemid, $userid)) {
-            // Nope. So get 'normal' grade.
-            $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $userid);
-            $released = $usercapture->get_released();
-        }
-
-        // Don't bother if grade is in error.
-        if ($released && !$released->iserror) {
-            \local_gugrades\grades::write_grade(
-                courseid: $courseid,
-                gradeitemid: $gradeitemid,
-                userid: $userid,
-                admingrade: $released->admingrade,
-                rawgrade: $released->rawgrade,
-                convertedgrade: $released->convertedgrade,
-                displaygrade: $released->displaygrade,
-                weightedgrade: $released->weightedgrade,
-                gradetype: 'RELEASED',
-                other: '',
-                iscurrent: true,
-                iserror: false,
-                auditcomment: 'Release grades',
-                ispoints: $released->points,
-            );
-
-            // Re-aggregate this user.
-            if ($aggregationsupported) {
-                $mapping = \local_gugrades\grades::mapping_factory($courseid, $gradeitemid);
-                \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $userid);
-            }
-        }
-
-        // Activity action .
-        $activity->release_grades($userid);
+        \local_gugrades\grades::release_user_grade($courseid, $gradeitemid, $user->id, $activity);
     }
 
     /**
@@ -1762,8 +1723,13 @@ class api {
                 // Activity action.
                 $activity->unrelease_grades($user->id);
             } else {
-                self::release_user_grade($courseid, $gradeitemid, $user->id, $activity);
+                \local_gugrades\grades::release_user_grade($courseid, $gradeitemid, $user->id, $activity);
             }
+        }
+
+        if (\local_gugrades\grades::is_gradeitemid_category($gradeitemid)) {
+            $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
+            \local_gugrades\aggregation::aggregate($courseid, $gradecategoryid, $users);
         }
     }
 
