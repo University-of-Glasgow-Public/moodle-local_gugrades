@@ -74,15 +74,6 @@
         })
     }
 
-    // Handle change of selection in dropdown.
-    /*
-    function levelOneChange(event) {
-        const categoryid = event.target.value;
-        level1store.categoryid = categoryid;
-        emit('levelchange', categoryid);
-    }
-        */
-
     watch(categoryid, () => {
         level1store.categoryid = categoryid.value;
         emit('levelchange', categoryid.value);
