@@ -4,7 +4,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import TabMenu from '../src/views/TabMenu.vue';
 </script>
 

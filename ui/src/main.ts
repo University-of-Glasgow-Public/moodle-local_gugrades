@@ -7,7 +7,7 @@ import 'vue3-easy-data-table/dist/style.css';
 import { plugin, defaultConfig } from '@formkit/vue';
 import { Modal } from '@kouts/vue-modal';
 import { createPinia } from 'pinia';
-import { usePopulateTrees } from './js/setuptrees.js';
+import { usePopulateTrees } from './js/setuptrees';
 import { usePreload } from './js/preload.js';
 import { useMstrings } from './stores/mstrings';
 import { moodleFetch } from '@/js/moodlefetch';
