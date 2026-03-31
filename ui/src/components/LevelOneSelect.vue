@@ -6,63 +6,63 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <div v-if="notsetup" class="alert alert-warning">
-            {{ mstrings.notoplevel }}
-        </div>
-        <div v-if="itemerror" class="alert alert-danger">
+        <TwAlert v-if="notsetup">{{ mstrings.notoplevel }}</TwAlert>
+        <TwAlert v-if="itemerror">
             {{ mstrings.changedgradetype }}
             <ul>
                 <li v-for="item in erroritems">{{ item.itemname }}</li>
             </ul>
-        </div>
-        <select v-if="!notsetup && !itemerror" class="form-control border-dark" @change="levelOneChange($event)">
-            <option value="0">{{ mstrings.selectgradecategory }}</option>
+        </TwAlert>
+        <select v-if="!notsetup && !itemerror" v-model="categoryid" class="tw:select tw:w-full">
+            <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
             <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
         </select>
     </div>
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted, inject} from '@vue/runtime-core';
+    import {ref, onMounted, watch} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import DebugDisplay from '@/components/DebugDisplay.vue';
-    import { setlevel1, getlevel1 } from '@/js/level1.js';
+    import type { ICategories, IErrorItems } from '@/js/Interfaces';
+    import { useLeve1Store } from '@/stores/level1';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import TwAlert from './Tailwind/TwAlert.vue';
 
-    const level1categories = ref([]);
-    const erroritems = ref([]);
+    const level1categories = ref< ICategories[] >([]);
+    const categoryid = ref(0);
+    const erroritems = ref< IErrorItems[] >([]);
     const selected = ref(0);
     const notsetup = ref(false);
     const itemerror = ref(false);
     const debug = ref({});
-    const mstrings = inject('mstrings');
+    const level1store = useLeve1Store();
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emit = defineEmits(['levelchange']);
 
     // Get the top level categories
     function getLevelOne() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_get_levelonecategories',
-            args: {
-                courseid
-            }
-        }])[0]
-        .then((result) => {
+        moodleFetch(
+            'local_gugrades_get_levelonecategories',
+            {}
+        )
+        .then((result: any) => {
             level1categories.value = result.categories;
             erroritems.value = result.erroritems;
             notsetup.value = level1categories.value.length == 0;
             itemerror.value = erroritems.value.length > 0;
 
             // If it's already been selected on another tab...
-            selected.value = getlevel1(level1categories.value);
+            selected.value = level1store.getvalidcategoryid(level1categories.value);
             if (selected.value) {
                 emit('levelchange', selected.value);
             }
 
             // if there's only one then might as well select it.
-            if ((level1categories.value.length == 1) && !itemerror.value && !notsetup.value) {
+            if ((level1categories.value.length == 1) && (0 in level1categories.value) && !itemerror.value && !notsetup.value) {
                 selected.value = level1categories.value[0].id;
                 emit('levelchange', selected.value);
             }
@@ -74,11 +74,18 @@
     }
 
     // Handle change of selection in dropdown.
+    /*
     function levelOneChange(event) {
         const categoryid = event.target.value;
-        setlevel1(categoryid);
+        level1store.categoryid = categoryid;
         emit('levelchange', categoryid);
     }
+        */
+
+    watch(categoryid, () => {
+        level1store.categoryid = categoryid.value;
+        emit('levelchange', categoryid.value);
+    })
 
     onMounted(() => {
         //selected.value = localStorage.getItem('level1category');

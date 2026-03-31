@@ -51,3 +51,16 @@ export interface IGradetype {
     value: string;
     label: string;
 }
+
+/**
+ * see get_leveloncategories
+ */
+export interface ICategories {
+    id: number;
+    fullname: string;
+}
+
+export interface IErrorItems {
+    gradeitemid: number;
+    itemname: string;
+}
