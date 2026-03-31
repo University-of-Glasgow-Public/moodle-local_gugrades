@@ -58,6 +58,7 @@
             // If it's already been selected on another tab...
             selected.value = level1store.getvalidcategoryid(level1categories.value);
             if (selected.value) {
+                categoryid.value = selected.value;
                 emit('levelchange', selected.value);
             }
 
@@ -88,7 +89,6 @@
     })
 
     onMounted(() => {
-        //selected.value = localStorage.getItem('level1category');
         getLevelOne();
         if (selected.value != 0) {
             emit('levelchange', selected.value);
