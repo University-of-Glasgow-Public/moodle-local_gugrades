@@ -50,6 +50,7 @@
     import DebugDisplay from '@/components/DebugDisplay.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
 
     interface GradeType {
         label: string;
@@ -83,22 +84,18 @@
      * Button clicked
      */
     function add_multiple_button_click() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         // Clear for new form
         other.value = '';
         reason.value = '';
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_gradetypes',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_gradetypes',
+            {
                 gradeitemid: props.itemid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             gradetypes.value = result.gradetypes;
         })
         .catch((error) => {
@@ -115,19 +112,15 @@
      * This is called immediately after the submit_form() promise
      * completes.
      */
-     function get_capture_cell_form(columnid) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
+     function get_capture_cell_form(columnid: number) {
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_capture_cell_form',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_capture_cell_form',
+            {
                 gradeitemid: props.itemid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const usescale = result.usescale;
             const grademax = result.grademax;
             const scalemenu = result.scalemenu;
@@ -162,9 +155,6 @@
      * Process form submission
      */
     function submit_form() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         // Where reason looks like OTHER_nn,
         // It's an exiting other, the corresponding
@@ -177,17 +167,16 @@
             }
         }
 
-        fetchMany([{
-            methodname: 'local_gugrades_write_column',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_write_column',
+            {
                 gradeitemid: props.itemid,
                 reason: reason.value,
                 other: other.value,
                 notes: notes.value,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const columnid = result.columnid;
             get_capture_cell_form(columnid);
         })

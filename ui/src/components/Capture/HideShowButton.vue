@@ -4,12 +4,16 @@
     <a v-if="!props.gradehidden" class="dropdown-item" href="#" @click="showhide('hide')">{{ mstrings.hide }}</a>
 </template>
 
-<script setup>
-    import {defineProps, defineEmits, inject, ref} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {inject, ref} from '@vue/runtime-core';
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
 
-    const mstrings = inject('mstrings');
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const props = defineProps({
         courseid: Number,
@@ -23,25 +27,20 @@
     /**
      * Hide/show button clicked
      */
-    function showhide(action) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_show_hide_grade',
-            args: {
-                courseid: courseid,
+    function showhide(action: string) {
+        moodleFetch(
+            'local_gugrades_show_hide_grade',
+            {
                 gradeitemid: props.itemid,
                 userid: props.userid,
                 hide: action == 'hide',
             }
-        }])[0]
+        )
         .then(() => {
             emit('changed');
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             debug.value = error;
         });
     }

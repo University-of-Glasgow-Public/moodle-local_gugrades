@@ -14,11 +14,13 @@
     </div>
 </template>
 
-<script setup>
-    import {inject, defineProps} from '@vue/runtime-core';
+<script setup lang="ts">
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
     import DismissableAlert from '@/components/DismissableAlert.vue';
 
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const props = defineProps({
         gradesupported: Boolean,

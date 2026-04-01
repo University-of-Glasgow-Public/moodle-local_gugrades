@@ -1,39 +1,47 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
-    <a class="dropdown-item" href="#" @click="read_history()">{{ mstrings.history }}</a>
+    <a @click.prevent="read_history()">{{ mstrings.history }}</a>
 
-    <VueModal v-model="showhistorymodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="mstrings.gradehistory">
+    <VueModal v-model="showhistorymodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.gradehistory">
         <div>
-            <ul class="list-unstyled">
+            <ul class="tw:list-none">
                 <li><b>{{ mstrings.name }}:</b> {{ props.name }}</li>
                 <li><b>{{ mstrings.itemname }}:</b> {{ props.itemname }}</li>
             </ul>
         </div>
-        <div v-if="grades.length == 0" class="alert alert-warning">{{ mstrings.nohistory }}</div>
+
+        <TwAlert v-if="grades.length == 0">{{ mstrings.nohistory }}</TwAlert>
 
         <EasyDataTable v-else :headers="headers" :items="grades">
         </EasyDataTable>
 
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="float-right">
-                    <button class="btn btn-warning" type="button" @click="showhistorymodal = false">{{  mstrings.close }}</button>
-                </div>
-            </div>
+        <div class="tw:flex tw:justify-end tw:mt-5">
+            <TwButton color="warning" @click="showhistorymodal = false">{{ mstrings.close }}</TwButton>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, onMounted, inject} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, onMounted, inject} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import TwButton from '../Tailwind/TwButton.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+
+    interface IHeader {
+        text: string;
+        value: string;
+    }
 
     const showhistorymodal = ref(false);
     const grades = ref([]);
-    const mstrings = inject('mstrings');
-    const headers = ref([]);
+    const headers = ref< IHeader[] >([]);
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
 
@@ -48,19 +56,14 @@
      * Read history on button click
      */
     function read_history() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_get_history',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_history',
+            {
                 gradeitemid: props.itemid,
                 userid: props.userid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             grades.value = result;
         })
         .catch((error) => {
@@ -77,12 +80,12 @@
      */
     onMounted(() => {
         headers.value = [
-               {text: mstrings.time, value: 'time'},
-               {text: mstrings.by, value: 'auditbyname'},
-               {text: mstrings.grade, value: 'displaygrade'},
-               {text: mstrings.gradetype, value: 'description'},
-               {text: mstrings.current, value: 'current'},
-               {text: mstrings.comment, value: 'auditcomment'},
+               {text: mstringstore.getMstring('time'), value: 'time'},
+               {text: mstringstore.getMstring('by'), value: 'auditbyname'},
+               {text: mstringstore.getMstring('grade'), value: 'displaygrade'},
+               {text: mstringstore.getMstring('gradetype'), value: 'description'},
+               {text: mstringstore.getMstring('current'), value: 'current'},
+               {text: mstringstore.getMstring('comment'), value: 'auditcomment'},
             ];
     });
 </script>

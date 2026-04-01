@@ -1,14 +1,18 @@
 <template>
-    <div class="alert alert-dismissible fade show" :class="[alertclass]" role="alert">
-        <span v-html="props.message"></span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    <TwAlert v-if="open" class="tw:my-2">
+        <div class="tw:flex tw:justify-between tw:items-center tw:w-full">
+            <span class="tw:flex-1" v-html="props.message"></span>
+            <XCircleIcon class="tw:size-6 tw:text-black-500 tw:shrink-0" @click="open = false"></XCircleIcon>
+        </div>
+    </TwAlert>
 </template>
 
-<script setup>
-    import {defineProps, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {computed, ref} from '@vue/runtime-core';
+    import TwAlert from './Tailwind/TwAlert.vue';
+    import { XCircleIcon } from '@heroicons/vue/24/outline';
+
+    const open = ref(true);
 
     const alertclass = computed(() => {
         return 'alert-' + props.alertstyle;

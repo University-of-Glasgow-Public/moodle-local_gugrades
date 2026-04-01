@@ -5,11 +5,11 @@
         {{ buttontitle }}
     </a>
 
-    <VueModal v-model="showaddgrademodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="buttontitle">
+    <VueModal v-model="showaddgrademodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="buttontitle">
 
         <!-- Can either show add grade form or re-release dialogue -->
         <div v-if="!showreleaseddialogue">
-            <ul class="list-unstyled">
+            <ul class="tw:list-none">
                 <li v-if="props.categoryid"><b>{{ mstrings.category }}:</b> {{ itemname }}</li>
                 <li v-else><b>{{ mstrings.itemname }}:</b> {{ itemname }}</li>
                 <li><b>{{ mstrings.username }}:</b> {{ name }}</li>
@@ -20,14 +20,10 @@
             </ul>
 
             <!-- message if not available -->
-            <div v-if="!available" class="alert alert-danger">
-            {{ mstrings.overridenotavailable }}
-            </div>
+            <TwAlert v-if="!available">{{ mstrings.overridenotavailable }}</TwAlert>
 
             <!-- message if error -->
-            <div v-if="error" class="alert alert-danger">
-                {{ mstrings.overrideerror}}
-            </div>
+            <TwAlert v-if="error">{{ mstrings.overrideerror}}</TwAlert>
 
             <FormKit v-if="!overridden && available && !error" class="border rounded" type="form"  @submit="submit_form">
                 <FormKit
@@ -101,18 +97,13 @@
             </FormKit>
 
             <div v-if="overridden" class="border rounded mt-3 p-4">
-                <div class="alert alert-primary">
-                    {{ mstrings.categoryremoveoverride }}
-                </div>
-                <a href="#" class="btn btn-primary" @click="removeoverride">{{ mstrings.remove }}</a>
+
+                <TwAlert>{{ mstrings.categoryremoveoverride }}</TwAlert>
+                <TwButton color="primary" @click="removeoverride">{{ mstrings.remove }}</TwButton>
             </div>
 
-            <div class="row mt-2">
-                <div class="col-sm-12">
-                    <div class="float-right">
-                        <button class="btn btn-warning" type="button" @click="showaddgrademodal = false">{{  mstrings.cancel }}</button>
-                    </div>
-                </div>
+            <div class="tw:flex tw:justify-end">
+                <TwButton color="warning">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>
 
@@ -129,20 +120,42 @@
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, computed} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
+
+    interface IAdminMenu {
+        value: string;
+        label: string;
+    }
+
+    interface IScaleOption {
+        value: string;
+        label: string;
+    }
+
+    interface IGradeType {
+        value: string;
+        label: string;
+    }
+
+    type FormKitRule = [string, ...any[]];
+    type FormKitValidationRules = FormKitRule[];
 
     const showaddgrademodal = ref(false);
     const showreleaseddialogue = ref(false);
     const debug = ref({});
-    const mstrings = inject('mstrings');
-    const gradetypes = ref({});
+    const gradetypes = ref< IGradeType[] >([]);
     const idnumber = ref('');
     const reason = ref('');
     const admingrade = ref('GRADE'); // GRADE == not an admin grade (a real grade)
-    const scale = ref('');
+    const scale = ref< string >('');
     const grade = ref(0);
     const notes = ref('');
     const other = ref('');
@@ -152,9 +165,11 @@
     const available = ref(true);
     const error = ref(false);
     const grademax = ref(0);
-    const scalemenu = ref([]);
-    const adminmenu = ref([]);
-    const gradevalidation = ref([]);
+    const scalemenu = ref< IScaleOption[] >([]);
+    const adminmenu = ref< IAdminMenu[] >([]);
+    const gradevalidation = ref< FormKitValidationRules >([]);
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emit = defineEmits([
         'gradeadded'
@@ -177,9 +192,9 @@
      */
     const buttontitle = computed(() => {
         if (props.categoryid) {
-            return mstrings.overridecategory;
+            return mstringstore.getMstring('overridecategory');
         } else {
-            return mstrings.addgrade;
+            return mstringstore.getMstring('addgrade');
         }
     });
 
@@ -187,19 +202,15 @@
      * Get data for form
      */
     function add_grade() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_add_grade_form',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_add_grade_form',
+            {
                 gradeitemid: props.itemid,
                 userid: props.userid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             gradetypes.value = result.gradetypes;
             idnumber.value = result.idnumber;
             usescale.value = result.usescale;
@@ -214,7 +225,7 @@
             // Add 'use grade' option onto front of adminmenu
             adminmenu.value.unshift({
                 value: 'GRADE',
-                label: mstrings.selectnormalgrade,
+                label: mstringstore.getMstring('selectnormalgrade'),
             });
 
             gradevalidation.value = [
@@ -233,22 +244,17 @@
     }
 
     /**
-     * Request recalculate single user. 
+     * Request recalculate single user.
      * Note: no need to wait for response
      */
     function recalculate_user() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-        
-        fetchMany([{
-            methodname: 'local_gugrades_recalculate',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_recalculate',
+            {
                 gradecategoryid: props.selectedcategoryid,
                 userid: props.userid,
             }
-        }])[0]
+        )
         .catch(error => {
             console.log(error);
         });
@@ -258,19 +264,15 @@
      * Process form submission
      */
     function submit_form() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         // We don't ask for the reason if a category. So...
         if (iscategory.value) {
             reason.value = 'CATEGORY';
         }
 
-        fetchMany([{
-            methodname: 'local_gugrades_write_additional_grade',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_write_additional_grade',
+            {
                 gradeitemid: props.itemid,
                 userid: props.userid,
                 admingrade: admingrade.value == 'GRADE' ? '' : admingrade.value,
@@ -280,10 +282,10 @@
                 grade: grade.value,
                 notes: notes.value,
             }
-        }])[0]
+        )
         .then(() => {
             emit('gradeadded');
-            toast.success(mstrings.gradeadded);
+            toast.success(mstringstore.getMstring('gradeadded'));
 
             // If the grade was released then we have more stuff to do
             if (props.released) {
@@ -306,24 +308,20 @@
      * Grade gets re-released after add
      */
     function release_grade() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_release_grade',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_release_grade',
+            {
                 gradeitemid: props.itemid,
                 userid: props.userid,
             }
-        }])[0]
+        )
         .then(() => {
 
             // This will be sufficient to re-aggregate and so on.
             emit('gradeadded');
             showaddgrademodal.value = false;
-            toast.success(mstrings.gradesreleased);
+            toast.success(mstringstore.getMstring('gradesreleased'));
         })
         .catch((error) => {
             window.console.error(error);
@@ -339,15 +337,11 @@
      *
      */
     function removeoverride() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         // Scale and grade are both 0 = remove override
-        fetchMany([{
-            methodname: 'local_gugrades_write_additional_grade',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_write_additional_grade',
+            {
                 gradeitemid: props.itemid,
                 userid: props.userid,
                 admingrade: '',
@@ -358,11 +352,11 @@
                 notes: '',
                 delete: true,
             }
-        }])[0]
+        )
         .then(() => {
             emit('gradeadded');
             recalculate_user();
-            toast.success(mstrings.gradeadded);
+            toast.success(mstringstore.getMstring('gradeadded'));
         })
         .catch((error) => {
             window.console.error(error);

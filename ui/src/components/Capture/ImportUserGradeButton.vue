@@ -1,17 +1,21 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a class="dropdown-item" href="#" @click="import_grade()">{{ mstrings.importusergrade }}</a>
+    <a @click.prevent="import_grade()">{{ mstrings.importusergrade }}</a>
 </template>
 
-<script setup>
-    import {inject, defineEmits, defineProps, ref} from '@vue/runtime-core';
+<script setup lang="ts">
+    import { ref } from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
 
-    const mstrings = inject('mstrings');
     const toast = useToast();
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const props = defineProps({
         itemid: Number,
@@ -24,24 +28,20 @@
      * Import grade for single user
      */
      function import_grade() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_import_grade',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_import_grade',
+            {
                 gradeitemid: props.itemid,
                 userid: props.userid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const success = result['success'];
             if (success) {
-                toast.success(mstrings.gradeimporteduser);
+                toast.success(mstringstore.getMstring('gradeimporteduser'));
             } else {
-                toast.warning(mstrings.nothingtoimport);
+                toast.warning(mstringstore.getMstring('nothingtoimport'));
             }
             emit('imported');
         })

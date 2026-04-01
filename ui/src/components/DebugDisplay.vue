@@ -21,11 +21,13 @@
 
 <script setup lang="ts">
     import {computed} from '@vue/runtime-core';
-    import  * as _ from 'underscore';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
     const props = defineProps({
-        debug: Object,
+        debug: {
+            type: Object,
+            default: () => ({})
+        }
     });
 
     const moodlecourseid = computed(() => {
@@ -49,8 +51,7 @@
     });
 
     const showdebugmodal = computed(() => {
-        const simpledebug = {...props.debug};
-        return !_.isEmpty(simpledebug);
+        return Object.keys(props.debug).length !== 0
     });
 </script>
 

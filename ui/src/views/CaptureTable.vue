@@ -805,4 +805,8 @@
     .buttons-pagination .item.button.active {
         color: black !important;
     }
+
+    .vue3-easy-data-table__main {
+        overflow: visible !important;
+    }
 </style>
