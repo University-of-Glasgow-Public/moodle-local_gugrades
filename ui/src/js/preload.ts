@@ -3,22 +3,20 @@
  * (where possible)
  */
 
+import { moodleFetch } from '@/js/moodlefetch';
+import type { ICategories } from './Interfaces';
+
 export function usePreload() {
 
     const recalculate = () => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         // Get all the level 1 categories.
-        fetchMany([{
-            methodname: 'local_gugrades_get_levelonecategories',
-            args: {
-                courseid: courseid,
-            }
-        }])[0]
-        .then(result => {
-            const categories = result.categories;
+        moodleFetch(
+            'local_gugrades_get_levelonecategories',
+            {}
+        )
+        .then((result: any) => {
+            const categories: ICategories[] = result.categories;
             const erroritems = result.erroritems;
 
             // If there are erroritems, no point continuing
@@ -27,7 +25,7 @@ export function usePreload() {
                 return;
             }
 
-            categories.forEach(cat => {
+            categories.forEach((cat) => {
                 const catid = cat.id;
                 const fullname = cat.fullname.toLowerCase();
 
@@ -36,14 +34,13 @@ export function usePreload() {
                 if (fullname.includes('summative')) {
 
                     // Call full recalculate.
-                    fetchMany([{
-                        methodname: 'local_gugrades_recalculate',
-                        args: {
-                            courseid: courseid,
+                    moodleFetch(
+                        'local_gugrades_recalculate',
+                        {
                             gradecategoryid: catid,
                         }
-                    }])[0]
-                    .then(result => {
+                    )
+                    .then(() => {
                         console.log('Recalculated ' + cat.fullname)
                     })
                     .catch(error => {

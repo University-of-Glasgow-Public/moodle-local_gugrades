@@ -2,7 +2,7 @@
     <TwAlert v-if="open" class="tw:my-2">
         <div class="tw:flex tw:justify-between tw:items-center tw:w-full">
             <span class="tw:flex-1" v-html="props.message"></span>
-            <XCircleIcon class="tw:size-6 tw:text-black-500 tw:shrink-0" @click="open = false"></XCircleIcon>
+            <XCircleIcon class="tw:size-6 tw:text-black-500 tw:shrink-0 tw:tooltip" @click="open = false" data-tip="Dissmiss"></XCircleIcon>
         </div>
     </TwAlert>
 </template>

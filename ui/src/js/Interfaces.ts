@@ -64,3 +64,11 @@ export interface IErrorItems {
     gradeitemid: number;
     itemname: string;
 }
+
+/**
+ * Se get_all_strings
+ */
+export interface IMoodleString {
+    tag: string;
+    stringvalue: string;
+}

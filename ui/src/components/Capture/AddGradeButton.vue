@@ -103,7 +103,7 @@
             </div>
 
             <div class="tw:flex tw:justify-end">
-                <TwButton color="warning">{{ mstrings.cancel }}</TwButton>
+                <TwButton color="warning" @click="showaddgrademodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>
 

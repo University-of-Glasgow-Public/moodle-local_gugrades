@@ -37,8 +37,8 @@
     </div>
 </template>
 
-<script setup>
-    import {ref, defineProps, onMounted, onBeforeUnmount, defineEmits, inject, watch, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, onMounted, onBeforeUnmount, inject, watch, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/DebugDisplay.vue';
 
@@ -138,14 +138,14 @@
     }
 
     /**
-     * Request recalculate single user. 
+     * Request recalculate single user.
      * Note: no need to wait for response
      */
     function recalculate_user(userid) {
         const GU = window.GU;
         const courseid = GU.courseid;
         const fetchMany = GU.fetchMany;
-        
+
         fetchMany([{
             methodname: 'local_gugrades_recalculate',
             args: {

@@ -1,20 +1,26 @@
-import { createApp, reactive } from 'vue'
+import { createApp, reactive, ref } from 'vue'
 import App from './App.vue'
 import Toast  from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import Vue3EasyDataTable from 'vue3-easy-data-table';
 import 'vue3-easy-data-table/dist/style.css';
 import { plugin, defaultConfig } from '@formkit/vue';
-import { Modal } from '@kouts/vue-modal';
 import { createPinia } from 'pinia';
 import { usePopulateTrees } from './js/setuptrees';
-import { usePreload } from './js/preload.js';
+import { usePreload } from './js/preload';
 import { useMstrings } from './stores/mstrings';
 import { moodleFetch } from '@/js/moodlefetch';
 import '../src/assets/VueModal.css';
 import '../src/assets/MyGrades.css';
+import type { IMoodleString } from './js/Interfaces';
 
-import customConfig from '../formkit.config.js';
+// Following work but cause trouble with Typescript.
+// Something to improve another day.
+// @ts-ignore
+import Vue3EasyDataTable from 'vue3-easy-data-table';
+// @ts-ignore
+import { Modal } from '@kouts/vue-modal';
+
+import customConfig from './js/formkit.config';
 
 // This stuff makes sure that the window.GU variable
 // exists.
@@ -22,7 +28,8 @@ import customConfig from '../formkit.config.js';
 // has loaded
 var timeout = 1000000;
 
-function ensureGUIsSet(timeout) {
+/*
+function ensureGUIsSet(timeout: number) {
     var start = Date.now();
     return new Promise(waitForGU);
 
@@ -34,6 +41,31 @@ function ensureGUIsSet(timeout) {
             reject(new Error("timeout"));
         } else {
             setTimeout(waitForGU.bind(this, resolve, reject), 30);
+        }
+    }
+}
+*/
+
+/**
+ * Updated, even more inscruitable AI version.
+ * @param timeout
+ * @returns
+ */
+function ensureGUIsSet(timeout: number): Promise<typeof window.GU> {
+    const start = Date.now();
+
+    return new Promise(waitForGU);
+
+    function waitForGU(
+        resolve: (value: typeof window.GU) => void,
+        reject: (reason?: Error) => void
+    ): void {
+        if (window.GU) {
+            resolve(window.GU);
+        } else if ((Date.now() - start) >= timeout) {
+            reject(new Error("timeout"));
+        } else {
+            setTimeout(waitForGU.bind(null, resolve, reject), 30);
         }
     }
 }
@@ -61,7 +93,7 @@ ensureGUIsSet(timeout)
 .then(() => {
     const app = createApp(App);
     app.use(pinia);
-    const mstrings = reactive([]);
+    const mstrings = ref<Record<string, string>>({});
     app.provide('mstrings', mstrings);
     app.use(Toast, toastoptions);
     app.use(plugin, defaultConfig(customConfig));
@@ -77,12 +109,12 @@ ensureGUIsSet(timeout)
         'local_gugrades_get_all_strings',
         {}
     )
-    .then((result) => {
-        const strings = result;
-        strings.forEach((string) => {
-            mstrings[string.tag] = string.stringvalue;
+    .then((result: any) => {
+        const strings: IMoodleString[] = result;
+        strings.forEach((mstring: IMoodleString) => {
+            mstrings.value[mstring.tag] = mstring.stringvalue;
         });
-        mstringstore.mstrings = mstrings;
+        mstringstore.mstrings = mstrings.value;
     })
     .catch((error) => {
         window.console.error(error);
