@@ -2,17 +2,11 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <EasyDataTable 
+        <EasyDataTable
             :headers="headers"
             :items="items"
             ref="dataTable"
-            hide-footer
         ></EasyDataTable>
-        <!-- Implementation of our own accessible footer. -->
-        <CustomPagination
-            v-if="loaded"
-            v-bind="props"
-        />
     </div>
     <div>
         <button class="mt-2 btn btn-success" @click="download_clicked">{{ mstrings.downloadtocsv }}</button>
@@ -24,7 +18,6 @@
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/DebugDisplay.vue';
-    import CustomPagination from '@/components/CustomPagination.vue';
 
     const mstrings = inject('mstrings');
     const items = ref([]);

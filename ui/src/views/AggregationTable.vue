@@ -73,7 +73,6 @@
             :filter-options="table_filter"
             :rows-items="[25,50,100,250]"
             ref="dataTable"
-            hide-footer
         >
 
             <!-- additional information in header cells -->
@@ -217,12 +216,6 @@
             </template>
         </EasyDataTable>
 
-        <!-- Implementation of our own accessible footer. -->
-        <CustomPagination
-            v-if="!loading"
-            v-bind="props"
-        />
-
         <!-- display debugging/timing information -->
         <div v-if="debug.length > 0" class="my-3 pt-2 rounded border text-monospace bg-secondary text-dark">
             <ul>
@@ -246,7 +239,6 @@
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DismissableAlert from '@/components/DismissableAlert.vue';
     import DebugDisplay from '@/components/DebugDisplay.vue';
-    import CustomPagination from '@/components/CustomPagination.vue';
 
     const toast = useToast();
     const mstrings = inject('mstrings');

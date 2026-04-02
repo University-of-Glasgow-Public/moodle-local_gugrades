@@ -12,12 +12,11 @@
                 {{ mstrings.noconversionmaps }}
             </div>
 
-            <EasyDataTable 
-                v-if="loaded" 
-                :headers="headers" 
+            <EasyDataTable
+                v-if="loaded"
+                :headers="headers"
                 :items="maps"
                 ref="dataTable"
-                hide-footer
             >
                 <template #item-inuse="map">
                     <span v-if="map.inuse">{{ mstrings.yes }}</span>
@@ -32,12 +31,6 @@
                     </div>
                 </template>
             </EasyDataTable>
-
-            <!-- Implementation of our own accessible footer. -->
-            <CustomPagination
-                v-if="loaded"
-                v-bind="props"
-            />
 
             <div v-if="caneditgrades" class="mt-4">
                 <button class="btn btn-primary mr-1" @click="add_map">{{ mstrings.addconversionmap }}</button>
@@ -83,7 +76,6 @@
     import { saveAs } from 'file-saver';
     import { useFileDialog } from '@vueuse/core';
     import DebugDisplay from '@/components/DebugDisplay.vue';
-    import CustomPagination from '@/components/CustomPagination.vue';
 
     const maps = ref([]);
     const editmap = ref(false);

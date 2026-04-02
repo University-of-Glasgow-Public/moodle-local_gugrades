@@ -81,7 +81,6 @@
                     @xxupdate-page-items="pagination_clicked()"
                     ref="dataTable"
                     :rows-items="[25,50,100,250]"
-                    hide-footer
                     >
 
                     <!-- add header text and edit cog next to cell if required -->
@@ -165,12 +164,6 @@
                     </template>
                 </EasyDataTable>
 
-                <!-- Implementation of our own accessible footer. -->
-                <CustomPagination
-                    v-if="loaded"
-                    v-bind="props"
-                />
-
                 <!-- button for saving cell edits -->
                 <div class="pb-1 clearfix mt-2" v-if="ineditcellmode">
                     <button class="btn btn-warning float-right mr-1" @click="edit_cell_cancelled">{{ mstrings['cancel'] }}</button>
@@ -197,7 +190,6 @@
     import { useWindowScroll, watchDebounced } from '@vueuse/core';
     import PleaseWait from '@/components/PleaseWait.vue';
     import DebugDisplay from '@/components/DebugDisplay.vue';
-    import CustomPagination from '@/components/CustomPagination.vue';
     import { useLogo } from '@/js/monochromelogo.js';
     import { useMstrings } from '@/stores/mstrings.js';
     import TwButton from '@/components/Tailwind/TwButton.vue';
