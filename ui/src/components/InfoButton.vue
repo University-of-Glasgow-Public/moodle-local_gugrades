@@ -63,6 +63,7 @@
     import TwButton from './Tailwind/TwButton.vue';
     import { InformationCircleIcon } from '@heroicons/vue/24/outline'
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
 
     const showinfomodal = ref(false);
     const itemname = ref('');
@@ -91,17 +92,14 @@
      * Info button clicked
      */
     function info_clicked() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_grade_item',
-            args: {
+        moodleFetch(
+            'local_gugrades_get_grade_item',
+            {
                 itemid: props.itemid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             itemname.value = result.itemname;
             itemtype.value = result.itemtype;
             itemmodule.value = result.itemmodule;
@@ -113,7 +111,7 @@
             link.value = result.link;
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             debug.value = error;
         });
 
