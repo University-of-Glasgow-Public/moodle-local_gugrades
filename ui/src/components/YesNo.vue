@@ -3,9 +3,7 @@
     <span v-else>No</span>
 </template>
 
-<script setup>
-    import {ref, defineProps, inject} from '@vue/runtime-core';
-
+<script setup lang="ts">
     const props = defineProps({
         yes: Boolean,
     });
