@@ -40,7 +40,7 @@
 <script setup lang="ts">
     import {ref, onMounted, onBeforeUnmount, inject, watch, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     // (item.id is current userid)
     // (item.reason is the reason/gradetype)

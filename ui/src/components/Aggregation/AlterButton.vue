@@ -84,7 +84,7 @@
 <script setup>
     import {ref, defineProps, defineEmits, inject, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const showaltermodal = ref(false);
     const mstrings = inject('mstrings');

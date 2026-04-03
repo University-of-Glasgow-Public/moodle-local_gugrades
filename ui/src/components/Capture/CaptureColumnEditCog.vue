@@ -9,7 +9,7 @@
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useToast } from "vue-toastification";
     import { Cog6ToothIcon } from '@heroicons/vue/24/outline';
 

@@ -44,7 +44,7 @@
     import TwAlert from '../Tailwind/TwAlert.vue';
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { ICaptureExportOptions } from '@/js/Interfaces';

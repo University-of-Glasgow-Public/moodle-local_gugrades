@@ -229,7 +229,7 @@
 
 <script setup>
     import {ref, computed, inject, onMounted} from '@vue/runtime-core';
-    import LevelOneSelect from '@/components/LevelOneSelect.vue';
+    import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import NameFilter from '@/components/NameFilter.vue';
     import GroupSelect from '@/components/GroupSelect.vue';
     import { useToast } from "vue-toastification";
@@ -237,8 +237,8 @@
     import PleaseWait from '@/components/PleaseWait.vue';
     import AggregationButtons from '@/components/Aggregation/AggregationButtons.vue';
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
-    import DismissableAlert from '@/components/DismissableAlert.vue';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DismissableAlert from '@/components/Common/DismissableAlert.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const toast = useToast();
     const mstrings = inject('mstrings');

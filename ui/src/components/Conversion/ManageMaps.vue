@@ -75,7 +75,7 @@
     import ConfirmModal from '@/components/ConfirmModal.vue';
     import { saveAs } from 'file-saver';
     import { useFileDialog } from '@vueuse/core';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const maps = ref([]);
     const editmap = ref(false);

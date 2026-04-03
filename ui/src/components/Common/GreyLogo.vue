@@ -8,7 +8,7 @@
 
 <script setup>
     import {ref, onMounted} from 'vue';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
 
     const debug = ref({});

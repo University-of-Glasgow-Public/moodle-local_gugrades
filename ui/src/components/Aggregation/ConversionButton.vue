@@ -52,7 +52,7 @@
 <script setup>
     import {ref, inject, defineProps, defineEmits} from '@vue/runtime-core';
     import PleaseWait from '@/components/PleaseWait.vue';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useToast } from "vue-toastification";
 
     const mstrings = inject('mstrings');

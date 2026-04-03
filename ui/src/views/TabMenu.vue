@@ -50,8 +50,8 @@
     import SettingsPage from '@/views/SettingsPage.vue';
     import AuditPage from '@/views/AuditPage.vue';
     import { useToast } from "vue-toastification";
-    import DebugDisplay from '@/components/DebugDisplay.vue';
-    import GreyLogo from '@/components/GreyLogo.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import GreyLogo from '@/components/Common/GreyLogo.vue';
     import PleaseWait from '@/components/PleaseWait.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
 

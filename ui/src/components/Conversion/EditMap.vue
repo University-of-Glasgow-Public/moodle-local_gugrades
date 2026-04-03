@@ -105,7 +105,7 @@
     import {ref, inject, defineProps, defineEmits, onMounted, watch, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import { watchDebounced } from '@vueuse/core';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const mstrings = inject('mstrings');
     const loaded = ref(false);

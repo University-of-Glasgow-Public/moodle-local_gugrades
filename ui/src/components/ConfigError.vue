@@ -5,12 +5,14 @@
     </TwAlert>
 </template>
 
-<script setup>
-    import {defineProps, inject} from 'vue';
+<script setup lang="ts">
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
     const props = defineProps({
         errormessage: String,
     });
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 </script>

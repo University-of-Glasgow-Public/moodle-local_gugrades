@@ -47,7 +47,7 @@
     import {ref} from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';

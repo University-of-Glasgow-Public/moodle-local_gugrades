@@ -10,9 +10,15 @@
 
 <script setup lang="ts">
     import {ref } from '@vue/runtime-core';
-    import LevelOneSelect from '@/components/LevelOneSelect.vue';
+    import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import ActivitySelect from '@/components/ActivitySelect.vue';
     import GroupSelect from '@/components/GroupSelect.vue'
+
+    interface IItemData {
+        itemid: number;
+        groupid: number;
+        categoryid: number;
+    }
 
     const level1category = ref(0);
     const showactivityselect = ref(false);
@@ -22,46 +28,46 @@
     const emits = defineEmits(['selecteditemid'])
 
     /**
+     * Emit the current data
+     */
+    function emitdata() {
+        const itemdata: IItemData = {
+            itemid: itemid.value,
+            groupid: groupid.value,
+            categoryid: level1category.value,
+        };
+        emits('selecteditemid', itemdata );
+    }
+
+    /**
      * Capture change to top level category dropdown
      * @param {*} level
      */
-     function levelOneChange(level) {
+     function levelOneChange(level: number) {
         itemid.value = 0;
-        level1category.value = parseInt(level);
+        level1category.value = level;
         if (level1category.value) {
             showactivityselect.value = true;
         } else {
             showactivityselect.value = false;
         }
 
-        emits('selecteditemid', {
-            itemid: itemid.value,
-            groupid: groupid.value,
-            categoryid: level1category.value,
-        });
+        emitdata();
     }
 
     /**
      * Capture change to activity selection
      */
-     function activity_selected(newitemid) {
-        itemid.value = Number(newitemid);
-        emits('selecteditemid', {
-            itemid: itemid.value,
-            groupid: groupid.value,
-            categoryid: level1category.value,
-        });
+     function activity_selected(newitemid: number) {
+        itemid.value = newitemid;
+        emitdata();
     }
 
     /**
      * Capture change to group
      */
-    function groupselected(gid) {
-        groupid.value = Number(gid);
-        emits('selecteditemid', {
-            itemid: itemid.value,
-            groupid: groupid.value,
-            categoryid: level1category.value,
-        });
+    function groupselected(gid: number) {
+        groupid.value = gid;
+        emitdata();
     }
 </script>

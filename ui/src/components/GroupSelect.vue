@@ -12,7 +12,7 @@
 
 <script setup>
     import {ref, onMounted, defineEmits, inject} from '@vue/runtime-core';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const groups = ref([]);
     const mstrings = inject('mstrings');

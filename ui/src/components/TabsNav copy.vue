@@ -52,7 +52,7 @@
 <script setup>
     import {ref, defineEmits, defineProps, inject, onMounted} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const activetab = ref('capture');
     const settingscapability = ref(false);

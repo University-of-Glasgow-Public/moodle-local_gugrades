@@ -31,7 +31,7 @@
     import {ref, inject, onMounted} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import ResetButton from '@/components/ResetButton.vue';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
 
     const mstrings = inject('mstrings');

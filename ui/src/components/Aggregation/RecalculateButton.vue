@@ -23,7 +23,7 @@
     import {ref, inject, defineProps, defineEmits} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import PleaseWait from '@/components/PleaseWait.vue';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const mstrings = inject('mstrings');
     const showrecalculatemodal = ref(false);

@@ -23,7 +23,6 @@ export function usePopulateTrees() {
             const categories: ICategories[] = result.categories;
             categories.forEach(cat => {
                 const catid = cat.id;
-
                 promises.push(
 
                     // Get the (detailed) tree for this top level category.
@@ -44,6 +43,7 @@ export function usePopulateTrees() {
                 );
             });
 
+            console.log(promises);
             Promise.all(promises).then(() => {
                 activitytree.ready = true;
                 console.log('Activity trees preloaded');

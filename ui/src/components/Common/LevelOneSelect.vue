@@ -23,12 +23,12 @@
 <script setup lang="ts">
     import {ref, onMounted, watch} from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import type { ICategories, IErrorItems } from '@/js/Interfaces';
     import { useLeve1Store } from '@/stores/level1';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import TwAlert from './Tailwind/TwAlert.vue';
+    import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
     const level1categories = ref< ICategories[] >([]);
     const categoryid = ref(0);
@@ -50,6 +50,7 @@
             {}
         )
         .then((result: any) => {
+
             level1categories.value = result.categories;
             erroritems.value = result.erroritems;
             notsetup.value = level1categories.value.length == 0;
@@ -65,6 +66,7 @@
             // if there's only one then might as well select it.
             if ((level1categories.value.length == 1) && (0 in level1categories.value) && !itemerror.value && !notsetup.value) {
                 selected.value = level1categories.value[0].id;
+                categoryid.value = selected.value;
                 emit('levelchange', selected.value);
             }
         })

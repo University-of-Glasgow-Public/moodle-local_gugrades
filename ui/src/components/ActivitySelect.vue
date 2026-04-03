@@ -1,9 +1,9 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="mt-2 border border-dark p-3 rounded" v-if="loaded">
+    <div class="tw:mt-2 tw:border-solid tw:border-2 tw:border-gray-500 tw:p-3 tw:rounded-md" v-if="loaded">
         <div v-if="collapsed" @click="open_selection" class="cursor-pointer row">
-            <div class="col-10">
+            <div v-if="selectedactivity" class="col-10">
                 {{ mstrings.selected }}: {{ selectedactivity.itemname }}
             </div>
             <div class="col-2 text-right">
@@ -12,21 +12,28 @@
         </div>
         <div v-else>
             <b>{{ categoryname }}</b>
-            <ActivityTree v-if="!treeerror" :nodes="activitytree" @activityselected="activity_selected" depth="1"></ActivityTree>
+            <ActivityTree v-if="!treeerror" :nodes="activitytree" @activityselected="activity_selected" :depth="1"></ActivityTree>
             <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
         </div>
     </div>
 </template>
 
-<script setup>
-    import {ref, onMounted, defineProps, defineEmits, watch, inject} from 'vue';
+<script setup lang="ts">
+    import {ref, onMounted, watch } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import ActivityTree from '@/components/ActivityTree.vue';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import ConfigError from '@/components/ConfigError.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
+    import type { IGradeitem } from '@/js/Interfaces.js';
 
     const props = defineProps({
-        categoryid: Number,
+        categoryid: {
+            type: Number,
+            required: true,
+        },
         currentitem: Number,
     });
 
@@ -34,44 +41,48 @@
 
     const activitytree = ref({});
     const categoryname = ref('');
-    const selectedactivity = ref({});
+    const selectedactivity = ref< IGradeitem | undefined >(undefined);
     const loaded = ref(false);
     const collapsed = ref(false);
     const treeerror = ref('');
     const debug = ref({});
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     // Get the sub-category / activity
     function getActivity() {
         const treestore = useActivityTreeStore();
+
         const catid = props.categoryid;
-        const tree = JSON.parse(treestore.trees[catid]);
-        treeerror.value = treestore.errors[catid];
-        if (!treeerror.value) {
-            activitytree.value = tree;
-            categoryname.value = tree.category.fullname;
-        } else {
-            activitytree.value = [];
-            categoryname.value = '';
+        if (treestore.trees[catid]) {
+            const tree = JSON.parse(treestore.trees[catid]);
+            if (treestore.errors[catid]) {
+                treeerror.value = treestore.errors[catid];
+            } else {
+                treeerror.value = '';
+            }
+            if (!treeerror.value) {
+                activitytree.value = tree;
+                categoryname.value = tree.category.fullname;
+            } else {
+                activitytree.value = [];
+                categoryname.value = '';
+            }
+            loaded.value = true;
         }
-        loaded.value = true;
     }
 
     // Get the sub-category / activity
     function getActivityOld() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
         const catid = props.categoryid;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_activities',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_activities',
+            {
                 categoryid: catid
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const tree = JSON.parse(result['activities']);
             treeerror.value = result.error;
 
@@ -91,21 +102,19 @@
     }
 
     // Get the selected avtivity
-    function activity_selected(activityid) {
-        const GU = window.GU;
-        const fetchMany = GU.fetchMany;
-        fetchMany([{
-            methodname: 'local_gugrades_get_grade_item',
-            args: {
+    function activity_selected(activityid: number) {
+        moodleFetch(
+            'local_gugrades_get_grade_item',
+            {
                 itemid: activityid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             selectedactivity.value = result;
             collapsed.value = true;
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             debug.value = error;
         });
 
@@ -126,7 +135,7 @@
 
         // Could be mounted with something selected
         if (props.currentitem) {
-            selectedactivity.value = props.currentitem;
+            activity_selected(props.currentitem);
             collapsed.value = true;
         }
     });

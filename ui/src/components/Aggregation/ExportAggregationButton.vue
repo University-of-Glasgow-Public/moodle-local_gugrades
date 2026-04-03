@@ -79,7 +79,7 @@
     import PleaseWait from '@/components/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const showexportmodal = ref(false);
     const allnone = ref(false);

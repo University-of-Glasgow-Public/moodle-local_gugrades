@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
     import {computed, ref} from '@vue/runtime-core';
-    import TwAlert from './Tailwind/TwAlert.vue';
+    import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import { XCircleIcon } from '@heroicons/vue/24/outline';
 
     const open = ref(true);

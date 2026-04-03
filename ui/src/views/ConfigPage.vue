@@ -28,8 +28,8 @@
 <script setup lang="ts">
     import {ref, onMounted} from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
-    import LevelOneSelect from '@/components/LevelOneSelect.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import ConfigTree from '@/components/ConfigTree.vue';
     import ConfigError from '@/components/ConfigError.vue';
     import PleaseWait from '@/components/PleaseWait.vue';

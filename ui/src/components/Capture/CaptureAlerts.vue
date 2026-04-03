@@ -17,7 +17,7 @@
 <script setup lang="ts">
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import DismissableAlert from '@/components/DismissableAlert.vue';
+    import DismissableAlert from '@/components/Common/DismissableAlert.vue';
 
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );

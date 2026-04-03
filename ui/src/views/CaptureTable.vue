@@ -180,18 +180,20 @@
     import {ref, computed, watch, onMounted} from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
     import NameFilter from '@/components/NameFilter.vue';
-    import CaptureSelect from '@/components/CaptureSelect.vue';
-    import CaptureMenu from '@/components/CaptureMenu.vue';
+    import CaptureSelect from '@/components/Capture/CaptureSelect.vue';
+    import CaptureMenu from '@/components/Capture/CaptureMenu.vue';
     import { useToast } from "vue-toastification";
     import CaptureButtons from '@/components/Capture/CaptureButtons.vue';
-    import CaptureAlerts from '@/components/CaptureAlerts.vue';
-    import CaptureColumnEditCog from '@/components/CaptureColumnEditCog.vue';
+    import CaptureAlerts from '@/components/Capture/CaptureAlerts.vue';
+    import CaptureColumnEditCog from '@/components/Capture/CaptureColumnEditCog.vue';
     import EditCaptureCell from '@/components/Capture/EditCaptureCell.vue';
     import { useWindowScroll, watchDebounced } from '@vueuse/core';
     import PleaseWait from '@/components/PleaseWait.vue';
-    import DebugDisplay from '@/components/DebugDisplay.vue';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import type { Header, Item } from "vue3-easy-data-table";
     import TwButton from '@/components/Tailwind/TwButton.vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
@@ -255,18 +257,14 @@
      * onMounted, get write grades capability
      */
     onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_has_capability',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
                 capability: 'local/gugrades:editgrades'
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             caneditgrades.value = result.hascapability;
         })
         .catch((error) => {
@@ -336,7 +334,7 @@
      * Get class name for table row depending on criteria
      * Used to show hidden rows
      */
-    function table_row_class(item) {
+    function table_row_class(item: Item) {
         return 'non-hidden-row'
         if (item.gradehidden) {
             return 'hidden-row';
@@ -350,7 +348,7 @@
     /**
      * Get class name for table items
      */
-    function table_item_class(column) {
+    function table_item_class(column: string) {
 
         // Hide name initial columns
         if ((column == 'firstinitial') || (column == 'lastinitial')) {
@@ -364,7 +362,7 @@
     /**
      * Get class name for header items
      */
-     function header_item_class(header) {
+     function header_item_class(header: Header) {
         if ((header.value == 'firstinitial') || (header.value == 'lastinitial')) {
             return 'd-none';
         }
@@ -614,24 +612,19 @@
      * @param int gid (group id)
      */
      function get_page_data(itemid, gid) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         loaded.value = false;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_capture_page',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_capture_page',
+            {
                 gradeitemid: itemid,
                 firstname: '',
                 lastname: '',
                 groupid: gid,
                 viewfullnames: revealnames.value,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             usershidden.value = result.hidden;
             users.value = result.users;
             itemtype.value = result.itemtype;
@@ -656,7 +649,7 @@
             loaded.value = true;
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             debug.value = error;
         });
     }
@@ -691,20 +684,16 @@
      * (If grade added and so on)
      */
     function get_user_data(userid) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_capture_user',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_capture_user',
+            {
                 gradeitemid: itemid.value,
                 userid: userid,
                 viewfullnames: revealnames.value,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const updateduser = add_user_grades(result, columns.value);
 
             // If this seems to have added more columns then do a page reload.
