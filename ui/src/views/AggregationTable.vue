@@ -231,7 +231,7 @@
     import {ref, computed, inject, onMounted} from '@vue/runtime-core';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import NameFilter from '@/components/NameFilter.vue';
-    import GroupSelect from '@/components/GroupSelect.vue';
+    import GroupSelect from '@/components/Common/GroupSelect.vue';
     import { useToast } from "vue-toastification";
     import InfoButton from '@/components/InfoButton.vue';
     import PleaseWait from '@/components/PleaseWait.vue';

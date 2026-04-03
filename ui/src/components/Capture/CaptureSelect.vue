@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12 col-lg-6">
+    <div class="tw:w-120">
         <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
         <div>
             <ActivitySelect v-if="showactivityselect" :categoryid="level1category" :currentitem="itemid" @activityselected="activity_selected"></ActivitySelect>
@@ -12,7 +12,7 @@
     import {ref } from '@vue/runtime-core';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import ActivitySelect from '@/components/ActivitySelect.vue';
-    import GroupSelect from '@/components/GroupSelect.vue'
+    import GroupSelect from '@/components/Common/GroupSelect.vue'
 
     interface IItemData {
         itemid: number;

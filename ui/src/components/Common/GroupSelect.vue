@@ -1,8 +1,8 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div v-if="showgroupselect" class="mt-2">
-        <select class="form-control border-dark" @change="group_change($event)">
+    <div v-if="showgroupselect" class="tw:mt-2">
+        <select class="tw:select" @change="group_change($event)">
             <option value="0">{{ mstrings.allparticipants }}</option>
             <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
         </select>
@@ -10,7 +10,7 @@
 
 </template>
 
-<script setup>
+<script setup lang="ts">
     import {ref, onMounted, defineEmits, inject} from '@vue/runtime-core';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 

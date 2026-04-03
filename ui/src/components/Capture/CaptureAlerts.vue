@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12 mt-2">
+    <div class="tw:mt-2">
         <small>
             <DismissableAlert v-if="!props.gradesupported" alertstyle="danger" :message="mstrings.gradenotsupported"></DismissableAlert>
 

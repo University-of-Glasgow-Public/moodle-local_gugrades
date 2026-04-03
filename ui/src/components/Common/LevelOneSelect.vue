@@ -13,7 +13,7 @@
                 <li v-for="item in erroritems">{{ item.itemname }}</li>
             </ul>
         </TwAlert>
-        <select v-if="!notsetup && !itemerror" v-model="categoryid" class="tw:select tw:w-full">
+        <select v-if="!notsetup && !itemerror" v-model="categoryid" class="tw:select tw:w-120">
             <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
             <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
         </select>
