@@ -1,46 +1,43 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div>
+    <div class="my-5">
         <EasyDataTable
             :headers="headers"
             :items="items"
-            ref="dataTable"
         ></EasyDataTable>
     </div>
-    <div>
-        <button class="mt-2 btn btn-success" @click="download_clicked">{{ mstrings.downloadtocsv }}</button>
-    </div>
+    <TwButton class="tw:mt-2" color="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</TwButton>
 </template>
 
-<script setup>
-    import {ref, computed, onMounted, inject} from '@vue/runtime-core';
-    import { useToast } from "vue-toastification";
+<script setup lang="ts">
+    import {ref, onMounted } from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import type { IAuditItem } from '@/js/Interfaces';
+    import type { Header } from "vue3-easy-data-table";
+    import TwButton from '@/components/Tailwind/TwButton.vue';
 
-    const mstrings = inject('mstrings');
-    const items = ref([]);
-    const headers = ref([]);
+    const items = ref< IAuditItem[] >([]);
+    const headers = ref< Header[] >([]);
     const debug = ref({});
-    const toast = useToast();
     const loaded = ref(false);
-    // pagination related.
-    const dataTable = ref();
-    const props = {
-        dataTable: dataTable,
-    }
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     /**
      * Download button clicked
      */
     function download_clicked() {
         let csv =
-            mstrings.time + ', ' +
-            mstrings.gradeitem + ', ' +
-            mstrings.by + ', ' +
-            mstrings.relateduser + ', ' +
-            mstrings.message + '\n';
+            mstringstore.getMstring('time') + ', ' +
+            mstringstore.getMstring('gradeitem') + ', ' +
+            mstringstore.getMstring('by') + ', ' +
+            mstringstore.getMstring('relateduser') + ', ' +
+            mstringstore.getMstring('message') + '\n';
         items.value.forEach((item) => {
             csv +=
                 '"' + item.time + '", ' +
@@ -56,25 +53,19 @@
     }
 
     onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         headers.value = [
-               {text: mstrings.time, value: 'time'},
-               {text: mstrings.gradeitem, value: 'gradeitem'},
-               {text: mstrings.by, value: 'username'},
-               {text: mstrings.relateduser, value: 'relatedusername'},
-               {text: mstrings.message, value: 'message'},
+               {text: mstringstore.getMstring('time'), value: 'time'},
+               {text: mstringstore.getMstring('gradeitem'), value: 'gradeitem'},
+               {text: mstringstore.getMstring('by'), value: 'username'},
+               {text: mstringstore.getMstring('relateduser'), value: 'relatedusername'},
+               {text: mstringstore.getMstring('message'), value: 'message'},
             ];
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_audit',
-            args: {
-                courseid: courseid,
-            }
-        }])[0]
-        .then((result) => {
+        moodleFetch(
+            'local_gugrades_get_audit',
+            {}
+        )
+        .then((result: any) => {
             items.value = result;
             loaded.value = true;
 

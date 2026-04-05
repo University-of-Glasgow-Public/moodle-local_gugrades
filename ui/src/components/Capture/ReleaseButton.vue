@@ -57,7 +57,7 @@
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import { useLogo } from '@/js/monochromelogo';

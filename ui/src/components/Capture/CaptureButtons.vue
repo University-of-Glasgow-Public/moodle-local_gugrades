@@ -23,18 +23,28 @@
     import InfoButton from '@/components/InfoButton.vue';
     import ReloadButton from '@/components/ReloadButton.vue';
     import ExportCaptureButton from '@/components/Capture/ExportCaptureButton.vue';
+    import type { IEmitEditColumn } from '@/js/Interfaces';
 
     const props = defineProps({
         loaded: {
             type: Boolean,
             default: false,
         },
-        itemid: Number,
-        groupid: Number,
+        itemid: {
+            type: Number,
+            required: true
+        },
+        groupid: {
+            type: Number,
+            required: true
+        },
         userids: Array,
         users: Array,
         itemtype: String,
-        itemname: String,
+        itemname: {
+            type: String,
+            required: true
+        },
         usershidden: Boolean,
         gradesimported: Boolean,
         showconversion: Boolean,
@@ -52,7 +62,7 @@
      * Handle viewfullnames
      * @param bool toggleview
      */
-     function viewfullnames(toggleview) {
+     function viewfullnames(toggleview: boolean) {
         emit('viewfullnames', toggleview);
     }
 
@@ -60,7 +70,7 @@
      * Multiple button has added another column
      * We need to know what it was
      */
-    function multipleclicked(cellform) {
+    function multipleclicked(cellform: IEmitEditColumn) {
         emit('editcolumn', cellform);
     }
 

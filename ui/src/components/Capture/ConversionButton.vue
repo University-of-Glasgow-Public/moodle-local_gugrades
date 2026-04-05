@@ -60,7 +60,7 @@
 <script setup lang="ts">
     import {ref } from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';

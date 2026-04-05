@@ -26,7 +26,7 @@
     import ActivityTree from '@/components/ActivityTree.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import ConfigError from '@/components/ConfigError.vue';
-    import { useActivityTreeStore } from '../stores/activitytree.js';
+    import { useActivityTreeStore } from '@/stores/activitytree.js';
     import type { IGradeitem } from '@/js/Interfaces.js';
 
     const props = defineProps({

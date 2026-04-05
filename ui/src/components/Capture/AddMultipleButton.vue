@@ -51,6 +51,7 @@
     import TwButton from '../Tailwind/TwButton.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
+    import type { IEmitEditColumn } from '@/js/Interfaces';
 
     interface GradeType {
         label: string;
@@ -66,9 +67,9 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
-    const emits = defineEmits([
-        'editcolumn'
-    ]);
+    const emits = defineEmits<{
+        editcolumn: [payload: IEmitEditColumn]
+    }>()
 
     const toast = useToast();
 
@@ -142,6 +143,7 @@
                 scalemenu: scalemenu,
                 adminmenu: adminmenu,
                 notes: notes.value,
+                columnid: 0,
             });
         })
         .catch((error) => {

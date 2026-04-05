@@ -61,7 +61,7 @@
     import {ref, inject, defineProps, defineEmits, computed} from '@vue/runtime-core';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useLogo } from '@/js/monochromelogo.js';
 
     const showreleasemodal = ref(false);

@@ -32,7 +32,7 @@
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import ConfigTree from '@/components/ConfigTree.vue';
     import ConfigError from '@/components/ConfigError.vue';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import { usePopulateTrees } from '../js/setuptrees.js';
     import { useMstrings } from '@/stores/mstrings.js';

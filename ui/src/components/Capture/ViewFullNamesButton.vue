@@ -7,20 +7,21 @@
     </TwButton>
 </template>
 
-<script setup>
-    import {ref, onMounted, inject, defineEmits} from '@vue/runtime-core';
-    import { useToast } from "vue-toastification";
+<script setup lang="ts">
+    import {ref, onMounted } from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import { useMstrings } from '@/stores/mstrings.js';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwButton from '../Tailwind/TwButton.vue';
 
     const hascapability = ref(false);
     const togglereveal = ref(false);
-    const mstrings = inject('mstrings');
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emit = defineEmits(['viewfullnames']);
-
-    const toast = useToast();
 
     /**
      * Export data to file
@@ -34,22 +35,17 @@
      * Check capability
      */
     onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_has_capability',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
                 capability: 'local/gugrades:viewhiddennames'
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             hascapability.value = result['hascapability'];
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             debug.value = error;
         });
 

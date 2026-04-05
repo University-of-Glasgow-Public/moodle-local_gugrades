@@ -39,7 +39,7 @@
 <script setup lang="ts">
     import {ref } from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import { useToast } from "vue-toastification";

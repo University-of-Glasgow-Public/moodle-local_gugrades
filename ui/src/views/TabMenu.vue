@@ -52,7 +52,7 @@
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import GreyLogo from '@/components/Common/GreyLogo.vue';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
 
     const currenttab = ref('capture');

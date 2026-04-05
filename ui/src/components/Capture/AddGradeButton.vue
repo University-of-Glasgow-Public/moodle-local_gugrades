@@ -129,6 +129,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import type { IGradetype } from '@/js/Interfaces';
 
     interface IAdminMenu {
         value: string;
@@ -140,18 +141,13 @@
         label: string;
     }
 
-    interface IGradeType {
-        value: string;
-        label: string;
-    }
-
     type FormKitRule = [string, ...any[]];
     type FormKitValidationRules = FormKitRule[];
 
     const showaddgrademodal = ref(false);
     const showreleaseddialogue = ref(false);
     const debug = ref({});
-    const gradetypes = ref< IGradeType[] >([]);
+    const gradetypes = ref< IGradetype[] >([]);
     const idnumber = ref('');
     const reason = ref('');
     const admingrade = ref('GRADE'); // GRADE == not an admin grade (a real grade)

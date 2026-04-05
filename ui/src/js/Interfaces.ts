@@ -9,6 +9,14 @@ export interface IMap {
 }
 
 /**
+ * Menu item - value/label, used all over
+ */
+export interface IMenuItem {
+    value: string;
+    label: string;
+}
+
+/**
  * See get_grade_item
  */
 export interface IGradeitem {
@@ -71,4 +79,100 @@ export interface IErrorItems {
 export interface IMoodleString {
     tag: string;
     stringvalue: string;
+}
+
+/**
+ * See get_audit
+ */
+export interface IAuditItem {
+    id: number;
+    courseid: number;
+    userid: number;
+    username: string;
+    relateduserid: number;
+    relatedusername: string;
+    gradeitemid: number;
+    gradeitem: string;
+    timecreated: number;
+    time: string;
+    message: string;
+}
+
+/**
+ * See get_capture_page.
+ */
+export interface ICaptureColumn {
+    id: number;
+    gradetype: string;
+    editable: boolean;
+    description: string;
+    other: string;
+    points: boolean;
+}
+
+export interface ICaptureGrade {
+    displaygrade: string;
+    gradetype: string;
+    columnid: number;
+}
+
+export interface ICaptureUser {
+    id: number;
+    displayname: string;
+    firstinitial: string;
+    lastinitial: string;
+    pictureurl: string;
+    profileurl: string;
+    idnumber: string;
+    alert: boolean;
+    gradehidden: boolean;
+    gradebookhidden: boolean;
+    grades: ICaptureGrade[];
+    awaitingcapture?: boolean;
+    editcolumn?: boolean;
+    reason?: string;
+    other?: string;
+    gradeitemid?: number;
+}
+
+/**
+ * See get_groups
+ */
+export interface IGroup {
+    id: number;
+    courseid: number;
+    name: string;
+}
+
+/**
+ * Formkit
+ *
+ */
+export interface IFormkitOption {
+    value: string;
+    label: string;
+}
+
+/**
+ * CaptureSelect.vue
+ */
+export interface IEmitItemData {
+    itemid: number;
+    groupid: number;
+    categoryid: number;
+}
+
+/**
+ * AddMultipleButton.vue
+ */
+export interface IEmitEditColumn {
+    columnname: string;
+    gradetype: string;
+    other: string;
+    usescale: boolean;
+    grademax: number;
+    scalemenu: IMenuItem[];
+    adminmenu: IMenuItem[];
+    notes: string;
+    columnid: number;
 }

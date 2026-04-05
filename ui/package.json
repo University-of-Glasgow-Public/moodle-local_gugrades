@@ -21,6 +21,7 @@
     "@heroicons/vue": "^2.2.0",
     "@kouts/vue-modal": "^5.0.1",
     "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/vue-table": "^8.21.3",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vueuse/core": "^14.2.1",
     "core-js": "^3.48.0",

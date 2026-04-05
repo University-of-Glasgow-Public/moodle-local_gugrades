@@ -11,27 +11,24 @@
 <script setup lang="ts">
     import {ref } from '@vue/runtime-core';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
-    import ActivitySelect from '@/components/ActivitySelect.vue';
+    import ActivitySelect from '@/components/Capture/ActivitySelect.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue'
-
-    interface IItemData {
-        itemid: number;
-        groupid: number;
-        categoryid: number;
-    }
+    import type { IEmitItemData } from '@/js/Interfaces';
 
     const level1category = ref(0);
     const showactivityselect = ref(false);
     const itemid = ref(0);
     const groupid = ref(0);
 
-    const emits = defineEmits(['selecteditemid'])
+    const emits = defineEmits<{
+        selecteditemid: [payload: IEmitItemData]
+    }>();
 
     /**
      * Emit the current data
      */
     function emitdata() {
-        const itemdata: IItemData = {
+        const itemdata: IEmitItemData = {
             itemid: itemid.value,
             groupid: groupid.value,
             categoryid: level1category.value,

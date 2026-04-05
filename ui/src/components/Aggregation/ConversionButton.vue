@@ -51,7 +51,7 @@
 
 <script setup>
     import {ref, inject, defineProps, defineEmits} from '@vue/runtime-core';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useToast } from "vue-toastification";
 

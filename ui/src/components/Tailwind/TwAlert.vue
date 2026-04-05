@@ -10,7 +10,7 @@
 <script setup lang="ts">
     import { computed } from 'vue';
 
-    const classes = {
+    const classes: Record<string, string> = {
         default: '',
         primary: 'tw:alert-primary',
         secondary: 'tw:alert-secondary',

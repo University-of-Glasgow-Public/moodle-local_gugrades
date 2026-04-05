@@ -234,7 +234,7 @@
     import GroupSelect from '@/components/Common/GroupSelect.vue';
     import { useToast } from "vue-toastification";
     import InfoButton from '@/components/InfoButton.vue';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import AggregationButtons from '@/components/Aggregation/AggregationButtons.vue';
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DismissableAlert from '@/components/Common/DismissableAlert.vue';

@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div v-if="showgroupselect" class="tw:mt-2">
-        <select class="tw:select" @change="group_change($event)">
+        <select class="tw:select" v-model="groupid">
             <option value="0">{{ mstrings.allparticipants }}</option>
             <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
         </select>
@@ -11,13 +11,19 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted, defineEmits, inject} from '@vue/runtime-core';
+    import {ref, onMounted, watch} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import { useMstrings } from '@/stores/mstrings.js';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import type { IGroup } from '@/js/Interfaces';
 
-    const groups = ref([]);
-    const mstrings = inject('mstrings');
+    const groups = ref< IGroup[] >([]);
+    const groupid = ref(0);
     const showgroupselect = ref(false);
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emit = defineEmits(['groupselected']);
 
@@ -25,17 +31,12 @@
      * Get groups for this course.
      */
     function get_groups() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_groups',
-            args: {
-                courseid
-            }
-        }])[0]
-        .then((result) => {
+        moodleFetch(
+            'local_gugrades_get_groups',
+            {}
+        )
+        .then((result: any) => {
             groups.value = result;
             showgroupselect.value = groups.value.length > 0;
         })
@@ -46,10 +47,9 @@
     }
 
     // Handle change of selection in dropdown.
-    function group_change(event) {
-        const groupid = event.target.value;
-        emit('groupselected', groupid);
-    }
+    watch(groupid, () => {
+        emit('groupselected', groupid.value);
+    })
 
     onMounted(() => {
         get_groups();

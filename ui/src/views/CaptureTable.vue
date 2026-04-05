@@ -188,7 +188,7 @@
     import CaptureColumnEditCog from '@/components/Capture/CaptureColumnEditCog.vue';
     import EditCaptureCell from '@/components/Capture/EditCaptureCell.vue';
     import { useWindowScroll, watchDebounced } from '@vueuse/core';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
     import { useMstrings } from '@/stores/mstrings.js';
@@ -196,9 +196,10 @@
     import type { Header, Item } from "vue3-easy-data-table";
     import TwButton from '@/components/Tailwind/TwButton.vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
 
-    const users = ref([]);
-    const userids = ref([]);
+    const users = ref< ICaptureUser[] >([]);
+    const userids = ref< number[] >([]);
     const itemid = ref(0);
     const categoryid = ref(0);
     const groupid = ref(0);
@@ -216,7 +217,7 @@
     const gradelocked = ref(false);
     const converted = ref(false);
     const released = ref(false);
-    const columns = ref([]);
+    const columns = ref< ICaptureColumn[] >([]);
     const loaded = ref(false);
     const showalert = ref(false);
     const revealnames = ref(false);
@@ -224,8 +225,8 @@
     const editcolumn = ref('');
     const editcolumnslot = ref('');
     const editusescale = ref(false);
-    const editscalemenu = ref([]);
-    const editadminmenu = ref([]);
+    const editscalemenu = ref< IMenuItem[] >([]);
+    const editadminmenu = ref< IMenuItem[] >([]);
     const editgradetype = ref('');
     const editgrademax = ref(0);
     const editgradecount = ref(0);
@@ -385,7 +386,7 @@
      * New itemid and/or groupid has been selected
      * If itemid = 0, then reset the table
      */
-    function selecteditemid(itemgroup) {
+    function selecteditemid(itemgroup: IEmitItemData) {
         itemid.value = itemgroup.itemid;
         groupid.value = itemgroup.groupid;
         categoryid.value = itemgroup.categoryid;
@@ -400,7 +401,7 @@
     /**
      * Column editcog has been clicked
      */
-     function editcog_clicked(cellform) {
+     function editcog_clicked(cellform: IEmitEditColumn) {
 
         // Unpack data
         const columnname = cellform.columnname;
@@ -531,7 +532,7 @@
      * Handle viewfullnames
      * @param bool toggleview
      */
-    function viewfullnames(toggleview) {
+    function viewfullnames(toggleview: boolean) {
         revealnames.value = toggleview;
         reload_page();
     }
@@ -540,8 +541,8 @@
      * Add the column/grade data for individual user
      *
      */
-    function add_user_grades(user, columns) {
-        let grade = {};
+    function add_user_grades(user: ICaptureUser, columns: ICaptureColumn[]) {
+        let grade: Partial<ICaptureGrade> | undefined = {};
 
         // Only show alert/discrepancy column if there are any
         if (user.alert || user.gradebookhidden || user.gradehidden) {
@@ -585,7 +586,7 @@
      * @param columns
      * @return array
      */
-    function add_grades(users, columns) {
+    function add_grades(users: ICaptureUser[], columns: ICaptureColumn[]) {
 
         showalert.value = false;
         users.forEach(user => {
@@ -611,7 +612,7 @@
      * @param char last
      * @param int gid (group id)
      */
-     function get_page_data(itemid, gid) {
+     function get_page_data(itemid: number, gid: number) {
         loaded.value = false;
 
         moodleFetch(
@@ -683,7 +684,7 @@
      * Get the data for an individual user
      * (If grade added and so on)
      */
-    function get_user_data(userid) {
+    function get_user_data(userid: number) {
 
         moodleFetch(
             'local_gugrades_get_capture_user',
@@ -719,7 +720,7 @@
      * @param {*} first
      * @param {*} last
      */
-    function filter_selected(first, last) {
+    function filter_selected(first: string, last: string) {
         if (first == 'all') {
             first = '';
         }

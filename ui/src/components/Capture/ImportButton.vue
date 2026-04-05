@@ -55,10 +55,7 @@
                         <FormKit
                             type="radio"
                             :label="mstrings['recursiveimport']"
-                            :options="{
-                                single: mstrings['recursive_single'],
-                                recursive: mstrings['recursive_recursive']
-                            }",
+                            :options="recursiveimportoptions",
                             name="recursiveimport"
                             v-model="recursiveselect"
                             >
@@ -87,11 +84,7 @@
                         type="radio"
                         :label="mstrings['importadditional']"
                         name="importadditional"
-                        :options="{
-                            admin: mstrings['importadditional_admin'],
-                            missing: mstrings['importadditional_missing'],
-                            update: mstrings['importadditional_update']
-                        }"
+                        :options="additionaloptions"
                         v-model="importadditional"
                         >
                     </FormKit>
@@ -131,13 +124,20 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, inject, computed} from '@vue/runtime-core';
+    import {ref, computed } from '@vue/runtime-core';
     import { storeToRefs } from 'pinia';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import TwButton from '../Tailwind/TwButton.vue';
-    import PleaseWait from '@/components/PleaseWait.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
+    import type { IGradetype, IFormkitOption } from '@/js/Interfaces';
+
+    interface IFormkitOptions {
+        label: string;
+        value: string;
+    }
 
     const props = defineProps({
         enable: {
@@ -152,8 +152,9 @@
     });
 
     const toast = useToast();
+
     const groupimport = computed(() => {
-        return props.groupid > 0;
+        return props.groupid ? props.groupid > 0 : false;
     });
 
     const emit = defineEmits(['imported']);
@@ -167,7 +168,7 @@
     const importadditional = ref<'admin' | 'missing' | 'update'>('admin');
     const importfillns = ref<'none' | 'fillns'>('none');
     const allgradesvalid = ref(false);
-    const gradetypes = ref([]);
+    const gradetypes = ref< IGradetype[] >([]);
     const other = ref('');
     const level = ref(0);
     const dryruncount = ref(0);
@@ -176,6 +177,19 @@
     const debug = ref({});
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
+
+    // Options for radio "importadditional"
+    const additionaloptions: IFormkitOption[] = [
+        {value: 'admin', label: mstringstore.getMstring('importadditional_admin')},
+        {value: 'missing', label:  mstringstore.getMstring('importadditional_missing')},
+        {value: 'update', label: mstringstore.getMstring('importadditional_update')}
+    ];
+
+    // Options for "recursiveimport".
+    const recursiveimportoptions: IFormkitOption[] = [
+        {value: 'single', label: mstringstore.getMstring('recursive_single')},
+        {value: 'recursive', label: mstringstore.getMstring('recursive_recursive')}
+    ];
 
     /**
      * What kind of alert do you get?
@@ -189,15 +203,18 @@
      * Options for NS/NS0 dropdown
      */
     const nsoptions = computed(() => {
-        const options: Record<string, string> = {
-            none: mstrings.value['donotfill'],
-            fillns: mstrings.value['fillns'],
 
-        };
+        const options: IFormkitOption[] = [
+            {value: 'none', label: mstringstore.getMstring('donotfill')},
+            {value: 'fillns', label: mstringstore.getMstring('fillns')}
+
+        ];
 
         // NS0 only available level >=2
         if (level.value > 1) {
-            options.fillns0 = mstrings.value['fillns0'];
+            options.push(
+                {value: 'fillns0', label: mstringstore.getMstring('fillns0')}
+            );
         }
 
         return options;
@@ -236,18 +253,13 @@
      * Get the add grade form stuff
      */
     function get_gradetypes() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_get_gradetypes',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_gradetypes',
+            {
                 gradeitemid: props.itemid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             gradetypes.value = result.gradetypes;
         })
         .catch((error) => {
@@ -260,15 +272,10 @@
     /**
      * Import single grade item
      */
-     function importsingle(is_dryrun) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_import_grades_users',
-            args: {
-                courseid: courseid,
+     function importsingle(is_dryrun: boolean) {
+        moodleFetch(
+            'local_gugrades_import_grades_users',
+            {
                 gradeitemid: props.itemid,
                 additional: importadditional.value,
                 fillns: importfillns.value,
@@ -277,8 +284,8 @@
                 other: is_importgrades.value ? other.value : '',
                 dryrun: is_dryrun,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const importcount = result['importcount'];
             dryruncount.value = importcount;
             loading.value = false;
@@ -307,15 +314,10 @@
     /**
      * Import recursive grades
      */
-    function importrecursive(is_dryrun) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        fetchMany([{
-            methodname: 'local_gugrades_import_grades_recursive',
-            args: {
-                courseid: courseid,
+    function importrecursive(is_dryrun: boolean) {
+        moodleFetch(
+            'local_gugrades_import_grades_recursive',
+            {
                 gradeitemid: props.itemid,
                 groupid: props.groupid,
                 additional: importadditional.value,
@@ -324,8 +326,8 @@
                 other: is_importgrades.value ? other.value : '',
                 dryrun: is_dryrun,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const itemcount = result.itemcount;
             const gradecount = result.gradecount;
             dryruncount.value = gradecount;
@@ -368,21 +370,16 @@
         showdryrun.value = false;
         loading.value = false;
 
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         get_gradetypes();
 
-        fetchMany([{
-            methodname: 'local_gugrades_is_grades_imported',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_is_grades_imported',
+            {
                 gradeitemid: props.itemid,
                 groupid: props.groupid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             is_importgrades.value = result.imported;
             recursiveavailable.value = result.recursiveavailable;
             recursivematch.value = result.recursivematch;
