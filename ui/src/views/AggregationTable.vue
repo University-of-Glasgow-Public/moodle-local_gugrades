@@ -233,7 +233,7 @@
     import NameFilter from '@/components/NameFilter.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue';
     import { useToast } from "vue-toastification";
-    import InfoButton from '@/components/InfoButton.vue';
+    import InfoButton from '@/components/Common/InfoButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import AggregationButtons from '@/components/Aggregation/AggregationButtons.vue';
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';

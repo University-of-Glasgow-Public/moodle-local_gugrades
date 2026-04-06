@@ -60,7 +60,7 @@
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwButton from './Tailwind/TwButton.vue';
+    import TwButton from '@/components/Tailwind/TwButton.vue';
     import { InformationCircleIcon } from '@heroicons/vue/24/outline'
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';

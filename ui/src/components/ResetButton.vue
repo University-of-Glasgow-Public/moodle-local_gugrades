@@ -10,7 +10,7 @@
 
 <script setup>
     import {ref, onMounted, inject} from '@vue/runtime-core';
-    import ConfirmModal from '@/components/ConfirmModal.vue';
+    import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useToast } from "vue-toastification";
 

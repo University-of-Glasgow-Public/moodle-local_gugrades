@@ -145,6 +145,15 @@ export interface IGroup {
 }
 
 /**
+ * See get_conversion_map
+ */
+export interface IConversionMap {
+    band: string;
+    bound: number;
+    grade: number;
+}
+
+/**
  * Formkit
  *
  */

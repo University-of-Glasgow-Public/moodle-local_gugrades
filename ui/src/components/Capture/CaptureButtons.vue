@@ -20,8 +20,8 @@
     import ViewFullNamesButton from '@/components/Capture/ViewFullNamesButton.vue';
     import AddMultipleButton from '@/components/Capture/AddMultipleButton.vue';
     import ConversionButton from '@/components/Capture/ConversionButton.vue';
-    import InfoButton from '@/components/InfoButton.vue';
-    import ReloadButton from '@/components/ReloadButton.vue';
+    import InfoButton from '@/components/Common/InfoButton.vue';
+    import ReloadButton from '@/components/Capture/ReloadButton.vue';
     import ExportCaptureButton from '@/components/Capture/ExportCaptureButton.vue';
     import type { IEmitEditColumn } from '@/js/Interfaces';
 

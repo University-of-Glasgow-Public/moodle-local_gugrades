@@ -64,14 +64,14 @@
                     number="float"
                     outer-class="mb-3"
                     :disabled="(entrytype != 'percentage') || (item.band == 'H') || !caneditgrades"
-                    :validation-rules="{ validate_order }"
                     validation="between:0,100"
                     validation-visibility="blur"
                     :validation-messages="{
                         between: 'Percentage must be between 0 and 100',
                         validate_order: 'Values must be in ascending sequence',
                     }"
-                    v-model="item.boundpc"
+                    :model-value="item.boundpc?.toString() ?? ''"
+                    @input="(event) => handleInput(item, event)"
                 ></FormKit>
             </div>
             <div class="col-5">
@@ -80,14 +80,15 @@
                     number="float"
                     outer-class="mb-3"
                     :disabled="(entrytype != 'points') || (item.band == 'H') || !caneditgrades"
-                    :validation-rules="{ validate_points, validate_order }"
+                    :validation-rules="{ validate_points }"
                     validation="validate_points|validate_order"
                     validation-visibility="blur"
                     :validation-messages="{
                         validate_points: 'Number must be between 0 and ' + maxgrade,
                         validate_order: 'Values must be in ascending sequence',
                     }"
-                    v-model="item.boundpoints"
+                    :model-value="item.boundpoints?.toString() ?? ''"
+                    @input="(event) => handleInput(item, event)"
                 ></FormKit>
             </div>
         </div>
@@ -101,19 +102,32 @@
 
 </template>
 
-<script setup>
-    import {ref, inject, defineProps, defineEmits, onMounted, watch, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, onMounted, watch, computed} from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import { watchDebounced } from '@vueuse/core';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import type { IConversionMap } from '@/js/Interfaces';
+    import type { FormKitNode } from '@formkit/core';
 
-    const mstrings = inject('mstrings');
+    interface IBandItem {
+        band: string;
+        boundpc: number | null;
+        boundpoints: number | null;
+        grade: number;
+    }
+
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
     const loaded = ref(false);
     const mapname = ref('');
     const tmpmapname = ref(mapname);
     const maxgrade = ref(100);
-    const rawmap = ref([]);
-    const items = ref([]);
+    const rawmap = ref< IConversionMap[] >([]);
+    const items = ref< IBandItem[] >([]);
     const scaletype = ref('schedulea');
     const entrytype = ref('percentage');
     const scaletypeoptions = [
@@ -139,9 +153,20 @@
      * Round values to 5 decimal place
      * TODO: This might change
      */
-    function precision(num, decimals) {
-        return +(Math.round(num + "e" + decimals) + "e-" + decimals);
+    function precision(num: number, decimals: number) {
+        return parseFloat(num.toFixed(decimals));
     }
+
+    // Method to handle input changes and convert string to number
+    const handleInput = (item: IBandItem, newValue: string | number | undefined) => {
+        if (typeof newValue === 'string') {
+            item.boundpc = parseFloat(newValue) || 0; // Convert to number, default to 0 if invalid
+        } else if (typeof newValue === 'number') {
+            item.boundpc = newValue; // Use the number directly
+        } else {
+            item.boundpc = 0; // Fallback to 0 if newValue is undefined
+        }
+    };
 
     /**
      * Build items array
@@ -165,6 +190,11 @@
      * entrytypeoptions setting
      */
     function recalculate() {
+        // Don't rely on first entry existing
+        if (!items.value[0]) {
+            return
+        }
+
         // Grade H should always be zero - setting it as such here, prevents the method from messing with the on page value.
         items.value[0].boundpc = 0;
         items.value[0].boundpoints = 0;
@@ -221,7 +251,7 @@
     /**
      * Custom rule for points values
      */
-    function validate_points(node) {
+    function validate_points(node: FormKitNode) {
 
         // Careful about text fields not being treated as numbers properly.
         const points = Number(node.value);
@@ -269,32 +299,27 @@
             return;
         }
 
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
-        const map = [];
+        const map: IConversionMap[] = [];
         items.value.forEach((item) => {
             map.push({
                 band: item.band,
-                bound: precision(item.boundpc, 5),
+                bound: precision(item.boundpc ?? 0, 5),
                 grade: item.grade,
             });
         });
 
-        fetchMany([{
-            methodname: 'local_gugrades_write_conversion_map',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_write_conversion_map',
+            {
                 mapid: props.mapid,
                 name: mapname.value,
                 schedule: scaletype.value,
                 maxgrade: maxgrade.value,
                 map: map,
             }
-        }])[0]
+        )
         .then(() => {
-            toast.success(mstrings.conversionmapsaved);
+            toast.success(mstringstore.getMstring('conversionmapsaved'));
             emits('close')
         })
         .catch((error) => {
@@ -314,19 +339,15 @@
      * Update the conversion map
      */
     function update_map() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_conversion_map',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_conversion_map',
+            {
                 mapid: props.mapid,
                 schedule: scaletype.value,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             mapname.value = ((tmpmapname.value) ? tmpmapname.value : result.name);
             scaletype.value = result.schedule;
             maxgrade.value = result.maxgrade;

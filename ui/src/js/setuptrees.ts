@@ -43,7 +43,6 @@ export function usePopulateTrees() {
                 );
             });
 
-            console.log(promises);
             Promise.all(promises).then(() => {
                 activitytree.ready = true;
                 console.log('Activity trees preloaded');

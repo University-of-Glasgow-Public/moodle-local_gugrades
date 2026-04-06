@@ -11,8 +11,10 @@
     </VueModal>
 </template>
 
-<script setup>
-    import {defineProps, defineEmits, inject, toRef} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {toRef} from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const props = defineProps({
         show: Boolean,
@@ -22,5 +24,6 @@
     const showmodal = toRef(props, 'show');
 
     const emit = defineEmits(['confirm']);
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 </script>
