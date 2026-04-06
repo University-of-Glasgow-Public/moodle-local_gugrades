@@ -1,43 +1,41 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button v-if="hascapability" type="button" class="btn btn-danger  mr-1" @click="showconfirm = true">
-        {{ mstrings.resetcourse }}
-    </button>
+    <TwButton v-if="hascapability" color="error" class="tw:mr-1" @click="showconfirm = true">{{ mstrings.resetcourse }}</TwButton>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetcourseconfirm" @confirm="confirmdelete"></ConfirmModal>
 </template>
 
-<script setup>
-    import {ref, onMounted, inject} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, onMounted, inject} from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useToast } from "vue-toastification";
+    import TwButton from '../Tailwind/TwButton.vue';
 
     const hascapability = ref(false);
     const showconfirm = ref(false);
     const debug = ref({});
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
 
     /**
      * Process confirmation
      */
-    function confirmdelete(confirmyes) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
+    function confirmdelete(confirmyes: boolean) {
 
         if (confirmyes) {
-            fetchMany([{
-                methodname: 'local_gugrades_reset',
-                args: {
-                    courseid: courseid,
-                }
-            }])[0]
+            moodleFetch(
+                'local_gugrades_reset',
+                {}
+            )
             .then(() => {
-                toast.success(mstrings.resetsuccess)
+                toast.success(mstringstore.getMstring('resetsuccess'))
             })
             .catch((error) => {
                 window.console.error(error);
@@ -52,18 +50,14 @@
      * Check capability
      */
     onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_has_capability',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
                 capability: 'local/gugrades:resetcourse'
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             hascapability.value = result['hascapability'];
         })
         .catch((error) => {

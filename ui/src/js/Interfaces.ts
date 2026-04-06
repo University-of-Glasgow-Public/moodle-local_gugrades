@@ -74,7 +74,7 @@ export interface IErrorItems {
 }
 
 /**
- * Se get_all_strings
+ * See get_all_strings
  */
 export interface IMoodleString {
     tag: string;
@@ -151,6 +151,53 @@ export interface IConversionMap {
     band: string;
     bound: number;
     grade: number;
+}
+
+/**
+ * See get_settings
+ */
+export interface ISetting {
+    name: string;
+    value: string;
+}
+
+/**
+ * See get_aggregation_export_plugins
+ */
+export interface IAggregationExportPlugin {
+    name: string;
+    description: string;
+}
+
+/**
+ * See get_aggregation_export_form
+ */
+export interface IAggregationExportForm {
+    identifier: string;
+    description: string;
+    selected: boolean;
+    category: boolean;
+}
+
+/**
+ * See get_alter_weight_form
+ */
+export interface IAlterWeightItem {
+    fullname: string;
+    gradeitemid: number;
+    gradetype: string;
+    display: string;
+    originalweight: number;
+    alteredweight: number;
+    isaltered: boolean;
+}
+
+/**
+ * See save_altered_weights
+ */
+export interface ISaveAlteredWeightItem {
+    gradeitemid: number;
+    weight: number;
 }
 
 /**

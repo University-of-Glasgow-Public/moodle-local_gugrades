@@ -1,34 +1,38 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" @click="recalculate_clicked()">
-        {{ mstrings.recalculate }}
-    </button>
+    <TwButton color="primary" class="tw:mr-1" @click="recalculate_clicked()">{{ mstrings.recalculate }}</TwButton>
 
-    <VueModal v-model="showrecalculatemodal" :enableClose="false" modalClass="col-11 col-lg-6 rounded" :title="mstrings.recalculate">
+    <VueModal v-model="showrecalculatemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.recalculate">
         <div v-if="loading">
             <PleaseWait :staffuserid="props.staffuserid" progresstype="aggregate"></PleaseWait>
         </div>
 
         <div v-else>
-            <div class="alert alert-info">{{ mstrings.recalculatehelp }}</div>
+            <TwAlert class="tw:mb-5">{{ mstrings.recalculatehelp }}</TwAlert>
 
-            <button class="btn btn-primary mr-1" type="button" @click="do_recalculate()">{{  mstrings.recalculate }}</button>
-            <button class="btn btn-warning" type="button" @click="showrecalculatemodal = false">{{  mstrings.cancel }}</button>
+            <TwButton color="primary" class="tw:mr-1"  @click="do_recalculate()">{{  mstrings.recalculate }}</TwButton>
+            <TwButton color="warning" @click="showrecalculatemodal = false">{{  mstrings.cancel }}</TwButton>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, inject, defineProps, defineEmits} from '@vue/runtime-core';
+<script setup lang="ts">
+    import { ref } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
 
-    const mstrings = inject('mstrings');
     const showrecalculatemodal = ref(false);
     const loading = ref(false);
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const props = defineProps({
         categoryid: Number,
@@ -52,20 +56,16 @@
      * Perform recalculation
      */
     function do_recalculate() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         loading.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_recalculate',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_recalculate',
+            {
                 gradecategoryid: props.categoryid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then(() => {
             toast.success('Grades recalculated');
             loading.value = false;
             showrecalculatemodal.value = false;

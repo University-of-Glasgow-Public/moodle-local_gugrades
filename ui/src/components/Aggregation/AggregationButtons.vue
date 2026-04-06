@@ -1,7 +1,7 @@
 <template>
     <div class="col-12 mt-2">
         <RecalculateButton v-if="caneditgrades" :categoryid="props.categoryid" :staffuserid="props.staffuserid" @recalculated="refreshtable"></RecalculateButton>
-        <ConversionButton v-if="allowconversion && caneditgrades" :categoryid="props.categoryid" @converted="refreshtable"></ConversionButton>
+        <ConversionButton v-if="!props.toplevel && caneditgrades" :categoryid="props.categoryid" :disabled="!allowconversion" @converted="refreshtable"></ConversionButton>
         <ReleaseCategoryButton v-if="!props.toplevel && caneditgrades"
             :disabled="!props.allowrelease"
             :gradeitemid="props.gradeitemid"
@@ -13,8 +13,7 @@
     </div>
 </template>
 
-<script setup>
-    import {defineProps, defineEmits} from '@vue/runtime-core';
+<script setup lang="ts">
     import RecalculateButton from '@/components/Aggregation/RecalculateButton.vue';
     import ConversionButton from '@/components/Aggregation/ConversionButton.vue';
     import ReleaseCategoryButton from '@/components/Aggregation/ReleaseCategoryButton.vue';
@@ -23,7 +22,10 @@
     const props = defineProps({
         categoryid: Number,
         gradeitemid: Number,
-        groupid: Number,
+        groupid: {
+            type: Number,
+            required: true
+        },
         toplevel: Boolean,
         atype: String,
         allowconversion: Boolean,

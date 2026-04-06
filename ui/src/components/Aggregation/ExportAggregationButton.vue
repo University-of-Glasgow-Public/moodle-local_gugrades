@@ -1,14 +1,14 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" @click="open_modal()">{{ mstrings.exportaggregation }}</button>
+    <TwButton color="primary" class="tw:mr-1" @click="open_modal()">{{ mstrings.exportaggregation }}</TwButton>
 
-    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded scrollable-modal" :title="mstrings.exportaggregation">
+    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl tw:overflow-y-auto" :title="mstrings.exportaggregation">
 
         <PleaseWait v-if="pleasewait"></PleaseWait>
 
         <!-- step to select plugin and filename -->
-        <div v-if="step == 'selectplugin'" class="mb-5">
+        <div v-if="step == 'selectplugin'" class="tw:mb-5">
             <FormKit
                 type="form"
                 @submit="plugin_selected()"
@@ -33,18 +33,18 @@
         </div>
 
         <!-- step to select form fields-->
-        <div v-if="(step == 'selectfields') && hasform" class="mb-5 scrollable-content">
+        <div v-if="(step == 'selectfields') && hasform" class="tw:mb-5 scrollable-content">
             <FormKit
                 type="form"
                 @submit="fields_selected()"
                 :submit-label="mstrings.export"
             >
 
-                <div class="alert alert-primary">{{ mstrings.selectfields }}</div>
+                <TwAlert class="tw:mb-5">{{ mstrings.selectfields }}</TwAlert>
 
-                <div class="mb-2">
-                    <a href="#" class="btn btn-sm btn-info mr-1" @click="all_selected">{{ mstrings.checkall }}</a>
-                    <a href="#" class="btn btn-sm btn-secondary" @click="none_selected">{{ mstrings.checknone }}</a>
+                <div class="tw:mb-2">
+                    <TwButton color="info" class="tw:mr-1" @click="all_selected">{{ mstrings.checkall }}</TwButton>
+                    <TwButton color="secondary"  @click="none_selected">{{ mstrings.checknone }}</TwButton>
                 </div>
 
                 <FormKit
@@ -58,42 +58,43 @@
         </div>
 
         <!-- alternatively -->
-        <div v-if="(step == 'selectfields') && !hasform" class="mb-5 scrollable-content">
-            <div class="alert alert-primary">{{ mstrings.noselectfields }}</div>
-            <button class="btn btn-primary" type="button" @click="fields_selected()">{{  mstrings.next }}</button>
+        <div v-if="(step == 'selectfields') && !hasform" class="tw:mb-5 scrollable-content">
+            <TwAlert>{{ mstrings.noselectfields }}</TwAlert>
+            <TwButton color="primary" class="tw:mt-2" @click="fields_selected()">{{  mstrings.next }}</TwButton>"
         </div>
 
-        <div class="row scrollable-modal-footer">
-            <div class="col-sm-12">
-                <div class="float-right">
-                    <button class="btn btn-warning" type="button" @click="close_modal()">{{  mstrings.cancel }}</button>
-                </div>
-            </div>
+        <div class="tw:flex tw:justify-end">
+            <TwButton color="warning" @click="close_modal()">{{ mstrings.cancel }}</TwButton>
         </div>
-
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, inject, watch} from '@vue/runtime-core';
+<script setup lang="ts">
+    import { ref } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
+    import type { IAggregationExportPlugin, IMenuItem, IAggregationExportForm } from '@/js/Interfaces';
 
     const showexportmodal = ref(false);
     const allnone = ref(false);
     const pleasewait = ref(false);
-    const options = ref([]);
-    const plugins = ref([]);
+    const plugins = ref< IMenuItem[] >([]);
     const selectedplugin = ref('custom');
-    const mstrings = inject('mstrings');
     const debug = ref({});
     const step = ref('selectplugin');
     const hasform = ref(false);
-    const form = ref([]);
-    const selected = ref({});
+    const form = ref< IAggregationExportForm[] >([]);
+    const selected = ref<Record<string, boolean>>({});
     const filename = ref('');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
 
@@ -107,22 +108,18 @@
      * Load initial plugin options
      */
     function open_modal() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         pleasewait.value = true;
         step.value = 'selectplugin';
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_aggregation_export_plugins',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_aggregation_export_plugins',
+            {
                 gradecategoryid: props.categoryid,
             }
-        }])[0]
-        .then((result) => {
-            const options = result.plugins;
+        )
+        .then((result: any) => {
+            const options: IAggregationExportPlugin[] = result.plugins;
             plugins.value = [];
             options.forEach(option => {
                 plugins.value.push({
@@ -173,21 +170,16 @@
      * Get the settings form for selected (if there is one)
      */
     function plugin_selected() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         pleasewait.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_aggregation_export_form',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_aggregation_export_form',
+            {
                 gradecategoryid: props.categoryid,
                 plugin: selectedplugin.value,
             }
-        }])[0]
-        .then(result => {
+        )
+        .then((result:any) => {
             hasform.value = result.hasform;
             form.value = result.form;
             if (hasform.value) {
@@ -208,10 +200,6 @@
      *
      */
     function fields_selected() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
-
         pleasewait.value = true;
 
         // Munge selected array into required form.
@@ -223,17 +211,16 @@
             });
         }
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_aggregation_export_data',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_aggregation_export_data',
+            {
                 gradecategoryid: props.categoryid,
                 plugin: selectedplugin.value,
                 groupid: props.groupid,
                 form: paramform,
             }
-        }])[0]
-        .then(result => {
+        )
+        .then((result: any) => {
             const csv = result['csv'];
             const d = new Date();
             const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});

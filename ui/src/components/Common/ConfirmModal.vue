@@ -1,12 +1,12 @@
 <template>
-    <VueModal v-model="showmodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="mstrings.confirm">
-        <div class="alert alert-danger">
+    <VueModal v-model="showmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.confirm">
+        <TwAlert color="error">
             <p><strong>{{  props.message }}</strong></p>
             <p>{{ mstrings.areyousure }}</p>
-        </div>
-        <div class="mt-2 pt-2 border-top">
-            <button class="btn btn-primary mr-1" @click="emit('confirm', true)">{{ mstrings.yes }}</button>
-            <button class="btn btn-warning" @click="emit('confirm', false)">{{ mstrings.no }}</button>
+        </TwAlert>
+        <div class="tw:mt-2 tw:pt-2">
+            <TwButton color="primary" class="tw:mr-1" @click="emit('confirm', true)">{{ mstrings.yes }}</TwButton>
+            <TwButton color="warning" @click="emit('confirm', false)">{{ mstrings.no }}</TwButton>
         </div>
     </VueModal>
 </template>
@@ -15,6 +15,8 @@
     import {toRef} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
 
     const props = defineProps({
         show: Boolean,

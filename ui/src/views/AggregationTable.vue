@@ -227,7 +227,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import {ref, computed, inject, onMounted} from '@vue/runtime-core';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import NameFilter from '@/components/NameFilter.vue';

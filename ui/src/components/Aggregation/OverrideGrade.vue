@@ -27,8 +27,7 @@
     </span>
 </template>
 
-<script setup>
-    import {defineProps, defineEmits} from '@vue/runtime-core';
+<script setup lang="ts">
     import HistoryButton from '@/components/Capture/HistoryButton.vue';
     import AddGradeButton from '@/components/Capture/AddGradeButton.vue';
     import HideShowButton from '@/components/Capture/HideShowButton.vue';

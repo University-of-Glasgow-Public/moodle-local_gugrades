@@ -81,21 +81,26 @@
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, inject, computed} from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import type { IAlterWeightItem, ISaveAlteredWeightItem } from '@/js/Interfaces';
 
     const showaltermodal = ref(false);
-    const mstrings = inject('mstrings');
     const debug = ref({});
     const toast = useToast();
     const categoryname = ref('');
     const userfullname = ref('');
     const idnumber = ref('');
-    const items = ref([]);
+    const items = ref< IAlterWeightItem[] >([]);
     const reason = ref('');
     const loading = ref(true);
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const props = defineProps({
         userid: Number,
@@ -113,7 +118,7 @@
     const alteredtotal = computed(() => {
         var total = 0.0;
         items.value.forEach((item) => {
-            total = total + parseFloat(item.alteredweight);
+            total = total + item.alteredweight;
         });
 
         return total;
@@ -125,7 +130,7 @@
      const defaulttotal = computed(() => {
         var total = 0.0;
         items.value.forEach((item) => {
-            total = total + parseFloat(item.originalweight);
+            total = total + item.originalweight;
         });
 
         return total;
@@ -137,7 +142,7 @@
     const closeenough = computed(() => {
         var total = 0.0;
         items.value.forEach((item) => {
-            total = total + parseFloat(item.alteredweight);
+            total = total + item.alteredweight;
         });
         const error = Math.abs(total - 1);
 
@@ -148,23 +153,19 @@
      * Alter weights button has been clicked
      */
     function alter_weights() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         showaltermodal.value = true;
 
         reason.value = '';
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_alter_weight_form',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_alter_weight_form',
+            {
                 categoryid: props.categoryid,
                 userid: props.userid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             categoryname.value = result.categoryname;
             userfullname.value = result.userfullname;
             idnumber.value = result.idnumber;
@@ -181,11 +182,8 @@
      * Save altered weights
      */
     function save_altered_weights() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        const saveitems = [];
+        const saveitems: ISaveAlteredWeightItem[] = [];
         items.value.forEach((item) => {
             saveitems.push({
                 gradeitemid: item.gradeitemid,
@@ -193,20 +191,19 @@
             });
         });
 
-        fetchMany([{
-            methodname: 'local_gugrades_save_altered_weights',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_save_altered_weights',
+            {
                 categoryid: props.categoryid,
                 userid: props.userid,
                 revert: false,
                 reason: reason.value,
                 items: saveitems,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             emit('weightsaltered');
-            toast.success(mstrings.weightsaltered);
+            toast.success(mstringstore.getMstring('weightsaltered'));
 
             showaltermodal.value = false;
         })
@@ -220,24 +217,20 @@
      * Revert altered weights
      */
      function revert_altered_weights() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_save_altered_weights',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_save_altered_weights',
+            {
                 categoryid: props.categoryid,
                 userid: props.userid,
                 revert: true,
                 reason: '',
                 items: [],
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then(() => {
             emit('weightsaltered');
-            toast.success(mstrings.weightsreverted);
+            toast.success(mstringstore.getMstring('weightsreverted'));
 
             showaltermodal.value = false;
         })

@@ -1,83 +1,83 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary mr-1" :disabled="props.disabled" @click="showreleasemodal=true">
-        <span>
+    <TwButton color="primary" :disabled="props.disabled" @click="showreleasemodal=true">
             <span v-if="grouprelease"><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgroup }}</span>
             <span v-else><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgrade }}</span>
-        </span>
-    </button>
+    </TwButton>
 
-    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded" :title="mstrings.releaseaggregatedgrade">
+    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.releaseaggregatedgrade">
 
-        <div v-if="loading">
-            <PleaseWait></PleaseWait>
-        </div>
+        <PleaseWait v-if="loading"></PleaseWait>
 
-        <div class="p-2 border rounded">
+        <!-- Displayed if not released -->
+        <div v-if="!props.released">
             <h4>{{ mstrings.releaseaggregatedgrade }}</h4>
-            <div v-if="!props.released" class="alert alert-warning">
-                {{ mstrings.releaseaggregatedconfirm }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+            <TwAlert v-if="!props.released" color="warning" class="tw:mt-2">
+                <div>
+                    {{ mstrings.releaseaggregatedconfirm }}
+                    <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+                </div>
+            </TwAlert>
+            <TwAlert v-if="props.released" color="error" class="tw:mt-2">
+                <div>
+                    {{ mstrings.releaseaggregatedconfirmstern }}
+                    <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+                </div>
+            </TwAlert>
+            <div class="tw:mt-4">
+                <TwButton color="primary" @click="release_grades()">{{ mstrings.yesrelease }}</TwButton>
+                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
-            <div v-if="props.released" class="alert alert-danger">
-                {{ mstrings.releaseaggregatedconfirmstern }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
-            </div>
-            <button
-                class="btn btn-primary mr-1"
-                @click="release_grades()"
-                >{{ mstrings.yesrelease }}
-            </button>
-            <button
-                class="btn btn-warning"
-                @click="showreleasemodal = false"
-                >{{ mstrings.cancel }}
-            </button>
         </div>
 
         <!-- display if already released -->
-        <div v-if="props.released" class="border rounded mt-4 p-2">
+        <div v-if="props.released" class="tw:mt-4">
             <h4>Revert release of grades</h4>
-            <div class="alert alert-danger">
-                {{ mstrings.removerelease }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.removereleasegroup }}</b></p>
+            <TwAlert color="error" class="tw:mt-2">
+                <div>
+                    {{ mstrings.removerelease }}
+                    <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.removereleasegroup }}</b></p>
+                </div>
+            </TwAlert>
+            <div class="tw:mt-4">
+                <TwButton class="error" @click="revert_release()">{{ mstrings.yesunrelease }}</TwButton>
+                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
-            <button
-                class="btn btn-danger mr-1"
-                @click="revert_release()"
-                >{{ mstrings.yesunrelease }}
-            </button>
-            <button
-                class="btn btn-warning"
-                @click="showreleasemodal = false"
-                >{{ mstrings.cancel }}
-            </button>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, inject, defineProps, defineEmits, computed} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, computed } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
-    import { useLogo } from '@/js/monochromelogo.js';
+    import { useLogo } from '@/js/monochromelogo';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
 
     const showreleasemodal = ref(false);
     const loading = ref(false);
-    const mstrings = inject('mstrings');
     const debug = ref({});
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emit = defineEmits(['released']);
 
     const toast = useToast();
 
-    const {monochrome, updateLogo} = useLogo();
+    const { updateLogo } = useLogo();
 
     const props = defineProps({
         gradeitemid: Number,
-        groupid: Number,
+        groupid: {
+            type: Number,
+            required: true
+        },
         released: Boolean,
         disabled: Boolean,
     });
@@ -90,27 +90,23 @@
      * Release grades on button click
      */
     function release_grades() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         loading.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_release_grades',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_release_grades',
+            {
                 gradeitemid: props.gradeitemid,
                 groupid: props.groupid,
                 revert: false,
             }
-        }])[0]
+        )
         .then(() => {
             emit('released');
             showreleasemodal.value = false;
             updateLogo();
             loading.value = false;
-            toast.success(mstrings.gradesreleased);
+            toast.success(mstringstore.getMstring('gradesreleased'));
         })
         .catch((error) => {
             window.console.error(error);
@@ -125,27 +121,23 @@
      * Revert release grades on button click
      */
      function revert_release() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         loading.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_release_grades',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_release_grades',
+            {
                 gradeitemid: props.gradeitemid,
                 groupid: props.groupid,
                 revert: true,
             }
-        }])[0]
+        )
         .then(() => {
             emit('released');
             showreleasemodal.value = false;
             updateLogo();
             loading.value = false;
-            toast.success(mstrings.gradesunreleased);
+            toast.success(mstringstore.getMstring('gradesunreleased'));
         })
         .catch((error) => {
             showreleasemodal.value = false;

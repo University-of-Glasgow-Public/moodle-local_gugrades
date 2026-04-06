@@ -2,10 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <h1>{{ mstrings.settings }}</h1>
-
-
-        <FormKit type="form" @submit="submit_form">
+        <FormKit type="form" @submit="submit_form" class="tw:mt-8">
 
             <div v-if="!gradesreleased" class="alert alert-warning">
                 {{ mstrings.gradesnotreleased }}
@@ -27,32 +24,34 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import {ref, inject, onMounted} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
-    import ResetButton from '@/components/ResetButton.vue';
+    import ResetButton from '@/components/Settings/ResetButton.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import { useLogo } from '@/js/monochromelogo.js';
+    import { useLogo } from '@/js/monochromelogo';
+    import type { ISetting } from '@/js/Interfaces';
 
-    const mstrings = inject('mstrings');
     const disabledashboard = ref(false);
+    const debug = ref({});
     const gradesreleased = ref(true);
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const toast = useToast();
-    const {setmonochrome, updateLogo} = useLogo();
+    const { updateLogo } = useLogo();
 
     /**
      * Submit button clicked
      */
     function submit_form() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_save_settings',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_save_settings',
+            {
                 gradeitemid: 0,
                 settings: [
                     {
@@ -61,10 +60,10 @@
                     },
                 ]
             }
-        }])[0]
+        )
         .then(() => {
             updateLogo();
-            toast.success(mstrings.settingssaved);
+            toast.success(mstringstore.getMstring('settingssaved'));
         })
         .catch((error) => {
             window.console.error(error);
@@ -76,20 +75,17 @@
      * Load initial page
      */
     onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         updateLogo();
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_settings',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_settings',
+            {
                 gradeitemid: 0,
             }
-        }])[0]
-        .then((settings) => {
+        )
+        .then((result: any) => {
+            const settings: ISetting[] = result;
             settings.forEach((setting) => {
 
                 // TODO: Something a bit cleverer than this
