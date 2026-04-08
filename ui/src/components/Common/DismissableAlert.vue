@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-    import {computed, ref} from '@vue/runtime-core';
+    import {computed, ref} from 'vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import { XCircleIcon } from '@heroicons/vue/24/outline';
 

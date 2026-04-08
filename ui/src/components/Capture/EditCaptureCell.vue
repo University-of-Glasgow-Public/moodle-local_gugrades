@@ -38,11 +38,10 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted, onBeforeUnmount, inject, watch, computed} from '@vue/runtime-core';
+    import {ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import type { IMenuItem, ICaptureUser } from '@/js/Interfaces';
 

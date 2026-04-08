@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref} from '@vue/runtime-core';
+    import {ref} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';

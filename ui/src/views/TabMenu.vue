@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted, computed} from '@vue/runtime-core';
+    import {ref, onMounted, computed} from 'vue';
     import { moodleFetch } from '@/js/moodlefetch';
     import TabsNav from '@/components/TabsNav.vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';

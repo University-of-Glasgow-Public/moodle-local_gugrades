@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref } from '@vue/runtime-core';
+    import {ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";

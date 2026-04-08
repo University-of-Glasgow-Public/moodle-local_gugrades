@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted} from '@vue/runtime-core';
+    import {ref, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-    import {inject, ref} from '@vue/runtime-core';
+    import { ref } from 'vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';

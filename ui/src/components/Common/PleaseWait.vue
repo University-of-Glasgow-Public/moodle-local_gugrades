@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, inject, onMounted, onUnmounted, computed} from '@vue/runtime-core';
+    import {ref, onMounted, onUnmounted, computed} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useIntervalFn } from '@vueuse/core';
     import { useMstrings } from '@/stores/mstrings.js';

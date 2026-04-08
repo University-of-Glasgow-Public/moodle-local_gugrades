@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-    import {computed} from '@vue/runtime-core';
+    import {computed} from 'vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
     const props = defineProps({

@@ -177,9 +177,9 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, watch, onMounted} from '@vue/runtime-core';
+    import {ref, computed, watch, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
-    import NameFilter from '@/components/NameFilter.vue';
+    import NameFilter from '@/components/Common/NameFilter.vue';
     import CaptureSelect from '@/components/Capture/CaptureSelect.vue';
     import CaptureMenu from '@/components/Capture/CaptureMenu.vue';
     import { useToast } from "vue-toastification";

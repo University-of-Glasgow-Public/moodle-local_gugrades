@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed} from '@vue/runtime-core';
+    import {ref, computed} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';

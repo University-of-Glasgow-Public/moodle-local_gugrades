@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
-    import {ref} from '@vue/runtime-core';
-    import InitialBar from '@/components/InitialBar.vue';
+    import {ref} from 'vue';
+    import InitialBar from '@/components/Common/InitialBar.vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
 

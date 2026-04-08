@@ -218,12 +218,12 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, inject, onMounted} from '@vue/runtime-core';
+    import {ref, computed, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
-    import NameFilter from '@/components/NameFilter.vue';
+    import NameFilter from '@/components/Common/NameFilter.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue';
     import InfoButton from '@/components/Common/InfoButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';

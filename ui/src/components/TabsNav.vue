@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, inject, onMounted} from '@vue/runtime-core';
+    import {ref, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';

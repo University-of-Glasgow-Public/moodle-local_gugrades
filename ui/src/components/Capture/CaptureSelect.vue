@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref } from '@vue/runtime-core';
+    import {ref } from 'vue';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import ActivitySelect from '@/components/Capture/ActivitySelect.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue'

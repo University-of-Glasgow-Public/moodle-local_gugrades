@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted, computed} from '@vue/runtime-core';
+    import {ref, onMounted, computed} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';

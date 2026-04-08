@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed} from '@vue/runtime-core';
+    import {ref, computed} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
