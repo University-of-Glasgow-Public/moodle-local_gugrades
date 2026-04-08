@@ -97,12 +97,11 @@
             </FormKit>
 
             <div v-if="overridden" class="border rounded mt-3 p-4">
-
                 <TwAlert>{{ mstrings.categoryremoveoverride }}</TwAlert>
                 <TwButton color="primary" @click="removeoverride">{{ mstrings.remove }}</TwButton>
             </div>
 
-            <div class="tw:flex tw:justify-end">
+            <div class="tw:flex tw:justify-end tw:mt-8">
                 <TwButton color="warning" @click="showaddgrademodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>

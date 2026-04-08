@@ -6,24 +6,28 @@
         </button>
 
         <div role="tablist" class="tw:tabs tw:tabs-box tw:text-black">
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'configure'}" @click="clickTab('configure')">{{ mstrings.configure }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'capture'}" @click="clickTab('capture')">{{ mstrings.assessmentgradecapture }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'conversion'}" @click="clickTab('conversion')">{{ mstrings.manageconversion }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'aggregation'}" @click="clickTab('aggregation')">{{ mstrings.coursegradeaggregation }}</a>
-            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'audit'}" @click="clickTab('audit')">{{ mstrings.auditlog }}</a>
-            <a v-if="settingscapability" role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'settings'}" @click="clickTab('settings')">{{ mstrings.settings }}</a>
+            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'configure'}" @click="clickTab('configure')" @keydown.enter="clickTab('configure')" tabindex="0">{{ mstrings.configure }}</a>
+            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'capture'}" @click="clickTab('capture')" @keydown.enter="clickTab('capture')" tabindex="0">{{ mstrings.assessmentgradecapture }}</a>
+            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'conversion'}" @click="clickTab('conversion')" @keydown.enter="clickTab('conversion')" tabindex="0">{{ mstrings.manageconversion }}</a>
+            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'aggregation'}" @click="clickTab('aggregation')" @keydown.enter="clickTab('aggregation')" tabindex="0">{{ mstrings.coursegradeaggregation }}</a>
+            <a role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'audit'}" @click="clickTab('audit')"  @keydown.enter="clickTab('audit')" tabindex="0">{{ mstrings.auditlog }}</a>
+            <a v-if="settingscapability" role="tab" class="tw:tab" :class="{'tw:tab-active': activetab == 'settings'}" @click="clickTab('settings')"  @keydown.enter="clickTab('settings')" tabindex="0">{{ mstrings.settings }}</a>
         </div>
 </template>
 
-<script setup>
-    import {ref, defineEmits, defineProps, inject, onMounted} from '@vue/runtime-core';
+<script setup lang="ts">
+    import {ref, inject, onMounted} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
 
     const activetab = ref('capture');
     const settingscapability = ref(false);
     const debug = ref({});
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
     let whichtableft = '';
     let whichtabright = '';
 
@@ -39,90 +43,23 @@
      * Detect change of tab and emit result to parent
      * @param {} item
      */
-    function clickTab(item) {
+    function clickTab(item: string) {
         activetab.value = item;
         emit('tabchange', item);
-    }
-
-    /**
-     * Give focus to the element to the left of the current one.
-     * Unless of course the user doesn't have permission to do so.
-     *
-     * @param elemname
-     */
-    function moveLeft(elemname) {
-        let el = '';
-        switch (elemname) {
-            case 'settings':
-                el = whichtableft;
-            break;
-            case 'aggregation':
-                el =  ((props.viewaggregation) ? 'aggregation' : 'conversion');
-            break;
-            default:
-                el = elemname;
-            break;
-        }
-        let tmp = document.getElementsByName(el);
-        tmp[0].focus({ focusVisible:true });
-    }
-
-    /**
-     * Give focus to the element to the right of the current one.
-     * Unless of course the user doesn't have permission to do so.
-     *
-     * @param elemname
-     */
-    function moveRight(elemname) {
-        let el = '';
-        switch (elemname) {
-            case 'settings':
-                el = whichtabright;
-            break;
-            case 'aggregation':
-                el =  ((props.viewaggregation) ? 'aggregation' : 'audit');
-            break;
-            default:
-                el = elemname;
-            break;
-        }
-        let tmp = document.getElementsByName(el);
-        tmp[0].focus({ focusVisible:true });
-    }
-
-    /**
-     * Listen for left/right arrow key events.
-     *
-     * @param elemname
-     * @param e
-     */
-    function handleKeyNavigation (elemname, e) {
-        switch (e.keyCode) {
-            case 37:
-                moveLeft(elemname);
-            break;
-            case 39:
-                moveRight(elemname);
-            break;
-      }
     }
 
     /**
      * Check capability
      */
      onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_has_capability',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
                 capability: 'local/gugrades:changesettings'
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             settingscapability.value = result['hascapability'];
             whichtableft = ((settingscapability.value) ? 'settings' : 'audit');
             whichtabright = ((settingscapability.value) ? 'settings' : 'capture');

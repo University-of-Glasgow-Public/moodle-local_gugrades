@@ -49,8 +49,8 @@
 <script setup lang="ts">
     import {ref, inject, computed, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
-    import ConfigTreeIcon from './ConfigTreeIcon.vue';
-    import ResitCheckbox from './ResitCheckbox.vue';
+    import ConfigTreeIcon from '@/components/Configure/ConfigTreeIcon.vue';
+    import ResitCheckbox from '@/components/Configure/ResitCheckbox.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
 
@@ -59,8 +59,14 @@
      * resitfade = if above is true then non-resit categories are faded out.
      */
     const props = defineProps({
-        nodes: Object,
-        depth: Number,
+        nodes: {
+            type: Object,
+            required: true
+        },
+        depth: {
+            type: Number,
+            required: true
+        },
         resitconfig: Boolean,
         resitfade: Boolean,
     });
@@ -80,7 +86,7 @@
     /**
      * Pass up save error
      */
-    function handle_saveerror(error) {
+    function handle_saveerror(error: object) {
         emit('saverror', error);
     }
 
@@ -119,7 +125,7 @@
     /**
      * Save selected/deselected resit item
      */
-    function save_resit_item(itemid, set) {
+    function save_resit_item(itemid: number, set: boolean) {
         moodleFetch(
             'local_gugrades_save_resit_item',
             {
@@ -136,7 +142,7 @@
     /**
      * A resit box was clicked.
      */
-    function resit_clicked(itemid) {
+    function resit_clicked(itemid: number) {
         if (resititemid.value == itemid) {
             resititemid.value = null;
             save_resit_item(itemid, false);
@@ -146,16 +152,9 @@
         }
     }
 
-
-    // Emit activity id when activity selected
-    function activity_click(itemid, event) {
-        event.preventDefault();
-        emit('activityselected', itemid);
-    }
-
     // As emit only works for one level, this re-emits events
     // from lower levels.
-    function sub_activity_click(activityid) {
+    function sub_activity_click(activityid: number) {
         emit('activityselected', activityid);
     }
 </script>

@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-    import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline'
+    import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
     import HistoryButton from '@/components/Capture/HistoryButton.vue';
     import ImportUserGradeButton from '@/components/Capture/ImportUserGradeButton.vue';
     import AddGradeButton from '@/components/Capture/AddGradeButton.vue';

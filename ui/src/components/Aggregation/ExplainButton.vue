@@ -5,69 +5,76 @@
         {{ mstrings.explain }}
     </a>
 
-    <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded scrollable-modal" :title="mstrings.explain">
+    <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.explain">
 
-        <div v-if="loading" class="alert alert-info">
-            {{ mstrings.pleasewait }}
-        </div>
+        <TwAlert v-if="loading">{{ mstrings.pleasewait }}</TwAlert>
 
         <div v-if="!loading" class="scrollable-content">
 
             <!-- user stuffs -->
-            <div class="border rounded my-2 p-2 text-center">
-                <img :src="user.pictureurl" :alt="displayname" class="userpicture defaultuserpic" width="35" height="35"/> <b>{{ user.displayname }}</b>
+            <div class="tw:flex tw:justify-center tw:items-center tw:mb-8">
+                <div class="tw:flex tw:items-center tw:space-x-2">
+                    <div class="tw:avatar">
+                        <div class="tw:w-12 tw:rounded-full">
+                            <a :href="user!.profileurl" target="_profile">
+                                <img :src="user!.pictureurl" :alt="user!.displayname" class="userpicture defaultuserpic" width="35" height="35"/>
+                            </a>
+                        </div>
+                    </div>
+                    <h1 class="tw:text-lg tw:font-bold">{{ user!.displayname }}</h1>
+                </div>
             </div>
 
             <!-- details -->
-            <div class="border rounded my-2 p-2">
-                <table class="table table-striped">
+            <div class="tw:overflow-x-auto">
+                <table class="tw:table">
                     <tbody>
                         <tr>
                             <th>{{ mstrings.idnumber }}</th>
-                            <td>{{ user.idnumber }}</td>
+                            <td>{{ user!.idnumber }}</td>
                         </tr>
                         <tr>
                             <th>{{ mstrings.completed }}</th>
-                            <td>{{ user.completed }}&percnt;</td>
+                            <td>{{ user!.completed }}&percnt;</td>
                         </tr>
                         <tr>
                             <th>{{ mstrings.gradecategory }}</th>
-                            <td>{{ user.itemname }}</td>
+                            <td>{{ user!.itemname }}</td>
                         </tr>
                         <tr>
                             <th>{{ mstrings.aggregatedgrade }}</th>
-                            <td>{{ user.displaygrade }}</td>
+                            <td>{{ user!.displaygrade }}</td>
                         </tr>
-                        <tr v-if="user.rawgrade">
+                        <tr v-if="user!.rawgrade">
                             <th>{{ mstrings.rawgrade }}</th>
-                            <td>{{ user.rawgrade }}</td>
+                            <td>{{ user!.rawgrade }}</td>
                         </tr>
                         <tr>
                             <th>{{ mstrings.overridden }}</th>
-                            <td><YesNo :yes="user.overridden"></YesNo></td>
+                            <td><YesNo :yes="user!.overridden"></YesNo></td>
                         </tr>
-                        <tr v-if="user.showweights">
+                        <tr v-if="user!.showweights">
                             <th>{{ mstrings.alteredweights }}</th>
-                            <td><YesNo :yes="user.alteredweight"></YesNo></td>
+                            <td><YesNo :yes="user!.alteredweight"></YesNo></td>
                         </tr>
                         <tr>
                             <th>{{ mstrings.strategy }}</th>
-                            <td>{{ user.strategy }}</td>
+                            <td>{{ user!.strategy }}</td>
                         </tr>
                         <tr>
                             <th>{{ mstrings.gradetype }}</th>
-                            <td>{{ user.formattedatype }}</td>
+                            <td>{{ user!.formattedatype }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- component grades -->
-            <div class="border rounded my-2 p-2">
-                <h5>{{ mstrings.grades }}</h5>
-                <table class="table table-striped">
+            <div>
+                <h5 class="tw:mt-8">{{ mstrings.grades }}</h5>
+                <table class="tw:table">
                     <tbody>
-                        <tr v-for="field in user.fields">
+                        <tr v-for="field in user!.fields">
                             <th>{{ field.fullname }}</th>
                             <td>
                                 <ul class="list-unstyled">
@@ -76,9 +83,9 @@
                                     <li v-if="field.dropped">{{ mstrings.dropped }}</li>
                                     <li v-if="field.hidden">{{ mstrings.hidden }}</li>
                                     <li v-if="field.overridden">{{ mstrings.overridden }}</li>
-                                    <li v-if="user.showweights">{{ mstrings.weight }}: {{ field.weight }}%</li>
-                                    <li v-if="user.showweights && field.normalisedweight">{{ mstrings.normalisedweight }}: {{ field.normalisedweight }}&percnt;</li>
-                                    <li v-if="user.showweights && user.alteredweight">{{ mstrings.alteredweight }}: {{ field.alteredweight }}&percnt;</li>
+                                    <li v-if="user!.showweights">{{ mstrings.weight }}: {{ field.weight }}%</li>
+                                    <li v-if="user!.showweights && field.normalisedweight">{{ mstrings.normalisedweight }}: {{ field.normalisedweight }}&percnt;</li>
+                                    <li v-if="user!.showweights && user!.alteredweight">{{ mstrings.alteredweight }}: {{ field.alteredweight }}&percnt;</li>
                                 </ul>
                             </td>
                         </tr>
@@ -87,29 +94,33 @@
             </div>
 
             <!-- explanation -->
-            <div class="border rounded my-2 p-2">
-                <h5>{{ mstrings.explanation }}</h5>
-                <div class="alert alert-info">{{ user.explain }}</div>
+            <div>
+                <h5 class="tw:mt-8">{{ mstrings.explanation }}</h5>
+                <div class="tw:flex tw:justify-center tw:font-bold tw:text-lg">{{ user!.explain }}</div>
             </div>
 
-            <div class="mt-2">
-                <button class="btn btn-warning" type="button" @click="showexplainmodal = false">{{  mstrings.close }}</button>
-            </div>
-
+            <TwButton color="warning" @click="showexplainmodal = false" class="tw:mt-8">{{ mstrings.close }}</TwButton>
         </div>
     </VueModal>
 </template>
 
-<script setup>
-    import {ref, defineProps, inject} from '@vue/runtime-core';
+<script setup lang="ts">
+    import { ref } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import YesNo from '@/components/YesNo.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
+    import type { IUser } from '@/js/Interfaces';
 
     const showexplainmodal = ref(false);
-    const mstrings = inject('mstrings');
     const debug = ref({});
     const loading = ref(true);
-    const user = ref([]);
+    const user = ref< IUser >();
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const props = defineProps({
         userid: Number,
@@ -117,26 +128,21 @@
         categoryid: Number,
     });
 
-
     /**
      * Alter weights button has been clicked
      */
     function explain() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         showexplainmodal.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_explain_aggregation',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_explain_aggregation',
+            {
                 gradecategoryid: props.categoryid,
                 userid: props.userid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             user.value = result;
 
             loading.value = false;

@@ -72,7 +72,6 @@
             :headers="headers"
             :filter-options="table_filter"
             :rows-items="[25,50,100,250]"
-            ref="dataTable"
         >
 
             <!-- additional information in header cells -->
@@ -215,33 +214,49 @@
                 </div>
             </template>
         </EasyDataTable>
-
-        <!-- display debugging/timing information -->
-        <div v-if="debug.length > 0" class="my-3 pt-2 rounded border text-monospace bg-secondary text-dark">
-            <ul>
-                <li v-for="line in debug">
-                    {{ line.line }}
-                </li>
-            </ul>
-        </div>
     </div>
 </template>
 
 <script setup lang="ts">
     import {ref, computed, inject, onMounted} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import NameFilter from '@/components/NameFilter.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue';
-    import { useToast } from "vue-toastification";
     import InfoButton from '@/components/Common/InfoButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import AggregationButtons from '@/components/Aggregation/AggregationButtons.vue';
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DismissableAlert from '@/components/Common/DismissableAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning } from '@/js/Interfaces';
+    import type { Header, Item } from "vue3-easy-data-table";
 
-    const toast = useToast();
-    const mstrings = inject('mstrings');
+    interface IAggregationHeader {
+        infocol?: boolean;
+        text: string;
+        value: string;
+        sortType?: string;
+        sortable?: boolean;
+        excludeempty?: boolean;
+        strategy?: string;
+        categoryid?: number;
+        fullname?: string;
+        gradeitemid?: number;
+        grademax?: number;
+        gradetype?: string;
+        isscale?: boolean;
+        released?: boolean;
+        resititem?: boolean;
+        showweights?: boolean;
+        slot?: string;
+        weight?: number;
+    }
+
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
     const level1category = ref(0);
     const loading = ref(true);
     const aggregationsupported = ref(true);
@@ -249,16 +264,16 @@
     const gradeitemid = ref(0);
     const groupid = ref(0);
     const items = ref([]);
-    const users = ref([]);
-    const columns = ref([]);
+    const users = ref< IUser[] >([]);
+    const columns = ref< IColumn[] >([]);
     const categories = ref([]);
-    const breadcrumb = ref([]);
+    const breadcrumb = ref< IBreadcrumb[] >([]);
     const backid = ref(0);
     const toplevel = ref(false);
     const completed = ref(0);
     const atype = ref('');
     const formattedatype = ref('');
-    const warnings = ref([]);
+    const warnings = ref< IWarning[] >([]);
     const strategy = ref('');
     const debug = ref([]);
     const conversion = ref('');
@@ -272,29 +287,19 @@
     const lastname = ref('');
     const staffuserid = ref(0);
     const caneditgrades = ref(false);
-    // pagination related.
-    const dataTable = ref();
-    const props = {
-        dataTable: dataTable,
-        loading: loading
-    }
 
     /**
      * onMounted, get write grades capability
      */
     onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_has_capability',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
                 capability: 'local/gugrades:editgrades'
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             caneditgrades.value = result.hascapability;
         })
         .catch((error) => {
@@ -331,7 +336,7 @@
     /**
      * Work out border classes for item
      */
-    function itemclasses(item) {
+    function itemclasses(item: IUserField) {
         if (item.overridden) {
             return ['border', 'border-danger', 'rounded', 'p-1']
         }
@@ -345,8 +350,8 @@
      * Capture change to top level category dropdown
      * @param {*} level
      */
-    function levelOneChange(level) {
-        level1category.value = parseInt(level);
+    function levelOneChange(level: number) {
+        level1category.value = level;
         categoryid.value = level1category.value;
         if (categoryid.value) {
             table_update();
@@ -356,7 +361,7 @@
     /**
      * Capture change to group
      */
-     function groupselected(gid) {
+     function groupselected(gid: number) {
         groupid.value = Number(gid);
         table_update();
     }
@@ -364,7 +369,7 @@
     /**
      * Get class name for table items
      */
-     function table_item_class(column) {
+     function table_item_class(column: string) {
 
         // Hide name initial columns
         if ((column == 'firstinitial') || (column == 'lastinitial')) {
@@ -378,7 +383,7 @@
     /**
      * Get class name for header items
      */
-     function header_item_class(header) {
+     function header_item_class(header: IAggregationHeader) {
         if ((header.value == 'firstinitial') || (header.value == 'lastinitial')) {
             return 'd-none';
         }
@@ -387,19 +392,15 @@
     /**
      * Resit required 'pill' clicked
      */
-    function resit_clicked(userid, required) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
+    function resit_clicked(userid: number, required: boolean) {
 
-        fetchMany([{
-            methodname: 'local_gugrades_resit_required',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_resit_required',
+            {
                 userid: userid,
                 required: required,
             }
-        }])[0]
+        )
         .then(() => {
             user_update(userid);
 
@@ -413,14 +414,14 @@
     /**
      * Grade has been modified for user
      */
-    function grade_changed(userid) {
+    function grade_changed(userid: number) {
         user_update(userid);
     }
 
     /**
      * Add columns to user array
      */
-    function process_users(users) {
+    function process_users(users: IUser[]) {
         users.forEach(user => {
             user.fields.forEach(field => {
                 user[field.fieldname] = {
@@ -441,7 +442,7 @@
     /**
      * Process columns for single user
      */
-    function process_user(user) {
+    function process_user(user: IUser) {
         user.fields.forEach(field => {
                 user[field.fieldname] = {
                     userid: user.id,
@@ -466,9 +467,9 @@
         } else if (atype.value == 'B') {
             return 'Schedule B';
         } else if (atype.value == 'P') {
-            return mstrings.points + ' 100';
+            return mstringstore.getMstring('points') + ' 100';
         } else if (atype.value == 'C') {
-            return mstrings.converted;
+            return mstringstore.getMstring('converted');
         } else if (atype.value == 'E') {
             return 'Error';
         } else {
@@ -480,15 +481,15 @@
      * Create list of headers for EasyDataTable
      * (infocol = true, means that the column has no grade data)
      */
-    const headers = computed(() => {
+    const headers = computed< IAggregationHeader[] >(() => {
         let heads = [];
 
         // User identification.
         heads.push({text: 'firstinitial', value: 'firstinitial'});
         heads.push({text: 'lastinitial', value: 'firstinitial'});
-        heads.push({text: mstrings.userpicture, value: "slotuserpicture", infocol: true});
-        heads.push({text: mstrings.firstnamelastname, value: "displayname", sortable: true, infocol: true})
-        heads.push({text: mstrings.idnumber, value: "idnumber", sortable: true, infocol: true});
+        heads.push({text: mstringstore.getMstring('userpicture'), value: "slotuserpicture", infocol: true});
+        heads.push({text: mstringstore.getMstring('firstnamelastname'), value: "displayname", sortable: true, infocol: true})
+        heads.push({text: mstringstore.getMstring('idnumber'), value: "idnumber", sortable: true, infocol: true});
 
         // 'Back' button column on everything but "top level"
         if (!toplevel.value) {
@@ -523,21 +524,21 @@
 
             // Resit required?
             heads.push({
-                text: mstrings.resitrequired,
+                text: mstringstore.getMstring('resitrequired'),
                 value: "resitrequired",
                 infocol: true,
             });
 
             // Completion %age
             heads.push({
-                text: mstrings.completed,
+                text: mstringstore.getMstring('completed'),
                 value: "completed",
                 infocol: true,
             });
 
             // Total.
             heads.push({
-                text: mstrings.coursetotal,
+                text: mstringstore.getMstring('coursetotal'),
                 value: "total",
                 infocol: true,
                 strategy: strategy.value,
@@ -553,7 +554,7 @@
 
             // Sub-category total
             heads.push({
-                text: mstrings.subcattotal,
+                text: mstringstore.getMstring('subcattotal'),
                 atype: atype.value,
                 grademax: 100,
                 value: "total",
@@ -565,12 +566,13 @@
         // Released grade (not shown for grand total)
         if (released.value && !toplevel.value) {
             heads.push({
-                text: mstrings.released,
+                text: mstringstore.getMstring('released'),
                 value: 'releasegrade',
                 infocol: true,
             });
         }
 
+        console.log(heads);
         return heads;
     });
 
@@ -579,7 +581,7 @@
      * @param {*} first
      * @param {*} last
      */
-     function filter_selected(first, last) {
+     function filter_selected(first: string, last: string) {
         if (first == 'all') {
             first = '';
         }
@@ -597,20 +599,16 @@
     /**
      * Update single user (when something changes)
      */
-    function user_update(userid) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
+    function user_update(userid: number) {
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_aggregation_user',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_aggregation_user',
+            {
                 gradecategoryid: categoryid.value,
                 userid: userid,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             const found = users.value.findIndex((user) => {
                 return user.id == userid;
             });
@@ -628,9 +626,6 @@
      * Update table (when something changes)
      */
     function table_update() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         // If we happen to end up here with no categoryid then just bail out.
         if (!Number.isInteger(categoryid.value)) {
@@ -639,20 +634,17 @@
 
         loading.value = true;
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_aggregation_page',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_aggregation_page',
+            {
                 gradecategoryid: categoryid.value,
                 firstname: '',
                 lastname: '',
                 groupid: groupid.value,
                 aggregate: false,
             }
-        }])[0]
-        .then((result) => {
-            //items.value = result.items;
-            //categories.value = result.categories;
+        )
+        .then((result: any) => {
             aggregationsupported.value = result.aggregationsupported;
             users.value = result.users;
             warnings.value = result.warnings;
@@ -674,7 +666,12 @@
             if (aggregationsupported.value) {
 
                 // Get id of one back from breadcrumb
-                backid.value = breadcrumb.value.slice(-2)[0].id;
+                if (breadcrumb.value.length >= 2) {
+                    const crumb = breadcrumb.value.slice(-2);
+                    if (crumb.length > 0) {
+                        backid.value = crumb[0]!.id;
+                    }
+                }
 
                 users.value = process_users(users.value);
                 formattedatype.value = get_formattedatype();
@@ -691,7 +688,7 @@
     /**
      * Expand button was clicked in header
      */
-    function expand_clicked(id) {
+    function expand_clicked(id: number) {
         categoryid.value = id;
         table_update();
     }

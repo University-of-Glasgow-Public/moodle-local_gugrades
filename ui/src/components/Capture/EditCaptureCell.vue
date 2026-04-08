@@ -39,37 +39,41 @@
 
 <script setup lang="ts">
     import {ref, onMounted, onBeforeUnmount, inject, watch, computed} from '@vue/runtime-core';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import type { IMenuItem, ICaptureUser } from '@/js/Interfaces';
 
     // (item.id is current userid)
     // (item.reason is the reason/gradetype)
     // (item.other is the other text)
     // (item.gradeitemid)
-    const props = defineProps({
-        item: Object,
-        gradeitemid: Number,
-        categoryid: Number,
-        column: String,
-        columnid: Number,
-        other: String,
-        notes: String,
-        gradetype: String,
-        usescale: Boolean,
-        scalemenu: Array,
-        adminmenu: Array,
-        grademax: Number,
-        cancelled: Boolean,
-    });
+    interface ICaptureCellProps {
+        item: ICaptureUser;
+        gradeitemid: number;
+        categoryid: number;
+        column: string;
+        columnid: number;
+        other: string;
+        notes: string;
+        gradetype: string;
+        usescale: boolean;
+        scalemenu: IMenuItem[];
+        adminmenu: IMenuItem[];
+        grademax: number;
+        cancelled: boolean;
+    }
+
+    const props = defineProps< ICaptureCellProps >();
 
     const grade = ref('');
-    let   originalgrade = '';
-    let   originaladmingrade = '';
-    //const scale = ref(0);
+    const debug = ref({});
     const admingrade = ref('GRADE');
     const edited = ref(false);
-    const toast = useToast();
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     const emits = defineEmits(['gradewritten', 'gradecancel']);
 
@@ -80,6 +84,9 @@
             ['between', 0, props.grademax],
         ];
     })
+
+    let   originalgrade = '';
+    let   originaladmingrade = '';
 
     /**
      * Watch out for cancel being clicked.
@@ -141,19 +148,15 @@
      * Request recalculate single user.
      * Note: no need to wait for response
      */
-    function recalculate_user(userid) {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
+    function recalculate_user(userid: number) {
 
-        fetchMany([{
-            methodname: 'local_gugrades_recalculate',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_recalculate',
+            {
                 gradecategoryid: props.categoryid,
                 userid: userid,
             }
-        }])[0]
+        )
         .catch(error => {
             console.log(error);
         });
@@ -174,18 +177,14 @@
         const other = props.other;
         const gradeitemid = props.gradeitemid;
         const saveadmingrade = admingrade.value == 'GRADE' ? '' : admingrade.value;
-        const savescale = (admingrade.value == 'GRADE') && props.usescale ? grade.value : 0;
-        const savegrade = (admingrade.value == 'GRADE') && !props.usescale ? grade.value : 0;
+        const savescale = (admingrade.value == 'GRADE') && props.usescale ? grade.value : '0';
+        const savegrade = (admingrade.value == 'GRADE') && !props.usescale ? grade.value : '0';
         const notes = props.notes;
 
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
-        fetchMany([{
-            methodname: 'local_gugrades_write_additional_grade',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_write_additional_grade',
+            {
                 gradeitemid: gradeitemid,
                 userid: userid,
                 admingrade: saveadmingrade,
@@ -195,7 +194,7 @@
                 grade: parseFloat(savegrade),
                 notes: notes,
             }
-        }])[0]
+        )
         .then(() => {
             recalculate_user(userid);
         })

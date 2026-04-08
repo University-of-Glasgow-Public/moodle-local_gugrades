@@ -6,13 +6,18 @@
     <span class="badge badge-pill ml-2"  :class="badgeclass">{{ mstrings.reassessment }}?</span>
 </template>
 
-<script setup>
-    import {ref, defineProps, defineEmits, inject, computed} from 'vue';
+<script setup lang="ts">
+    import { computed } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const props = defineProps({
         itemid: Number,
         checkeditemid: Number,
-        depth: Number,
+        depth: {
+            type: Number,
+            required: true
+        }
     });
 
     const bscolors = [
@@ -23,7 +28,8 @@
         'warning',
         'success'
     ];
-    const mstrings = inject('mstrings');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
 
     /**
      * Is the box checked?
@@ -49,7 +55,7 @@
             'padding-left': padding + 'px',
         }
     });
-    
+
 </script>
 
 <style>

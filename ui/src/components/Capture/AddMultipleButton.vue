@@ -37,7 +37,7 @@
             />
         </FormKit>
 
-        <div class="tw:flex tw:justify-end">
+        <div class="tw:flex tw:justify-end tw:mt-8">
             <TwButton color="warning" @click="showaddmultiplemodal = false">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>

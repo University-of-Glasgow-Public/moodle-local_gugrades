@@ -39,8 +39,9 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import {ref, onMounted, computed} from '@vue/runtime-core';
+    import { moodleFetch } from '@/js/moodlefetch';
     import TabsNav from '@/components/TabsNav.vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import ConfigPage from '@/views/ConfigPage.vue';
@@ -70,7 +71,7 @@
      * Capture change to capture/aggregate tab
      * @param {*} tab
      */
-    function tabChange(tab) {
+    function tabChange(tab: string) {
         currenttab.value = tab;
         level1category.value = 0;
         showactivityselect.value = false;
@@ -90,18 +91,13 @@
      * Check for aggregation tab permission
      */
      onMounted(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         // Check that MyGrades is available for this course at all.
-        fetchMany([{
-            methodname: 'local_gugrades_is_mygrades_available',
-            args: {
-                courseid: courseid,
-            }
-        }])[0]
-        .then((result) => {
+        moodleFetch(
+            'local_gugrades_is_mygrades_available',
+            {}
+        )
+        .then((result: any) => {
             available.value = result.available;
         })
         .catch((error) => {
@@ -110,14 +106,13 @@
         });
 
         // Check capability to use the aggregation tab.
-        fetchMany([{
-            methodname: 'local_gugrades_has_capability',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
                 capability: 'local/gugrades:viewaggregation'
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             viewaggregation.value = result.hascapability;
         })
         .catch((error) => {

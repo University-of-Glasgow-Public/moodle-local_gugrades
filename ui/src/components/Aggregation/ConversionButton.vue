@@ -1,9 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button type="button" class="btn btn-outline-primary  mr-1" @click="conversion_clicked()">
-        {{ mstrings.convertgrades }}
-    </button>
+    <TwButton color="primary" class="tw:mr-1" @click="conversion_clicked()">{{ mstrings.convertgrades }}</TwButton>
 
     <VueModal v-model="showselectmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.conversionselect">
 

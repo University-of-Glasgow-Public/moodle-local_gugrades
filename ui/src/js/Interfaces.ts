@@ -133,6 +133,7 @@ export interface ICaptureUser {
     reason?: string;
     other?: string;
     gradeitemid?: number;
+    [key: string]: any;
 }
 
 /**
@@ -198,6 +199,79 @@ export interface IAlterWeightItem {
 export interface ISaveAlteredWeightItem {
     gradeitemid: number;
     weight: number;
+}
+
+/**
+ * See get_explain_aggregation
+ * See get_aggregation_page
+ */
+export interface IUserField {
+    fieldname: string;
+    itemname: string;
+    fullname: string;
+    display: string;
+    dropped: boolean;
+    isadmin: boolean;
+    hidden: boolean;
+    overridden: boolean;
+    available: boolean;
+    weight: number;
+    normalisedweight: number;
+    alteredweight: number;
+}
+
+export interface IUser {
+    id: number;
+    displayname: string;
+    firstinitial: string;
+    lastinitial: string;
+    itemname: string;
+    pictureurl: string;
+    profileurl: string;
+    idnumber: string;
+    resitrequired: boolean;
+    completed: number;
+    displaygrade: string;
+    releasedgrade: string;
+    mismatch: boolean;
+    rawgrade: number;
+    total: number;
+    overridden: boolean;
+    alteredweight: boolean;
+    showweights: boolean;
+    strategy: string;
+    atype: string;
+    formattedatype: string;
+    error: string;
+    explain: string;
+    fields: IUserField[];
+    [key: string]: any;
+}
+
+export interface IWarning {
+    message: string;
+}
+
+export interface IBreadcrumb {
+    id: number;
+    shortname: string;
+}
+
+export interface IColumn {
+    fieldname: string;
+    gradeitemid: number;
+    categoryid: number;
+    shortname: string;
+    fullname: string;
+    weight: number;
+    gradetype: string;
+    grademax: number;
+    isscale: boolean;
+    schedule: string;
+    strategy: string;
+    showweights: boolean;
+    released: boolean;
+    isresitgradeitem: boolean;
 }
 
 /**

@@ -30,7 +30,7 @@
     import { storeToRefs } from 'pinia';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
-    import ConfigTree from '@/components/ConfigTree.vue';
+    import ConfigTree from '@/components/Configure/ConfigTree.vue';
     import ConfigError from '@/components/ConfigError.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
@@ -73,7 +73,7 @@
     /**
      * Deal with save error down in tree structure
      */
-    function handle_saveerror(error) {
+    function handle_saveerror(error: object) {
         debug.value = error;
     }
 
@@ -81,8 +81,8 @@
      * Capture change to top level category dropdown
      * @param {*} level
      */
-    function levelOneChange(level) {
-        categoryid.value = parseInt(level);
+    function levelOneChange(level: number) {
+        categoryid.value = level;
         if (categoryid.value) {
             getActivities(categoryid.value);
         }
@@ -120,16 +120,20 @@
     /**
      * Get tree structure of activities and grade categories
      */
-    function getActivities(catid) {
+    function getActivities(catid: number) {
         const treestore = useActivityTreeStore();
-        const tree = JSON.parse(treestore.trees[catid]);
-        treeerror.value = treestore.errors[catid];
-
-        if (!treeerror.value) {
-            activitytree.value = tree;
-            categoryname.value = tree.category.fullname;
+            if (treestore.errors[catid]) {
+            treeerror.value = treestore.errors[catid];
         }
-        showresitoption.value = tree.anyresitcandidates;
+        if (treestore.trees[catid]) {
+            const tree = JSON.parse(treestore.trees[catid]);
+            if (!treeerror.value) {
+                activitytree.value = tree;
+                categoryname.value = tree.category.fullname;
+            }
+            showresitoption.value = tree.anyresitcandidates;
+        }
+
         loaded.value = true;
     }
 </script>

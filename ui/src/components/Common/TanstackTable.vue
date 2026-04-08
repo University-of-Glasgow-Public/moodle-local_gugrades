@@ -11,7 +11,7 @@
             class="tw-p-2 tw-text-left tw-border tw-cursor-pointer"
           >
             {{ header.column.columnDef.header }}
-            {{ { asc: ' 🔼', desc: ' 🔽' }[header.column.getIsSorted()] }}
+            {{ getSortIcon(header.column.getIsSorted()) }}
           </th>
         </tr>
       </thead>
@@ -79,6 +79,8 @@ const columns = [
   },
 ];
 
+const sortIcons = { asc: '🔼', desc: '🔽' };
+
 const table = useVueTable({
   data,
   columns,
@@ -86,4 +88,9 @@ const table = useVueTable({
   getSortedRowModel: getSortedRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
 });
+
+function getSortIcon(sortStatus: false | 'asc' | 'desc') {
+  if (sortStatus === false) return ''; // or null, or a default icon
+  return sortIcons[sortStatus];
+}
 </script>

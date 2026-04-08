@@ -6,8 +6,9 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import {ref, onMounted} from 'vue';
+    import { moodleFetch } from '@/js/moodlefetch';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
 
@@ -18,9 +19,6 @@
     const {monochrome, updateLogo} = useLogo();
 
     function get_url() {
-        const GU = window.GU;
-        const courseid = GU.courseid;
-        const fetchMany = GU.fetchMany;
 
         const images = [
             {
@@ -29,14 +27,13 @@
             }
         ];
 
-        fetchMany([{
-            methodname: 'local_gugrades_get_image_urls',
-            args: {
-                courseid: courseid,
+        moodleFetch(
+            'local_gugrades_get_image_urls',
+            {
                 images: images,
             }
-        }])[0]
-        .then((result) => {
+        )
+        .then((result: any) => {
             url.value = result[0]['url'];
             loading.value = false;
         })
