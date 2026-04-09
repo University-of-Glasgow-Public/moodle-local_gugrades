@@ -40,27 +40,30 @@ class get_grade_item extends external_api {
      */
     public static function execute_parameters() {
         return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'itemid' => new external_value(PARAM_INT, 'Grade item id'),
         ]);
     }
 
     /**
      * Execute function
+     * @param int $courseid
      * @param int $itemid
      */
-    public static function execute($itemid) {
+    public static function execute(int $courseid, int $itemid) {
         global $DB;
 
         \local_gugrades\development::increase_debugging();
 
         // Security.
-        $params = self::validate_parameters(self::execute_parameters(), ['itemid' => $itemid]);
-
-        // Get item (if it exists).
-        $item = $DB->get_record('grade_items', ['id' => $itemid], '*', MUST_EXIST);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            [
+                'courseid' => $courseid,
+                'itemid' => $itemid
+            ]);
 
         // More security.
-        $courseid = $item->courseid;
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 

@@ -18,8 +18,8 @@
     </div>
 
     <div v-if="loaded && !treeerror">
-        <h3>{{ categoryname }}</h3>
-        <table class="tw:table tw:border-none">
+        <h3 class="tw"mt-5>{{ categoryname }}</h3>
+        <table id="config_table" class="tw:table tw:border-none">
             <ConfigTree :nodes="activitytree" :depth="1" :resitconfig="configuringresits" :resitfade="true" @saveerror="handle_saveerror"></ConfigTree>
         </table>
     </div>
@@ -137,3 +137,9 @@
         loaded.value = true;
     }
 </script>
+
+<style>
+#config_table td, th{
+    border-width: 0 !important;
+}
+</style>
