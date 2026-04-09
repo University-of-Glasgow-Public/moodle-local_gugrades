@@ -1,22 +1,15 @@
 <template>
     <DebugDisplay :debug="serverdebug"></DebugDisplay>
 
-    <div class="border rounded p-2 mt-2">
-        <div class="col-12 col-lg-6">
+    <div class="tw:border tw:rounded-md tw:p-2 tw:mt-2 tw:border-gray-300">
+        <div>
             <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
             <GroupSelect v-if="level1category" @groupselected="groupselected"></GroupSelect>
         </div>
 
         <!-- display warnings -->
-        <div class="mt-2" v-if="level1category">
-            <small>
-                <div v-for="warning in warnings" class="alert alert-warning alert-dismissible fade show mb-1" role="alert">
-                    {{ warning.message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            </small>
+        <div v-if="level1category">
+            <DismissableAlert v-for="warning in warnings" :message="warning.message"></DismissableAlert>
         </div>
 
         <!-- Buttons line -->
@@ -37,21 +30,18 @@
     </div>
 
     <!-- Aggregation is not possible -->
-    <div v-if="!aggregationsupported" class="alert alert-danger my-5">
-        {{  mstrings.aggregationnotsupported }}
-    </div>
+     <TwAlert v-if="!aggregationsupported" color="error" class="tw:my-5">{{  mstrings.aggregationnotsupported }}</TwAlert>
 
-    <div v-if="level1category && aggregationsupported" class="mt-2">
+    <div v-if="level1category && aggregationsupported" class="tw:mt-2">
 
         <!-- Filter on initials -->
         <NameFilter @selected="filter_selected" ref="namefilterref"></NameFilter>
 
         <!-- Breadcrumb trail -->
-        <div v-if="breadcrumb.length > 1" class="gug_breadcrumb border rounded my-3 p-2 text-white">
-            <ul class="list-inline mb-0">
-                <li v-for="(item, index) in breadcrumb" :key="item.id" class="list-inline-item">
-                    <span v-if="index != 0"> > </span>
-                    <a class="text-white" href="#" @click="expand_clicked(item.id)">{{ item.shortname }}</a>
+        <div v-if="breadcrumb.length > 1" class="tw:my-3 tw:breadcrumbs tw:max-w-xs tw:text-sm tw:border tw:rounded-md tw:p-2 tw:border-gray-300">
+            <ul class="tw:p-0 tw:m-0">
+                <li v-for="(item, index) in breadcrumb" :key="item.id">
+                    <a href="#" @click="expand_clicked(item.id)">{{ item.shortname }}</a>
                 </li>
             </ul>
         </div>
@@ -77,12 +67,12 @@
             <!-- additional information in header cells -->
             <template #header="header">
                 <div v-if="header.value == 'back'">
-                    <a class="text-white" href="#" @click="expand_clicked(backid)">
-                        <i class="fa fa-arrow-circle-left fa-xl" aria-hidden="true"></i>
+                    <a href="#" @click="expand_clicked(backid)">
+                        <ArrowLeftCircleIcon class="tw:size-6 tw:text-white" />
                     </a>
                 </div>
                 <div v-else class="aggregation-header">
-                    <div data-toggle="tooltip" :title="header.fullname" :data-original-title="header.fullname">
+                    <div class="tw:tooltip tw:tooltip-success" :data-tip="header.fullname">
 
                         <div>
                             <!-- column title -->
@@ -91,17 +81,17 @@
                         </div>
                         <div v-if="!header.infocol && showweights">{{ header.weight }}%</div>
                         <div v-if="header.gradetype">{{ header.gradetype }} <span v-if="!header.isscale">({{ header.grademax }})</span></div>
-                        <div v-if="header.resititem" class="badge badge-pill badge-success">{{ mstrings.resitselected }}</div>
+                        <div v-if="header.resititem" class="tw:badge tw:badge-success">{{ mstrings.reassessment}}</div>
                     </div>
-                    <div class="py-1" v-if="header.strategy">
+                    <div class="tw:py-1" v-if="header.strategy">
                         <i>{{ header.strategy }}</i>
                     </div>
                     <div v-if="header.categoryid">
                         <a href="#" @click="expand_clicked(header.categoryid)">
-                            <span class="badge badge-light mt-2" >
-                                <i class="fa fa-caret-left" aria-hidden="true"></i>
+                            <span class="tw:badge tw:badge-sm tw:badge-primary tw:mt-2" >
+                                <ChevronDoubleLeftIcon class="size-4" />
                                 {{ mstrings.expand }}
-                                <i class="fa fa-caret-right" aria-hidden="true"></i>
+                                <ChevronDoubleRightIcon class="size-4" />
                             </span>
                         </a>
                     </div>
@@ -115,36 +105,39 @@
             <!-- point is to iterate over field names to maniuplate data in individual field items -->
             <template v-for="header in headers" v-slot:[header.slot]="item">
 
-                <!-- strikethrough if data is dropped -->
-                <!-- bold if admin -->
-                <!-- there HAS to be an easier way -->
-                <span :class="itemclasses(item[header.value])">
-                    <s v-if="item[header.value].dropped">
-                        <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                        <span v-else>{{ item[header.value].data }}</span>
-                    </s>
-                    <span v-else>
-                        <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                        <span v-else>{{ item[header.value].data }}</span>
-                    </span>
-                </span>
+                <div class="tw:inline-flex tw:items-center tw:gap-1">
 
-                <!-- add/override grade -->
-                <OverrideGrade
-                    v-if="item[header.value].available"
-                    :itemid = "header.gradeitemid"
-                    :categoryid = "header.categoryid"
-                    :selectedcategoryid = "level1category"
-                    :userid = "item.id"
-                    :gradehidden = "item[header.value].hidden"
-                    :overridden = "item[header.value].overridden"
-                    :itemname = "header.fullname"
-                    :name = "item.displayname"
-                    :showweights = "header.showweights"
-                    :released = "header.released"
-                    :caneditgrades = "caneditgrades"
-                    @gradeadded = "grade_changed(item.id)"
-                ></OverrideGrade>
+                    <!-- strikethrough if data is dropped -->
+                    <!-- bold if admin -->
+                    <!-- there HAS to be an easier way -->
+                    <span :class="itemclasses(item[header.value])">
+                        <s v-if="item[header.value].dropped">
+                            <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
+                            <span v-else>{{ item[header.value].data }}</span>
+                        </s>
+                        <span v-else>
+                            <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
+                            <span v-else>{{ item[header.value].data }}</span>
+                        </span>
+                    </span>
+
+                    <!-- add/override grade -->
+                    <OverrideGrade
+                        v-if="item[header.value].available"
+                        :itemid = "header.gradeitemid"
+                        :categoryid = "header.categoryid"
+                        :selectedcategoryid = "level1category"
+                        :userid = "item.id"
+                        :gradehidden = "item[header.value].hidden"
+                        :overridden = "item[header.value].overridden"
+                        :itemname = "header.fullname"
+                        :name = "item.displayname"
+                        :showweights = "header.showweights"
+                        :released = "header.released"
+                        :caneditgrades = "caneditgrades"
+                        @gradeadded = "grade_changed(item.id)"
+                    ></OverrideGrade>
+                </div>
             </template>
 
             <!-- User picture column -->
@@ -156,13 +149,13 @@
 
             <!-- Resit required -->
             <template #item-resitrequired="item">
-                <a href="#" v-if="caneditgrades" @click="resit_clicked(item.id, !item.resitrequired)">
-                    <span v-if="item.resitrequired" class="gug_pill badge badge-pill badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="gug_pill badge badge-pill badge-secondary">{{ mstrings.no }}</span>
+                <a v-if="caneditgrades" class="tw:cursor-pointer" @click.prevent="resit_clicked(item.id, !item.resitrequired)">
+                    <span v-if="item.resitrequired" class="tw:badge tw:badge-success">{{ mstrings.yes }}</span>
+                    <span v-else class="tw:badge tw:badge-secondary">{{ mstrings.no }}</span>
                 </a>
                 <span v-if="!caneditgrades">
-                    <span v-if="item.resitrequired" class="gug_pill badge badge-pill badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="gug_pill badge badge-pill badge-secondary">{{ mstrings.no }}</span>
+                    <span v-if="item.resitrequired" class="tw:badge tw:badge-success">{{ mstrings.yes }}</span>
+                    <span v-else class="tw:badge tw:badge-secondary">{{ mstrings.no }}</span>
                 </span>
             </template>
 
@@ -177,20 +170,20 @@
                     {{ item.releasegrade }}
                     <span v-if="item.mismatch">
                         <br />
-                        <span class="badge badge-danger mt-1">MISMATCH</span>
+                        <span class="tw:badge tw:badge-error tw:mt-1">MISMATCH</span>
                     </span>
                 </div>
             </template>
 
             <!-- Total -->
             <template #item-total="item">
-                <div class="d-flex justify-content-center align-items-center">
+                <div class="tw:inline-flex tw:items-center tw:gap-1">
                     <div>
                         <span v-if="item.error">{{ item.error }}</span>
                         <span :class="itemclasses(item)" v-else>{{ item.displaygrade }}</span>
                         <span v-if="item.alteredweight">
                             <br />
-                            <span class="badge badge-warning mt-1">ALTERED</span>
+                            <span class="tw:badge tw:badge-warning tw:mt-1">ALTERED</span>
                          </span>
                     </div>
                     <div>
@@ -231,8 +224,10 @@
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DismissableAlert from '@/components/Common/DismissableAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import { ArrowLeftCircleIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/vue/24/outline';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning } from '@/js/Interfaces';
     import type { Header, Item } from "vue3-easy-data-table";
+import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;

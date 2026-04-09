@@ -2,15 +2,19 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <div class="border rounded p-2 mt-2">
-            <div class="col-12 mb-2">
-                <button class="badge badge-primary" @click="selectcollapse">
-                    <span v-if="collapsed"><i class="fa fa-arrow-right"></i> {{ mstrings['showcategories'] }}</span>
-                    <span v-else><i class="fa fa-arrow-down"></i> {{ mstrings['hidecategories'] }}</span>
-                </button>
+        <div class="tw:border tw:rounded-md tw:p-2 tw:mt-2 tw:border-gray-300">
+            <div>
+                <div class="tw:badge tw:badge-primary tw:mb-4" @click="selectcollapse">
+                    <span class="tw:inline-flex tw:items-center tw:gap-1">
+                        <ArrowUpCircleIcon v-if="collapsed" class="tw:size-5 tw:text-black-500" />
+                        <ArrowDownCircleIcon v-else class="tw:size-5 tw:text-black-500" />
+                        {{ collapsed ? mstrings['showcategories'] : mstrings['hidecategories'] }}
+                    </span>
+                </div>
             </div>
 
-            <div id="captureselect" :class="collapseclasses">
+            <div id="captureselect" class="tw:overflow-hidden tw:transition-all tw:duration-300"
+                :class="collapsed ? 'tw:max-h-0 tw:opacity-0' : 'tw:max-h-screen tw:opacity-100'">
                 <CaptureSelect @selecteditemid="selecteditemid"></CaptureSelect>
 
                 <div v-if="itemid">
@@ -51,7 +55,7 @@
             </div>
         </div>
 
-        <div v-if="itemid && gradesupported" class="mt-2">
+        <div v-if="itemid && gradesupported" class="tw:mt-2">
             <NameFilter v-if="!usershidden" @selected="filter_selected" ref="namefilterref"></NameFilter>
 
             <!-- Please wait spinner -->
@@ -60,9 +64,9 @@
             <div v-if="showtable && loaded">
 
                 <!-- button for saving cell edits -->
-                <div class="pb-1 clearfix" v-if="ineditcellmode">
-                    <button class="btn btn-warning float-right mr-1" @click="edit_cell_cancelled">{{ mstrings['cancel'] }}</button>
-                    <button class="btn btn-primary float-right mr-1" @click="edit_cell_saved">{{ mstrings['save'] }}</button>
+                <div class="tw:pb-1 tw:flex tw:justify-end" v-if="ineditcellmode">
+                    <TwButton color="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</TwButton>
+                    <TwButton color="primary" @click="edit_cell_saved">{{ mstrings.save }}</TwButton>
                 </div>
 
                 <!-- Note. The array 'users' contains the lines of data. One record for each user -->
@@ -100,8 +104,8 @@
                     <!-- Provisional column -->
                     <template v-slot:[provisionalslot]="item">
                         <div v-if="item[provisionalid]">
-                            <span v-if="item.gradehidden && !item.gradebookhidden" class="border border-lg border-warning rounded p-1">{{ item[provisionalid] }}</span>
-                            <span v-if="item.gradebookhidden" class="border border-lg border-success rounded p-1">{{ item[provisionalid] }}</span>
+                            <span v-if="item.gradehidden && !item.gradebookhidden" class="tw:border-2 tw:border-yellow-500 tw:border-rounded-md tw:p-1">{{ item[provisionalid] }}</span>
+                            <span v-if="item.gradebookhidden" class="tw:border-2 tw:border-green-500 tw:border-rounded-md tw:p-1">{{ item[provisionalid] }}</span>
                             <span v-if="!item.gradebookhidden && !item.gradehidden">{{ item[provisionalid] }}</span>
                         </div>
                     </template>
@@ -152,9 +156,9 @@
                     <!-- show warning if grades do not agree -->
                     <template #item-alert="item">
                         <div class="capture-warning">
-                            <div v-if="item.alert" class="badge badge-pill badge-danger mb-1 mr-1">{{ mstrings['discrepancy'] }}</div>
-                            <div v-if="item.gradebookhidden" class="badge badge-pill badge-success mb-1 mr-1">{{ mstrings['hiddengradebook'] }}</div>
-                            <div v-if="item.gradehidden" class="badge badge-pill badge-warning mb-1">{{ mstrings['hiddenmygrades'] }}</div>
+                            <div v-if="item.alert" class="tw:badge tw:badge-error tw:mb-1 tw:mr-1">{{ mstrings['discrepancy'] }}</div>
+                            <div v-if="item.gradebookhidden" class="tw:badge tw:badge-success tw:mb-1 tw:mr-1">{{ mstrings['hiddengradebook'] }}</div>
+                            <div v-if="item.gradehidden" class="tw:badge tw:badge-warning tw:mb-1">{{ mstrings['hiddenmygrades'] }}</div>
                         </div>
                     </template>
 
@@ -165,9 +169,9 @@
                 </EasyDataTable>
 
                 <!-- button for saving cell edits -->
-                <div class="pb-1 clearfix mt-2" v-if="ineditcellmode">
-                    <button class="btn btn-warning float-right mr-1" @click="edit_cell_cancelled">{{ mstrings['cancel'] }}</button>
-                    <button class="btn btn-primary float-right mr-1" @click="edit_cell_saved">{{ mstrings['save'] }}</button>
+                <div class="tw:pb-1 tw:mt-2 tw:flex tw:justify-end" v-if="ineditcellmode">
+                    <TwButton color="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</TwButton>
+                    <TwButton color="primary" @click="edit_cell_saved">{{ mstrings.save }}</TwButton>
                 </div>
             </div>
 
@@ -196,6 +200,7 @@
     import type { Header, Item } from "vue3-easy-data-table";
     import TwButton from '@/components/Tailwind/TwButton.vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import { ArrowDownCircleIcon, ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
 
     const users = ref< ICaptureUser[] >([]);
@@ -374,11 +379,6 @@
      */
     function selectcollapse() {
 
-        if (collapsed.value) {
-            collapseclasses.value = ['collapse', 'show'];
-        } else {
-            collapseclasses.value = ['collapse'];
-        }
         collapsed.value = !collapsed.value;
     }
 

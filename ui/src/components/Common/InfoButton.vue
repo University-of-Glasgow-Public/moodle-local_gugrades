@@ -2,12 +2,14 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <!-- info button -->
-    <div class="tw:ml-2 tw:tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
+    <div v-if="!props.text" class="tw:ml-2 tw:tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
         <button class="tw:btn">
-            <span v-if="props.text" class="tw:text-black-500"><u>{{ props.text }}</u></span>
-            <InformationCircleIcon v-else class="tw:size-6 tw:text-black-500"></InformationCircleIcon>
+            <InformationCircleIcon class="tw:size-6 tw:text-black-500"></InformationCircleIcon>
         </button>
     </div>
+
+    <!-- info link -->
+    <a v-if="props.text" class="tw:text-white tw:underline tw:cursor-pointer" @click="info_clicked">{{ props.text }}</a>
 
     <!-- modal to show info-->
     <VueModal v-model="showinfomodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="itemname">
