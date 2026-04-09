@@ -574,7 +574,9 @@
             user.editcolumn = (columnname == editcolumn.value);
             user.reason = column.gradetype;
             user.other = column.other;
-            user.gradeitemid = column.gradeitemid;
+
+            // TODO: gradeitemid doesn't appear to be in the columns array
+            //user.gradeitemid = column.gradeitemid;
         });
 
         return user;
@@ -660,7 +662,7 @@
      * If a new column has been added then
      * Return true if missing columns
      */
-    function missing_columns(usergrades) {
+    function missing_columns(usergrades: ICaptureGrade[]) {
 
         // Flag a missing gradetype inside the callback
         let missing = false;
