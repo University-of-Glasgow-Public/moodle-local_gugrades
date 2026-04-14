@@ -85,7 +85,6 @@
                     :header-item-class-name="header_item_class"
                     :filter-options="table_filter"
                     @update-page-items="pagination_change"
-                    ref="dataTable"
                     :rows-per-page="rowsperpage"
                     :rows-items="[25,50,100,250]"
                     >

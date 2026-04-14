@@ -52,7 +52,8 @@
         <EasyDataTable
             v-if="!loading"
             alternating
-            buttons-pagination
+            :key="datatablekey"
+            :current-page="currentpage"
             sort-by="displayname"
             sort-type="asc"
             table-class-name="aggregation-table"
@@ -63,6 +64,7 @@
             :headers="headers"
             :filter-options="table_filter"
             :rows-items="[25,50,100,250]"
+            @update-page-items="pagination_change"
         >
 
             <!-- additional information in header cells -->
@@ -207,6 +209,16 @@
                     </div>
                 </div>
             </template>
+
+            <!-- Override pagination -->
+            <template #pagination>
+                <TablePagination
+                    :rowsPerPage="rowsperpage"
+                    :rowsCount="users.length"
+                    :startPage="currentpage"
+                    @pagechange="page_changed"
+                ></TablePagination>
+            </template>
         </EasyDataTable>
     </div>
 </template>
@@ -228,7 +240,8 @@
     import { ArrowLeftCircleIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/vue/24/outline';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning } from '@/js/Interfaces';
     import type { Header, Item } from "vue3-easy-data-table";
-import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import TablePagination from '@/components/Common/TablePagination.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -255,6 +268,9 @@ import TwAlert from '@/components/Tailwind/TwAlert.vue';
     const { mstrings } = storeToRefs( mstringstore );
     const level1category = ref(0);
     const loading = ref(true);
+    const currentpage = ref(1);
+    const rowsperpage = ref(25);
+    const datatablekey = ref(1);
     const aggregationsupported = ref(true);
     const categoryid = ref(0);
     const gradeitemid = ref(0);
@@ -328,6 +344,23 @@ import TwAlert from '@/components/Tailwind/TwAlert.vue';
 
         return options;
     });
+
+    /**
+     * Page changed by pagination
+     */
+    function page_changed(newpage: number) {
+        currentpage.value = newpage;
+        datatablekey.value++;
+    }
+
+    /**
+     * Number of pages changed
+     */
+    function pagination_change(rows: any) {
+        rowsperpage.value = rows.length;
+        currentpage.value = 1;
+        datatablekey.value++;
+    }
 
     /**
      * Work out border classes for item
