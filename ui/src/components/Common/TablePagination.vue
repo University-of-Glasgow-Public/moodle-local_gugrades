@@ -3,26 +3,32 @@
         :total-items="rowsCount"
         :items-per-page="rowsPerPage"
         :max-pages-shown="5"
-        v-model="currentpage"
+        v-model="currentPage"
+        @click="handle_click"
     ></vue-awesome-paginate>
 </template>
 
 <script setup lang="ts">
-    import { ref, watch } from 'vue';
+    import { ref, onMounted } from 'vue';
 
     interface PaginationProps {
         rowsPerPage: number;
         rowsCount: number;
-        currentPage: number;
+        startPage: number;
     }
 
     const props = defineProps<PaginationProps>();
-    const currentpage = ref(1);
+    const currentPage = ref(1);
 
     const emits = defineEmits(['pagechange']);
 
-    watch(currentpage, (newpage) => {
+    function handle_click(newpage: number) {
+        currentPage.value = newpage;
         emits('pagechange', newpage);
-    });
+    }
+
+    onMounted(() => {
+        currentPage.value = props.startPage;
+    })
 
 </script>

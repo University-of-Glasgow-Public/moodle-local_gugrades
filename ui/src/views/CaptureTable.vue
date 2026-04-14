@@ -171,7 +171,7 @@
                         <TablePagination v-else
                             :rowsPerPage="rowsperpage"
                             :rowsCount="users.length"
-                            :currentPage="currentpage"
+                            :startPage="currentpage"
                             @pagechange="page_changed"
                         ></TablePagination>
                     </template>
