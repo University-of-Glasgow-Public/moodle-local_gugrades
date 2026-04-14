@@ -11,6 +11,11 @@ export default defineConfig({
     vue(),
     tailwindcss(),
   ],
+  css: {
+    preprocessorOptions: {
+      // Ensure CSS imports are resolved
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

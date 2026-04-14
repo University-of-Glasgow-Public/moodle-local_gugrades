@@ -72,6 +72,8 @@
                 <!-- Note. The array 'users' contains the lines of data. One record for each user -->
                 <EasyDataTable
                     alternating
+                    :key="datatablekey"
+                    :current-page="currentpage"
                     sort-by="displayname"
                     sort-type="asc"
                     table-class-name="capture-table"
@@ -82,8 +84,9 @@
                     :body-item-class-name="table_item_class"
                     :header-item-class-name="header_item_class"
                     :filter-options="table_filter"
-                    @xxupdate-page-items="pagination_clicked()"
+                    @update-page-items="pagination_change"
                     ref="dataTable"
+                    :rows-per-page="rowsperpage"
                     :rows-items="[25,50,100,250]"
                     >
 
@@ -163,8 +166,14 @@
                     </template>
 
                     <!-- Override pagination if bulk editing -->
-                    <template #pagination v-if="ineditcellmode">
-                        {{ mstrings['pleasesavefirst'] }}
+                    <template #pagination>
+                        <span v-if="ineditcellmode">{{ mstrings['pleasesavefirst'] }}</span>
+                        <TablePagination v-else
+                            :rowsPerPage="rowsperpage"
+                            :rowsCount="users.length"
+                            :currentPage="currentpage"
+                            @pagechange="page_changed"
+                        ></TablePagination>
                     </template>
                 </EasyDataTable>
 
@@ -198,6 +207,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { Header, Item } from "vue3-easy-data-table";
+    import TablePagination from '@/components/Common/TablePagination.vue';
     import TwButton from '@/components/Tailwind/TwButton.vue';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import { ArrowDownCircleIcon, ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
@@ -210,6 +220,8 @@
     const groupid = ref(0);
     const totalrows = ref(0);
     const currentpage = ref(1);
+    const rowsperpage = ref(25);
+    const datatablekey = ref(1);
     const usershidden = ref(false);
     const namefilterref = ref(null);
     const itemtype = ref('');
@@ -278,6 +290,23 @@
             debug.value = error;
         });
     });
+
+    /**
+     * Page changed by pagination
+     */
+    function page_changed(newpage: number) {
+        currentpage.value = newpage;
+        datatablekey.value++;
+    }
+
+    /**
+     * Number of pages changed
+     */
+    function pagination_change(rows: any) {
+        rowsperpage.value = rows.length;
+        currentpage.value = 1;
+        datatablekey.value++;
+    }
 
     /**
      * Table name filter
@@ -464,15 +493,6 @@
         },
         { debounce: 500, maxWait: 1000 },
     );
-
-    /**
-     * Change pagination
-     */
-    function pagination_clicked() {
-
-        // If the multiple update is open, we'll close it
-        edit_cell_saved();
-    }
 
     /**
      * Are we in "edit a cell" mode?

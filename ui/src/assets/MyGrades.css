@@ -7,3 +7,16 @@
 legend {
     font-size: inherit;
 }
+
+/* VueAwesomePaginate stuffs */
+.pagination-container {
+    @apply tw:flex;
+}
+
+.paginate-buttons {
+    @apply tw:btn
+}
+
+.active-page {
+    @apply tw:btn-accent
+}

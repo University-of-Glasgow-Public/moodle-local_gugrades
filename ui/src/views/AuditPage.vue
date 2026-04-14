@@ -5,7 +5,14 @@
         <EasyDataTable
             :headers="headers"
             :items="items"
-        ></EasyDataTable>
+        >
+
+            <!-- Override pagination  -->
+            <template #pagination="{ prevPage, nextPage, isFirstPage, isLastPage }">
+                <TablePagination :prevPage="prevPage" :nextPage="nextPage" :isFirstPage="isFirstPage" :isLastPage="isLastPage" :rowsPerPage="25" :rowsCount="items.length"></TablePagination>
+            </template>
+
+        </EasyDataTable>
     </div>
     <TwButton class="tw:mt-2" color="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</TwButton>
 </template>
@@ -20,6 +27,7 @@
     import type { IAuditItem } from '@/js/Interfaces';
     import type { Header } from "vue3-easy-data-table";
     import TwButton from '@/components/Tailwind/TwButton.vue';
+    import TablePagination from '@/components/Common/TablePagination.vue';
 
     const items = ref< IAuditItem[] >([]);
     const headers = ref< Header[] >([]);

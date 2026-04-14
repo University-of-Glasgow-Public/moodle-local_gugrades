@@ -52,6 +52,7 @@
         <EasyDataTable
             v-if="!loading"
             alternating
+            buttons-pagination
             sort-by="displayname"
             sort-type="asc"
             table-class-name="aggregation-table"
@@ -567,7 +568,6 @@ import TwAlert from '@/components/Tailwind/TwAlert.vue';
             });
         }
 
-        console.log(heads);
         return heads;
     });
 

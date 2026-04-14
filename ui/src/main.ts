@@ -12,6 +12,7 @@ import { moodleFetch } from '@/js/moodlefetch';
 import '../src/assets/VueModal.css';
 import '../src/assets/MyGrades.css';
 import type { IMoodleString } from './js/Interfaces';
+import VueAwesomePaginate from 'vue-awesome-paginate';
 
 // Following work but cause trouble with Typescript.
 // Something to improve another day.
@@ -97,6 +98,7 @@ ensureGUIsSet(timeout)
     app.provide('mstrings', mstrings);
     app.use(Toast, toastoptions);
     app.use(plugin, defaultConfig(customConfig));
+    app.use(VueAwesomePaginate);
     app.component('EasyDataTable', Vue3EasyDataTable);
     app.component('VueModal', Modal);
     app.mount('#app');
