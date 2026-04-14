@@ -23,10 +23,14 @@
     const emits = defineEmits(['pagechange']);
 
     function handle_click(newpage: number) {
-        currentPage.value = newpage;
+        //currentPage.value = newpage;
         emits('pagechange', newpage);
     }
 
+    /**
+     * BEWARE: EasyDataTable is configured to refresh when a page is changed,
+     * so this is quite important (otherwise it resets to 1 each time)
+     */
     onMounted(() => {
         currentPage.value = props.startPage;
     })
