@@ -1686,7 +1686,7 @@ class api {
         // Look up actvity object if we need to.
         $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
 
-        \local_gugrades\grades::release_user_grade($courseid, $gradeitemid, $user->id, $activity);
+        \local_gugrades\grades::release_user_grade($courseid, $gradeitemid, $userid, $activity);
     }
 
     /**
