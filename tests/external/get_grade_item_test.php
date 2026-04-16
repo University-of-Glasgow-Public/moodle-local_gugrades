@@ -48,7 +48,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
         // Use the test teacher.
         $this->setUser($this->teacher->id);
 
-        $item = get_grade_item::execute($this->gradeitemidassign1);
+        $item = get_grade_item::execute($this->course->id, $this->gradeitemidassign1);
         $item = external_api::clean_returnvalue(
             get_grade_item::execute_returns(),
             $item
@@ -58,7 +58,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
         $this->assertFalse($item['isscale']);
         $this->assertEquals(100, $item['grademax']);
 
-        $item = get_grade_item::execute($this->gradeitemidassign2);
+        $item = get_grade_item::execute($this->course->id, $this->gradeitemidassign2);
         $item = external_api::clean_returnvalue(
             get_grade_item::execute_returns(),
             $item
@@ -70,7 +70,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
         $this->assertEquals('Schedule A', $item['scalename']);
 
         // Manual item.
-        $item = get_grade_item::execute($this->gradeitemsecond1);
+        $item = get_grade_item::execute($this->course->id, $this->gradeitemsecond1);
         $item = external_api::clean_returnvalue(
             get_grade_item::execute_returns(),
             $item
@@ -102,7 +102,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
             MUST_EXIST
         );
 
-        $item = get_grade_item::execute($gradeitem->id);
+        $item = get_grade_item::execute($this->course->id, $gradeitem->id);
         $item = external_api::clean_returnvalue(
             get_grade_item::execute_returns(),
             $item
@@ -142,7 +142,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
             MUST_EXIST
         );
 
-        $item = get_grade_item::execute($gradeitem->id);
+        $item = get_grade_item::execute($this->course->id, $gradeitem->id);
         $item = external_api::clean_returnvalue(
             get_grade_item::execute_returns(),
             $item

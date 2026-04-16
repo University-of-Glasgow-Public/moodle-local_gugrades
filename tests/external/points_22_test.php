@@ -49,7 +49,7 @@ final class points_22_test extends \local_gugrades\external\gugrades_advanced_te
         // Use the test teacher.
         $this->setUser($this->teacher->id);
 
-        $item = get_grade_item::execute($this->gradeitemidassign22);
+        $item = get_grade_item::execute($this->course->id, $this->gradeitemidassign22);
         $item = external_api::clean_returnvalue(
             get_grade_item::execute_returns(),
             $item

@@ -1,0 +1,8 @@
+{
+    "subplugintypes": {
+        "regulations": "regulations"
+    },
+    "plugintypes": {
+        "regulations": "local/gugrades/regulations"
+    }
+}

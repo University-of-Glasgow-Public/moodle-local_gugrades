@@ -1,67 +1,72 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a class="dropdown-item" href="#" @click.prevent="alter_weights()">
+    <a @click.prevent="alter_weights()">
         {{ mstrings.altertitle }}
     </a>
 
-    <VueModal v-model="showaltermodal" :enableClose="false" modalClass="col-11 col-lg-5 rounded scrollable-modal" :title="mstrings.altertitle">
+    <VueModal v-model="showaltermodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.altertitle">
 
-        <div v-if="loading" class="alert alert-info">
-            {{ mstrings.pleasewait }}
-        </div>
+        <TwAlert v-if="loading">{{ mstrings.pleasewait }}</TwAlert>
 
         <div v-if="!loading" class="scrollable-content">
 
             <!-- basic details of category -->
-            <ul class="list-unstyled">
+            <ul class="tw:list-none">
                 <li><b>{{ mstrings.category }}:</b> {{ categoryname }}</li>
                 <li><b>{{ mstrings.username }}:</b> {{ userfullname }}</li>
                 <li><b>{{ mstrings.idnumber }}:</b> {{ idnumber }}</li>
             </ul>
 
+            <div class="tw:divider"></div>
+
             <!-- grade items therein -->
-            <div class="border rounded mt-3 p-2">
-                <div class="row mt-1 mb-2 font-weight-bolder">
-                    <div class="col">{{ mstrings.gradeitem }}</div>
-                    <div class="col">{{ mstrings.gradetype }}</div>
-                    <div class="col">{{ mstrings.grade }}</div>
-                    <div class="col">{{ mstrings.defaultweights }}</div>
-                    <div class="col">{{ mstrings.alteredweights }}</div>
-                </div>
-                <div v-for="item in items" class="row mt-1">
-                    <div class="col"><b>{{ item.fullname }}</b></div>
-                    <div class="col">{{ item.gradetype }}</div>
-                    <div class="col">{{ item.display }}</div>
-                    <div class="col">
-                        {{ item.originalweight }}
-                    </div>
-                    <div class="col">
-                        <FormKit
-                            type="number"
-                            number="float"
-                            outer-class="mb-3"
-                            placeholder="new weight"
-                            name="weight"
-                            step="0.05"
-                            validation="between:0,1"
-                            validation-visibility="live"
-                            v-model="item.alteredweight"
-                        />
-                    </div>
-                </div>
-                <div class="row mt-1">
-                    <div class="col font-weight-bold">{{ mstrings.sumofweights }}</div>
-                    <div class="col">&nbsp;</div>
-                    <div class="col">&nbsp;</div>
-                    <div class="col">{{ defaulttotal.toFixed(5) }}</div>
-                    <div class="col">{{ alteredtotal.toFixed(5) }}</div>
-                </div>
-                <div v-if="!closeenough" class="mt-2 text-danger">{{ mstrings.donotaddto1 }}</div>
-            </div>
+            <table class="tw:table tw:mt-3 tw:p-2">
+                <thead>
+                    <tr>
+                        <th>{{ mstrings.gradeitem }}</th>
+                        <th>{{ mstrings.gradetype }}</th>
+                        <th>{{ mstrings.grade }}</th>
+                        <th>{{ mstrings.defaultweights }}</th>
+                        <th>{{ mstrings.alteredweights }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in items" :key="item.gradeitemid">
+                        <td><b>{{ item.fullname }}</b></td>
+                        <td>{{ item.gradetype }}</td>
+                        <td>{{ item.display }}</td>
+                        <td>{{ item.originalweight }}</td>
+                        <td>
+                            <FormKit
+                                type="number"
+                                number="float"
+                                outer-class="mb-3"
+                                placeholder="new weight"
+                                name="weight"
+                                step="0.05"
+                                validation="between:0,1"
+                                validation-visibility="live"
+                                v-model="item.alteredweight"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tw:text-bold">{{ mstrings.sumofweights }}</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>{{ defaulttotal.toFixed(5) }}</td>
+                        <td>{{ alteredtotal.toFixed(5) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <TwAlert v-if="!closeenough" color="warning" class="tw:my-2">{{ mstrings.donotaddto1 }}</TwAlert>
+
+            <div class="tw:divider"></div>
 
             <!-- reason -->
-            <div class="border rounded mt-2 px-3">
+            <div class="tw:my-4">
                 <FormKit
                     type="textarea"
                     outer-class="mb-3"
@@ -72,9 +77,9 @@
             </div>
 
             <div class="mt-2">
-                <button class="btn btn-primary mr-1" type="button" @click="save_altered_weights">{{  mstrings.save }}</button>
-                <button class="btn btn-info mr-1" type="button" @click="revert_altered_weights">{{  mstrings.revert }}</button>
-                <button class="btn btn-warning" type="button" @click="showaltermodal = false">{{  mstrings.cancel }}</button>
+                <TwButton color="primary" class="tw:mr-1" @click="save_altered_weights">{{ mstrings.save }}</TwButton>
+                <TwButton color="info" class="tw:mr-1" @click="revert_altered_weights">{{ mstrings.revert }}</TwButton>
+                <TwButton color="warning" @click="showaltermodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
 
         </div>
@@ -88,6 +93,8 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import TwAlert from '../Tailwind/TwAlert.vue';
+    import TwButton from '../Tailwind/TwButton.vue';
     import type { IAlterWeightItem, ISaveAlteredWeightItem } from '@/js/Interfaces';
 
     const showaltermodal = ref(false);

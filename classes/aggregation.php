@@ -55,6 +55,19 @@ class aggregation {
     }
 
     /**
+     * Get aggregation/regulations subplugins
+     *
+     */
+    public static function get_regulations() {
+        $regulations = [];
+        $plugins = \core_component::get_plugin_list('regulations');
+
+        foreach ($plugins as $plugin) {
+            continue;
+        }
+    }
+
+    /**
      * Factory for aggregation rule set
      * @param int $courseid
      * @param string $atype
@@ -487,7 +500,7 @@ class aggregation {
             ];
 
             // Field identifier based on gradeitemid (which is unique even for categories).
-            $provisional = \local_gugrades\grades::get_provisional_from_id($column->gradeitemid, $user->id);
+            $provisional = \local_gugrades\grades::get_provisional_from_id($courseid, $column->gradeitemid, $user->id);
             if ($provisional) {
                 $data['rawgrade'] = $provisional->rawgrade;
                 $data['display'] = $provisional->displaygrade;
@@ -1614,6 +1627,10 @@ class aggregation {
      * @return array
      */
     public static function aggregate(int $courseid, int $gradecategoryid, array $users) {
+
+        // Get possible regulations
+        // TODO: This needs refined.
+        $regulations = self::get_regulations();
 
         // If $users is array of objects, convert to array of ids.
         if (is_object($users[0])) {

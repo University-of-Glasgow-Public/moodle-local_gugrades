@@ -791,7 +791,7 @@
     .capture-table {
         --easy-table-header-font-size: 14px;
         --easy-table-header-height: 50px;
-        --easy-table-header-font-color: #ffffff;
+        --easy-table-header-font-color: #f5f5f5;
         --easy-table-header-background-color: #005c8a;
 
         --easy-table-header-item-padding: 10px 15px;

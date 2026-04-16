@@ -619,7 +619,7 @@ class api {
         // missing - skip only missing grades (not admin)
         // update - just carry on and replace anything.
         if ($additional != 'update') {
-            if (\local_gugrades\grades::skip_update($gradeitemid, $userid, $additional)) {
+            if (\local_gugrades\grades::skip_update($courseid, $gradeitemid, $userid, $additional)) {
                 return false;
             }
         }
@@ -1686,7 +1686,7 @@ class api {
         // Look up actvity object if we need to.
         $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
 
-        \local_gugrades\grades::release_user_grade($courseid, $gradeitemid, $user->id, $activity);
+        \local_gugrades\grades::release_user_grade($courseid, $gradeitemid, $userid, $activity);
     }
 
     /**
@@ -2184,7 +2184,7 @@ class api {
         $gradeitemid = $category->itemid;
 
         // Get provisional grade for the actual category.
-        $provisional = \local_gugrades\grades::get_provisional_from_id($gradeitemid, $userid);
+        $provisional = \local_gugrades\grades::get_provisional_from_id($courseid, $gradeitemid, $userid);
         $provisional->itemid = $gradeitemid;
         $provisional->released = \local_gugrades\grades::is_grades_released($courseid, $gradeitemid);
 

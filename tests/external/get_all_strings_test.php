@@ -32,11 +32,12 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_testcase.php');
 
 /**
  * Test(s) for get_all_strings webservice
  */
-final class get_all_strings_test extends externallib_advanced_testcase {
+final class get_all_strings_test extends gugrades_advanced_testcase {
     /**
      * Called before every test
      */
@@ -52,7 +53,7 @@ final class get_all_strings_test extends externallib_advanced_testcase {
      * @return void
      */
     public function test_get_all_strings_returns_data(): void {
-        $mstrings = get_all_strings::execute();
+        $mstrings = get_all_strings::execute($this->course->id);
 
         // Clean up return values.
         $mstrings = external_api::clean_returnvalue(

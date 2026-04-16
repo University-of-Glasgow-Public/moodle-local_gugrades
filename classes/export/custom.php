@@ -279,7 +279,7 @@ class custom extends base {
             }
         } else {
             // Ordinary item.
-            if ($provisional = \local_gugrades\grades::get_provisional_from_id($gradeitemid, $userid)) {
+            if ($provisional = \local_gugrades\grades::get_provisional_from_id($courseid, $gradeitemid, $userid)) {
                 $displaygrade = $provisional->displaygrade;
                 $csvitems[$identifier] = $displaygrade;
             } else {

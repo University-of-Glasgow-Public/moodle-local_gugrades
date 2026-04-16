@@ -772,25 +772,35 @@ class grades {
      * Latest grade for any graditemid, userid combo is the highest id in the
      * grades table.
      * This makes it much faster to find.
+     * If we are just adding a grade then it has to be the latest grade.
+     * WARNING: 'latest grade' is (for historical reasons) referred to as 'provisional grade' in many places
+     * See, for example, get_provisional_from_id().
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
+     * @param object $newgrade
      * @return object|null
      */
-    public static function set_latest_grade(int $courseid, int $gradeitemid, int $userid) {
+    public static function set_latest_grade(int $courseid, int $gradeitemid, int $userid, object $newgrade = null) {
         global $DB;
 
-        // ...id is a proxy for time added.
-        // Cannot use the timestamp as the unit tests write the test grades all in the
-        // same second (potentially).
-        $sql = 'SELECT * FROM {local_gugrades_grade}
-            WHERE id = (SELECT max(id) FROM {local_gugrades_grade}
-                WHERE gradeitemid = :gradeitemid
-                AND userid = :userid
-                AND gradetype<>"RELEASED"
-                AND iscurrent = 1)';
-        if (!$grade = $DB->get_record_sql($sql, ['gradeitemid' => $gradeitemid, 'userid' => $userid])) {
-            return null;
+        // If we have a grade that we know is the latest (because we'ev just written it)...
+        if (!is_null($newgrade)) {
+            $grade = $newgrade;
+        } else {
+
+            // ...id is a proxy for time added.
+            // Cannot use the timestamp as the unit tests write the test grades all in the
+            // same second (potentially).
+            $sql = 'SELECT * FROM {local_gugrades_grade}
+                WHERE id = (SELECT max(id) FROM {local_gugrades_grade}
+                    WHERE gradeitemid = :gradeitemid
+                    AND userid = :userid
+                    AND gradetype<>"RELEASED"
+                    AND iscurrent = 1)';
+            if (!$grade = $DB->get_record_sql($sql, ['gradeitemid' => $gradeitemid, 'userid' => $userid])) {
+                return null;
+            }
         }
 
         // Update/create entry in latest grade table.
@@ -944,7 +954,7 @@ class grades {
                 $gugrade->catoverride = $catoverride;
 
                 $DB->update_record('local_gugrades_grade', $gugrade);
-                self::set_latest_grade($courseid, $gradeitemid, $userid);
+                self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
 
                 return;
             }
@@ -970,8 +980,8 @@ class grades {
         $gugrade->auditcomment = $auditcomment;
         $gugrade->points = $ispoints;
         $gugrade->catoverride = $catoverride;
-        $DB->insert_record('local_gugrades_grade', $gugrade);
-        self::set_latest_grade($courseid, $gradeitemid, $userid);
+        $gugrade->id = $DB->insert_record('local_gugrades_grade', $gugrade);
+        self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
     }
 
     /**
@@ -989,16 +999,24 @@ class grades {
     /**
      * Get the provisional/released grade from the
      * gradeitemid / userid
+     * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
      * @return oject|bool
      */
-    public static function get_provisional_from_id(int $gradeitemid, int $userid) {
+    public static function get_provisional_from_id(int $courseid, int $gradeitemid, int $userid) {
 
         $useridexists = array_key_exists($userid, self::$provisionalgrades);
         if ($useridexists && array_key_exists($gradeitemid, self::$provisionalgrades[$userid])) {
             $provisional = self::$provisionalgrades[$userid][$gradeitemid];
         } else {
+
+            // If not in the array, try setting the provisional/latest grade.
+            if ($provisional = self::set_latest_grade($courseid, $gradeitemid, $userid)) {
+                self::$provisionalgrades[$userid][$gradeitemid] = $provisional;
+                return $provisional;
+            }
+
             $provisional = null;
         }
 
@@ -1204,16 +1222,17 @@ class grades {
      * If true returned - then skip this update
      * admin = skip if there is any grade at all
      * missing = skip if there is a REAL grade (admin grades are NOT skipped)
+     * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
      * @param string $additional (admin or missing)
      * @return bool
      */
-    public static function skip_update(int $gradeitemid, int $userid, string $additional) {
+    public static function skip_update(int $courseid, int $gradeitemid, int $userid, string $additional) {
         global $DB;
 
         // Get the provisional grade. If there isn't one, then no skip.
-        if (!$provisional = self::get_provisional_from_id($gradeitemid, $userid)) {
+        if (!$provisional = self::get_provisional_from_id($courseid, $gradeitemid, $userid)) {
             return false;
         }
 
@@ -2109,6 +2128,7 @@ class grades {
         // Check that there are no missing grades in local_gugrades_latest.
         // Any grade_items represented in local_gugrades_grade should have a
         // corresponding entry in local_gugrades_latest.
+        /*
         $sql = 'SELECT gr.* FROM {local_gugrades_grade} gr
             LEFT JOIN {local_gugrades_latest} gl ON gl.gugradeid = gr.id
             WHERE gl.id IS NULL
@@ -2119,6 +2139,7 @@ class grades {
         foreach ($missinggrades as $grade) {
             self::set_latest_grade($courseid, $grade->gradeitemid, $grade->userid);
         }
+        */
 
         // Load provisional grades into array for the current course.
         self::$provisionalgrades = [];

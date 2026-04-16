@@ -27,6 +27,9 @@ const config = {
         outer: '$reset tw:mt-3',
         input: '$reset tw:btn tw:btn-primary'
       },
+      number: {
+        input: '$reset tw:input'
+      },
       checkbox: {
         outer: '$reset tw:fieldset',
         input: '$reset tw:checkbox',

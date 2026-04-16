@@ -3,6 +3,11 @@
     themes: nord  --default;
 }
 
+body {
+  background-color: #f5f5f5;
+  color: #111111;
+}
+
 /* form legends are huge in Bootstrap */
 legend {
     font-size: inherit;

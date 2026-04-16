@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Version file for original subplugin
  *
  * @package    local_gugrades
- * @copyright  2022
+ * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,8 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version      = 2026041000;
 $plugin->requires     = 2025100600; // Moodle 5.1.
-$plugin->component    = 'local_gugrades';
+$plugin->component    = 'regulations_original';
 
 $plugin->maturity     = MATURITY_BETA;
 
-$plugin->release      = '0.3 Beta';
