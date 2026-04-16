@@ -449,9 +449,10 @@ class aggregation {
      * @param int $gradecategoryid
      * @param object $user
      * @param array $columns
+     * @param bool $anyalteredweights
      * @return object
      */
-    public static function add_aggregation_fields_to_user(int $courseid, int $gradecategoryid, object $user, array $columns) {
+    public static function add_aggregation_fields_to_user(int $courseid, int $gradecategoryid, object $user, array $columns, bool $anyalteredweights = false) {
         global $DB;
 
         // We're assuming that this user is fully aggregated and no further checks are required.
@@ -476,6 +477,10 @@ class aggregation {
         $fields = [];
         $items = [];
         foreach ($columns as $column) {
+
+            // False if no altered weight.
+            $altweight = $anyalteredweights ? self::get_altered_weight($column->gradeitemid, $user->id) : false;
+
             // Basic fields.
             $fieldname = 'AGG_' . $column->gradeitemid;
             $data = [
@@ -495,7 +500,7 @@ class aggregation {
                 'overridden' => false,
                 'available' => true,
                 'normalisedweight' => null,
-                'alteredweight' => 100 * self::get_altered_weight($column->gradeitemid, $user->id),
+                'alteredweight' => $altweight ? 100 * $altweight : 0,
                 'iscategory' => $column->categoryid != 0,
             ];
 
@@ -589,6 +594,9 @@ class aggregation {
         // Get the grad item corresponding to this category.
         $gradecatitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
 
+        // Are there any altered weights?
+        $anyalteredweights = self::any_altered_weights($courseid);
+
         // Debugging stuff.
         $userhelpercount = 0;
 
@@ -608,7 +616,7 @@ class aggregation {
                 $userhelpercount++;
             }
 
-            $users[$id] = self::add_aggregation_fields_to_user($courseid, $gradecategoryid, $user, $columns);
+            $users[$id] = self::add_aggregation_fields_to_user($courseid, $gradecategoryid, $user, $columns, $anyalteredweights);
         }
 
         // Debug stuff.

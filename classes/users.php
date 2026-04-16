@@ -212,8 +212,15 @@ class users {
     public static function add_picture_and_profile_to_user_record(int $courseid, object $user) {
         global $PAGE;
 
-        $userpicture = new \user_picture($user);
-        $user->pictureurl = $userpicture->get_url($PAGE)->out(false);
+        $cache = \cache::make('local_gugrades', 'userpicture');
+        if ($pictureurl = $cache->get($user->id)) {
+            $user->pictureurl = $pictureurl;
+        } else {
+            $userpicture = new \user_picture($user);
+            $pictureurl = $userpicture->get_url($PAGE)->out(false);
+            $user->pictureurl = $pictureurl;
+            $cache->set($user->id, $pictureurl);
+        }
 
         // Also add profile url while we are here.
         $profile = new \moodle_url('/user/view.php', ['course' => $courseid, 'id' => $user->id]);

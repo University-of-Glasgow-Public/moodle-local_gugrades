@@ -52,4 +52,9 @@ $definitions = [
         'simplekeys' => true,
         'staticacceleration' => true,
     ],
+    'userpicture' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+    ],
 ];
