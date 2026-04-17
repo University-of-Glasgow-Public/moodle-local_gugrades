@@ -67,7 +67,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     Then I should see "B1"
-    And I click on "Course grade aggregation" "button"
+    And I click on "Course grade aggregation" "link"
     Then I should see "B1"
     And I should see "33.333%"
     And I should see "Grades missing" in the total cell
