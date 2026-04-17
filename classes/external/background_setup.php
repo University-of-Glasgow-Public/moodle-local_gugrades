@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define function get_grade_items
+ * Define function background_setup
  * @package    local_gugrades
- * @copyright  2023
+ * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,62 +31,45 @@ use core_external\external_single_structure;
 use core_external\external_value;
 
 /**
- * Get the data associated with a grade item
+ * Define function background setup
  */
-class get_grade_item extends external_api {
+class background_setup extends external_api {
     /**
      * Define function parameters
      * @return external_function_parameters
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID'),
-            'itemid' => new external_value(PARAM_INT, 'Grade item id'),
+            'courseid' => new external_value(PARAM_INT, 'Course id'),
         ]);
     }
 
     /**
      * Execute function
      * @param int $courseid
-     * @param int $itemid
      */
-    public static function execute(int $courseid, int $itemid) {
-        global $DB;
+    public static function execute($courseid) {
 
         \local_gugrades\development::increase_debugging();
 
         // Security.
-        $params = self::validate_parameters(self::execute_parameters(),[
+        $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
-            'itemid' => $itemid,
         ]);
-
-        // More security.
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        return \local_gugrades\api::get_grade_item($itemid);
+        \local_gugrades\api::background_setup($courseid);
+
+        return [];
     }
 
     /**
-     * Define function result
+     * Define result
      * @return external_single_structure
      */
     public static function execute_returns() {
         return new external_single_structure([
-            'id' => new external_value(PARAM_INT, 'Grade item ID'),
-            'courseid' => new external_value(PARAM_INT, 'Course ID'),
-            'categoryid' => new external_value(PARAM_INT, 'Grade category ID'),
-            'itemname' => new external_value(PARAM_TEXT, 'Name of grade item'),
-            'itemtype' => new external_value(PARAM_TEXT, 'course / mod / category / manual'),
-            'itemmodule' => new external_value(PARAM_TEXT, 'Module type (if module)'),
-            'iteminstance' => new external_value(PARAM_INT, 'Module instance ID'),
-            'isscale' => new external_value(PARAM_BOOL, 'True if grade item is a scale'),
-            'scalename' => new external_value(PARAM_TEXT, 'Name of scale (if it is a scale'),
-            'grademax' => new external_value(PARAM_FLOAT, 'Maximum grade'),
-            'weight' => new external_value(PARAM_FLOAT, 'Weight%'),
-            'categoryerror' => new external_value(PARAM_BOOL, 'Category config may not match'),
-            'link' => new external_value(PARAM_URL, 'Link to activity (if it is one) or empty'),
         ]);
     }
 }

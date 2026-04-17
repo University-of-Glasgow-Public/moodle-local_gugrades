@@ -788,7 +788,6 @@ class grades {
         if (!is_null($newgrade)) {
             $grade = $newgrade;
         } else {
-
             // ...id is a proxy for time added.
             // Cannot use the timestamp as the unit tests write the test grades all in the
             // same second (potentially).
@@ -1010,7 +1009,6 @@ class grades {
         if ($useridexists && array_key_exists($gradeitemid, self::$provisionalgrades[$userid])) {
             $provisional = self::$provisionalgrades[$userid][$gradeitemid];
         } else {
-
             // If not in the array, try setting the provisional/latest grade.
             if ($provisional = self::set_latest_grade($courseid, $gradeitemid, $userid)) {
                 self::$provisionalgrades[$userid][$gradeitemid] = $provisional;
@@ -2052,7 +2050,7 @@ class grades {
         }
 
         // Is it an aggregated category?
-        if (!$released = \local_gugrades\grades::get_aggregated_from_gradeitemid($gradeitemid, $userid)) {
+        if (!$released = self::get_aggregated_from_gradeitemid($gradeitemid, $userid)) {
             // Nope. So get 'normal' grade.
             $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $userid);
             $released = $usercapture->get_released();
@@ -2060,7 +2058,7 @@ class grades {
 
         // Don't bother if grade is in error.
         if ($released && !$released->iserror) {
-            \local_gugrades\grades::write_grade(
+            self::write_grade(
                 courseid: $courseid,
                 gradeitemid: $gradeitemid,
                 userid: $userid,
@@ -2125,10 +2123,24 @@ class grades {
             self::$hiddenids[$hidden->userid][] = $hidden->gradeitemid;
         }
 
-        // Check that there are no missing grades in local_gugrades_latest.
-        // Any grade_items represented in local_gugrades_grade should have a
-        // corresponding entry in local_gugrades_latest.
-        /*
+        // Load provisional grades into array for the current course.
+        self::$provisionalgrades = [];
+        $sql = 'SELECT gr.* FROM {local_gugrades_grade} gr
+            JOIN {local_gugrades_latest} gl ON gl.gugradeid = gr.id
+            WHERE gl.courseid = :courseid';
+        $provisionals = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        foreach ($provisionals as $provisional) {
+            self::$provisionalgrades[$provisional->userid][$provisional->gradeitemid] = $provisional;
+        }
+    }
+
+    /**
+     * Check missing latest grades. This is *slow*
+     * @param int $courseid
+     */
+    public static function missing_latest(int $courseid) {
+        global $DB;
+
         $sql = 'SELECT gr.* FROM {local_gugrades_grade} gr
             LEFT JOIN {local_gugrades_latest} gl ON gl.gugradeid = gr.id
             WHERE gl.id IS NULL
@@ -2138,17 +2150,6 @@ class grades {
         $missinggrades = $DB->get_records_sql($sql, ['courseid' => $courseid]);
         foreach ($missinggrades as $grade) {
             self::set_latest_grade($courseid, $grade->gradeitemid, $grade->userid);
-        }
-        */
-
-        // Load provisional grades into array for the current course.
-        self::$provisionalgrades = [];
-        $sql = 'SELECT gr.* FROM {local_gugrades_grade} gr
-            JOIN {local_gugrades_latest} gl ON gl.gugradeid = gr.id
-            WHERE gl.courseid = :courseid';
-        $provisionals = $DB->get_records_sql($sql, ['courseid' => $courseid]);
-        foreach ($provisionals as $provisional) {
-            self::$provisionalgrades[$provisional->userid][$provisional->gradeitemid] = $provisional;
         }
     }
 }

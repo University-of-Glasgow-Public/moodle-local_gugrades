@@ -25,9 +25,6 @@ namespace local_gugrades\plugininfo;
 
 use core\plugininfo\base;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * The local_gugrades\plugininfo\regulations class.
  *
@@ -35,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class regulations extends base {
-
     /**
      * Should there be a way to uninstall the plugin via the administration UI?
      *
@@ -45,5 +41,4 @@ class regulations extends base {
 
         return true;
     }
-
 }

@@ -226,7 +226,7 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
             $this->import_grades($this->course->id, $gradeitemid, $userlist);
         }
 
-        // Check the correct data on the page
+        // Check the correct data on the page.
         $page = get_aggregation_page::execute($this->course->id, $categoryid, '', '', 0, true);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),

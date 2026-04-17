@@ -30,4 +30,3 @@ $plugin->requires     = 2025100600; // Moodle 5.1.
 $plugin->component    = 'regulations_original';
 
 $plugin->maturity     = MATURITY_BETA;
-

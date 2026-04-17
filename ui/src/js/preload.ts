@@ -4,7 +4,6 @@
  */
 
 import { moodleFetch } from '@/js/moodlefetch';
-import type { ICategories } from './Interfaces';
 
 export function usePreload() {
 
@@ -12,44 +11,15 @@ export function usePreload() {
 
         // Get all the level 1 categories.
         moodleFetch(
-            'local_gugrades_get_levelonecategories',
+            'local_gugrades_background_setup',
             {}
         )
-        .then((result: any) => {
-            const categories: ICategories[] = result.categories;
-            const erroritems = result.erroritems;
-
-            // If there are erroritems, no point continuing
-            if (erroritems.length != 0) {
-                console.log('Errors found in get_levelonecategories. Aborting preload');
-                return;
-            }
-
-            categories.forEach((cat) => {
-                const catid = cat.id;
-                const fullname = cat.fullname.toLowerCase();
-
-                // Add only those that contain 'summative'
-                // (better than nothing)
-                if (fullname.includes('summative')) {
-
-                    // Call full recalculate.
-                    moodleFetch(
-                        'local_gugrades_recalculate',
-                        {
-                            gradecategoryid: catid,
-                        }
-                    )
-                    .then(() => {
-                        console.log('Recalculated ' + cat.fullname)
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-                }
-            });
+        .then(() => {
+            console.log('Background setup complete');
+        })
+        .catch((error) => {
+            console.error(error);
         });
-
     }
 
     return { recalculate };

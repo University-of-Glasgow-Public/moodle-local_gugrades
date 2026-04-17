@@ -2654,4 +2654,23 @@ class api {
         \local_gugrades\grades::build_bulk_data($courseid, []);
         \local_gugrades\aggregation::reset_bulk_data($courseid);
     }
+
+    /**
+     * Background setup
+     * Stuff that happens in the background when MyGrades is started
+     * @param int $courseid
+     */
+    public static function background_setup(int $courseid) {
+
+        // First step is to recalculate 'summative' categories
+        $categories = \local_gugrades\grades::get_firstlevel($courseid);
+        foreach ($categories as $category) {
+            if (str_contains(strtolower($category->fullname), 'summative')) {
+                self::recalculate($courseid, $category->id);
+            }
+        }
+
+        // Check that all latest_grades are up to date.
+        \local_gugrades\grades::missing_latest($courseid);
+    }
 }

@@ -460,7 +460,13 @@ class aggregation {
      * @param bool $anyalteredweights
      * @return object
      */
-    public static function add_aggregation_fields_to_user(int $courseid, int $gradecategoryid, object $user, array $columns, bool $anyalteredweights = false) {
+    public static function add_aggregation_fields_to_user(
+        int $courseid,
+        int $gradecategoryid,
+        object $user,
+        array $columns,
+        bool $anyalteredweights = false
+        ) {
         global $DB;
 
         // We're assuming that this user is fully aggregated and no further checks are required.
@@ -485,7 +491,6 @@ class aggregation {
         $fields = [];
         $items = [];
         foreach ($columns as $column) {
-
             // False if no altered weight.
             $altweight = $anyalteredweights ? self::get_altered_weight($column->gradeitemid, $user->id) : false;
 
