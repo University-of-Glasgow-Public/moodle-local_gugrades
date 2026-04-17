@@ -56,7 +56,7 @@ class get_grade_item extends external_api {
         \local_gugrades\development::increase_debugging();
 
         // Security.
-        $params = self::validate_parameters(self::execute_parameters(),[
+        $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'itemid' => $itemid,
         ]);

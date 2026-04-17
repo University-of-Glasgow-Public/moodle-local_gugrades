@@ -2662,7 +2662,7 @@ class api {
      */
     public static function background_setup(int $courseid) {
 
-        // First step is to recalculate 'summative' categories
+        // First step is to recalculate 'summative' categories.
         $categories = \local_gugrades\grades::get_firstlevel($courseid);
         foreach ($categories as $category) {
             if (str_contains(strtolower($category->fullname), 'summative')) {

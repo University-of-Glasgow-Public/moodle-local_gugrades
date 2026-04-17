@@ -466,7 +466,7 @@ class aggregation {
         object $user,
         array $columns,
         bool $anyalteredweights = false
-        ) {
+    ) {
         global $DB;
 
         // We're assuming that this user is fully aggregated and no further checks are required.
