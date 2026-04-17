@@ -154,11 +154,15 @@ class aggregation {
 
     /**
      * Get aggregation table columns for supplied gradecategoryid
+     *
+     * We can skip fetching userids as it's not needed for some functions
+     * and it's quite expensive.
      * @param int $courseid
      * @param int $gradecategoryid
+     * @param boolean $skipuserids
      * @return [$columns, $atype, $warnings]
      */
-    public static function get_columns(int $courseid, int $gradecategoryid) {
+    public static function get_columns(int $courseid, int $gradecategoryid, bool $skipuserids = false) {
         global $DB;
 
         // Clear reset cache for availability (lists of users).
@@ -236,8 +240,12 @@ class aggregation {
             $mapping = \local_gugrades\grades::mapping_factory($courseid, $gradeitem->gradeitemid);
 
             // Get list of available user ids to check later.
-            $activity = \local_gugrades\users::activity_factory($gradeitem->gradeitemid, $courseid, 0);
-            $userids = $activity->get_user_ids();
+            if (!$skipuserids) {
+                $activity = \local_gugrades\users::activity_factory($gradeitem->gradeitemid, $courseid, 0);
+                $userids = $activity->get_user_ids();
+            } else {
+                $userids = [];
+            }
 
             $columns[] = (object)[
                 'fieldname' => 'AGG_' . $gradeitem->gradeitemid,

@@ -1971,7 +1971,8 @@ class api {
         $explain = \local_gugrades\admingrades::replace_explain($explain);
 
         // Get categories and items at this level.
-        [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid);
+        // Skip getting users, we don't need them.
+        [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid, true);
 
         // Get user aggregation data.
         $context = \context_course::instance($courseid);
