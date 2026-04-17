@@ -159,7 +159,7 @@ class aggregation {
      * and it's quite expensive.
      * @param int $courseid
      * @param int $gradecategoryid
-     * @param boolean $skipuserids
+     * @param bool $skipuserids
      * @return [$columns, $atype, $warnings]
      */
     public static function get_columns(int $courseid, int $gradecategoryid, bool $skipuserids = false) {
