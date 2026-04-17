@@ -45,8 +45,8 @@ Feature: Testing view_staff_mygrades in local_gugrades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades (Beta)" in current page administration
-    Then "Assessment grade capture" "button" should exist
-    And I click on "Reassessment management" "button"
+    Then "Assessment grade capture" should exist
+    And I click on "Reassessment management"
     Then I should see "Summative"
     And I click on "Assessment grade capture" "button"
     Then I should see "Test assignment 1" in the "captureselect" "region"
