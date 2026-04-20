@@ -96,9 +96,12 @@
         <div v-if="!ordervalidated" class="alert alert-danger my-3">
             {{ mstrings.mapnotinorder }}
         </div>
-
-        <button class="btn btn-warning float-right" @click="cancel_button">{{ mstrings.cancel }}</button>
     </FormKit>
+
+    <div class="tw:flex tw:justify-end">
+        <TwButton color="warning" @click="cancel_button">{{ mstrings.cancel }}</TwButton>
+    </div>
+
 
 </template>
 
@@ -112,6 +115,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import type { IConversionMap } from '@/js/Interfaces';
     import type { FormKitNode } from '@formkit/core';
+    import TwButton from '../Tailwind/TwButton.vue';
 
     interface IBandItem {
         band: string;
