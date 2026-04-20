@@ -1543,7 +1543,7 @@ class grades {
         $DB->delete_records('local_gugrades_altered_weight', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_map_item', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_latest', ['courseid' => $courseid]);
-        $DB->delete_records('local_gugrades_resit', ['gradeitemid' => $gradeitemid]);
+        $DB->delete_records('local_gugrades_resit', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_agg_conversion', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_config', ['courseid' => $courseid]);
     }

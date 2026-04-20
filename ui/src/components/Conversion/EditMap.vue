@@ -1,9 +1,8 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="alert alert-info mb-2">
-        {{  mstrings.examplevalues }}
-    </div>
+    <TwAlert class="tw:mb-2">{{  mstrings.examplevalues }}</TwAlert>
+
     <FormKit v-if="loaded" type="form" submit-label="Save" :disabled="!caneditgrades" @submit="submit_form">
         <FormKit
             type="text"
@@ -116,6 +115,7 @@
     import type { IConversionMap } from '@/js/Interfaces';
     import type { FormKitNode } from '@formkit/core';
     import TwButton from '../Tailwind/TwButton.vue';
+import TwAlert from '../Tailwind/TwAlert.vue';
 
     interface IBandItem {
         band: string;
