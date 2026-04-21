@@ -77,7 +77,7 @@
     const emits = defineEmits(['gradewritten', 'gradecancel']);
 
     // validation depends on grademax
-    const gradevalidation = computed(() => {
+    const gradevalidation = computed<[string, ...any[]][]>(() => {
         return [
             ['number'],
             ['between', 0, props.grademax],

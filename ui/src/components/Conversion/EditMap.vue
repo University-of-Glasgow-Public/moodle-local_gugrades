@@ -71,7 +71,11 @@
                         validate_order: 'Values must be in ascending sequence',
                     }"
                     :model-value="item.boundpc?.toString() ?? ''"
-                    @input="(event) => handleInput(item, event)"
+                    @input="(value: unknown, _node) => {
+                        if (typeof value === 'string' || typeof value === 'number' || value === undefined) {
+                            handleInput(item, value);
+                        }
+                    }"
                 ></FormKit>
             </div>
             <div class="col-5">
@@ -88,7 +92,11 @@
                         validate_order: 'Values must be in ascending sequence',
                     }"
                     :model-value="item.boundpoints?.toString() ?? ''"
-                    @input="(event) => handleInput(item, event)"
+                    @input="(value: unknown, _node) => {
+                        if (typeof value === 'string' || typeof value === 'number' || value === undefined) {
+                            handleInput(item, value);
+                        }
+                    }"
                 ></FormKit>
             </div>
         </div>
