@@ -52,7 +52,7 @@ class regulations_test extends \advanced_testcase {
 
         // Check for regulation name.
         $original = $regulations['original'];
-        $this->assertEquals('Pre-2026', $original->displayname());
+        $this->assertEquals('Old regulations (to 2026)', $original->displayname());
 
         // Check correct regulations are selected
         $regulation = \local_gugrades\regulations::get_active_regulation($this->course->id);
