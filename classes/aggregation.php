@@ -55,19 +55,6 @@ class aggregation {
     }
 
     /**
-     * Get aggregation/regulations subplugins
-     *
-     */
-    public static function get_regulations() {
-        $regulations = [];
-        $plugins = \core_component::get_plugin_list('regulations');
-
-        foreach ($plugins as $plugin) {
-            continue;
-        }
-    }
-
-    /**
      * Factory for aggregation rule set
      * @param int $courseid
      * @param string $atype
@@ -1648,10 +1635,6 @@ class aggregation {
      * @return array
      */
     public static function aggregate(int $courseid, int $gradecategoryid, array $users) {
-
-        // Get possible regulations
-        // TODO: This needs refined.
-        $regulations = self::get_regulations();
 
         // If $users is array of objects, convert to array of ids.
         if (is_object($users[0])) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="tw:w-120">
+    <div class="tw:w-full">
         <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
         <div>
             <ActivitySelect v-if="showactivityselect" :categoryid="level1category" :currentitem="itemid" @activityselected="activity_selected"></ActivitySelect>

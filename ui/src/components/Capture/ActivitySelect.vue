@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="tw:mt-2 tw:border-solid tw:border-2 tw:border-gray-500 tw:p-3 tw:rounded-md" v-if="loaded">
+    <div class="tw:mt-2 tw:border-solid tw:border-2 tw:border-gray-500 tw:p-3 tw:rounded-md tw:w-120" v-if="loaded">
         <div v-if="collapsed" @click="open_selection" class="cursor-pointer row">
             <div v-if="selectedactivity" class="col-10">
                 {{ mstrings.selected }}: {{ selectedactivity.itemname }}

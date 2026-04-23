@@ -39,6 +39,8 @@ class admingrades {
      * 'grandtotal' = available in 'grand total' selection
      * 'items' = available in the small selection for all items / cats
      * 'level2' = available in small selection ONLY for L2 and below
+     * These are all the *possible* admingrades, not necessarily those
+     * valid for the current regulations regime.
      * @return array
      */
     private static function defaults() {
@@ -300,15 +302,24 @@ class admingrades {
     /**
      * Get grades for supplied
      * Level =
+     * @param int $courseid
      * @param int $level
      * @param bool $grandtotal
      * @return array
      */
-    public static function get_admingrades_for_level(int $level, bool $grandtotal = false) {
+    public static function get_admingrades_for_level(int $courseid, int $level, bool $grandtotal = false) {
 
         $defaults = self::defaults();
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $codes = $regulation->get_admingrades($grandtotal ? 0 : $level);
 
         $admingrades = [];
+        foreach ($codes as $code) {
+            [$displaygrade, $description] = self::get_displaygrade_from_name($code);
+            $admingrades[$code] = "$displaygrade - $description";
+        }
+
+        /*
         foreach ($defaults as $name => $default) {
             // Work out if this is ok for this level / grandtotal?
             $send = false;
@@ -327,28 +338,31 @@ class admingrades {
                 $admingrades[$name] = "$displaygrade - $description";
             }
         }
+        */
 
         return $admingrades;
     }
 
     /**
      * Get admincodes for non level 1 total menu
+     * @param int $courseid
      * @param int $gradeitemid
      * @return array
      */
-    public static function get_menu(int $gradeitemid) {
+    public static function get_menu(int $courseid, int $gradeitemid) {
         $level = \local_gugrades\grades::get_gradeitem_level($gradeitemid);
-        $admingrades = self::get_admingrades_for_level($level, false);
+        $admingrades = self::get_admingrades_for_level($courseid, $level, false);
 
         return $admingrades;
     }
 
     /**
      * Get admincodes for level 1 total menu
+     * @param int $courseid
      * @return array
      */
-    public static function get_menu_level_one() {
-        $admingrades = self::get_admingrades_for_level(1, true);
+    public static function get_menu_level_one(int $courseid) {
+        $admingrades = self::get_admingrades_for_level($courseid, 1, true);
 
         return $admingrades;
     }

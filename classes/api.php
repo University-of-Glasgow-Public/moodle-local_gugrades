@@ -546,9 +546,13 @@ class api {
 
         $erroritems = \local_gugrades\grades::check_grade_type_integrity($courseid);
 
+        // Regulation.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+
         return [
             'categories' => $results,
             'erroritems' => $erroritems,
+            'regulation' => $regulation->displayname(),
         ];
     }
 
@@ -631,6 +635,11 @@ class api {
 
         // Ask activity for grade.
         $rawgrade = $activity->get_first_grade($userid);
+
+        if (!is_null($rawgrade)) {
+            // Just for debugging breakpoint.
+            $rawgrade = $rawgrade;
+        }
 
         // If fillns not selected, then write whatever we got
         // MGU-1293: including null (no grade).
@@ -1032,7 +1041,7 @@ class api {
         }
 
         // Administrative grades.
-        $admingrades = \local_gugrades\admingrades::get_menu($gradeitemid);
+        $admingrades = \local_gugrades\admingrades::get_menu($courseid, $gradeitemid);
         $adminmenu = self::formkit_menu($admingrades, true);
 
         // Is it a scale?
@@ -1104,9 +1113,9 @@ class api {
         // Admin grades menu
         // Different for level == 1.
         if ($level == 1) {
-            $admingrades = \local_gugrades\admingrades::get_menu_level_one();
+            $admingrades = \local_gugrades\admingrades::get_menu_level_one($courseid);
         } else {
-            $admingrades = \local_gugrades\admingrades::get_menu($gradeitemid);
+            $admingrades = \local_gugrades\admingrades::get_menu($courseid, $gradeitemid);
         }
         $adminmenu = self::formkit_menu($admingrades, true);
 
@@ -1186,7 +1195,7 @@ class api {
         $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
         // Administrative grades.
-        $admingrades = \local_gugrades\admingrades::get_menu($gradeitemid);
+        $admingrades = \local_gugrades\admingrades::get_menu($courseid, $gradeitemid);
         $adminmenu = self::formkit_menu($admingrades, true);
 
         // Gradeitem.
@@ -1258,7 +1267,7 @@ class api {
         $wsgradetypes = self::formkit_menu($gradetypes);
 
         // Administrative grades.
-        $admingrades = \local_gugrades\admingrades::get_menu($gradeitemid);
+        $admingrades = \local_gugrades\admingrades::get_menu($courseid, $gradeitemid);
         $adminmenu = self::formkit_menu($admingrades, true);
 
         return [$wsgradetypes, $adminmenu];

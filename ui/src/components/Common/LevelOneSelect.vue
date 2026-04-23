@@ -13,10 +13,16 @@
                 <li v-for="item in erroritems">{{ item.itemname }}</li>
             </ul>
         </TwAlert>
-        <select v-if="!notsetup && !itemerror" v-model="categoryid" class="tw:select tw:w-120">
-            <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
-            <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
-        </select>
+        <div class="tw:flex tw:justify-between">
+            <select v-if="!notsetup && !itemerror" v-model="categoryid" class="tw:select tw:w-120">
+                <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
+                <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
+            </select>
+            <div class="tw:border-2 tw:rounded tw:p-2 tw:border-red-500">
+                <p class="tw:text-xs tw:mb-0 tw:text-red-500">Regulations used:</p>
+                <p class="tw:mb-0 tw:text-red-500">{{ regulation }}</p>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -37,6 +43,7 @@
     const notsetup = ref(false);
     const itemerror = ref(false);
     const debug = ref({});
+    const regulation = ref('');
     const level1store = useLeve1Store();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
@@ -53,6 +60,7 @@
 
             level1categories.value = result.categories;
             erroritems.value = result.erroritems;
+            regulation.value = result.regulation;
             notsetup.value = level1categories.value.length == 0;
             itemerror.value = erroritems.value.length > 0;
 
