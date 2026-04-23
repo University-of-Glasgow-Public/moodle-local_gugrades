@@ -53,6 +53,7 @@ class regulations {
     /**
      * Get the active regulations class
      * Works on a first one to "win" basis
+     * TODO: This *definitely* needs some sort of cache.
      * @param int $courseid
      * @return object
      */
