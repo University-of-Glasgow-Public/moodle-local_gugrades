@@ -18,7 +18,7 @@
                 <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
                 <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
             </select>
-            <div class="tw:border-2 tw:rounded tw:p-2 tw:border-red-500">
+            <div class="tw:border-2 tw:rounded tw:px-2 tw:pt-1 tw:border-red-500">
                 <p class="tw:text-xs tw:mb-0 tw:text-red-500">Regulations used:</p>
                 <p class="tw:mb-0 tw:text-red-500">{{ regulation }}</p>
             </div>
