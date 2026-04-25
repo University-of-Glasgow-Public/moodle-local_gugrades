@@ -29,7 +29,7 @@ namespace regulations_original;
 
 defined('MOODLE_INTERNAL') || die();
 
-class regulation {
+class regulation implements \local_gugrades\IRegulation {
 
     /**
      * Get short name
@@ -73,11 +73,28 @@ class regulation {
      * @param string $atype
      * @return object
      */
-    public function get_aggregation(int $courseid, string $atype) {
+    public function get_aggregation(int $courseid, string $atype): object {
         $class = new("\\regulations_original\\aggregate");
         $class->set_data($courseid, $atype);
 
         return $class;
+    }
+
+    /**
+     * Is NS0 supported.
+     * This appears on menu options in original version.
+     * @return bool
+     */
+    public function is_ns0_available(): bool {
+        return true;
+    }
+
+    /**
+     * Is completion supported
+     * @return bool
+     */
+    public function is_completion_supported(): bool {
+        return true;
     }
 
     /**

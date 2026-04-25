@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Base for aggregation class
+ * Aggregation rules from 2026
  * This class defines basic functional logic.
  * It could be overriden for custom instances.
  *
  * @package    local_gugrades
- * @copyright  2024
+ * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
@@ -54,6 +54,9 @@ class aggregate {
      */
     private string $atype;
 
+
+
+
     /**
      * Note that MV0 grades were found (and dropped) in pre-process
      * Their presence (even though dropped) effects the aggregated admin grade
@@ -67,13 +70,213 @@ class aggregate {
      */
 
     /**
-     * Constructor
+     * Set some required data
      * @param int $courseid
      * @param string $atype
      */
-    public function __construct(int $courseid, string $atype) {
+    public function set_data(int $courseid, string $atype) {
         $this->courseid = $courseid;
         $this->atype = $atype;
+    }
+
+    /**
+     * Use the array of items for a given gradecategory and produce
+     * an aggregated grade (or not).
+     * The category object is provided to identify aggregation settings
+     * and so on
+     * Note that this will be for one gradecategory for one user, only.
+     * Return array has the following...
+     * - parent grade value (See MGU-821)
+     * - raw aggregated grade
+     * - display grade (e.g. scale)
+     * - completion % (NOT USED)
+     * - error
+     * @param int $courseid
+     * @param object $category
+     * @param array $items
+     * @param int $level
+     * @param int $userid
+     * @return array ['rounded' grade, grade val, admingrade, grade disp, completion, error, explain, not available]
+     */
+    public function aggregate_user_category(int $courseid, object $category, array $items, int $level, int $userid) {
+
+        // Get basic data about aggregation
+        // (this is also a check that it actually exists).
+        $keephigh = $category->keephigh;
+        $droplow = $category->droplow;
+        $aggmethod = $category->aggregation;
+        $atype = $category->atype;
+        $itemid = $category->itemid;
+
+        // Initialise 'explain' string.
+        $explain = '';
+
+        // Logic will be different if this category is for resits.
+        $isresitcategory = \local_gugrades\grades::is_resit_category($category->categoryid);
+
+        // 0 based keys, please.
+        $items = array_values($items);
+
+        // Get the correct aggregation function.
+        [$aggfunction, $isweighted] = $this->strategy_factory($aggmethod);
+
+        // Populate lists of available users.
+        // Used to drop unavailable.
+        $items = $this->availability($items, $userid);
+
+        // MGU-1349: If there are now no 'available' items left, the
+        // aggregated category is 'not available'.
+        if (count($items) == 0) {
+            $explain = get_string('explain_notavailable', 'local_gugrades');
+            [$admingrade, $error, $displaygrade] = $this->all_unavailable_total($level);
+
+            return [0, 0, $admingrade, $displaygrade, 0, $error, $explain, true];
+        }
+
+        // Need to have a valid aggregation type to actually do the aggregation.
+        if ($category->atype == \local_gugrades\GRADETYPE_ERROR) {
+            // Additional check for zero weights. This is an exceptional case for atype = ERROR. So check specifically.
+            if ($this->weight_error($items, $aggmethod)) {
+                $explain = get_string('explain_zeroweights', 'local_gugrades');
+                return [null, null, '', null, 0, get_string('cannotaggregate', 'local_gugrades'), $explain, false];
+            }
+
+            $explain = get_string('explain_gradetypeerror', 'local_gugrades');
+
+            return [null, null, '', null, 0, get_string('cannotaggregate', 'local_gugrades'), $explain, false];
+        }
+
+        // Admingrade check for anything that happens before drop lowest and
+        // checks for all items graded etc.
+        // Skip this if we're dealing with a resit category.
+        if (!$isresitcategory && ($admingrade = $this->admin_grade_precheck($level, $items))) {
+            [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
+            $explain = $this->get_explain();
+
+            return [0, 0, $admingrade, $displaygrade, 0, '', $explain, false];
+        }
+
+        // Quick check - all items must have a grade.
+        foreach ($items as $item) {
+            if ($item->grademissing) {
+                $explain = get_string('explain_gradesmissing', 'local_gugrades');
+
+                return [null, null, '', null, 0, get_string('gradesmissing', 'local_gugrades'), $explain, false];
+            }
+        }
+
+        // If this is a resit category then we may be able to resolve aggregation before doing anything else.
+        if ($isresitcategory) {
+            // Find the resit item id (must exist).
+            $resititemid = \local_gugrades\grades::get_resit_itemid($category->categoryid, true);
+
+            [$rawgrade, $admingrade, $explain] = $this->resit($items, $resititemid);
+            if ($explain != '') {
+                if ($admingrade) {
+                    [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
+                    return [0, 0, $admingrade, $displaygrade, 0, '', $explain, false];
+                } else {
+                    if (($atype == \local_gugrades\GRADETYPE_SCHEDULEA) || ($atype == \local_gugrades\GRADETYPE_SCHEDULEB)) {
+                        [$convertedgrade, $convertedgradevalue] = $this->convert($rawgrade, $atype);
+                        $parentgrade = $this->get_grade_for_parent($rawgrade, $convertedgradevalue);
+                        $displaygrade = $this->format_displaygrade(
+                            $convertedgrade,
+                            $rawgrade,
+                            $convertedgradevalue,
+                            0,
+                            $level
+                        );
+
+                        return [$parentgrade, $rawgrade, '', $displaygrade, 0, '', $explain, false];
+                    } else {
+                        $roundpoints = $this->round_float($rawgrade);
+                        return [$roundpoints, $roundpoints, '', $roundpoints, 0, '', $explain, false];
+                    }
+                }
+            }
+        }
+
+        // If a resit category and we got this far, then none of the remaining checks are needed.
+        // (We *know* that there cannot be any admin grades).
+        if (!$isresitcategory) {
+            // Pre-process. Can optionally return aggregated grade.
+            [$admingrade, $items] = $this->pre_process_items($items, $isweighted, $level);
+            if ($admingrade) {
+                [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
+                $explain = $this->get_explain();
+
+                return [0, 0, $admingrade, $displaygrade, 0, '', $explain, false];
+            }
+
+            // ..."drop lowest" items.
+            // NOTE: droplow is NOT supported for level 1.
+            if (($droplow > 0) && ($level > 1)) {
+                [$items, $droppeditems] = $this->droplow($items, $droplow);
+                \local_gugrades\aggregation::flag_dropped_items($droppeditems, $userid);
+            }
+
+            // If we've got here and there are no grades to aggregate (possibly due to drop lowest)
+            // then it's an error.
+            // UNLESS any MV0s already dumped.
+            if (count($items) == 0) {
+                if ($this->get_mv0found()) {
+                    [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name('GOODCAUSE_NR');
+
+                    return [0, 0, 'GOODCAUSE_NR', $displaygrade, 0, '', $explain, false];
+                } else {
+                    $explain = get_string('explain_noitems', 'local_gugrades');
+
+                    return [null, null, '', null, 0, get_string('cannotaggregate', 'local_gugrades'), $explain, false];
+                }
+            }
+
+            // If level = 1 then check admin grades for 'top' level. TODO - Ticket number?
+            if ($level == 1) {
+                if ($admingrade = $this->admin_grades_level1($items)) {
+                    [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
+                    $explain = $this->get_explain();
+
+                    return [0, 0, $admingrade, $displaygrade, 0, '', $explain, false];
+                }
+            }
+        }
+
+        // Record normalised weights.
+        \local_gugrades\aggregation::record_weights($items, $userid);
+
+        // Check for zero weights with whatever items remain.
+        if ($this->weight_error($items, $aggmethod)) {
+            $explain = get_string('explain_zeroweights', 'local_gugrades');
+            return [null, null, '', null, 0, get_string('cannotaggregate', 'local_gugrades'), $explain, false];
+        }
+
+        // Now call the appropriate aggregation function to do the sums.
+        $aggregatedgrade = call_user_func([$this, $aggfunction], $items);
+
+        // If this is a scale convert the numeric grade to the appropriate.
+        if (($atype == \local_gugrades\GRADETYPE_SCHEDULEA) || ($atype == \local_gugrades\GRADETYPE_SCHEDULEB)) {
+            [$convertedgrade, $convertedgradevalue] = $this->convert($aggregatedgrade, $atype);
+
+            // Should we pass back convertedgradevalue or aggregatedgrade (see MGU-821).
+            $parentgrade = $this->get_grade_for_parent($aggregatedgrade, $convertedgradevalue);
+
+            // How do we want to display this?
+            $displaygrade = $this->format_displaygrade(
+                $convertedgrade,
+                $aggregatedgrade,
+                $convertedgradevalue,
+                $level
+            );
+
+            $explain = get_string('explain_schedule', 'local_gugrades');
+
+            return [$parentgrade, $aggregatedgrade, '', $displaygrade, 0, '', $explain, false];
+        }
+
+        // Return points grades.
+        $explain = get_string('explain_points', 'local_gugrades');
+
+        return [$aggregatedgrade, $aggregatedgrade, '', $aggregatedgrade, 0, '', $explain, false];
     }
 
     /**
@@ -182,16 +385,23 @@ class aggregate {
      * Pre-process grades for aggregation.
      * Allows grades to be 'normalised' prior to aggregation.
      * @param array $items
+     * @param bool $isweighted
+     * @param int $level
      * @return array
      */
-    public function pre_process_items(array $items) {
+    public function pre_process_items(array $items, bool $isweighted, int $level) {
 
         // Drop any GOODCAUSE_NR.
+        // UNLESS, level 1, any are weight>10% in which case grade is ECC. (MGU-1387, rule 4)
         $newitems = [];
         foreach ($items as $item) {
+            $weight = $isweighted ? $item->weight * 100 : 100 / count($items);
             if ($item->admingrade != 'GOODCAUSE_NR') {
                 $newitems[] = $item;
             } else {
+                if (($level == 1) && ($weight > 10)) {
+                    return ['GOODCAUSE_NR', []];
+                }
                 $this->mv0found = true;
             }
         }
@@ -309,19 +519,17 @@ class aggregate {
             }
         }
 
-        // If ALL grades are NS/NS0, then return NS (MGU-1191).
+        // If ALL grades are NS, then return NS (MGU-1191) at level 2
+        // At Level 1, drop through and just return H
         $allns = true;
         foreach ($items as $item) {
-            if (($item->admingrade != 'NOSUBMISSION') && ($item->admingrade != 'NOSUBMISSION_0')) {
+            if ($item->admingrade != 'NOSUBMISSION') {
                 $allns = false;
             }
         }
         if ($allns) {
             // MGU-1216.
-            if ($level == 1) {
-                $this->explain = get_string('explain_allnslevel1', 'local_gugrades');
-                return 'CREDITWITHHELD';
-            } else {
+            if ($level > 1) {
                 $this->explain = get_string('explain_allnslevel2', 'local_gugrades');
                 return 'NOSUBMISSION';
             }
@@ -332,62 +540,16 @@ class aggregate {
     }
 
     /**
-     * Logic for admingrades in >= level2, see MGU-726
-     * Works out if aggregated grade is some admin grade
-     * Returns this or empty string if not.
-     *
-     * @param array $items
-     * @return string
-     */
-    public function admin_grades_level2(array $items) {
-
-        // Condition 1: are there 1 or more NS? If so, result is NS.
-        foreach ($items as $item) {
-            $grade = $item->admingrade;
-            if ($grade == 'NOSUBMISSION') {
-                $this->explain = get_string('explain_anynslevel2', 'local_gugrades');
-                return 'NOSUBMISSION';
-            }
-        }
-
-        // No admin grade.
-        return '';
-    }
-
-    /**
      * Logic for admingrades in >= level2, TODO Ticket?
      * Works out if aggregated grade is some admin grade
      * Returns this or empty string if not.
      *
      * @param array $items
-     * @param float $completion
      * @return string
      */
-    public function admin_grades_level1(array $items, float $completion) {
+    public function admin_grades_level1(array $items) {
 
-        // If completion is <75% then admingrade is CW
-        // ...unless one of the items is MV0, then it's MV
-        // MGU-1110 CoS11
-        // UNLESS there is any NS - CoS12
-        // Superceded by MGU-1213.
-        if ($completion < 75.0) {
-            // Check for MV0.
-            if ($this->mv0found) {
-                // If there is an NS, then it's CW.
-                foreach ($items as $item) {
-                    if ($item->admingrade == 'NOSUBMISSION') {
-                        $this->explain = get_string('explain_lessthan75mv0level1ns', 'local_gugrades');
-                        return 'CREDITWITHHELD';
-                    }
-                }
-
-                $this->explain = get_string('explain_lessthan75mv0level1', 'local_gugrades');
-                return 'GOODCAUSE_FO';
-            }
-
-            $this->explain = get_string('explain_lessthan75level1', 'local_gugrades');
-            return 'CREDITWITHHELD';
-        }
+        // TODO: Is this needed?
 
         return '';
     }
@@ -440,7 +602,7 @@ class aggregate {
         // If the resit grade is NS/NS0 then the first grade is taken,
         // unless it too is admin. (This is 'rule 8').
         $resit = $items[$resitindex];
-        if (($resit->admingrade == 'NOSUBMISSION') || ($resit->admingrade == 'NOSUBMISSION_0')) {
+        if ($resit->admingrade == 'NOSUBMISSION') {
             $first = $items[$firstindex];
             if ($first->admingrade == '') {
                 $explain = get_string('explain_resitnosubmission', 'local_gugrades');
@@ -464,62 +626,6 @@ class aggregate {
         // In which case, we must have two grades and can allow normal aggregation to procede.
         // Signified by empty explain.
         return [0, '', ''];
-    }
-
-    /**
-     * Calculate completion %age for items
-     * Need to be "sympathetic" with rounding on this as
-     * stuff will be blocked if completion != 100%
-     *
-     * Completion is...
-     * (sum of weights of completed items) * 100 / (sum of all weights)
-     *
-     * If a non-weighted aggregation strategy is used then set
-     * $weighted=false. In this case weight is assumed to be 1 for all items
-     *
-     * NOTE: Points grades do NOT count. Admingrades do NOT count.
-     * @param array $items
-     * @param bool $weighted
-     * @return int
-     */
-    public function completion(array $items, bool $weighted) {
-
-        $totalweights = 0.0;
-        $countall = 0;
-        $totalcompleted = 0.0;
-        $countcompleted = 0;
-
-        foreach ($items as $item) {
-            // If item is not available, then just ignore it.
-            if (isset($item->available) && !$item->available) {
-                continue;
-            }
-            $weight = $weighted ? $item->weight : 1;
-            $totalweights += $weight;
-            $countall++;
-            if (!$item->grademissing && !$item->admingrade && $item->isscale) {
-                $totalcompleted += $weight;
-                $countcompleted++;
-            }
-        }
-
-        // Ideally, we shouldn't be here if countall or totalweights are zero.
-        // However, just for robustness...
-        if (($countall == 0) || ($totalweights == 0)) {
-            return 0;
-        }
-
-        // Calculation and rounding.
-        // If $totalweights == 0 then there are no weights, then use
-        // counts instead.
-        if ($totalweights == 0) {
-            $raw = $countcompleted * 100 / $countall;
-        } else {
-            $raw = $totalcompleted * 100 / $totalweights;
-        }
-
-        // MGU-1236.
-        return round($raw, 3, PHP_ROUND_HALF_DOWN);
     }
 
     /**
@@ -572,8 +678,9 @@ class aggregate {
 
     /**
      * Choose aggregation strategy method
+     * And detect if weighted
      * @param int $aggregationid
-     * @return string
+     * @return [string, boolean]
      */
     public function strategy_factory(int $aggregationid) {
 
@@ -594,7 +701,9 @@ class aggregate {
             throw new \moodle_exception('Unknown or unsupported aggregation strategy. Aggregation ID ' . $aggregationid);
         }
 
-        return "strategy_" . $agf;
+        $weighted = $aggregationid = \GRADE_AGGREGATE_WEIGHTED_MEAN;
+
+        return ["strategy_" . $agf, $weighted];
     }
 
     /**
@@ -819,27 +928,19 @@ class aggregate {
 
     /**
      * Format displaygrade for Schedule A / B
-     * Depends on completion (<75% or not)
-     * MGU-1000: return 'CW' if <75%
      * @param string $convertedgrade
      * @param float $rawgrade
      * @param float $gradepoint
-     * @param int $completion
      * @param int $level
      * @return string
      */
-    public function format_displaygrade(string $convertedgrade, float $rawgrade, float $gradepoint, int $completion, int $level) {
+    public function format_displaygrade(string $convertedgrade, float $rawgrade, float $gradepoint, int $level) {
 
         // If >level 1, then we always return the combination (no 75% rule).
         if ($level > 1) {
             return $convertedgrade;
         }
 
-        // Must be level 1, so grade displayed depends on completion %age.
-        if ($completion >= 75) {
-            return $convertedgrade . " ($rawgrade)";
-        } else {
-            return "$rawgrade";
-        }
+        return $convertedgrade . " ($rawgrade)";
     }
 }

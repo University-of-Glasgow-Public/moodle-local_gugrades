@@ -1,0 +1,880 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Test functions around aggregation conversion - from 2026 regulations
+ * @package    local_gugrades
+ * @copyright  2026
+ * @author     Howard Miller
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_gugrades\external;
+
+use core_external\external_api;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+
+require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregation_testcase.php');
+
+/**
+ * Specific tests for list of examples in the Excel file on Teams somewhere.
+ */
+final class aggregation_from2026_examples_test extends \local_gugrades\external\gugrades_aggregation_testcase {
+    /**
+     * @var object $gradecatsummative
+     */
+    protected $gradecatsummative;
+
+    /**
+     * @var object $gradecatquizzes
+     */
+    protected $gradecatquizzes;
+
+    /**
+     * @var array $itemids
+     */
+    protected $itemids = [];
+
+    /**
+     * Called before every test
+     */
+    protected function setUp(): void {
+        global $DB;
+
+        parent::setUp();
+
+        $this->resetAfterTest(true);
+
+        // Change the course start date so that it uses the >2026 regulations.
+        $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
+        $course->startdate = strtotime('2027-01-01');
+        $DB->update_record('course', $course);
+
+        // Install test schema.
+        $gradeitemids = $this->load_schema('schema_examples');
+
+        // Get the grade categories 'summative' and 'Quizzes'.
+        $this->gradecatsummative = $DB->get_record('grade_categories', ['fullname' => 'Summative'], '*', MUST_EXIST);
+        $this->gradecatquizzes = $DB->get_record('grade_categories', ['fullname' => 'Quizzes'], '*', MUST_EXIST);
+
+        // Get the itemids.
+        $itemids['Quizzes'] = $this->get_gradeitemid_for_category('Quizzes');
+        $itemids['Labs'] = $DB->get_record('grade_items', ['itemname' => 'Labs'], '*', MUST_EXIST)->id;
+        $itemids['ExamA'] = $DB->get_record('grade_items', ['itemname' => 'Exam A'], '*', MUST_EXIST)->id;
+        $itemids['ExamB'] = $DB->get_record('grade_items', ['itemname' => 'Exam B'], '*', MUST_EXIST)->id;
+        for ($i = 1; $i <= 5; $i++) {
+            $item = $DB->get_record('grade_items', ['itemname' => 'Quiz ' . $i], '*', MUST_EXIST);
+            $itemids['quiz' . $i] = $item->id;
+        }
+        $this->itemids = $itemids;
+    }
+
+    /**
+     * Define scale mapping
+     * @return array
+     */
+    public function get_map() {
+        return array_flip([
+            0 => 'H',
+            1 => 'G2',
+            2 => 'G1',
+            3 => 'F3',
+            4 => 'F2',
+            5 => 'F1',
+            6 => 'E3',
+            7 => 'E2',
+            8 => 'E1',
+            9 => 'D3',
+            10 => 'D2',
+            11 => 'D1',
+            12 => 'C3',
+            13 => 'C2',
+            14 => 'C1',
+            15 => 'B3',
+            16 => 'B2',
+            17 => 'B1',
+            18 => 'A5',
+            19 => 'A4',
+            20 => 'A3',
+            21 => 'A2',
+            22 => 'A1',
+        ]);
+    }
+
+    /**
+     * Write a new grade
+     * @param int $gradeitemid
+     * @param int $userid
+     * @param string $scale
+     * @param string $admingrade
+     * @param bool $iscategory
+     */
+    protected function write_grade($gradeitemid, $userid, $scale, $admingrade, $iscategory = false) {
+        $schedulea = $this->get_map();
+        $scalevalue = $scale ? $schedulea[$scale] : -1;
+        $nothing = write_additional_grade::execute(
+            courseid:       $this->course->id,
+            gradeitemid:    $gradeitemid,
+            userid:         $userid,
+            reason:         $iscategory ? 'CATEGORY' : 'SECOND',
+            other:          '',
+            admingrade:     $admingrade,
+            scale:          $scalevalue,
+            grade:          0,
+            notes:          'Test notes'
+        );
+        $nothing = external_api::clean_returnvalue(
+            write_additional_grade::execute_returns(),
+            $nothing
+        );
+    }
+
+    // TESTS FROM LEVEL 2+ TAB.
+
+    /**
+     * Test "With DFR deferred grade"
+     *
+     * If there is a DFR deferred grade for any of the components at level 2, the level 2 category
+     * total automatically becomes DF deferred. This includes if there are other admin grades present.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_dfr_deferred_grade(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'DEFERRED');
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('DFR', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies"
+     *
+     * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
+     * total automatically becomes IS interruption of studies.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_is_interruption_of_studies_grade(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies and NS no submission"
+     *
+     * If there is a IS interruption of studies grade for any weighted grade ite, at level 2, the level 2 category
+     * total automatically becomes IS interruption of studies.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_is_interruption_of_studies_and_ns_no_submission(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['quiz3'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With NS no submission" *changed*
+     *
+     * If the student gets a NS grade at Leve 2+, the NS grade is counted as zero
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_ns_no_submission(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('C1', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies and EC extenuating circumstances (further opportunity)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_is_interruption_of_studies_and_ec_extenuating_circumstances_fo(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With EC extenuating circumstances (further opportunity)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_ec_extenuating_circumstances_fo(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('EC', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies and ECC extenuating circumstances (condoned)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_is_interruption_of_studies_and_ec_extenuating_circumstances_condoned(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With  ECC extenuating circumstances (condoned)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_ec_extenuating_circumstances_condoned(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('A5', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "All NS no submission"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_all_ns(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz3'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz4'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz5'], $studentid, '', 'NOSUBMISSION');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('NS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "All EC extenuating circumstances (further opportunity)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_all_ec(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['quiz3'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['quiz4'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['quiz5'], $studentid, '', 'GOODCAUSE_FO');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('EC', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "All ECC extenuating circumstances (condoned)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_all_ecc(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['quiz3'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['quiz4'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['quiz5'], $studentid, '', 'GOODCAUSE_NR');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('ECC', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With NS no submission and EC extenuating circumstances"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_ns_no_submission_and_ec_extenuating_circumstances(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('EC', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With NS no submission and ECC extenuating circumstances (condoned)"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_with_ns_no_submission_and_ecc_extenuating_circumstances_condoned(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['quiz2'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, 'A3', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('D1', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies for a 0% weighted item"
+     * NOTE: This one doesn't make any sense in the sheet.
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function xx_test_with_is_for_0percent_weighted(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['quiz1'], $studentid, 'B2', '');
+        $this->write_grade($this->itemids['quiz2'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['quiz3'], $studentid, 'A5', '');
+        $this->write_grade($this->itemids['quiz4'], $studentid, 'C2', '');
+        $this->write_grade($this->itemids['quiz5'], $studentid, '', 'INTERRUPTIONOFSTUDIES');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatquizzes->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('NS', $fred['displaygrade']);
+    }
+
+    // TESTS FROM LEVEL 1 TAB.
+
+    /**
+     * Test "With DFR deferred grade"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_dfr_deferred_grade(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'DEFERRED', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('DFR', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_is_interruption_of_studies(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies and NS no submission"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_is_interruption_of_studies_ns_no_submission(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies and EC"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_is_interruption_of_studies_ecc(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With IS interruption of studies and EC extenuating circumstances"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_is_interruption_of_studies_and_ec_extenuating_circumstances(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'INTERRUPTIONOFSTUDIES', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('IS', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With EC extenuating circumstances "
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_ec_extenuating_circumstances(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('EC', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With ECC extenuating circumstances condoned and de-minimis"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_ecc_extenuating_circumstances_de_minimis(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_NR', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('B1 (17.11111)', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With ECC extenuating circumstances condoned and NOT de-minimis"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_ecc_extenuating_circumstances_not_de_minimis(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, 'A1', '', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['ExamA'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('ECC', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With NS no submission"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_ns_no_submission(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'NOSUBMISSION', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, 'A1', '');
+        $this->write_grade($this->itemids['ExamA'], $studentid, 'B3', '');
+        $this->write_grade($this->itemids['ExamB'], $studentid, 'A5', '');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('B3 (15.4)', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With all NS"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_all_ns(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'NOSUBMISSION', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['ExamA'], $studentid, '', 'NOSUBMISSION');
+        $this->write_grade($this->itemids['ExamB'], $studentid, '', 'NOSUBMISSION');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('H (0)', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With all EC"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_all_ec(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_FO', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['ExamA'], $studentid, '', 'GOODCAUSE_FO');
+        $this->write_grade($this->itemids['ExamB'], $studentid, '', 'GOODCAUSE_FO');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('EC', $fred['displaygrade']);
+    }
+
+    /**
+     * Test "With all ECC"
+     *
+     * @covers \local_gugrades\external\get_aggregation_page::execute
+     */
+    public function test_l1_all_ecc(): void {
+
+        $studentid = $this->student->id;
+        $this->write_grade($this->itemids['Quizzes'], $studentid, '', 'GOODCAUSE_NR', true);
+        $this->write_grade($this->itemids['Labs'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['ExamA'], $studentid, '', 'GOODCAUSE_NR');
+        $this->write_grade($this->itemids['ExamB'], $studentid, '', 'GOODCAUSE_NR');
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Get resulting aggregation page.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('ECC', $fred['displaygrade']);
+    }
+}

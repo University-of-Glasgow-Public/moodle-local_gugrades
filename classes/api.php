@@ -2035,6 +2035,9 @@ class api {
         \local_gugrades\grades::build_bulk_data($courseid, []);
         \local_gugrades\aggregation::reset_bulk_data($courseid);
 
+        // Get correct regulations object for this course.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+
         // Is aggregation supported (at all)?
         $gradeitemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($gradecategoryid);
         [$aggregationsupported, $unsupportedscales] = \local_gugrades\grades::are_all_grades_supported($courseid, $gradeitemid);
@@ -2057,6 +2060,7 @@ class api {
                 'excludeempty' => false,
                 'debug' => [],
                 'staffuserid' => $USER->id,
+                'completionused' => false,
             ];
         }
 
@@ -2136,6 +2140,7 @@ class api {
             'excludeempty' => $excludeempty,
             'debug' => [],
             'staffuserid' => $USER->id,
+            'completionused' => $regulation->is_completion_supported(),
         ];
     }
 

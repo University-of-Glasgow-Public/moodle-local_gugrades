@@ -299,6 +299,7 @@
     const lastname = ref('');
     const staffuserid = ref(0);
     const caneditgrades = ref(false);
+    const completionused = ref(false);
 
     /**
      * onMounted, get write grades capability
@@ -559,11 +560,13 @@
             });
 
             // Completion %age
-            heads.push({
-                text: mstringstore.getMstring('completed'),
-                value: "completed",
-                infocol: true,
-            });
+            if (completionused.value) {
+                heads.push({
+                    text: mstringstore.getMstring('completed'),
+                    value: "completed",
+                    infocol: true,
+                });
+            }
 
             // Total.
             heads.push({
@@ -690,6 +693,7 @@
             showweights.value = result.showweights;
             excludeempty.value = result.excludeempty;
             staffuserid.value = result.staffuserid;
+            completionused.value = result.completionused;
 
             if (aggregationsupported.value) {
 

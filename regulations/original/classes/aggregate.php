@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Base for aggregation class
+ * Aggregation rules up to 2026 (old/orginal)
  * This class defines basic functional logic.
  * It could be overriden for custom instances.
  *
  * @package    local_gugrades
- * @copyright  2024
+ * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *

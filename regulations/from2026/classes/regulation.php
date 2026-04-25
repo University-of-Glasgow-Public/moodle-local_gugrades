@@ -29,7 +29,7 @@ namespace regulations_from2026;
 
 defined('MOODLE_INTERNAL') || die();
 
-class regulation {
+class regulation implements \local_gugrades\IRegulation {
 
     /**
      * Get short name
@@ -65,6 +65,36 @@ class regulation {
         }
 
         return $course->startdate > $startdate;
+    }
+
+    /**
+     * Get aggregation object
+     * @param int $courseid
+     * @param string $atype
+     * @return object
+     */
+    public function get_aggregation(int $courseid, string $atype): object {
+        $class = new("\\regulations_from2026\\aggregate");
+        $class->set_data($courseid, $atype);
+
+        return $class;
+    }
+
+    /**
+     * Is NS0 supported.
+     * This appears on menu options in original version.
+     * @return bool
+     */
+    public function is_ns0_available(): bool {
+        return false;
+    }
+
+    /**
+     * Is completion supported
+     * @return bool
+     */
+    public function is_completion_supported(): bool {
+        return false;
     }
 
     /**
@@ -106,7 +136,6 @@ class regulation {
                 'GOODCAUSE_FO',
                 'GOODCAUSE_NR',
                 'NOSUBMISSION',
-                'NOSUBMISSION_0',
                 'DEFERRED',
                 'INTERRUPTIONOFSTUDIES',
             ];
