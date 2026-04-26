@@ -110,18 +110,18 @@ class regulation implements \local_gugrades\IRegulation {
             return [
                 'GOODCAUSE_FO',
                 'DEFERRED',
-                'GOODCAUSECREDITWITHHELD',
-                'CREDITWITHHELD',
                 'UNSATISFACTORY',
                 'SATISFACTORY',
                 'NOTPASSED',
                 'PASSED',
                 'NOTCOMPLETE',
                 'COMPLETE',
-                'CREDITREFUSED',
                 'CREDITAWARDED',
                 'AUDITONLY',
                 'INTERRUPTIONOFSTUDIES',
+                'CREDITNOTYETAWARED',
+                'CREDITNOTAWARDED',
+                'GOODCAUSE_NR',
             ];
         } else if ($level == 1) {
             return [

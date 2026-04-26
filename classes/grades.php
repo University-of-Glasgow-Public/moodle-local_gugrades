@@ -2081,6 +2081,30 @@ class grades {
     }
 
     /**
+     * Given an array of valid admin grades, check grade table (for selected course)
+     * to make sure that there are none outside of this list.
+     * Mitigates against regulation change when there is already data
+     * @param int $courseid
+     * @param array $admingrades
+     * @return bool
+     */
+    public static function any_invalid_admingrades(int $courseid, array $admingrades): bool {
+        global $DB;
+
+        $admingrades = array_merge([''], $admingrades);
+        $admingrades = array_map(function ($a) { return '"' . $a . '"'; }, $admingrades);
+        $validgrades = implode(',', $admingrades);
+
+        $sql = 'SELECT * FROM {local_gugrades_grade}
+            WHERE courseid = :courseid
+            AND admingrade NOT IN (' . $validgrades . ')';
+
+        $invalid = $DB->record_exists_sql($sql, ['courseid' => $courseid, 'validgrades' => $validgrades]);
+
+        return $invalid;
+    }
+
+    /**
      * MGU-1415: Aggregation bulk data.
      * This is stuff that we don't want to be accessing inside huge loops
      * Sets static variables on this class, but needs to be reset when

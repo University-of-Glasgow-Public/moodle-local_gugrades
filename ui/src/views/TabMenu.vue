@@ -1,6 +1,8 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
+    <RegulationCheck></RegulationCheck>
+
     <PleaseWait v-if="waiting" message="Setting up MyGrades"></PleaseWait>
 
     <div v-if="!waiting">
@@ -55,6 +57,7 @@
     import GreyLogo from '@/components/Common/GreyLogo.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
+    import RegulationCheck from '@/components/RegulationCheck.vue';
 
     const currenttab = ref('capture');
     const level1category = ref(0);

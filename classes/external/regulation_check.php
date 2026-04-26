@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define function is_grades_imported
+ * Check for regulations status and possible errors.
  * @package    local_gugrades
- * @copyright  2023
+ * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,9 +31,9 @@
  use core_external\external_value;
 
 /**
- * Define function is_grades_imported
+ * Define function regulations_check
  */
-class is_grades_imported extends external_api {
+class regulation_check extends external_api {
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -41,32 +41,29 @@ class is_grades_imported extends external_api {
     public static function execute_parameters() {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course id'),
-            'gradeitemid' => new external_value(PARAM_INT, 'Grade item id'),
-            'groupid' => new external_value(PARAM_INT, 'Group ID. 0 means everybody'),
         ]);
     }
 
     /**
      * Execute function
      * @param int $courseid
-     * @param int $gradeitemid
-     * @param int $groupid
      * @return array
      */
-    public static function execute($courseid, $gradeitemid, $groupid) {
+    public static function execute($courseid) {
 
         \local_gugrades\development::increase_debugging();
 
         // Security.
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
-            'gradeitemid' => $gradeitemid,
-            'groupid' => $groupid,
         ]);
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        return \local_gugrades\api::is_grades_imported($courseid, $gradeitemid, $groupid);
+        return [
+            'datemismatch' => false,
+            'admingradesvalid' => \local_gugrades\admingrades::are_admingrades_valid($courseid),
+        ];
     }
 
     /**
@@ -75,12 +72,8 @@ class is_grades_imported extends external_api {
      */
     public static function execute_returns() {
         return new external_single_structure([
-            'imported' => new external_value(PARAM_BOOL, 'Has anything been imported for this grade item?'),
-            'recursiveavailable' => new external_value(PARAM_BOOL, '>= grade category depth 2?'),
-            'recursivematch' => new external_value(PARAM_BOOL, 'Do all the grades match for recursive import?'),
-            'allgradesvalid' => new external_value(PARAM_BOOL, 'If recursive is available, are all gradetypes value?'),
-            'level' => new external_value(PARAM_INT, 'Level of grade categery. 1 = top.'),
-            'ns0used' => new external_value(PARAM_BOOL, 'Is NS0 available in prevailing regulations?'),
+            'datemismatch' => new external_value(PARAM_BOOL, 'Are the regulations different to the current date?'),
+            'admingradesvalid' => new external_value(PARAM_BOOL, 'Are admingrades all valid?'),
         ]);
     }
 }

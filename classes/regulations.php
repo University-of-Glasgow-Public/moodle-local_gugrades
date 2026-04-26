@@ -72,5 +72,4 @@ class regulations {
         // If none found.
         throw new \moodle_exception('Active regulation not found for course');
     }
-
 }

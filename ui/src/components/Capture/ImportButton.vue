@@ -173,6 +173,7 @@
     const level = ref(0);
     const dryruncount = ref(0);
     const showdryrun = ref(false);
+    const ns0used = ref(false);
     const loading = ref(false);
     const debug = ref({});
     const mstringstore = useMstrings();
@@ -210,8 +211,8 @@
 
         ];
 
-        // NS0 only available level >=2
-        if (level.value > 1) {
+        // NS0 only available level >=2 (if permitted by regulations)
+        if ((level.value > 1) && ns0used.value) {
             options.push(
                 {value: 'fillns0', label: mstringstore.getMstring('fillns0')}
             );
@@ -385,6 +386,7 @@
             recursivematch.value = result.recursivematch;
             allgradesvalid.value = result.allgradesvalid;
             level.value = result.level;
+            ns0used.value = result.ns0used;
         })
         .catch((error) => {
             window.console.error(error);

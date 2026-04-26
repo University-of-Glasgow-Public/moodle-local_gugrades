@@ -50,52 +50,48 @@ class admingrades {
                     'code' => 'EC',
                     'description' => get_string('adminmv', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
-                'items' => true,
             ],
             'GOODCAUSE_NR' => [
                 'default' => [
                     'code' => 'ECC',
                     'description' => get_string('adminmv0', 'local_gugrades'),
                 ],
-                'items' => true,
             ],
             'NOSUBMISSION' => [
                 'default' => [
                     'code' => 'NS',
                     'description' => get_string('adminns', 'local_gugrades'),
                 ],
-                'items' => true,
             ],
             'NOSUBMISSION_0' => [
                 'default' => [
                     'code' => 'NS0',
                     'description' => get_string('adminns0', 'local_gugrades'),
                 ],
-                'items' => true,
-                'level2' => true,
             ],
             'DEFERRED' => [
                 'default' => [
                     'code' => 'DFR',
                     'description' => get_string('admin07', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
-                'items' => true,
             ],
             'GOODCAUSECREDITWITHHELD' => [
                 'default' => [
                     'code' => 'ECW',
                     'description' => get_string('admingcw', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'CREDITWITHHELD' => [
                 'default' => [
                     'code' => 'CW',
                     'description' => get_string('admincw', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
+            ],
+            'CREDITNOTAWARDED' => [
+                'default' => [
+                    'code' => 'CAN',
+                    'description' => get_string('admincan', 'local_gugrades'),
+                ]
             ],
             'UNSATISFACTORY' => [
                 'name' => 'UNSATISFACTORY',
@@ -103,72 +99,66 @@ class admingrades {
                     'code' => 'UNS',
                     'description' => get_string('adminuns', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'SATISFACTORY' => [
                 'default' => [
                     'code' => 'SAT',
                     'description' => get_string('adminsat', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'NOTPASSED' => [
                 'default' => [
                     'code' => 'NP',
                     'description' => get_string('adminnp', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'PASSED' => [
                 'default' => [
                     'code' => 'P',
                     'description' => get_string('adminp', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
-                'levels' => [1],
             ],
             'NOTCOMPLETE' => [
                 'default' => [
                     'code' => 'NC',
                     'description' => get_string('adminnc', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'COMPLETE' => [
                 'default' => [
                     'code' => 'CP',
                     'description' => get_string('admincp', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'CREDITREFUSED' => [
                 'default' => [
                     'code' => 'CR',
                     'description' => get_string('admincr', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
+            ],
+            'CREDITNOTYETAWARDED' => [
+                'default' => [
+                    'code' => 'CNY',
+                    'description' => get_string('admincny', 'local_gugrades'),
+                ]
             ],
             'CREDITAWARDED' => [
                 'default' => [
                     'code' => 'CA',
                     'description' => get_string('adminca', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'AUDITONLY' => [
                 'default' => [
                     'code' => 'AU',
                     'description' => get_string('adminau', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
             ],
             'INTERRUPTIONOFSTUDIES' => [
                 'default' => [
                     'code' => 'IS',
                     'description' => get_string('adminis', 'local_gugrades'),
                 ],
-                'grandtotal' => true,
-                'items' => true,
             ],
         ];
     }
@@ -319,27 +309,6 @@ class admingrades {
             $admingrades[$code] = "$displaygrade - $description";
         }
 
-        /*
-        foreach ($defaults as $name => $default) {
-            // Work out if this is ok for this level / grandtotal?
-            $send = false;
-            if ($grandtotal && self::flag_set($default, 'grandtotal')) {
-                $send = true;
-            }
-            if (!$grandtotal && self::flag_set($default, 'items')) {
-                $send = true;
-            }
-            if (!$grandtotal && ($level == 1) && self::flag_set($default, 'level2')) {
-                $send = false;
-            }
-
-            if ($send) {
-                [$displaygrade, $description] = self::get_displaygrade_from_name($name);
-                $admingrades[$name] = "$displaygrade - $description";
-            }
-        }
-        */
-
         return $admingrades;
     }
 
@@ -394,5 +363,21 @@ class admingrades {
         }
 
         return $admingrades;
+    }
+
+    /**
+     * Validate admingrades for given courseid
+     * @param int $courseid
+     * @return bool
+     */
+    public static function are_admingrades_valid(int $courseid): bool {
+
+        // Get ALL valid admingrades for regulations.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $admingrades = $regulation->get_admingrades(0);
+        $admingrades = array_merge($admingrades, $regulation->get_admingrades(1));
+        $admingrades = array_unique(array_merge($admingrades, $regulation->get_admingrades(2)));
+
+        return !\local_gugrades\grades::any_invalid_admingrades($courseid, $admingrades);
     }
 }

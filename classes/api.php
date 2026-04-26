@@ -856,12 +856,16 @@ class api {
         [$recursiveavailable, $recursivematch, $allgradesvalid] = \local_gugrades\grades::recursive_import_match($gradeitemid);
         $level = \local_gugrades\grades::get_gradeitem_level($gradeitemid);
 
+        // Is NS0 available? Need regulations.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+
         return [
             'imported' => $imported,
             'recursiveavailable' => $recursiveavailable,
             'recursivematch' => $recursivematch,
             'allgradesvalid' => $allgradesvalid,
             'level' => $level,
+            'ns0used' => $regulation->is_ns0_available(),
         ];
     }
 

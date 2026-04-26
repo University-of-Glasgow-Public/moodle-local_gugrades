@@ -84,6 +84,7 @@ $services = [
             'local_gugrades_get_image_urls',
             'local_gugrades_save_resit_item',
             'local_gugrades_background_setup',
+            'local_gugrades_regulation_check',
         ],
         'requiredcapability' => 'local/gugrades:view',
         'restrictedusers' => 1,
@@ -433,6 +434,12 @@ $functions = [
         'classname' => 'local_gugrades\external\background_setup',
         'description' => 'Initial setup that runs in the background.',
         'type' => 'write',
+        'ajax' => true,
+    ],
+    'local_gugrades_regulation_check' => [
+        'classname' => 'local_gugrades\external\regulation_check',
+        'description' => 'Check for status issues with regulations.',
+        'type' => 'read',
         'ajax' => true,
     ],
 ];

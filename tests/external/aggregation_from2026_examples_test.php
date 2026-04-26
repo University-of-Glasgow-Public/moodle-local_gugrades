@@ -877,4 +877,19 @@ final class aggregation_from2026_examples_test extends \local_gugrades\external\
         $fred = $page['users'][0];
         $this->assertEquals('ECC', $fred['displaygrade']);
     }
+
+    /**
+     * Test regulations checks
+     *
+     * @covers \local_gugrades\external\regulations_check::execute
+     */
+    public function test_regulations_check(): void {
+
+        $check = regulation_check::execute($this->course->id);
+        $check = external_api::clean_returnvalue(
+            regulation_check::execute_returns(),
+            $check
+        );
+
+    }
 }
