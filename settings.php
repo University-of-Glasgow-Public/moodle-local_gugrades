@@ -201,5 +201,19 @@ if ($hassiteconfig) {
     );
     $settingspage->add($helptext);
 
+    // Regulations Settings
+    $settingspage->add(new admin_setting_heading(
+        'local_gugrades/headingregulations',
+        new lang_string('regulationssettings', 'local_gugrades'),
+        new lang_string('regulationssettings_help', 'local_gugrades')
+    ));
+
+    $settingspage->add(new admin_setting_configtext('local_gugrades/engineeringcat',
+        new lang_string('engineeringcat', 'local_gugrades'),
+        new lang_string('engineeringcat_help', 'local_gugrades'),
+        0,
+        PARAM_INT
+    ));
+
     $ADMIN->add('localplugins', $settingspage);
 }

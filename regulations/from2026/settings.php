@@ -15,13 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language EN
+ * Admin settings for from2026 subplugin
  *
- * @package    local_gugrades_regulations_from2026
+ * @package    local_gugrades
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Regulations from 2026/27';
+$settings->add(new admin_setting_configtext('regulations_from2026/engineeringcat',
+    new lang_string('engineeringcat', 'regulations_from2026'),
+    new lang_string('engineeringcat_help', 'regulations_from2026'),
+    0,
+    PARAM_INT
+));

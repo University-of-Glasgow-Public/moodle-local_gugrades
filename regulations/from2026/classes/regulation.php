@@ -68,6 +68,21 @@ class regulation implements \local_gugrades\IRegulation {
     }
 
     /**
+     * Return array of additional options. For example, modifiers
+     * for particular School.
+     * @param int $courseid
+     * @return array
+     */
+    public function get_options(int $courseid) {
+        global $DB;
+
+        $options = [];
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+
+        // Check if Engineering.
+    }
+
+    /**
      * Get aggregation object
      * @param int $courseid
      * @param string $atype
