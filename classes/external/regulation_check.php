@@ -60,9 +60,12 @@ class regulation_check extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
+        $continueurl = new \moodle_url('/course/view.php', ['id' => $courseid]);
+
         return [
             'datemismatch' => false,
             'admingradesvalid' => \local_gugrades\admingrades::are_admingrades_valid($courseid),
+            'continueurl' => $continueurl->out(),
         ];
     }
 
@@ -74,6 +77,7 @@ class regulation_check extends external_api {
         return new external_single_structure([
             'datemismatch' => new external_value(PARAM_BOOL, 'Are the regulations different to the current date?'),
             'admingradesvalid' => new external_value(PARAM_BOOL, 'Are admingrades all valid?'),
+            'continueurl' => new external_value(PARAM_TEXT, 'Where the continue button leads'),
         ]);
     }
 }
