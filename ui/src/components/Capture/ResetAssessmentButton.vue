@@ -4,9 +4,9 @@
     <TwButton v-if="hascapability" color="error" class="tw:mr-1" :disabled="processing" @click="showconfirm = true">
         {{ mstrings.resetassessment }}
     </TwButton>
-    <span v-if="processing" class="tw:text-sm tw:text-gray-600">{{ mstrings.pleasewait }}</span>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetassessmentconfirm" @confirm="confirmreset"></ConfirmModal>
+    <PleaseWait v-if="processing"></PleaseWait>
 </template>
 
 <script setup lang="ts">
@@ -16,6 +16,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import TwButton from '../Tailwind/TwButton.vue';
 

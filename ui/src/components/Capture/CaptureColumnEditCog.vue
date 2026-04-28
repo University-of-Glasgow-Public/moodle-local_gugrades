@@ -18,7 +18,7 @@
         :message="mstringstore.getMstring('deletecolumnconfirm')"
         @confirm="confirmdelete"
     />
-    <span v-if="processingdelete" class="tw:ml-2 tw:text-sm tw:text-gray-600">{{ mstrings.pleasewait }}</span>
+    <PleaseWait v-if="processingdelete"></PleaseWait>
 </template>
 
 <script setup lang="ts">
@@ -28,6 +28,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import { Cog6ToothIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
