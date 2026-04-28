@@ -1803,6 +1803,81 @@ class api {
         self::reset_all_caches();
     }
 
+        /**
+     * Reset MyGrades data for a single assessment (grade item)
+     * @param int $courseid
+     * @param int $gradeitemid
+     */
+    public static function reset_grade_item(int $courseid, int $gradeitemid) {
+        $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
+        if ($gradeitem->courseid != $courseid) {
+            throw new \moodle_exception('Grade item does not belong to this course');
+        }
+
+        // Keep parent category before deletion so we can recalculate.
+        $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
+
+        \local_gugrades\grades::delete_grade_item($courseid, $gradeitemid);
+        self::recalculate($courseid, $gradecategoryid);
+    }
+    
+    /**
+     * Delete a capture column (and its grades) for a grade item
+     * Admin-only operation in UI; enforced in external function.
+     *
+     * @param int $courseid
+     * @param int $gradeitemid
+     * @param int $columnid
+     */
+    public static function delete_capture_column(int $courseid, int $gradeitemid, int $columnid) {
+        global $DB;
+
+        // Basic sanity and ownership checks.
+        $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
+        if ($gradeitem->courseid != $courseid) {
+            throw new \moodle_exception('Grade item does not belong to this course');
+        }
+        $column = $DB->get_record('local_gugrades_column', ['id' => $columnid], '*', MUST_EXIST);
+        if (($column->courseid != $courseid) || ($column->gradeitemid != $gradeitemid)) {
+            throw new \moodle_exception('Column does not belong to this course/grade item');
+        }
+
+        // Safety: never allow deletion of FIRST/PROVISIONAL columns.
+        if (in_array($column->gradetype, ['FIRST', 'PROVISIONAL'])) {
+            throw new \moodle_exception('Cannot delete this column type');
+        }
+
+        // Keep parent category before deletion so we can recalculate.
+        $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
+
+        // Gather impacted users so we can clear latest-grade pointers.
+        $userids = [];
+        $grades = $DB->get_records('local_gugrades_grade', ['columnid' => $columnid, 'gradeitemid' => $gradeitemid]);
+        if ($grades) {
+            $userids = array_values(array_unique(array_column($grades, 'userid')));
+        }
+
+        // Delete all grades for this column (including history).
+        $DB->delete_records('local_gugrades_grade', ['columnid' => $columnid, 'gradeitemid' => $gradeitemid]);
+
+        // Remove any 'latest' pointers for affected users so bulk-data rebuild is consistent.
+        if ($userids) {
+            list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            $params = array_merge(['gradeitemid' => $gradeitemid], $inparams);
+            $sql = "DELETE FROM {local_gugrades_latest}
+                WHERE gradeitemid = :gradeitemid
+                AND userid $insql";
+            $DB->execute($sql, $params);
+        }
+
+        // Delete the column itself.
+        $DB->delete_records('local_gugrades_column', ['id' => $columnid]);
+
+        // Cleanup and recalculate.
+        \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
+        self::recalculate($courseid, $gradecategoryid);
+    }
+
     /**
      * Get course groups
      * @param int $courseid

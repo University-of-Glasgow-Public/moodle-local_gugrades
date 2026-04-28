@@ -93,7 +93,7 @@
                     <!-- component needs to return info about which column (which reason/gradetype has been selected)-->
                     <template #header="header">
                         {{ header.text }}
-                        <CaptureColumnEditCog v-if="header.editable  && !ineditcellmode && caneditgrades" :header="header" :itemid="itemid" @editcolumn="editcog_clicked"></CaptureColumnEditCog>
+                        <CaptureColumnEditCog v-if="header.editable  && !ineditcellmode && caneditgrades" :header="header" :itemid="itemid" @editcolumn="editcog_clicked" @columnchanged="refresh"></CaptureColumnEditCog>
                     </template>
 
                     <!-- User picture column -->
