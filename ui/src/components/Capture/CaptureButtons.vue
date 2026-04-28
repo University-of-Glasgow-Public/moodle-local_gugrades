@@ -8,6 +8,7 @@
         <ViewFullNamesButton v-if="props.usershidden"  @viewfullnames="viewfullnames"></ViewFullNamesButton>
         <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" @converted="emit('refreshtable')"></ConversionButton>
         <ExportCaptureButton :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :revealnames="revealnames"></ExportCaptureButton>
+        <ResetAssessmentButton v-if="caneditgrades" :itemid="props.itemid" @reset="emit('refreshtable')"></ResetAssessmentButton>
         <InfoButton :itemid="props.itemid" size="xl"></InfoButton>
         <ReloadButton size="3" @refreshtable="refresh_clicked"></ReloadButton>
     </div>
@@ -23,6 +24,7 @@
     import InfoButton from '@/components/Common/InfoButton.vue';
     import ReloadButton from '@/components/Capture/ReloadButton.vue';
     import ExportCaptureButton from '@/components/Capture/ExportCaptureButton.vue';
+    import ResetAssessmentButton from '@/components/Capture/ResetAssessmentButton.vue';
     import type { IEmitEditColumn } from '@/js/Interfaces';
 
     const props = defineProps({
