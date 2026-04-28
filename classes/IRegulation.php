@@ -80,4 +80,12 @@ interface IRegulation {
      * @return array
      */
     public function get_admingrades(int $level): array;
+
+    /**
+     * Return array of additional options. For example, modifiers
+     * for particular School.
+     * @param int $courseid
+     * @return array
+     */
+    public function get_options(int $courseid);
 }

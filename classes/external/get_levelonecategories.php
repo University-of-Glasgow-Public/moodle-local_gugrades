@@ -80,6 +80,7 @@ class get_levelonecategories extends external_api {
                 ])
             ),
             'regulation' => new external_value(PARAM_TEXT, 'Description of regulations used for this course.'),
+            'regulationextra' => new external_value(PARAM_TEXT, 'Additional options applied to regulation (e.g. School)'),
         ]);
     }
 }

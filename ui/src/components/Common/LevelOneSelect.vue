@@ -21,6 +21,7 @@
             <div class="tw:border-2 tw:rounded tw:px-2 tw:pt-1 tw:border-red-500">
                 <p class="tw:text-xs tw:mb-0 tw:text-red-500">Regulations used:</p>
                 <p class="tw:mb-0 tw:text-red-500">{{ regulation }}</p>
+                <p v-if="regulationextra" class="tw:mb-0 tw:text-green-500 tw:text-xs tw:text-center tw:uppercase">{{ regulationextra }}</p>
             </div>
         </div>
     </div>
@@ -44,6 +45,7 @@
     const itemerror = ref(false);
     const debug = ref({});
     const regulation = ref('');
+    const regulationextra = ref('');
     const level1store = useLeve1Store();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
@@ -61,6 +63,7 @@
             level1categories.value = result.categories;
             erroritems.value = result.erroritems;
             regulation.value = result.regulation;
+            regulationextra.value = result.regulationextra;
             notsetup.value = level1categories.value.length == 0;
             itemerror.value = erroritems.value.length > 0;
 

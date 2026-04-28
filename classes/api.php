@@ -548,11 +548,20 @@ class api {
 
         // Regulation.
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $options = $regulation->get_options($courseid);
+
+        // Check options for extra regulation information. Hard coded right now.
+        if (in_array('engineering', $options)) {
+            $regulationextra = 'Engineering';
+        } else {
+            $regulationextra = '';
+        }
 
         return [
             'categories' => $results,
             'erroritems' => $erroritems,
             'regulation' => $regulation->displayname(),
+            'regulationextra' => $regulationextra,
         ];
     }
 

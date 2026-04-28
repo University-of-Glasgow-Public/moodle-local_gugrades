@@ -70,6 +70,7 @@ class regulation implements \local_gugrades\IRegulation {
     /**
      * Return array of additional options. For example, modifiers
      * for particular School.
+     * TODO: Need to cache this somehow!!
      * @param int $courseid
      * @return array
      */
@@ -80,6 +81,18 @@ class regulation implements \local_gugrades\IRegulation {
         $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 
         // Check if Engineering.
+        $engineeringcat = get_config('local_gugrades', 'engineeringcat');
+        $coursecategoryid = $course->category;
+
+        // The engineering cat setting needs to be in the category path for the category
+        // this course is in (if you see what I mean).
+        $sql = "SELECT * FROM {course_categories} WHERE path LIKE :pathsegment";
+        $pathsegment = "%/" . $engineeringcat . "%";
+        if ($DB->record_exists_sql($sql, ['pathsegment' => $pathsegment])) {
+            $options[] = 'engineering';
+        }
+
+        return $options;
     }
 
     /**

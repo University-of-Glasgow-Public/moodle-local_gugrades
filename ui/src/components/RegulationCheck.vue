@@ -33,7 +33,6 @@
             {}
         )
         .then((result: any) => {
-            console.log(result);
             datemismatch.value = result.datemismatch;
             admingradesinvalid.value = !result.admingradesvalid;
             continueurl.value = result.continueurl;

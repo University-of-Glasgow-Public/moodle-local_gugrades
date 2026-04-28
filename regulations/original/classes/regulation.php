@@ -143,4 +143,15 @@ class regulation implements \local_gugrades\IRegulation {
         }
     }
 
+    /**
+     * Return array of additional options. For example, modifiers
+     * for particular School.
+     * TODO: Need to cache this somehow!!
+     * @param int $courseid
+     * @return array
+     */
+    public function get_options(int $courseid) {
+        return [];
+    }
+
 }
