@@ -1,11 +1,12 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton v-if="hascapability" color="error" class="tw:mr-1" @click="showconfirm = true">
+    <TwButton v-if="hascapability" color="error" class="tw:mr-1" :disabled="processing" @click="showconfirm = true">
         {{ mstrings.resetassessment }}
     </TwButton>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetassessmentconfirm" @confirm="confirmreset"></ConfirmModal>
+    <PleaseWait v-if="processing"></PleaseWait>
 </template>
 
 <script setup lang="ts">
@@ -15,6 +16,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import TwButton from '../Tailwind/TwButton.vue';
 
@@ -26,6 +28,7 @@
 
     const hascapability = ref(false);
     const showconfirm = ref(false);
+    const processing = ref(false);
     const debug = ref({});
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
@@ -41,6 +44,8 @@
             return;
         }
 
+        processing.value = true;
+
         moodleFetch(
             'local_gugrades_reset_grade_item',
             {
@@ -54,9 +59,6 @@
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
-        })
-        .finally(() => {
-            showconfirm.value = false;
         });
     }
 

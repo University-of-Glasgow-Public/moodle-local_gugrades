@@ -1,12 +1,12 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-        <a class="tw:ml-1 tw:tooltip" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
+    <a class="tw:ml-1 tw:tooltip tw:cursor-pointer" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
         <Cog6ToothIcon class="tw:size-6 tw:text-yellow-500"></Cog6ToothIcon>
     </a>
     <a
         v-if="candelete"
-        class="tw:ml-1 tw:tooltip"
+        class="tw:ml-1 tw:tooltip tw:cursor-pointer"
         aria-label="Delete column"
         :data-tip="mstringstore.getMstring('deletecolumn')"
         @click.prevent="delete_clicked"
@@ -18,6 +18,7 @@
         :message="mstringstore.getMstring('deletecolumnconfirm')"
         @confirm="confirmdelete"
     />
+    <PleaseWait v-if="processingdelete"></PleaseWait>
 </template>
 
 <script setup lang="ts">
@@ -27,6 +28,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import { Cog6ToothIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
@@ -50,6 +52,7 @@
     const emits = defineEmits(['editcolumn', 'columnchanged']);
     const showconfirm = ref(false);
     const hasadmincap = ref(false);
+    const processingdelete = ref(false);
     const candelete = computed(() => {
         if (!hasadmincap.value) {
             return false;
@@ -126,6 +129,8 @@
             showconfirm.value = false;
             return;
         }
+
+        processingdelete.value = true;
         moodleFetch(
             'local_gugrades_delete_capture_column',
             {
@@ -140,9 +145,6 @@
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
-        })
-        .finally(() => {
-            showconfirm.value = false;
         });
     }
 </script>
