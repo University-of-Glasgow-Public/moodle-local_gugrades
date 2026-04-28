@@ -1,9 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton v-if="hascapability" color="error" class="tw:mr-1" @click="showconfirm = true">
+    <TwButton v-if="hascapability" color="error" class="tw:mr-1" :disabled="processing" @click="showconfirm = true">
         {{ mstrings.resetassessment }}
     </TwButton>
+    <span v-if="processing" class="tw:text-sm tw:text-gray-600">{{ mstrings.pleasewait }}</span>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetassessmentconfirm" @confirm="confirmreset"></ConfirmModal>
 </template>
@@ -26,6 +27,7 @@
 
     const hascapability = ref(false);
     const showconfirm = ref(false);
+    const processing = ref(false);
     const debug = ref({});
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
@@ -41,6 +43,8 @@
             return;
         }
 
+        processing.value = true;
+
         moodleFetch(
             'local_gugrades_reset_grade_item',
             {
@@ -54,9 +58,6 @@
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
-        })
-        .finally(() => {
-            showconfirm.value = false;
         });
     }
 

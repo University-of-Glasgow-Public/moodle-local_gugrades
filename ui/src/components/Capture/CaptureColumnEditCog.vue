@@ -1,12 +1,12 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-        <a class="tw:ml-1 tw:tooltip" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
+    <a class="tw:ml-1 tw:tooltip tw:cursor-pointer" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
         <Cog6ToothIcon class="tw:size-6 tw:text-yellow-500"></Cog6ToothIcon>
     </a>
     <a
         v-if="candelete"
-        class="tw:ml-1 tw:tooltip"
+        class="tw:ml-1 tw:tooltip tw:cursor-pointer"
         aria-label="Delete column"
         :data-tip="mstringstore.getMstring('deletecolumn')"
         @click.prevent="delete_clicked"
@@ -18,6 +18,7 @@
         :message="mstringstore.getMstring('deletecolumnconfirm')"
         @confirm="confirmdelete"
     />
+    <span v-if="processingdelete" class="tw:ml-2 tw:text-sm tw:text-gray-600">{{ mstrings.pleasewait }}</span>
 </template>
 
 <script setup lang="ts">
@@ -50,6 +51,7 @@
     const emits = defineEmits(['editcolumn', 'columnchanged']);
     const showconfirm = ref(false);
     const hasadmincap = ref(false);
+    const processingdelete = ref(false);
     const candelete = computed(() => {
         if (!hasadmincap.value) {
             return false;
@@ -126,6 +128,8 @@
             showconfirm.value = false;
             return;
         }
+
+        processingdelete.value = true;
         moodleFetch(
             'local_gugrades_delete_capture_column',
             {
@@ -140,9 +144,6 @@
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
-        })
-        .finally(() => {
-            showconfirm.value = false;
         });
     }
 </script>

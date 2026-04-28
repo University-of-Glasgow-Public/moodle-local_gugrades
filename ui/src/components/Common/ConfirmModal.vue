@@ -1,8 +1,7 @@
 <template>
     <VueModal v-model="showmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.confirm">
         <TwAlert color="error">
-            <p><strong>{{  props.message }}</strong></p>
-            <p>{{ mstrings.areyousure }}</p>
+            <p><strong>{{  props.message }}</strong><br /><br />{{ mstrings.areyousure }}</p>
         </TwAlert>
         <div class="tw:mt-2 tw:pt-2">
             <TwButton color="primary" class="tw:mr-1" @click="emit('confirm', true)">{{ mstrings.yes }}</TwButton>
