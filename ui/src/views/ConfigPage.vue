@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div class="tw:mt-5">
-        <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
+        <LevelOneSelect  @levelchange="levelOneChange" @regulationextra="getregextra"></LevelOneSelect>
     </div>
 
     <div class="divider"></div>
@@ -20,7 +20,14 @@
     <div v-if="loaded && !treeerror">
         <h3 class="tw"mt-5>{{ categoryname }}</h3>
         <table id="config_table" class="tw:table tw:border-none">
-            <ConfigTree :nodes="activitytree" :depth="1" :resitconfig="configuringresits" :resitfade="true" @saveerror="handle_saveerror"></ConfigTree>
+            <ConfigTree
+                :nodes="activitytree"
+                :depth="1"
+                :resitconfig="configuringresits"
+                :resitfade="true"
+                :engineering="engineering"
+                @saveerror="handle_saveerror"
+            ></ConfigTree>
         </table>
     </div>
 </template>
@@ -45,6 +52,7 @@
     const showresitoption = ref(false);
     const configuringresits = ref(false);
     const caneditgrades = ref(false);
+    const engineering = ref(false);
     const debug = ref({});
     const treeerror = ref('');
     const mstringstore = useMstrings();
@@ -69,6 +77,14 @@
             debug.value = error;
         });
     });
+
+    /**
+     * Get regulationextra emmited from Level1Select
+     */
+    function getregextra(regextra: string) {
+        engineering.value = regextra == 'Engineering';
+        console.log(regextra);
+    }
 
     /**
      * Deal with save error down in tree structure

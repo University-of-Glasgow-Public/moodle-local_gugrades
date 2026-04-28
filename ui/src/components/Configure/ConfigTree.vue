@@ -29,6 +29,7 @@
                     <i v-if="props.depth == 1" class="fa fa-folder icon itemicon" :title="mstrings['gradecategory']" aria-hidden="true"></i>
                     <i v-else class="fa fa-folder-o" :title="mstrings['gradecategory']" aria-hidden="true"></i>
                     {{ category.category.fullname }}
+                    <!-- <span v-if="engineering"><input type="checkbox" /></span> -->
                 </b>
             </td>
             <td class="resit_select px-2" >
@@ -67,8 +68,13 @@
             type: Number,
             required: true
         },
+        engineering: {
+            type: Boolean,
+            default: false,
+        },
         resitconfig: Boolean,
         resitfade: Boolean,
+
     });
 
     const emit = defineEmits(['activityselected', 'saverror']);

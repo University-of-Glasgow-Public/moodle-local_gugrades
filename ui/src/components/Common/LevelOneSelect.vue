@@ -50,7 +50,7 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
-    const emit = defineEmits(['levelchange']);
+    const emit = defineEmits(['levelchange', 'regulationextra']);
 
     // Get the top level categories
     function getLevelOne() {
@@ -66,6 +66,9 @@
             regulationextra.value = result.regulationextra;
             notsetup.value = level1categories.value.length == 0;
             itemerror.value = erroritems.value.length > 0;
+
+            // Emit regulation extra to parent component
+            emit('regulationextra', regulationextra.value);
 
             // If it's already been selected on another tab...
             selected.value = level1store.getvalidcategoryid(level1categories.value);
