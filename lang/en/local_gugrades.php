@@ -454,6 +454,7 @@ $string['viewfullnames'] = 'View full names';
 $string['warnings'] = 'Warning(s)';
 $string['weight'] = 'Weight';
 $string['weightsaltered'] = 'Altered weights saved';
+$string['weightsreverted'] = 'Weights reverted';
 $string['weightszero'] = 'Weights sum to zero. Aggregation is not possible';
 $string['yes'] = 'Yes';
 $string['yesimport'] = 'Import grades';
