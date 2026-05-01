@@ -16,6 +16,7 @@ import VueAwesomePaginate from 'vue-awesome-paginate';
 
 import 'daisyui/daisyui.css';
 import 'daisyui/themes.css';
+import "vue-awesome-paginate/dist/style.css";
 
 // Following work but cause trouble with Typescript.
 // Something to improve another day.
@@ -37,10 +38,6 @@ const pinia = createPinia();
 
 // Trees.
 const populatetrees = usePopulateTrees();
-
-// MStrings - moving from provide/inject to Pinia.
-// Currently using both.
-
 
 // Preload
 const preload = usePreload();
