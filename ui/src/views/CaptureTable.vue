@@ -774,6 +774,7 @@
 </script>
 
 <style>
+/*
     .hidden-row td {
         background-color: #ffff66  !important;
         overflow: visible;
@@ -811,5 +812,14 @@
 
     .vue3-easy-data-table__main {
         overflow: visible !important;
+    }
+        */
+
+    .capture-table {
+        --easy-table-header-background-color: var(--color-primary);
+        --easy-table-header-font-color: var(--color-primary-content);
+
+        --easy-table-body-row-background-color: var(--color-base-100);
+        --easy-table-body-row-font-color: var(--color-base-content);
     }
 </style>

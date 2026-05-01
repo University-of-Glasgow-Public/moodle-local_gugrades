@@ -91,7 +91,7 @@
                     </div>
                     <div v-if="header.categoryid">
                         <a href="#" @click="expand_clicked(header.categoryid)">
-                            <span class="badge badge-sm badge-primary mt-2" >
+                            <span class="badge badge-sm badge-secondary my-2" >
                                 <ChevronDoubleLeftIcon class="size-4" />
                                 {{ mstrings.expand }}
                                 <ChevronDoubleRightIcon class="size-4" />
@@ -727,6 +727,7 @@
 </script>
 
 <style>
+/*
     .aggregation-table {
         --easy-table-header-font-size: 14px;
         --easy-table-header-height: 50px;
@@ -760,5 +761,14 @@
 
     .buttons-pagination .item.button.active {
         color: black !important;
+    }
+        */
+
+    .aggregation-table {
+        --easy-table-header-background-color: var(--color-primary);
+        --easy-table-header-font-color: var(--color-primary-content);
+
+        --easy-table-body-row-background-color: var(--color-base-100);
+        --easy-table-body-row-font-color: var(--color-base-content);
     }
 </style>
