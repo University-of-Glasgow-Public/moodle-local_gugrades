@@ -1,17 +1,22 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
+        <!--
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        -->
 
-        <div role="tablist" class="tabs tabs-box text-black">
-            <a role="tab" class="tab" :class="{'tab-active': activetab == 'configure'}" @click="clickTab('configure')" @keydown.enter="clickTab('configure')" tabindex="0">{{ mstrings.configure }}</a>
-            <a role="tab" class="tab" :class="{'tab-active': activetab == 'capture'}" @click="clickTab('capture')" @keydown.enter="clickTab('capture')" tabindex="0">{{ mstrings.assessmentgradecapture }}</a>
-            <a role="tab" class="tab" :class="{'tab-active': activetab == 'conversion'}" @click="clickTab('conversion')" @keydown.enter="clickTab('conversion')" tabindex="0">{{ mstrings.manageconversion }}</a>
-            <a role="tab" class="tab" :class="{'tab-active': activetab == 'aggregation'}" @click="clickTab('aggregation')" @keydown.enter="clickTab('aggregation')" tabindex="0">{{ mstrings.coursegradeaggregation }}</a>
-            <a role="tab" class="tab" :class="{'tab-active': activetab == 'audit'}" @click="clickTab('audit')"  @keydown.enter="clickTab('audit')" tabindex="0">{{ mstrings.auditlog }}</a>
-            <a v-if="settingscapability" role="tab" class="tab" :class="{'tab-active': activetab == 'settings'}" @click="clickTab('settings')"  @keydown.enter="clickTab('settings')" tabindex="0">{{ mstrings.settings }}</a>
+        <div class="flex justify-between">
+            <div role="tablist" class="tabs tabs-lift">
+                <a role="tab" class="tab" :class="{'tab-active': activetab == 'configure'}" @click="clickTab('configure')" @keydown.enter="clickTab('configure')" tabindex="0">{{ mstrings.configure }}</a>
+                <a role="tab" class="tab" :class="{'tab-active': activetab == 'capture'}" @click="clickTab('capture')" @keydown.enter="clickTab('capture')" tabindex="0">{{ mstrings.assessmentgradecapture }}</a>
+                <a role="tab" class="tab" :class="{'tab-active': activetab == 'conversion'}" @click="clickTab('conversion')" @keydown.enter="clickTab('conversion')" tabindex="0">{{ mstrings.manageconversion }}</a>
+                <a role="tab" class="tab" :class="{'tab-active': activetab == 'aggregation'}" @click="clickTab('aggregation')" @keydown.enter="clickTab('aggregation')" tabindex="0">{{ mstrings.coursegradeaggregation }}</a>
+                <a role="tab" class="tab" :class="{'tab-active': activetab == 'audit'}" @click="clickTab('audit')"  @keydown.enter="clickTab('audit')" tabindex="0">{{ mstrings.auditlog }}</a>
+                <a v-if="settingscapability" role="tab" class="tab" :class="{'tab-active': activetab == 'settings'}" @click="clickTab('settings')"  @keydown.enter="clickTab('settings')" tabindex="0">{{ mstrings.settings }}</a>
+            </div>
+            <ThemeSelect></ThemeSelect>
         </div>
 </template>
 
@@ -22,6 +27,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import ThemeSelect from './Common/ThemeSelect.vue';
 
     const activetab = ref('capture');
     const settingscapability = ref(false);
