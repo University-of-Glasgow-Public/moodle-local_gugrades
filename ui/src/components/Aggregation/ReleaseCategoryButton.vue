@@ -6,41 +6,41 @@
             <span v-else><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgrade }}</span>
     </TwButton>
 
-    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.releaseaggregatedgrade">
+    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.releaseaggregatedgrade">
 
         <PleaseWait v-if="loading"></PleaseWait>
 
         <!-- Displayed if not released -->
         <div v-if="!props.released">
             <h4>{{ mstrings.releaseaggregatedgrade }}</h4>
-            <TwAlert v-if="!props.released" color="warning" class="tw:mt-2">
+            <TwAlert v-if="!props.released" color="warning" class="mt-2">
                 <div>
                     {{ mstrings.releaseaggregatedconfirm }}
                     <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
                 </div>
             </TwAlert>
-            <TwAlert v-if="props.released" color="error" class="tw:mt-2">
+            <TwAlert v-if="props.released" color="error" class="mt-2">
                 <div>
                     {{ mstrings.releaseaggregatedconfirmstern }}
                     <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
                 </div>
             </TwAlert>
-            <div class="tw:mt-4">
+            <div class="mt-4">
                 <TwButton color="primary" @click="release_grades()">{{ mstrings.yesrelease }}</TwButton>
                 <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>
 
         <!-- display if already released -->
-        <div v-if="props.released" class="tw:mt-4">
+        <div v-if="props.released" class="mt-4">
             <h4>Revert release of grades</h4>
-            <TwAlert color="error" class="tw:mt-2">
+            <TwAlert color="error" class="mt-2">
                 <div>
                     {{ mstrings.removerelease }}
                     <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.removereleasegroup }}</b></p>
                 </div>
             </TwAlert>
-            <div class="tw:mt-4">
+            <div class="mt-4">
                 <TwButton class="error" @click="revert_release()">{{ mstrings.yesunrelease }}</TwButton>
                 <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
             </div>

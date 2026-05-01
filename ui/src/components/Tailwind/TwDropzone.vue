@@ -1,7 +1,7 @@
 <template>
     <div
         ref="dropZoneRef"
-        class="tw:flex tw:items-center tw:justify-center tw:w-full tw:mb-4"
+        class="flex items-center justify-center w-full mb-4"
         @click="handleClick"
         @dragover.prevent="handleDragOver"
         @dragenter.prevent="handleDragEnter"
@@ -9,15 +9,15 @@
         @drop.prevent="handleDropEvent"
     >
         <div
-            class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:w-full tw:h-64 tw:bg-neutral-secondary-medium tw:border-2 tw:border-dashed tw:border-gray-400 tw:rounded-base tw:cursor-pointer tw:hover:bg-neutral-tertiary-medium"
-            :class="{ 'tw:border-primary tw:border-2': isOverDropZone }"
+            class="flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border-2 border-dashed border-gray-400 rounded-base cursor-pointer hover:bg-neutral-tertiary-medium"
+            :class="{ 'border-primary border-2': isOverDropZone }"
         >
-            <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-body tw:pt-5 tw:pb-6">
-                <svg class="tw:w-8 tw:h-8 tw:mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <div class="flex flex-col items-center justify-center text-body pt-5 pb-6">
+                <svg class="w-8 h-8 mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2"/>
                 </svg>
-                <p class="tw:mb-2 tw:text-sm">
-                    <span class="tw:font-semibold">Click to upload</span> or Drop file here
+                <p class="mb-2 text-sm">
+                    <span class="font-semibold">Click to upload</span> or Drop file here
                 </p>
                 <slot></slot>
                 <p v-if="filename">{{ filename }}</p>

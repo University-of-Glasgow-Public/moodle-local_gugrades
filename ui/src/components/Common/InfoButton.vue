@@ -2,20 +2,20 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <!-- info button -->
-    <div v-if="!props.text" class="tw:ml-2 tw:tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
-        <button class="tw:btn">
-            <InformationCircleIcon class="tw:size-6 tw:text-black-500"></InformationCircleIcon>
+    <div v-if="!props.text" class="ml-2 tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
+        <button class="btn">
+            <InformationCircleIcon class="size-6 text-black-500"></InformationCircleIcon>
         </button>
     </div>
 
     <!-- info link -->
-    <a v-if="props.text" class="tw:text-white tw:underline tw:cursor-pointer" @click="info_clicked">{{ props.text }}</a>
+    <a v-if="props.text" class="text-white underline cursor-pointer" @click="info_clicked">{{ props.text }}</a>
 
     <!-- modal to show info-->
-    <VueModal v-model="showinfomodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="itemname">
+    <VueModal v-model="showinfomodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="itemname">
 
-        <div class="tw:overflow-x-auto">
-            <table class="tw:table">
+        <div class="overflow-x-auto">
+            <table class="table">
                 <tbody>
                     <tr>
                         <th>{{ mstrings['name'] }}</th>
@@ -43,15 +43,15 @@
                         <td>{{  weight }}</td>
                     </tr>
                     <tr v-if="categoryerror">
-                        <div class="alert alert-warning">
+                        <td colspan="2" class="alert alert-warning">
                             {{ mstrings['categoryerror'] }}
-                        </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="tw:flex tw:justify-end tw:mt-5">
+        <div class="flex justify-end mt-5">
             <TwButton color="warning" @click="showinfomodal = false">{{ mstrings['close'] }}</TwButton>
         </div>
     </VueModal>

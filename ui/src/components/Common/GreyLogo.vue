@@ -1,8 +1,8 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div v-if="!loading" class="tw:flex tw:justify-center">
-        <img :src="url" id="mygradeslogo" alt="MyGrades Logo" :class="{'tw:grayscale': monochrome}"/>
+    <div v-if="!loading" class="flex justify-center">
+        <img :src="url" id="mygradeslogo" alt="MyGrades Logo" :class="{'grayscale': monochrome}"/>
     </div>
 </template>
 

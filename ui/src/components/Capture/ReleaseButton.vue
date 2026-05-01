@@ -12,7 +12,7 @@
         </span>
     </TwButton>
 
-    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['releasegrades']">
+    <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['releasegrades']">
 
         <div v-if="loading">
             <PleaseWait></PleaseWait>
@@ -22,7 +22,7 @@
         <div v-if="!props.released">
             <TwAlert v-if="!props.released">
                 {{ mstrings['releaseconfirm'] }}
-                <p v-if="grouprelease" class="tw:mt-1"><b>{{ mstrings['releaseconfirmgroup'] }}</b></p>
+                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['releaseconfirmgroup'] }}</b></p>
             </TwAlert>
 
             <TwAlert v-if="props.released">
@@ -30,7 +30,7 @@
                 <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['releaseconfirmgroup'] }}</b></p>
             </TwAlert>
 
-            <div class="tw:mt-5 flex justify-start">
+            <div class="mt-5 flex justify-start">
                 <TwButton color="primary" @click="release_grades">{{ mstrings['yesrelease'] }}</TwButton>
                 <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
@@ -44,7 +44,7 @@
                 <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['removereleasegroup'] }}</b></p>
             </TwAlert>
 
-            <div class="tw:mt-5 flex justify-start">
+            <div class="mt-5 flex justify-start">
                 <TwButton color="primary" @click="revert_release">{{ mstrings['yesunrelease'] }}</TwButton>
                 <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>

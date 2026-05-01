@@ -14,6 +14,9 @@ import '../src/assets/MyGrades.css';
 import type { IMoodleString } from './js/Interfaces';
 import VueAwesomePaginate from 'vue-awesome-paginate';
 
+import 'daisyui/daisyui.css';
+import 'daisyui/themes.css';
+
 // Following work but cause trouble with Typescript.
 // Something to improve another day.
 // @ts-ignore
@@ -22,54 +25,6 @@ import Vue3EasyDataTable from 'vue3-easy-data-table';
 import { Modal } from '@kouts/vue-modal';
 
 import customConfig from './js/formkit.config';
-
-// This stuff makes sure that the window.GU variable
-// exists.
-// This can take some time as Moodle runs this once the page
-// has loaded
-var timeout = 1000000;
-
-/*
-function ensureGUIsSet(timeout: number) {
-    var start = Date.now();
-    return new Promise(waitForGU);
-
-
-    function waitForGU(resolve, reject) {
-        if (window.GU) {
-            resolve(window.GU)
-        } else if (timeout && (Date.now() - start) >= timeout) {
-            reject(new Error("timeout"));
-        } else {
-            setTimeout(waitForGU.bind(this, resolve, reject), 30);
-        }
-    }
-}
-*/
-
-/**
- * Updated, even more inscruitable AI version.
- * @param timeout
- * @returns
- */
-function ensureGUIsSet(timeout: number): Promise<typeof window.GU> {
-    const start = Date.now();
-
-    return new Promise(waitForGU);
-
-    function waitForGU(
-        resolve: (value: typeof window.GU) => void,
-        reject: (reason?: Error) => void
-    ): void {
-        if (window.GU) {
-            resolve(window.GU);
-        } else if ((Date.now() - start) >= timeout) {
-            reject(new Error("timeout"));
-        } else {
-            setTimeout(waitForGU.bind(null, resolve, reject), 30);
-        }
-    }
-}
 
 // Toast defaults
 const toastoptions = {
@@ -90,44 +45,41 @@ const populatetrees = usePopulateTrees();
 // Preload
 const preload = usePreload();
 
-ensureGUIsSet(timeout)
-.then(() => {
-    const app = createApp(App);
-    app.use(pinia);
-    const mstrings = ref<Record<string, string>>({});
-    app.provide('mstrings', mstrings);
-    app.use(Toast, toastoptions);
-    app.use(plugin, defaultConfig(customConfig));
-    app.use(VueAwesomePaginate);
-    app.component('EasyDataTable', Vue3EasyDataTable);
-    app.component('VueModal', Modal);
-    app.mount('#app');
+const app = createApp(App);
+app.use(pinia);
+const mstrings = ref<Record<string, string>>({});
+//app.provide('mstrings', mstrings);
+app.use(Toast, toastoptions);
+app.use(plugin, defaultConfig(customConfig));
+app.use(VueAwesomePaginate);
+app.component('EasyDataTable', Vue3EasyDataTable);
+app.component('VueModal', Modal);
+app.mount('#app');
 
-    // Read strings
-    // Strings are pushed to individual components using provide() / inject(
-    const mstringstore = useMstrings();
+// Read strings
+// Strings are pushed to individual components using provide() / inject(
+const mstringstore = useMstrings();
 
-    moodleFetch(
-        'local_gugrades_get_all_strings',
-        {}
-    )
-    .then((result: any) => {
-        const strings: IMoodleString[] = result;
-        strings.forEach((mstring: IMoodleString) => {
-            mstrings.value[mstring.tag] = mstring.stringvalue;
-        });
-        mstringstore.mstrings = mstrings.value;
-    })
-    .catch((error) => {
-        window.console.error(error);
+moodleFetch(
+    'local_gugrades_get_all_strings',
+    {}
+)
+.then((result: any) => {
+    const strings: IMoodleString[] = result;
+    strings.forEach((mstring: IMoodleString) => {
+        mstrings.value[mstring.tag] = mstring.stringvalue;
     });
-
-    // Populate activity trees.
-    populatetrees.populate();
-
-    // Preload aggregation recalculations.
-    preload.recalculate();
-
+    mstringstore.mstrings = mstrings.value;
+})
+.catch((error) => {
+    window.console.error(error);
 });
+
+// Populate activity trees.
+populatetrees.populate();
+
+// Preload aggregation recalculations.
+preload.recalculate();
+
 
 

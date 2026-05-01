@@ -1,7 +1,7 @@
 <template>
-    <details class="tw:dropdown tw:dropdown-end tw:dropdown-left tw:dropdown-hover" tabindex="0">
-        <summary class="tw:list-none"><EllipsisVerticalIcon class="tw:size-6 tw:text-black-500" tabindex="0"></EllipsisVerticalIcon></summary>
-        <ul class="tw:menu tw:dropdown-content tw:bg-base-100 tw:rounded-box tw:z-999 tw:w-52 tw:p-2 tw:shadow-sm" tabindex="-1">
+    <details class="dropdown dropdown-end dropdown-left dropdown-hover" tabindex="0">
+        <summary class="list-none"><EllipsisVerticalIcon class="size-6 text-black-500" tabindex="0"></EllipsisVerticalIcon></summary>
+        <ul class="menu dropdown-content bg-base-100 rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">
             <li @click="handleItemClick" v-if="props.awaitingcapture && !props.converted && caneditgrades"><ImportUserGradeButton :itemid="props.itemid" :userid="props.userid" @imported="grade_added()"></ImportUserGradeButton></li>
             <li @click="handleItemClick" v-if="caneditgrades"><AddGradeButton :itemid="props.itemid" :selectedcategoryid="props.categoryid" :userid="props.userid" :name="props.name" :itemname="props.itemname" @gradeadded = "grade_added()"></AddGradeButton></li>
             <li @click="handleItemClick"><HistoryButton :userid="props.userid" :itemid="props.itemid" :name="props.name" :itemname="props.itemname"></HistoryButton></li>

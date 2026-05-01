@@ -2,7 +2,7 @@
      <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div id="managemaps">
-        <TwAlert v-html="mstrings.conversionhelp" class="tw:my-6"></TwAlert>
+        <TwAlert v-html="mstrings.conversionhelp" class="my-6"></TwAlert>
 
         <!-- show available maps -->
         <div v-if="!editmap && loaded">
@@ -19,16 +19,16 @@
                 </template>
                 <template #item-actions="map">
                     <div class="py-1" role="group" aria-label="Actions">
-                        <button v-if="caneditgrades" class="tw:btn tw:btn-sm tw:mr-1" @click="edit_clicked(map.id)">{{ mstrings.edit }}</button>
-                        <button v-if="!caneditgrades" class="tw:btn tw:btn-sm tw:mr-1" @click="edit_clicked(map.id)">{{ mstrings.view }}</button>
-                        <button v-if="caneditgrades" class="tw:btn tw:btn-sm tw:btn-error tw:mr-1" :class="{ disabled: map.inuse }" :disabled="map.inuse" @click="delete_clicked(map.id)">{{ mstrings.delete }}</button>
-                        <button class="tw:btn tw:btn-sm tw:btn-success tw:mr-1" @click="export_clicked(map.id)">{{ mstrings.export }}</button>
+                        <button v-if="caneditgrades" class="btn btn-sm mr-1" @click="edit_clicked(map.id)">{{ mstrings.edit }}</button>
+                        <button v-if="!caneditgrades" class="btn btn-sm mr-1" @click="edit_clicked(map.id)">{{ mstrings.view }}</button>
+                        <button v-if="caneditgrades" class="btn btn-sm btn-error mr-1" :class="{ disabled: map.inuse }" :disabled="map.inuse" @click="delete_clicked(map.id)">{{ mstrings.delete }}</button>
+                        <button class="btn btn-sm btn-success mr-1" @click="export_clicked(map.id)">{{ mstrings.export }}</button>
                     </div>
                 </template>
             </EasyDataTable>
 
-            <div v-if="caneditgrades" class="tw:mt-4">
-                <TwButton color="primary" @click="add_map" class="tw:mr-1">{{ mstrings.addconversionmap }}</TwButton>
+            <div v-if="caneditgrades" class="mt-4">
+                <TwButton color="primary" @click="add_map" class="mr-1">{{ mstrings.addconversionmap }}</TwButton>
                 <TwButton color="success" @click="import_clicked">{{ mstrings.importconversionmap }}</TwButton>
             </div>
         </div>
@@ -43,11 +43,11 @@
     <ConfirmModal :show="showconfirm" :message="mstrings.deletemapconfirm" @confirm="confirmdelete"></ConfirmModal>
 
     <!-- Modal for map upload -->
-    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.importconversionmap">
+    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.importconversionmap">
 
         <TwDropzone :mimetypes="['text/json']" accept="text/json" @onchange="uploadfilechange"></TwDropzone>
 
-        <TwButton color="info" class="tw:mr-1" @click="process_import">{{ mstrings.import }}</TwButton>
+        <TwButton color="info" class="mr-1" @click="process_import">{{ mstrings.import }}</TwButton>
         <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
     </VueModal>
 </template>

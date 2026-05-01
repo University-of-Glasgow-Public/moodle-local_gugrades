@@ -13,15 +13,15 @@
                 <li v-for="item in erroritems">{{ item.itemname }}</li>
             </ul>
         </TwAlert>
-        <div class="tw:flex tw:justify-between">
-            <select v-if="!notsetup && !itemerror" v-model="categoryid" class="tw:select tw:w-120">
+        <div class="flex justify-between">
+            <select v-if="!notsetup && !itemerror" v-model="categoryid" class="select w-120">
                 <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
                 <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
             </select>
-            <div class="tw:border-2 tw:rounded tw:px-2 tw:pt-1 tw:border-red-500">
-                <p class="tw:text-xs tw:mb-0 tw:text-red-500">Regulations used:</p>
-                <p class="tw:mb-0 tw:text-red-500">{{ regulation }}</p>
-                <p v-if="regulationextra" class="tw:mb-0 tw:text-green-500 tw:text-xs tw:text-center tw:uppercase">{{ regulationextra }}</p>
+            <div class="border-2 rounded px-2 pt-1 border-red-500">
+                <p class="text-xs mb-0 text-red-500">Regulations used:</p>
+                <p class="mb-0 text-red-500">{{ regulation }}</p>
+                <p v-if="regulationextra" class="mb-0 text-green-500 text-xs text-center uppercase">{{ regulationextra }}</p>
             </div>
         </div>
     </div>

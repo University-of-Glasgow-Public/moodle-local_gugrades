@@ -1,5 +1,5 @@
 <template>
-    <TwAlert color="error" class="tw:mt-1">
+    <TwAlert color="error" class="mt-1">
         <p><b><span v-html="mstrings.configerror"></span>:</b></p>
         <p v-html="errormessage"></p>
     </TwAlert>

@@ -2,9 +2,9 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
     <a @click.prevent="read_history()">{{ mstrings.history }}</a>
 
-    <VueModal v-model="showhistorymodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.gradehistory">
+    <VueModal v-model="showhistorymodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.gradehistory">
         <div>
-            <ul class="tw:list-none">
+            <ul class="list-none">
                 <li><b>{{ mstrings.name }}:</b> {{ props.name }}</li>
                 <li><b>{{ mstrings.itemname }}:</b> {{ props.itemname }}</li>
             </ul>
@@ -15,7 +15,7 @@
         <EasyDataTable v-else :headers="headers" :items="grades">
         </EasyDataTable>
 
-        <div class="tw:flex tw:justify-end tw:mt-5">
+        <div class="flex justify-end mt-5">
             <TwButton color="warning" @click="showhistorymodal = false">{{ mstrings.close }}</TwButton>
         </div>
     </VueModal>

@@ -1,8 +1,8 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div v-if="showgroupselect" class="tw:mt-2">
-        <select class="tw:select" v-model="groupid">
+    <div v-if="showgroupselect" class="mt-2">
+        <select class="select" v-model="groupid">
             <option value="0">{{ mstrings.allparticipants }}</option>
             <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
         </select>

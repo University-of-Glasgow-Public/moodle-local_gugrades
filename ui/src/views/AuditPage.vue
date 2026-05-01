@@ -14,7 +14,7 @@
 
         </EasyDataTable>
     </div>
-    <TwButton class="tw:mt-2" color="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</TwButton>
+    <TwButton class="mt-2" color="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</TwButton>
 </template>
 
 <script setup lang="ts">

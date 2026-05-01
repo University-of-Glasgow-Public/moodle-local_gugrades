@@ -1,16 +1,16 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" class="tw:mr-1" @click="conversion_clicked()">{{ mstrings.convertgrades }}</TwButton>
+    <TwButton color="primary" class="mr-1" @click="conversion_clicked()">{{ mstrings.convertgrades }}</TwButton>
 
-    <VueModal v-model="showselectmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.conversionselect">
+    <VueModal v-model="showselectmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.conversionselect">
 
         <PleaseWait v-if="waiting"></PleaseWait>
 
         <div v-if="!waiting">
 
             <!-- Show the selected map name (if there is one)-->
-            <p v-if="mapname" class="tw:mb-2">
+            <p v-if="mapname" class="mb-2">
                 {{ mstrings.selectedmap }}: <b>{{ mapname }}</b>
             </p>
 
@@ -18,14 +18,14 @@
             <div v-if="!selection">
                 <TwAlert v-if="nomaps && loaded" class="warning">{{ mstrings.nomaps }}</TwAlert>
 
-                <EasyDataTable class="tw:mb-2" v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true">
+                <EasyDataTable class="mb-2" v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true">
                     <template #item-select="item">
                         <input type="radio" :value="item.id" v-model="mapid"/>
                     </template>
                 </EasyDataTable>
 
                 <div>
-                    <TwButton color="primary" class="tw:mr-1" @click="save_clicked" :disabled="mapid == 0">{{ mstrings.save }}</TwButton>
+                    <TwButton color="primary" class="mr-1" @click="save_clicked" :disabled="mapid == 0">{{ mstrings.save }}</TwButton>
                     <TwButton color="warning" @click="showselectmodal = false">{{  mstrings.cancel }}</TwButton>
                 </div>
             </div>
@@ -33,8 +33,8 @@
             <!-- if a map is selected then show warning message and option to remove -->
             <div v-if="selection">
                 <TwAlert color="warning">{{ mstrings.conversionremovewarning }}</TwAlert>
-                <div class="tw:mt-1 tw:mb-4">
-                    <TwButton color="primary" class="tw:mr-1" @click="remove_clicked">{{ mstrings.remove }}</TwButton>
+                <div class="mt-1 mb-4">
+                    <TwButton color="primary" class="mr-1" @click="remove_clicked">{{ mstrings.remove }}</TwButton>
                     <TwButton color="warning" @click="showselectmodal = false">{{  mstrings.cancel }}</TwButton>
                 </div>
             </div>

@@ -5,11 +5,11 @@
         {{ buttontitle }}
     </a>
 
-    <VueModal v-model="showaddgrademodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="buttontitle">
+    <VueModal v-model="showaddgrademodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="buttontitle">
 
         <!-- Can either show add grade form or re-release dialogue -->
         <div v-if="!showreleaseddialogue">
-            <ul class="tw:list-none">
+            <ul class="list-none">
                 <li v-if="props.categoryid"><b>{{ mstrings.category }}:</b> {{ itemname }}</li>
                 <li v-else><b>{{ mstrings.itemname }}:</b> {{ itemname }}</li>
                 <li><b>{{ mstrings.username }}:</b> {{ name }}</li>
@@ -101,7 +101,7 @@
                 <TwButton color="primary" @click="removeoverride">{{ mstrings.remove }}</TwButton>
             </div>
 
-            <div class="tw:flex tw:justify-end tw:mt-8">
+            <div class="flex justify-end mt-8">
                 <TwButton color="warning" @click="showaddgrademodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>

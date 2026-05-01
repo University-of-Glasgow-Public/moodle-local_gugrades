@@ -66,7 +66,7 @@ $event->trigger();
 custom_course_field();
 
 // VueJS stuff gets injected here.
-echo $OUTPUT->header();
+//echo $OUTPUT->header();
 
 echo "<div id=\"app\"></div>";
 
@@ -75,4 +75,4 @@ $lisuurl = "https://gla.sharepoint.com/sites/learning-innovation/SitePages/LISU-
 echo '<div class="text-center my-3">
           <a class="btn btn-info px-5" href="' . $helpurl . '" target="_blank">' . $helptext . '</a>
       </div>';
-echo $OUTPUT->footer();
+//echo $OUTPUT->footer();

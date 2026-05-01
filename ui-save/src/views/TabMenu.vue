@@ -1,0 +1,126 @@
+<template>
+    <DebugDisplay :debug="debug"></DebugDisplay>
+
+    <RegulationCheck></RegulationCheck>
+
+    <PleaseWait v-if="waiting" message="Setting up MyGrades"></PleaseWait>
+
+    <div v-if="!waiting">
+        <GreyLogo></GreyLogo>
+
+        <TWAlert v-if="!available" color="error">
+            MyGrades cannot be used in this course as it has too many enrolled participants.
+        </TWAlert>
+        <div v-else id="tabmenu">
+            <TabsNav @tabchange="tabChange" :viewaggregation="viewaggregation"></TabsNav>
+
+            <div v-if="currenttab == 'configure'">
+                <ConfigPage></ConfigPage>
+            </div>
+
+            <div v-if="currenttab == 'capture'">
+                <CaptureTable></CaptureTable>
+            </div>
+
+            <div v-if="currenttab == 'conversion'">
+                <ConversionPage></ConversionPage>
+            </div>
+
+            <div v-if="(currenttab == 'aggregation') && viewaggregation">
+                <AggregationTable></AggregationTable>
+            </div>
+
+            <div v-if="currenttab == 'settings'">
+                <SettingsPage></SettingsPage>
+            </div>
+
+            <div v-if="currenttab == 'audit'">
+                <AuditPage></AuditPage>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+    import {ref, onMounted, computed} from 'vue';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import TabsNav from '@/components/TabsNav.vue';
+    import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import ConfigPage from '@/views/ConfigPage.vue';
+    import CaptureTable from '@/views/CaptureTable.vue';
+    import AggregationTable from '@/views/AggregationTable.vue';
+    import ConversionPage from '@/views/ConversionPage.vue';
+    import SettingsPage from '@/views/SettingsPage.vue';
+    import AuditPage from '@/views/AuditPage.vue';
+    import { useToast } from "vue-toastification";
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import GreyLogo from '@/components/Common/GreyLogo.vue';
+    import PleaseWait from '@/components/Common/PleaseWait.vue';
+    import { useActivityTreeStore } from '../stores/activitytree.js';
+    import RegulationCheck from '@/components/RegulationCheck.vue';
+
+    const currenttab = ref('capture');
+    const level1category = ref(0);
+    const showactivityselect = ref(false);
+    const itemid = ref(0);
+    const enabledashboard = ref(false);
+    const viewaggregation = ref(true);
+    const available = ref(true);
+    const debug = ref({});
+
+    const toast = useToast();
+
+    /**
+     * Capture change to capture/aggregate tab
+     * @param {*} tab
+     */
+    function tabChange(tab: string) {
+        currenttab.value = tab;
+        level1category.value = 0;
+        showactivityselect.value = false;
+        itemid.value = 0;
+    }
+
+    /**
+     * Anything in here that involves MyGrades waiting to open
+     */
+    const waiting = computed(() => {
+        const treestore = useActivityTreeStore();
+
+        return !treestore.ready;
+    })
+
+    /**
+     * Check for aggregation tab permission
+     */
+     onMounted(() => {
+
+        // Check that MyGrades is available for this course at all.
+        moodleFetch(
+            'local_gugrades_is_mygrades_available',
+            {}
+        )
+        .then((result: any) => {
+            available.value = result.available;
+        })
+        .catch((error) => {
+            window.console.log(error);
+            debug.value = error;
+        });
+
+        // Check capability to use the aggregation tab.
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
+                capability: 'local/gugrades:viewaggregation'
+            }
+        )
+        .then((result: any) => {
+            viewaggregation.value = result.hascapability;
+        })
+        .catch((error) => {
+            window.console.log(error);
+            debug.value = error;
+        });
+    })
+</script>

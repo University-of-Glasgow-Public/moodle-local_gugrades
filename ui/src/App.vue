@@ -1,5 +1,7 @@
 <template>
     <div id="mygrades_container">
+        <button class="btn btn-error">Button</button>
+
         <TabMenu />
     </div>
 </template>

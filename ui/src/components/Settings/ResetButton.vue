@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton v-if="hascapability" color="error" class="tw:mr-1" @click="showconfirm = true">{{ mstrings.resetcourse }}</TwButton>
+    <TwButton v-if="hascapability" color="error" class="mr-1" @click="showconfirm = true">{{ mstrings.resetcourse }}</TwButton>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetcourseconfirm" @confirm="confirmdelete"></ConfirmModal>
 </template>

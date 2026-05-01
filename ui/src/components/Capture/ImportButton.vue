@@ -6,21 +6,21 @@
         <span v-else>{{ mstrings['importgrades'] }}</span>
     </TwButton>
 
-    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['importgrades']">
+    <VueModal v-model="showimportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['importgrades']">
 
         <div v-if="loading">
             <PleaseWait progresstype="import" :staffuserid="props.staffuserid"></PleaseWait>
         </div>
 
-        <div v-if="showdryrun" class="tw:text-center">
+        <div v-if="showdryrun" class="text-center">
 
             <p v-if="dryruncount > 0" v-html="mstrings['importdryrun']"></p>
             <p v-else v-html="mstrings['importdryrunzero']"></p>
-            <p v-if="dryruncount > 0" class="tw:text-[56px]/17 tw:font-light">{{ dryruncount }}</p>
+            <p v-if="dryruncount > 0" class="text-[56px]/17 font-light">{{ dryruncount }}</p>
 
-            <div class="tw:divider"></div>
+            <div class="divider"></div>
 
-            <div class="tw:mt-2 tw:pt-2">
+            <div class="mt-2 pt-2">
                 <TwButton v-if="dryruncount > 0" color="primary" @click="importgrades()">{{ mstrings['yesimport'] }}</TwButton>
                 <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
@@ -29,8 +29,8 @@
         <div v-if="!loading && !showdryrun">
 
             <!-- already imported warning-->
-            <div class="tw:alert tw:alert-soft tw:alert-vertical tw:sm:alert-horizontal tw:mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="tw:stroke-info tw:h-6 tw:w-6 tw:shrink-0">
+            <div class="alert alert-soft alert-vertical sm:alert-horizontal mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info h-6 w-6 shrink-0">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <div v-if="is_importgrades">
@@ -48,7 +48,7 @@
 
                 <!-- Recursive options -->
                 <div v-if="recursiveavailable">
-                    <div v-if="!allgradesvalid" class="tw:alert tw:alert-danger">
+                    <div v-if="!allgradesvalid" class="alert alert-danger">
                         {{ mstrings['invalidgradetype'] }}
                     </div>
                     <div v-else>
@@ -62,7 +62,7 @@
                         </FormKit>
                     </div>
 
-                    <div class="tw:divider"></div>
+                    <div class="divider"></div>
                 </div>
 
                 <!-- NS fill options -->
@@ -78,7 +78,7 @@
                 <!-- If there are existing grades then show all the options for importing extra grades -->
                 <div v-if="is_importgrades">
 
-                    <div class="tw:divider"></div>
+                    <div class="divider"></div>
 
                     <FormKit
                         type="radio"
@@ -88,7 +88,7 @@
                         v-model="importadditional"
                         >
                     </FormKit>
-                    <div class="tw:divider"></div>
+                    <div class="divider"></div>
                     <FormKit
                         type="select"
                         :label="mstrings['reasonforadditionalimport']"
@@ -109,13 +109,13 @@
                 </div>
             </FormKit>
 
-            <div v-if="recursiveavailable && (recursiveselect=='recursive') && !recursivematch" class="tw:mt-2 tw:alert tw:alert-warning">
+            <div v-if="recursiveavailable && (recursiveselect=='recursive') && !recursivematch" class="mt-2 alert alert-warning">
                 {{ mstrings['importnomatch'] }}
             </div>
 
-            <div class="tw:divider"></div>
+            <div class="divider"></div>
 
-            <div class="tw:mt-2 tw:pt-2">
+            <div class="mt-2 pt-2">
                 <TwButton color="primary" @click="dryrungrades()">{{ mstrings['yesimport'] }}</TwButton>
                 <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>
@@ -196,8 +196,8 @@
      * What kind of alert do you get?
      */
     const importclass = computed(() => ({
-        'tw:alert-error' : is_importgrades.value,
-        'tw:alert-info' : !is_importgrades.value,
+        'alert-error' : is_importgrades.value,
+        'alert-info' : !is_importgrades.value,
     }));
 
     /**

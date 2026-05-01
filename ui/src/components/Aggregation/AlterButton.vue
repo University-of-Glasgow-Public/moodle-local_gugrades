@@ -5,23 +5,23 @@
         {{ mstrings.altertitle }}
     </a>
 
-    <VueModal v-model="showaltermodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.altertitle">
+    <VueModal v-model="showaltermodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.altertitle">
 
         <TwAlert v-if="loading">{{ mstrings.pleasewait }}</TwAlert>
 
         <div v-if="!loading" class="scrollable-content">
 
             <!-- basic details of category -->
-            <ul class="tw:list-none">
+            <ul class="list-none">
                 <li><b>{{ mstrings.category }}:</b> {{ categoryname }}</li>
                 <li><b>{{ mstrings.username }}:</b> {{ userfullname }}</li>
                 <li><b>{{ mstrings.idnumber }}:</b> {{ idnumber }}</li>
             </ul>
 
-            <div class="tw:divider"></div>
+            <div class="divider"></div>
 
             <!-- grade items therein -->
-            <table class="tw:table tw:mt-3 tw:p-2">
+            <table class="table mt-3 p-2">
                 <thead>
                     <tr>
                         <th>{{ mstrings.gradeitem }}</th>
@@ -52,7 +52,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="tw:text-bold">{{ mstrings.sumofweights }}</td>
+                        <td class="text-bold">{{ mstrings.sumofweights }}</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>{{ defaulttotal.toFixed(5) }}</td>
@@ -61,12 +61,12 @@
                 </tbody>
             </table>
 
-            <TwAlert v-if="!closeenough" color="warning" class="tw:my-2">{{ mstrings.donotaddto1 }}</TwAlert>
+            <TwAlert v-if="!closeenough" color="warning" class="my-2">{{ mstrings.donotaddto1 }}</TwAlert>
 
-            <div class="tw:divider"></div>
+            <div class="divider"></div>
 
             <!-- reason -->
-            <div class="tw:my-4">
+            <div class="my-4">
                 <FormKit
                     type="textarea"
                     outer-class="mb-3"
@@ -77,8 +77,8 @@
             </div>
 
             <div class="mt-2">
-                <TwButton color="primary" class="tw:mr-1" @click="save_altered_weights">{{ mstrings.save }}</TwButton>
-                <TwButton color="info" class="tw:mr-1" @click="revert_altered_weights">{{ mstrings.revert }}</TwButton>
+                <TwButton color="primary" class="mr-1" @click="save_altered_weights">{{ mstrings.save }}</TwButton>
+                <TwButton color="info" class="mr-1" @click="revert_altered_weights">{{ mstrings.revert }}</TwButton>
                 <TwButton color="warning" @click="showaltermodal = false">{{ mstrings.cancel }}</TwButton>
             </div>
 

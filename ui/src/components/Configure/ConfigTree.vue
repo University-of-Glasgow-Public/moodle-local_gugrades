@@ -1,9 +1,9 @@
 <template>
     <tr v-for="item in props.nodes.items" :key="item.id" :class="resitclass">
-        <td v-if="resitconfig" class="tw:px-2 resit_select tw:border-none">
+        <td v-if="resitconfig" class="px-2 resit_select border-none">
             <ResitCheckbox  v-if="!resitfade" :itemid="item.id" :checkeditemid="resititemid" @checked="resit_clicked" :depth="depth"></ResitCheckbox>
         </td>
-        <td :style="indentstyle" class="tw:flex tw:justify-start">
+        <td :style="indentstyle" class="flex justify-start">
             <ConfigTreeIcon :gradeitem="item"></ConfigTreeIcon>
             {{ item.itemname }}
         </td>

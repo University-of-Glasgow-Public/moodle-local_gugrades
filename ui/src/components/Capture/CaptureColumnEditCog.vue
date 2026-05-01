@@ -1,17 +1,17 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a class="tw:ml-1 tw:tooltip tw:cursor-pointer" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
-        <Cog6ToothIcon class="tw:size-6 tw:text-yellow-500"></Cog6ToothIcon>
+    <a class="ml-1 tooltip cursor-pointer" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
+        <Cog6ToothIcon class="size-6 text-yellow-500"></Cog6ToothIcon>
     </a>
     <a
         v-if="candelete"
-        class="tw:ml-1 tw:tooltip tw:cursor-pointer"
+        class="ml-1 tooltip cursor-pointer"
         aria-label="Delete column"
         :data-tip="mstringstore.getMstring('deletecolumn')"
         @click.prevent="delete_clicked"
     >
-        <TrashIcon class="tw:size-6 tw:text-red-600"></TrashIcon>
+        <TrashIcon class="size-6 text-red-600"></TrashIcon>
     </a>
     <ConfirmModal
         :show="showconfirm"

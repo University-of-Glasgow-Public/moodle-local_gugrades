@@ -1,17 +1,17 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" class="tw:mr-1" @click="recalculate_clicked()">{{ mstrings.recalculate }}</TwButton>
+    <TwButton color="primary" class="mr-1" @click="recalculate_clicked()">{{ mstrings.recalculate }}</TwButton>
 
-    <VueModal v-model="showrecalculatemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.recalculate">
+    <VueModal v-model="showrecalculatemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.recalculate">
         <div v-if="loading">
             <PleaseWait :staffuserid="props.staffuserid" progresstype="aggregate"></PleaseWait>
         </div>
 
         <div v-else>
-            <TwAlert class="tw:mb-5">{{ mstrings.recalculatehelp }}</TwAlert>
+            <TwAlert class="mb-5">{{ mstrings.recalculatehelp }}</TwAlert>
 
-            <TwButton color="primary" class="tw:mr-1"  @click="do_recalculate()">{{  mstrings.recalculate }}</TwButton>
+            <TwButton color="primary" class="mr-1"  @click="do_recalculate()">{{  mstrings.recalculate }}</TwButton>
             <TwButton color="warning" @click="showrecalculatemodal = false">{{  mstrings.cancel }}</TwButton>
         </div>
     </VueModal>

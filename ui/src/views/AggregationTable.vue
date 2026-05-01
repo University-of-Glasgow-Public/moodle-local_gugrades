@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="serverdebug"></DebugDisplay>
 
-    <div class="tw:border tw:rounded-md tw:p-2 tw:mt-2 tw:border-gray-300">
+    <div class="border rounded-md p-2 mt-2 border-gray-300">
         <div>
             <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
             <GroupSelect v-if="level1category" @groupselected="groupselected"></GroupSelect>
@@ -30,16 +30,16 @@
     </div>
 
     <!-- Aggregation is not possible -->
-     <TwAlert v-if="!aggregationsupported" color="error" class="tw:my-5">{{  mstrings.aggregationnotsupported }}</TwAlert>
+     <TwAlert v-if="!aggregationsupported" color="error" class="my-5">{{  mstrings.aggregationnotsupported }}</TwAlert>
 
-    <div v-if="level1category && aggregationsupported" class="tw:mt-2">
+    <div v-if="level1category && aggregationsupported" class="mt-2">
 
         <!-- Filter on initials -->
         <NameFilter @selected="filter_selected" ref="namefilterref"></NameFilter>
 
         <!-- Breadcrumb trail -->
-        <div v-if="breadcrumb.length > 1" class="tw:my-3 tw:breadcrumbs tw:max-w-xs tw:text-sm tw:border tw:rounded-md tw:p-2 tw:border-gray-300">
-            <ul class="tw:p-0 tw:m-0">
+        <div v-if="breadcrumb.length > 1" class="my-3 breadcrumbs max-w-xs text-sm border rounded-md p-2 border-gray-300">
+            <ul class="p-0 m-0">
                 <li v-for="(item, index) in breadcrumb" :key="item.id">
                     <a href="#" @click="expand_clicked(item.id)">{{ item.shortname }}</a>
                 </li>
@@ -71,11 +71,11 @@
             <template #header="header">
                 <div v-if="header.value == 'back'">
                     <a href="#" @click="expand_clicked(backid)">
-                        <ArrowLeftCircleIcon class="tw:size-6 tw:text-white" />
+                        <ArrowLeftCircleIcon class="size-6 text-white" />
                     </a>
                 </div>
                 <div v-else class="aggregation-header">
-                    <div class="tw:tooltip tw:tooltip-success" :data-tip="header.fullname">
+                    <div class="tooltip tooltip-success" :data-tip="header.fullname">
 
                         <div>
                             <!-- column title -->
@@ -84,14 +84,14 @@
                         </div>
                         <div v-if="!header.infocol && showweights">{{ header.weight }}%</div>
                         <div v-if="header.gradetype">{{ header.gradetype }} <span v-if="!header.isscale">({{ header.grademax }})</span></div>
-                        <div v-if="header.resititem" class="tw:badge tw:badge-success">{{ mstrings.reassessment}}</div>
+                        <div v-if="header.resititem" class="badge badge-success">{{ mstrings.reassessment}}</div>
                     </div>
-                    <div class="tw:py-1" v-if="header.strategy">
+                    <div class="py-1" v-if="header.strategy">
                         <i>{{ header.strategy }}</i>
                     </div>
                     <div v-if="header.categoryid">
                         <a href="#" @click="expand_clicked(header.categoryid)">
-                            <span class="tw:badge tw:badge-sm tw:badge-primary tw:mt-2" >
+                            <span class="badge badge-sm badge-primary mt-2" >
                                 <ChevronDoubleLeftIcon class="size-4" />
                                 {{ mstrings.expand }}
                                 <ChevronDoubleRightIcon class="size-4" />
@@ -108,7 +108,7 @@
             <!-- point is to iterate over field names to maniuplate data in individual field items -->
             <template v-for="header in headers" v-slot:[header.slot]="item">
 
-                <div class="tw:inline-flex tw:items-center tw:gap-1">
+                <div class="inline-flex items-center gap-1">
 
                     <!-- strikethrough if data is dropped -->
                     <!-- bold if admin -->
@@ -152,13 +152,13 @@
 
             <!-- Resit required -->
             <template #item-resitrequired="item">
-                <a v-if="caneditgrades" class="tw:cursor-pointer" @click.prevent="resit_clicked(item.id, !item.resitrequired)">
-                    <span v-if="item.resitrequired" class="tw:badge tw:badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="tw:badge tw:badge-secondary">{{ mstrings.no }}</span>
+                <a v-if="caneditgrades" class="cursor-pointer" @click.prevent="resit_clicked(item.id, !item.resitrequired)">
+                    <span v-if="item.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
+                    <span v-else class="badge badge-secondary">{{ mstrings.no }}</span>
                 </a>
                 <span v-if="!caneditgrades">
-                    <span v-if="item.resitrequired" class="tw:badge tw:badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="tw:badge tw:badge-secondary">{{ mstrings.no }}</span>
+                    <span v-if="item.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
+                    <span v-else class="badge badge-secondary">{{ mstrings.no }}</span>
                 </span>
             </template>
 
@@ -173,20 +173,20 @@
                     {{ item.releasegrade }}
                     <span v-if="item.mismatch">
                         <br />
-                        <span class="tw:badge tw:badge-error tw:mt-1">MISMATCH</span>
+                        <span class="badge badge-error mt-1">MISMATCH</span>
                     </span>
                 </div>
             </template>
 
             <!-- Total -->
             <template #item-total="item">
-                <div class="tw:inline-flex tw:items-center tw:gap-1">
+                <div class="inline-flex items-center gap-1">
                     <div>
                         <span v-if="item.error">{{ item.error }}</span>
                         <span :class="itemclasses(item)" v-else>{{ item.displaygrade }}</span>
                         <span v-if="item.alteredweight">
                             <br />
-                            <span class="tw:badge tw:badge-warning tw:mt-1">ALTERED</span>
+                            <span class="badge badge-warning mt-1">ALTERED</span>
                          </span>
                     </div>
                     <div>

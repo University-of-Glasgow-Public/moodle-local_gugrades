@@ -1,8 +1,8 @@
 <template>
-    <VueModal v-model="showmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-xl" :title="titletext">
-        <div class="tw:flex tw:justify-center" >
-            <div class="tw:border-solid tw:rounded-md tw:m-1 tw:p-2 tw:flex tw:justify-center" style="min-width: 300px">
-                <span v-if="!showprogress" class="tw:loading tw:loading-ring tw:loading-xl"></span>
+    <VueModal v-model="showmodal" :enableClose="false" modalClass="rounded max-w-xl" :title="titletext">
+        <div class="flex justify-center" >
+            <div class="border-solid rounded-md m-1 p-2 flex justify-center" style="min-width: 300px">
+                <span v-if="!showprogress" class="loading loading-ring loading-xl"></span>
                 <RadialProgress v-if="showprogress" :diameter="100" :totalSteps="100" :completedSteps="progress">{{ progress }}%</RadialProgress>
             </div>
         </div>

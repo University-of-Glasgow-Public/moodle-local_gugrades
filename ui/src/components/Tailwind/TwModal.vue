@@ -1,12 +1,12 @@
 <template>
     <Teleport to="#extension-mmplj">
-        <dialog ref="modalRef" class="tw:modal"  :class="{'modal-open': model}" style="z-index: 9999 !important;">
-            <div class="tw:modal-box" >
-                <h3 class="tw:text-lg tw:font-bold">{{ title }}</h3>
-                <div class="tw:py-4">
+        <dialog ref="modalRef" class="modal"  :class="{'modal-open': model}" style="z-index: 9999 !important;">
+            <div class="modal-box" >
+                <h3 class="text-lg font-bold">{{ title }}</h3>
+                <div class="py-4">
                     <slot></slot>
                 </div>
-                <div class="tw:modal-action">
+                <div class="modal-action">
                     <form method="dialog">
                         <!-- if there is a button in form, it will close the modal -->
                         <button class="btn">Close</button>

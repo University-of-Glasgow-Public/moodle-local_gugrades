@@ -1,14 +1,14 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" class="tw:mr-1" @click="open_modal()">{{ mstrings.exportaggregation }}</TwButton>
+    <TwButton color="primary" class="mr-1" @click="open_modal()">{{ mstrings.exportaggregation }}</TwButton>
 
-    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl tw:overflow-y-auto" :title="mstrings.exportaggregation">
+    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="rounded max-w-3xl overflow-y-auto" :title="mstrings.exportaggregation">
 
         <PleaseWait v-if="pleasewait"></PleaseWait>
 
         <!-- step to select plugin and filename -->
-        <div v-if="step == 'selectplugin'" class="tw:mb-5">
+        <div v-if="step == 'selectplugin'" class="mb-5">
             <FormKit
                 type="form"
                 @submit="plugin_selected()"
@@ -33,17 +33,17 @@
         </div>
 
         <!-- step to select form fields-->
-        <div v-if="(step == 'selectfields') && hasform" class="tw:mb-5 scrollable-content">
+        <div v-if="(step == 'selectfields') && hasform" class="mb-5 scrollable-content">
             <FormKit
                 type="form"
                 @submit="fields_selected()"
                 :submit-label="mstrings.export"
             >
 
-                <TwAlert class="tw:mb-5">{{ mstrings.selectfields }}</TwAlert>
+                <TwAlert class="mb-5">{{ mstrings.selectfields }}</TwAlert>
 
-                <div class="tw:mb-2">
-                    <TwButton color="info" class="tw:mr-1" @click="all_selected">{{ mstrings.checkall }}</TwButton>
+                <div class="mb-2">
+                    <TwButton color="info" class="mr-1" @click="all_selected">{{ mstrings.checkall }}</TwButton>
                     <TwButton color="secondary"  @click="none_selected">{{ mstrings.checknone }}</TwButton>
                 </div>
 
@@ -58,12 +58,12 @@
         </div>
 
         <!-- alternatively -->
-        <div v-if="(step == 'selectfields') && !hasform" class="tw:mb-5 scrollable-content">
+        <div v-if="(step == 'selectfields') && !hasform" class="mb-5 scrollable-content">
             <TwAlert>{{ mstrings.noselectfields }}</TwAlert>
-            <TwButton color="primary" class="tw:mt-2" @click="fields_selected()">{{  mstrings.next }}</TwButton>"
+            <TwButton color="primary" class="mt-2" @click="fields_selected()">{{  mstrings.next }}</TwButton>"
         </div>
 
-        <div class="tw:flex tw:justify-end">
+        <div class="flex justify-end">
             <TwButton color="warning" @click="close_modal()">{{ mstrings.cancel }}</TwButton>
         </div>
     </VueModal>

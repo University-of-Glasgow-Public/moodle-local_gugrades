@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="tw:mt-5">
+    <div class="mt-5">
         <LevelOneSelect  @levelchange="levelOneChange" @regulationextra="getregextra"></LevelOneSelect>
     </div>
 
@@ -19,7 +19,7 @@
 
     <div v-if="loaded && !treeerror">
         <h3 class="tw"mt-5>{{ categoryname }}</h3>
-        <table id="config_table" class="tw:table tw:border-none">
+        <table id="config_table" class="table border-none">
             <ConfigTree
                 :nodes="activitytree"
                 :depth="1"

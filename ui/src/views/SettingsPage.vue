@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <FormKit type="form" @submit="submit_form" class="tw:mt-8">
+        <FormKit type="form" @submit="submit_form" class="mt-8">
 
             <div v-if="!gradesreleased" class="alert alert-warning">
                 {{ mstrings.gradesnotreleased }}

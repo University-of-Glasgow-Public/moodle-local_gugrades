@@ -3,12 +3,12 @@
 
     <TwButton color="primary" @click="conversion_clicked">{{ mstrings['convertgrades'] }}</TwButton>
 
-    <VueModal v-model="showselectmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['conversionselect']">
+    <VueModal v-model="showselectmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['conversionselect']">
 
         <PleaseWait v-if="waiting"></PleaseWait>
 
         <div v-if="showmismatch">
-            <TwAlert class="tw:mb-3">{{ mstrings['conversionmismatch'] }}</TwAlert>
+            <TwAlert class="mb-3">{{ mstrings['conversionmismatch'] }}</TwAlert>
             <TwButton color="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['yes'] }}</TwButton>
             <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
         </div>
@@ -17,7 +17,7 @@
         <div v-if="!showmismatch">
 
             <!-- Show the selected map name (if there is one)-->
-            <p v-if="mapname" class="tw:mb-2">
+            <p v-if="mapname" class="mb-2">
                 {{ mstrings['selectedmap'] }}: <b>{{ mapname }}</b>
             </p>
 
@@ -34,7 +34,7 @@
                     <TwAlert v-if="nomaps && loaded">{{ mstrings['nomaps'] }}</TwAlert>
                     <TwAlert v-else>{{ mstrings['noimportafterconversion'] }}</TwAlert>
 
-                    <EasyDataTable v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true" class="tw:my-4">
+                    <EasyDataTable v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true" class="my-4">
                         <template #item-select="item">
                             <input type="radio" :value="item.id" v-model="mapid"/>
                         </template>
@@ -49,7 +49,7 @@
 
             <!-- if a map is selected then show warning message and option to remove -->
             <div v-if="selection">
-                <TwAlert class="tw:mb-3">{{ mstrings['conversionremovewarning'] }}</TwAlert>
+                <TwAlert class="mb-3">{{ mstrings['conversionremovewarning'] }}</TwAlert>
                 <TwButton color="danger" @click="remove_clicked">{{ mstrings['remove'] }}</TwButton>
                 <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
             </div>

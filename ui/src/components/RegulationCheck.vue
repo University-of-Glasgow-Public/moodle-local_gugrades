@@ -1,10 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <VueModal v-model="admingradesinvalid" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" title="Issue with configuration">
+    <VueModal v-model="admingradesinvalid" :enableClose="false" modalClass="rounded max-w-3xl" title="Issue with configuration">
         <TwAlert>
             {{ mstrings.admingradesinvalid }}
-            <div v-if="continueurl" class="tw:flex tw:justy-center">
+            <div v-if="continueurl" class="flex justy-center">
                 <TwButton @click="redirectToExternalUrl">Continue</TwButton>
             </div>
         </TwAlert>

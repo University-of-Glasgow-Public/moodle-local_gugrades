@@ -1,12 +1,12 @@
 <template>
-    <ul class="tw:list-none tw:pl-8">
+    <ul class="list-none pl-8">
         <li v-for="item in props.nodes.items" :key="item.id">
             <a href="#" @click.prevent="activity_click(item.id)">{{ item.itemname }}</a>
         </li>
         <li v-for="category in props.nodes.categories" :key="category.id">
-            <div class="tw:font-bold tw:flex tw:justify-start tw:space-x-4">
-                <FolderIcon v-if="props.depth == 1" class="tw:size-5 tw:text-black-500 tw:mr-2"></FolderIcon>
-                <FolderOpenIcon v-else class="tw:size-5 tw:text-black-500 tw:mr-2"></FolderOpenIcon>
+            <div class="font-bold flex justify-start space-x-4">
+                <FolderIcon v-if="props.depth == 1" class="size-5 text-black-500 mr-2"></FolderIcon>
+                <FolderOpenIcon v-else class="size-5 text-black-500 mr-2"></FolderOpenIcon>
                 {{ category.category.fullname }}
             </div>
             <ActivityTree :nodes="category" @activityselected="sub_activity_click" :depth="props.depth + 1"></ActivityTree>

@@ -9,11 +9,11 @@ const config = {
   config: {
     classes: generateClasses({
       global: { // classes
-        outer: '$reset tw:my-1',
-        input: 'tw:fieldset',
-        label: '$reset tw:fieldset-legend',
-        legend: '$reset tw:fieldset-legend',
-        help: 'tw:text-sm',
+        outer: '$reset my-1',
+        input: 'fieldset',
+        label: '$reset fieldset-legend',
+        legend: '$reset fieldset-legend',
+        help: 'text-sm',
         messages: 'list-unstyled mt-1',
         message: 'text-danger',
       },
@@ -24,16 +24,16 @@ const config = {
         input: '$reset form-range',
       },
       submit: {
-        outer: '$reset tw:mt-3',
-        input: '$reset tw:btn tw:btn-primary'
+        outer: '$reset mt-3',
+        input: '$reset btn btn-primary'
       },
       number: {
-        input: '$reset tw:input'
+        input: '$reset input'
       },
       checkbox: {
-        outer: '$reset tw:fieldset',
-        input: '$reset tw:checkbox',
-        wrapper: '$reset tw:label',
+        outer: '$reset fieldset',
+        input: '$reset checkbox',
+        wrapper: '$reset label',
       },
       radio: {
         legend: '$reset mb-0 font-weight-bold',
@@ -44,13 +44,13 @@ const config = {
         option: '$reset pr-3'
       },
       select: {
-        input: '$reset tw:select',
+        input: '$reset select',
       },
       text: {
-        input: '$reset tw:input',
+        input: '$reset input',
       },
       textarea: {
-        input: '$reset tw:textarea',
+        input: '$reset textarea',
       }
     })
   }

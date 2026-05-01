@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwAlert class="tw:mb-2">{{  mstrings.examplevalues }}</TwAlert>
+    <TwAlert class="mb-2">{{  mstrings.examplevalues }}</TwAlert>
 
     <FormKit v-if="loaded" type="form" submit-label="Save" :disabled="!caneditgrades" @submit="submit_form">
         <FormKit
@@ -97,7 +97,7 @@
         </div>
     </FormKit>
 
-    <div class="tw:flex tw:justify-end">
+    <div class="flex justify-end">
         <TwButton color="warning" @click="cancel_button">{{ mstrings.cancel }}</TwButton>
     </div>
 

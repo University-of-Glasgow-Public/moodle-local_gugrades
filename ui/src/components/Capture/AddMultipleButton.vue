@@ -5,7 +5,7 @@
         {{ mstrings['addmultiple'] }}
     </TwButton>
 
-    <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['addmultiple']">
+    <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['addmultiple']">
         <FormKit type="form" @submit="submit_form">
             <FormKit
                 type="select"
@@ -37,7 +37,7 @@
             />
         </FormKit>
 
-        <div class="tw:flex tw:justify-end tw:mt-8">
+        <div class="flex justify-end mt-8">
             <TwButton color="warning" @click="showaddmultiplemodal = false">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>

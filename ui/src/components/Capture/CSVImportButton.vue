@@ -5,7 +5,7 @@
         {{ mstrings['csvimport'] }}
     </TwButton>
 
-    <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['csvimport']">
+    <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['csvimport']">
 
         <PleaseWait v-if="waiting" progresstype="csvimport" :staffuserid="props.staffuserid"></PleaseWait>
 
@@ -22,7 +22,7 @@
 
                 <TwButton color="primary" @click="csv_download()">{{  mstrings['csvdownload'] }}</TwButton>
 
-                <div class="tw:divider"></div>
+                <div class="divider"></div>
 
                 <!-- select file / upload bit -->
                 <p><b>{{ mstrings['csvuploadhelp'] }}</b></p>
@@ -40,22 +40,22 @@
                         <span v-if="item.grade">{{ item.gradevalue }}</span>
                     </template>
                     <template #item-error="item">
-                        <i v-if="item.state < 0" class="tw:text-red-500 fa fa-times" aria-hidden="true"></i>
-                        <i v-if="item.state > 0" class="tw:text-green-500 fa fa-check" aria-hidden="true"></i>
-                        <i v-if="item.state == 0" class="tw:text-yellow-500 fa fa-info" aria-hidden="true"></i>
+                        <i v-if="item.state < 0" class="text-red-500 fa fa-times" aria-hidden="true"></i>
+                        <i v-if="item.state > 0" class="text-green-500 fa fa-check" aria-hidden="true"></i>
+                        <i v-if="item.state == 0" class="text-yellow-500 fa fa-info" aria-hidden="true"></i>
                         {{ item.error }}
                     </template>
                 </EasyDataTable>
-                <p v-if="errorcount" class="tw:text-red-500 tw:mt-1">{{ mstrings['lineswitherrors'] }}: {{ errorcount }}:</p>
-                <ul class="tw:text-red-500">
+                <p v-if="errorcount" class="text-red-500 mt-1">{{ mstrings['lineswitherrors'] }}: {{ errorcount }}:</p>
+                <ul class="text-red-500">
                     <li v-for="error in errorlist" v-key="error.error">
                         <span>{{ error.error }}</span>: <b>{{ error.count }} line(s)</b>
                     </li>
                 </ul>
 
                 <!-- submit bit (if no errors) -->
-                <div v-if="!errorcount" class="tw:mt-2">
-                    <div class="tw:divider"></div>
+                <div v-if="!errorcount" class="mt-2">
+                    <div class="divider"></div>
                     <FormKit type="form" @submit="submit_reason_form">
                         <FormKit
                             type="select"
@@ -80,7 +80,7 @@
 
         </div> <!-- incorrectfiletype -->
 
-        <div class="tw:flex tw:justify-end">
+        <div class="flex justify-end">
             <TwButton color="warning" @click="close_modal()">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>

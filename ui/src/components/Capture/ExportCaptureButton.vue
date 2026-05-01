@@ -3,13 +3,13 @@
 
     <TwButton color="primary" @click="open_modal">{{ mstrings['exportcapture'] }}</TwButton>
 
-    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings['exportcapture']">
+    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['exportcapture']">
 
         <TwAlert color="info">{{  mstrings['exportcapturehelp'] }}</TwAlert>
 
         <PleaseWait v-if="pleasewait"></PleaseWait>
 
-        <div class="tw:pl-8 tw:mt-5">
+        <div class="pl-8 mt-5">
             <FormKit
                 v-if="!pleasewait"
                 type="form"
@@ -30,7 +30,7 @@
             </FormKit>
         </div>
 
-        <div class="tw:flex tw:justify-end">
+        <div class="flex justify-end">
             <TwButton color="warning" @click="close_modal">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>

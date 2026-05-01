@@ -11,6 +11,7 @@ export default defineConfig({
     vue(),
     tailwindcss(),
   ],
+  base: "./",
   css: {
     preprocessorOptions: {
       // Ensure CSS imports are resolved

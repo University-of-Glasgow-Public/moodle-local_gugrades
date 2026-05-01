@@ -5,29 +5,29 @@
         {{ mstrings.explain }}
     </a>
 
-    <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" :title="mstrings.explain">
+    <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.explain">
 
         <TwAlert v-if="loading">{{ mstrings.pleasewait }}</TwAlert>
 
         <div v-if="!loading" class="scrollable-content">
 
             <!-- user stuffs -->
-            <div class="tw:flex tw:justify-center tw:items-center tw:mb-8">
-                <div class="tw:flex tw:items-center tw:space-x-2">
-                    <div class="tw:avatar">
-                        <div class="tw:w-12 tw:rounded-full">
+            <div class="flex justify-center items-center mb-8">
+                <div class="flex items-center space-x-2">
+                    <div class="avatar">
+                        <div class="w-12 rounded-full">
                             <a :href="user!.profileurl" target="_profile">
                                 <img :src="user!.pictureurl" :alt="user!.displayname" class="userpicture defaultuserpic" width="35" height="35"/>
                             </a>
                         </div>
                     </div>
-                    <h1 class="tw:text-lg tw:font-bold">{{ user!.displayname }}</h1>
+                    <h1 class="text-lg font-bold">{{ user!.displayname }}</h1>
                 </div>
             </div>
 
             <!-- details -->
-            <div class="tw:overflow-x-auto">
-                <table class="tw:table">
+            <div class="overflow-x-auto">
+                <table class="table">
                     <tbody>
                         <tr>
                             <th>{{ mstrings.idnumber }}</th>
@@ -71,8 +71,8 @@
 
             <!-- component grades -->
             <div>
-                <h5 class="tw:mt-8">{{ mstrings.grades }}</h5>
-                <table class="tw:table">
+                <h5 class="mt-8">{{ mstrings.grades }}</h5>
+                <table class="table">
                     <tbody>
                         <tr v-for="field in user!.fields">
                             <th>{{ field.fullname }}</th>
@@ -95,11 +95,11 @@
 
             <!-- explanation -->
             <div>
-                <h5 class="tw:mt-8">{{ mstrings.explanation }}</h5>
-                <div class="tw:flex tw:justify-center tw:font-bold tw:text-lg">{{ user!.explain }}</div>
+                <h5 class="mt-8">{{ mstrings.explanation }}</h5>
+                <div class="flex justify-center font-bold text-lg">{{ user!.explain }}</div>
             </div>
 
-            <TwButton color="warning" @click="showexplainmodal = false" class="tw:mt-8">{{ mstrings.close }}</TwButton>
+            <TwButton color="warning" @click="showexplainmodal = false" class="mt-8">{{ mstrings.close }}</TwButton>
         </div>
     </VueModal>
 </template>

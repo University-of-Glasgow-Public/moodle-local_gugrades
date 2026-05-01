@@ -1,8 +1,8 @@
 <template>
-    <button v-if="disabled" :disabled="disabled" class="tw:btn tw:mr-1 tw:btn-disabled tw:btn-dash" tabindex="-1" role="button" aria-disabled="true">
+    <button v-if="disabled" :disabled="disabled" class="btn mr-1 btn-disabled btn-dash" tabindex="-1" role="button" aria-disabled="true">
         <slot></slot>
     </button>
-    <button v-else class="tw:btn tw:mr-1" :class="btnclasses" v-bind="$attrs">
+    <button v-else class="btn mr-1" :class="btnclasses" v-bind="$attrs">
         <slot></slot>
     </button>
 </template>
@@ -12,13 +12,13 @@
 
     const colorclasses = {
         default: '',
-        primary: 'tw:btn-primary',
-        secondary: 'tw:btn-secondary',
-        accent: 'tw:btn-accent',
-        info: 'tw:btn-info',
-        success: 'tw:btn-success',
-        warning: 'tw:btn-warning',
-        error: 'tw:btn-error',
+        primary: 'btn-primary',
+        secondary: 'btn-secondary',
+        accent: 'btn-accent',
+        info: 'btn-info',
+        success: 'btn-success',
+        warning: 'btn-warning',
+        error: 'btn-error',
     };
 
     const props = defineProps({
@@ -40,7 +40,7 @@
             classes.push(colorclasses['default']);
         }
         if (props.disabled) {
-            classes.push('tw:btn-disabled');
+            classes.push('btn-disabled');
         }
         return classes;
     });

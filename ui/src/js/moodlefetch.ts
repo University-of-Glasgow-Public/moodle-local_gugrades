@@ -1,24 +1,36 @@
-declare global {
-  interface Window {
-      GU: GUType;
-  }
-}
+/**
+ * This proxies ajax calls through service.php in mygrades directory.
+ * This is so we can use Moodle's web services without having to load all
+ * of Moodle's javascript stuff that we don't need.
+ */
 
-interface GUType {
-    courseid: number,
-    fetchMany: CallableFunction,
-}
+import ky from 'ky';
 
-export const moodleFetch = (methodname: string, args: Record<string, any>, async=true, loginrequired=true ): Promise<object> => {
+export const moodleFetch = async (
+  methodname: string,
+  args: Record<string, any>,
+  async = true,
+  loginrequired = true
+): Promise<object> => {
 
-    const GU = window.GU;
-    const fetchMany = GU.fetchMany;
-    const courseid = GU.courseid;
+  const pluginBase = new URL('../../', window.location.href).pathname;
+  const courseidParam = new URLSearchParams(window.location.search).get('courseid');
+  const courseid = courseidParam ? Number(courseidParam) : null;
 
-    args['courseid'] = courseid;
+  const api = ky.create({
+    prefix: `${pluginBase}service.php`
+  });
 
-    return fetchMany([{
-        methodname: methodname,
-        args: args
-    }], async, loginrequired)[0];
-}
+  args.courseid = courseid;
+
+  const response = await api.post('', {
+    json: {
+      methodname,
+      args,
+      async,
+      loginrequired
+    }
+  }).json();
+
+  return response as object;
+};

@@ -1,6 +1,6 @@
 <template>
-    <VueModal v-model="showdebugmodal" :enableClose="false" modalClass="tw:rounded tw:max-w-3xl" title="A serious error has occurred">
-        <TwAlert class="tw:my-4" color="error">A serious error has occurred and MyGrades cannot continue.</TwAlert>
+    <VueModal v-model="showdebugmodal" :enableClose="false" modalClass="rounded max-w-3xl" title="A serious error has occurred">
+        <TwAlert class="my-4" color="error">A serious error has occurred and MyGrades cannot continue.</TwAlert>
         <ul>
             <li>
                 CourseID: <pre>{{ moodlecourseid }}</pre>
@@ -9,12 +9,12 @@
                 {{ index }}: <pre>{{ item }}</pre>
             </li>
         </ul>
-        <TwAlert class="tw:my-4">
+        <TwAlert class="my-4">
             <b>Please copy all of this data and send to IT Services / Help Desk for attention</b><br />
             You can then continue.
         </TwAlert>
-        <div class="tw:mt-2 tw:text-center">
-            <a class="tw:btn tw:btn-primary" href="javascript:window.location.reload(true)">Close and continue</a>
+        <div class="mt-2 text-center">
+            <a class="btn btn-primary" href="javascript:window.location.reload(true)">Close and continue</a>
         </div>
     </VueModal>
 </template>
