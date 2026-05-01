@@ -1,7 +1,5 @@
 <template>
-    <div id="mygrades_container">
-        <button class="btn btn-error">Button</button>
-
+    <div id="mygrades_container" class="px-4">
         <TabMenu />
     </div>
 </template>
@@ -10,9 +8,4 @@
     import TabMenu from '../src/views/TabMenu.vue';
 </script>
 
-<style>
-    body#mygrades_container {
-        background:    #ffffff !important;
-    }
-</style>
 

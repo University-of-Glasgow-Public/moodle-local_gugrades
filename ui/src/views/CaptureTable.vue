@@ -386,10 +386,10 @@
 
         // Hide name initial columns
         if ((column == 'firstinitial') || (column == 'lastinitial')) {
-            return 'd-none';
+            return 'hidden';
         }
         if (column != 'displayname') {
-            return 'text-center';
+            return '!text-center';
         }
     }
 
@@ -398,7 +398,7 @@
      */
      function header_item_class(header: Header) {
         if ((header.value == 'firstinitial') || (header.value == 'lastinitial')) {
-            return 'd-none';
+            return 'hidden';
         }
     }
 

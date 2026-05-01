@@ -1,18 +1,18 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="row" style="min-width: 250px;">
+    <div class="flex justify-center" style="min-width: 250px;">
         <FormKit
             type="select"
             name="admingrades"
-            outer-class="col pr-1"
+            outer-class="w-42 pr-1"
             v-model="admingrade"
             :options="adminmenu"
             @input="input_updated"
         ></FormKit>
         <FormKit
             v-if="!props.usescale"
-            outer-class="col pl-0"
+            outer-class="w-42 pl-0"
             type="text"
             number="float"
             :validation="gradevalidation"
@@ -27,7 +27,7 @@
             v-if="props.usescale"
             type="select"
             :placeholder="mstrings.scale"
-            outer-class="col pl-0"
+            outer-class="w-42 pl-0"
             :disabled="admingrade != 'GRADE'"
             name="scale"
             v-model="grade"

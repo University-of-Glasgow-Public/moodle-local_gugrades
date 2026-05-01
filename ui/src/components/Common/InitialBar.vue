@@ -1,31 +1,30 @@
 <template>
-    <div class="initialbar d-flex flex-wrap justify-content-center justify-content-md-start">
-        <span class="initialbarlabel mr-2">{{ props.label }}</span>
 
-        <nav class="initialbargroups d-flex flex-wrap justify-content-center justify-content-md-start">
-            <ul class="pagination pagination-sm">
-                <li class="initialbarall page-item" :class="{active: is_active('all')}">
-                    <a data-initial="" class="page-link" href="#" @click="letterclicked('all')">{{ mstrings.all }}</a>
-                </li>
-            </ul>
-            <ul class="pagination pagination-sm">
-                <li v-for="letter in letters1" :key="letter" class="page-item" :class="{active: is_active(letter)}">
-                    <a class="page-link" href="#" @click.prevent="letterclicked(letter)">{{letter}}</a>
-                </li>
-            </ul>
-            <ul class="pagination pagination-sm">
-                <li v-for="letter in letters2" :key="letter" class="page-item" :class="{active: is_active(letter)}">
-                    <a class="page-link" href="#" @click.prevent="letterclicked(letter)">{{letter}}</a>
-                </li>
-            </ul>
-        </nav>
+    <div class="flex flex-wrap gap-1 mb-2">
+        <div class="w-24">
+            {{ label }}
+        </div>
+        <button
+            v-for="letter in letters"
+            :key="letter"
+            class="px-1 border rounded font-mono"
+            :class="{
+                'bg-blue-600 text-white': selected?.toLowerCase() === letter.toLowerCase(),
+                'hover:bg-gray-200': selected?.toLowerCase() !== letter.toLowerCase()
+            }"
+            @click="letterclicked(letter)"
+            >
+            {{ letter }}
+        </button>
     </div>
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, watch } from 'vue';
+    import {ref, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
+
+    const letters = ['ALL', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
 
     const props = defineProps({
         'label': String,
@@ -38,21 +37,11 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
-    const letters1 = computed(() => {
-        return Array.from("ABCDEFGHIJKLM");
-    });
-
-    const letters2 = computed(() => {
-        return Array.from("NOPQRSTUVWXYZ");
-    });
-
     function letterclicked(letter: string) {
-        activeletter.value = letter;
-        emit('selected', letter);
-    }
-
-    function is_active(letter: string) {
-        return activeletter.value == letter;
+        if (letter) {
+            activeletter.value = letter == 'ALL' ? 'all' : letter;
+            emit('selected', activeletter.value);
+        }
     }
 
     watch(() => props.selected, (selected) => {
