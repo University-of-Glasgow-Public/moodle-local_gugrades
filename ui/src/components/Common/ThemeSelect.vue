@@ -8,7 +8,7 @@
     <!-- dropdown -->
     <div
       v-if="open"
-      class="absolute mt-2 w-56 bg-base-100 shadow rounded-box p-2 z-50"
+      class="absolute right-0 mt-2 w-56 bg-base-100 shadow rounded-box p-2 z-50"
     >
       <button
         v-for="t in themes"
