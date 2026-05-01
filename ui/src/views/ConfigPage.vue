@@ -9,25 +9,26 @@
 
     <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
 
-    <div v-if="showresitoption && caneditgrades" class="border rounded p-2 mt-2">
-        <button v-if="!configuringresits" type="button" class="btn btn-outline-primary" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
+    <div v-if="showresitoption && caneditgrades" class="my-2">
+        <button v-if="!configuringresits" type="button" class="btn btn-accent" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
         <div v-else>
-            <div class="alert alert-primary" v-html="mstrings['resit_help']"></div>
-            <button type="button" class="btn btn-outline-success" @click="click_finish">{{ mstrings['finish'] }}</button>
+            <div class="alert alert-primary mb-2" v-html="mstrings['resit_help']"></div>
+            <button type="button" class="btn btn-success" @click="click_finish">{{ mstrings['finish'] }}</button>
         </div>
     </div>
 
     <div v-if="loaded && !treeerror">
-        <h3 class="tw"mt-5>{{ categoryname }}</h3>
-        <table id="config_table" class="table border-none">
-            <ConfigTree
-                :nodes="activitytree"
-                :depth="1"
-                :resitconfig="configuringresits"
-                :resitfade="true"
-                :engineering="engineering"
-                @saveerror="handle_saveerror"
-            ></ConfigTree>
+        <table id="config_table" class="table table-zebra">
+            <tbody>
+                <ConfigTree
+                    :nodes="activitytree"
+                    :depth="1"
+                    :resitconfig="configuringresits"
+                    :resitfade="true"
+                    :engineering="engineering"
+                    @saveerror="handle_saveerror"
+                ></ConfigTree>
+            </tbody>
         </table>
     </div>
 </template>
@@ -153,9 +154,3 @@
         loaded.value = true;
     }
 </script>
-
-<style>
-#config_table td, th{
-    border-width: 0 !important;
-}
-</style>

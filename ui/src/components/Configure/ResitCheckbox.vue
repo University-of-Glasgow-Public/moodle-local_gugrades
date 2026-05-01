@@ -1,15 +1,18 @@
 <template>
-    <a href="#/" @click="$emit('checked', itemid)" class="plainlink" :style="indentstyle">
-        <i v-if="checked" class="fa fa-check-square-o" aria-hidden="true"></i>
-        <i v-else class="fa fa-square-o" aria-hidden="true"></i>
-    </a>
-    <span class="badge badge-pill ml-2"  :class="badgeclass">{{ mstrings.reassessment }}?</span>
+    <div class="flex">
+        <a href="#/" @click="$emit('checked', itemid)" class="plainlink" :style="indentstyle">
+            <CheckCircleIcon v-if="checked" class="size-6 text-black-500" tabindex="0"></CheckCircleIcon>
+            <PlusCircleIcon v-else class="size-6 text-black-500" tabindex="0"></PlusCircleIcon>
+        </a>
+        <span class="badge badge-pill ml-2"  :class="badgeclass">{{ mstrings.reassessment }}?</span>
+    </div>
 </template>
 
 <script setup lang="ts">
     import { computed } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { PlusCircleIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 
     const props = defineProps({
         itemid: Number,
