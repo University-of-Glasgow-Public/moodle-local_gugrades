@@ -5,20 +5,32 @@
  */
 
 import ky from 'ky';
+import type { AfterResponseHook } from 'ky';
 
 export const moodleFetch = async (
-  methodname: string,
-  args: Record<string, any>,
-  async = true,
-  loginrequired = true
+    methodname: string,
+    args: Record<string, any>,
+    async = true,
+    loginrequired = true
 ): Promise<object> => {
 
   const pluginBase = new URL('../../', window.location.href).pathname;
   const courseidParam = new URLSearchParams(window.location.search).get('courseid');
   const courseid = courseidParam ? Number(courseidParam) : null;
 
+  const siteBase = new URL('../../../../', window.location.href).pathname;
+
   const api = ky.create({
-    prefix: `${pluginBase}service.php`
+    prefix: `${pluginBase}ajax.php`,
+    hooks: {
+        afterResponse: [
+            ({response}) => {
+                if (response.status == 401) {
+                    window.location.href = `${siteBase}course/view.php?id=${courseid}`;
+                }
+            }
+        ]
+      }
   });
 
   args.courseid = courseid;

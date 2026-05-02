@@ -27,8 +27,6 @@ define('AJAX_SCRIPT', true);
 require('../../config.php');
 require_once($CFG->libdir . '/externallib.php');
 
-require_login();
-
 // Scary bodge (thanks ChatGPT).
 $_POST['sesskey'] = sesskey();
 
@@ -36,6 +34,21 @@ $raw = file_get_contents('php://input');
 $data = json_decode($raw, true);
 
 $params = $data['args'];
+$courseid = $params['courseid'];
+
+// Flag login errors. Note that AJAX_SCRIPT makes sure an exception
+// is caused not a (failed) redirect.
+try {
+    require_login($courseid);
+} catch (require_login_exception $e) {
+    http_response_code(401);
+    echo json_encode([
+        'error' => true,
+        'errorcode' => 'notloggedin',
+        'message' => 'User is not logged in'
+    ]);
+    exit;
+}
 
 $result = external_api::call_external_function(
     $data['methodname'],

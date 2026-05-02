@@ -50,7 +50,9 @@
     'lemonade',
     'winter',
     'nord',
-    'silk'
+    'silk',
+    'dark',
+    'dracula'
     ]
 
     const open = ref(false)
