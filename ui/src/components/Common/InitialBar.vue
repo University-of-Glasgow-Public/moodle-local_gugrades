@@ -7,10 +7,10 @@
         <button
             v-for="letter in letters"
             :key="letter"
-            class="px-1 border rounded font-mono"
+            class="px-1 btn border rounded font-mono"
             :class="{
-                'bg-blue-600 text-white': selected?.toLowerCase() === letter.toLowerCase(),
-                'hover:bg-gray-200': selected?.toLowerCase() !== letter.toLowerCase()
+                'btn-primary': selected?.toLowerCase() === letter.toLowerCase(),
+                'btn-outline btn-secondary': selected?.toLowerCase() !== letter.toLowerCase()
             }"
             @click="letterclicked(letter)"
             >

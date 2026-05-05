@@ -5,7 +5,6 @@
  */
 
 import ky from 'ky';
-import type { AfterResponseHook } from 'ky';
 
 export const moodleFetch = async (
     methodname: string,
