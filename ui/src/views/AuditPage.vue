@@ -3,15 +3,11 @@
 
     <div class="my-5">
         <EasyDataTable
+            alternating
             :headers="headers"
             :items="items"
+            table-class-name="audit-table"
         >
-
-            <!-- Override pagination  -->
-            <template #pagination="{ prevPage, nextPage, isFirstPage, isLastPage }">
-                <TablePagination :prevPage="prevPage" :nextPage="nextPage" :isFirstPage="isFirstPage" :isLastPage="isLastPage" :rowsPerPage="25" :rowsCount="items.length"></TablePagination>
-            </template>
-
         </EasyDataTable>
     </div>
     <TwButton class="mt-2" color="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</TwButton>
@@ -84,3 +80,16 @@
         })
     });
 </script>
+
+<style>
+    .audit-table {
+        --easy-table-header-background-color: var(--color-primary);
+        --easy-table-header-font-color: var(--color-primary-content);
+
+        --easy-table-body-row-background-color: var(--color-base-100);
+        --easy-table-body-row-font-color: var(--color-base-content);
+
+        --easy-table-body-even-row-background-color: var(--color-base-300);
+        --easy-table-body-even-row-font-color: var(--color-base-content);
+    }
+</style>

@@ -821,5 +821,8 @@
 
         --easy-table-body-row-background-color: var(--color-base-100);
         --easy-table-body-row-font-color: var(--color-base-content);
+
+        --easy-table-body-even-row-background-color: var(--color-base-300);
+        --easy-table-body-even-row-font-color: var(--color-base-content);
     }
 </style>

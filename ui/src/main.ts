@@ -2,7 +2,8 @@ import { createApp, reactive, ref } from 'vue'
 import App from './App.vue'
 import Toast  from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import 'vue3-easy-data-table/dist/style.css';
+//import 'vue3-easy-data-table/dist/style.css';
+import '../node_modules/vue3-easy-data-table/src/scss/vue3-easy-data-table.scss';
 import { plugin, defaultConfig } from '@formkit/vue';
 import { createPinia } from 'pinia';
 import { usePopulateTrees } from './js/setuptrees';
