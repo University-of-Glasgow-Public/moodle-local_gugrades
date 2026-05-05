@@ -15,7 +15,7 @@ const config = {
         legend: '$reset fieldset-legend',
         help: 'text-sm',
         messages: 'list-unstyled mt-1',
-        message: 'text-danger',
+        message: 'text-error',
       },
       form: {
         //form: "mt-5 mx-auto p-5 border rounded"
