@@ -15,10 +15,12 @@
             name="mapname"
             v-model="mapname"
         ></FormKit>
+        <!--
         <FormKit
             type="submit"
             label="Save"
         />
+        -->
         <FormKit
             type="text"
             outer-class="mb-3"
@@ -47,17 +49,17 @@
             :options="entrytypeoptions"
             :disabled="!caneditgrades"
         ></FormKit>
-        <div class="row mt-3">
-            <div class="col-2"><h3>{{ mstrings.band }}</h3></div>
-            <div class="col-5"><h3>{{ mstrings.percentage}}</h3></div>
-            <div class="col-5"><h3>{{ mstrings.points }}</h3></div>
+        <div class="flex">
+            <div class="w-24 font-bold"><h3>{{ mstrings.band }}</h3></div>
+            <div class="w-60 mr-5 font-bold"><h3>{{ mstrings.percentage}}</h3></div>
+            <div class="w-60 font-bold"><h3>{{ mstrings.points }}</h3></div>
         </div>
 
-        <div  class="row" v-for="item in items" :key="item.band">
-            <div class="col-2 pt-2">
-                <h3>{{  item.band  }}</h3>
+        <div  class="flex" v-for="item in items" :key="item.band">
+            <div class="pt-2">
+                <h3 class="w-24">{{  item.band  }}</h3>
             </div>
-            <div class="col-5">
+            <div class="w-60 mr-5">
                 <FormKit
                     type="text"
                     number="float"
@@ -73,7 +75,7 @@
                     @input="(event) => handleInput(item, event)"
                 ></FormKit>
             </div>
-            <div class="col-5">
+            <div class="w-60">
                 <FormKit
                     type="text"
                     number="float"
