@@ -19,7 +19,10 @@ export default defineConfig({
     dedupe: ['vue']
   },
   build: {
-    cssMinify: 'esbuild'
+    cssMinify: 'esbuild',
+    commonjsOptions: {
+      include: [/vue3-easy-data-table/, /node_modules/]
+    }
   },
   optimizeDeps: {
     exclude: ['vue3-easy-data-table'],
