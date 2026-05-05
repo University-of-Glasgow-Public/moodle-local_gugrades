@@ -63,9 +63,6 @@
 
     const { pause, resume, isActive } = useIntervalFn(() => {
         if (props.progresstype != '') {
-            const GU = window.GU;
-            const courseid = GU.courseid;
-            const fetchMany = GU.fetchMany;
 
             // Note the two additional parameters. They are
             // async = true
@@ -77,7 +74,6 @@
             moodleFetch(
                 'local_gugrades_get_progress',
                 {
-                    courseid: courseid,
                     uniqueid: props.uniqueid,
                     progresstype: props.progresstype,
                     staffuserid: props.staffuserid,

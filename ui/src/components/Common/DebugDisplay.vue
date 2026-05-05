@@ -31,8 +31,8 @@
     });
 
     const moodlecourseid = computed(() => {
-        const GU = window.GU;
-        const courseid = GU.courseid;
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseid = urlParams.get('courseid');
 
         return courseid;
     });

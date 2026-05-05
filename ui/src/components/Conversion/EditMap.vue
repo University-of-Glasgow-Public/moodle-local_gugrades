@@ -164,7 +164,7 @@ import TwAlert from '../Tailwind/TwAlert.vue';
     }
 
     // Method to handle input changes and convert string to number
-    const handleInput = (item: IBandItem, newValue: string | number | undefined) => {
+    const handleInput = (item: IBandItem, newValue: unknown) => {
         if (typeof newValue === 'string') {
             item.boundpc = parseFloat(newValue) || 0; // Convert to number, default to 0 if invalid
         } else if (typeof newValue === 'number') {
