@@ -1,12 +1,6 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-        <!--
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        -->
-
         <div class="flex justify-between">
             <div role="tablist" class="tabs tabs-lift">
                 <a role="tab" class="tab" :class="{'tab-active': activetab == 'configure'}" @click="clickTab('configure')" @keydown.enter="clickTab('configure')" tabindex="0">{{ mstrings.configure }}</a>

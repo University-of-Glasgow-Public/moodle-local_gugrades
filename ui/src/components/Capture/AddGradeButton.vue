@@ -243,7 +243,7 @@
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
-            showaddgrademodal.value = false;
+            closemodal();
         });
 
         showaddgrademodal.value = true;
@@ -262,7 +262,7 @@
             }
         )
         .catch(error => {
-            console.log(error);
+            console.error(error);
         });
     }
 
@@ -297,7 +297,7 @@
             if (props.released) {
                 showreleaseddialogue.value = true;
             } else {
-                showaddgrademodal.value = false;
+                closemodal();
             }
 
             recalculate_user();
@@ -305,7 +305,7 @@
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
-            showaddgrademodal.value = false;
+            closemodal();
         });
     }
 
@@ -326,12 +326,12 @@
 
             // This will be sufficient to re-aggregate and so on.
             emit('gradeadded');
-            showaddgrademodal.value = false;
+            closemodal();
             toast.success(mstringstore.getMstring('gradesreleased'));
         })
         .catch((error) => {
             window.console.error(error);
-            showaddgrademodal.value = false;
+            closemodal();
             debug.value = error;
         });
 
@@ -367,10 +367,10 @@
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
-            showaddgrademodal.value = false;
+            closemodal();
         });
 
         // close the modal
-        showaddgrademodal.value = false;
+        closemodal();
     }
 </script>
