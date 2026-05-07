@@ -20,6 +20,7 @@
     const props = defineProps({
         itemid: Number,
         userid: Number,
+        close: Function,
     });
 
     const emit = defineEmits(['imported']);
@@ -49,5 +50,9 @@
             window.console.error(error);
             debug.value = error;
         });
+
+        if (props.close) {
+            props.close();
+        }
     }
 </script>

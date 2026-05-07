@@ -79,7 +79,7 @@
             <div class="mt-2">
                 <TwButton color="primary" class="mr-1" @click="save_altered_weights">{{ mstrings.save }}</TwButton>
                 <TwButton color="info" class="mr-1" @click="revert_altered_weights">{{ mstrings.revert }}</TwButton>
-                <TwButton color="warning" @click="showaltermodal = false">{{ mstrings.cancel }}</TwButton>
+                <TwButton color="warning" @click="closemodal">{{ mstrings.cancel }}</TwButton>
             </div>
 
         </div>
@@ -113,11 +113,22 @@
         userid: Number,
         itemid: Number,
         categoryid: Number,
+        close: Function,
     });
 
     const emit = defineEmits([
         'weightsaltered'
     ]);
+
+    /**
+     * Close modal
+     */
+    function closemodal() {
+        showaltermodal.value = false;
+        if (props.close) {
+            props.close();
+        }
+    }
 
     /**
      * Calculate altered weight total
@@ -212,7 +223,7 @@
             emit('weightsaltered');
             toast.success(mstringstore.getMstring('weightsaltered'));
 
-            showaltermodal.value = false;
+            closemodal();
         })
         .catch((error) => {
             window.console.error(error);
@@ -239,7 +250,7 @@
             emit('weightsaltered');
             toast.success(mstringstore.getMstring('weightsreverted'));
 
-            showaltermodal.value = false;
+            closemodal();
         })
         .catch((error) => {
             window.console.error(error);

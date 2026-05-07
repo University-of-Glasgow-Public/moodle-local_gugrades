@@ -16,6 +16,7 @@
   "dependencies": {
     "@formkit/themes": "^2.0.0",
     "@formkit/vue": "^2.0.0",
+    "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@kouts/vue-modal": "^5.0.3",
     "@lucide/vue": "^1.14.0",

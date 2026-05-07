@@ -20,6 +20,7 @@
         itemid: Number,
         userid: Number,
         gradehidden: Boolean,
+        close: Function,
     });
 
     const emit = defineEmits(['changed']);
@@ -43,5 +44,9 @@
             console.error(error);
             debug.value = error;
         });
+
+        if (props.close) {
+            props.close();
+        }
     }
 </script>

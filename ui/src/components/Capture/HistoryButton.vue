@@ -16,7 +16,7 @@
         </EasyDataTable>
 
         <div class="flex justify-end mt-5">
-            <TwButton color="warning" @click="showhistorymodal = false">{{ mstrings.close }}</TwButton>
+            <TwButton color="warning" @click="closemodal">{{ mstrings.close }}</TwButton>
         </div>
     </VueModal>
 </template>
@@ -50,7 +50,18 @@
         itemid: Number,
         name: String,
         itemname: String,
+        close: Function,
     });
+
+    /**
+     * Close modal and whatever called it
+     */
+    function closemodal() {
+        showhistorymodal.value = false;
+        if (props.close) {
+            props.close();
+        }
+    }
 
     /**
      * Read history on button click

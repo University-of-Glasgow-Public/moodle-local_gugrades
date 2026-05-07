@@ -102,7 +102,7 @@
             </div>
 
             <div class="flex justify-end mt-8">
-                <TwButton color="warning" @click="showaddgrademodal = false">{{ mstrings.cancel }}</TwButton>
+                <TwButton color="warning" @click="closemodal">{{ mstrings.cancel }}</TwButton>
             </div>
         </div>
 
@@ -113,7 +113,7 @@
             </div>
             <div class="mt-2">
                 <button class="btn btn-success" type="button" @click="release_grade">{{  mstrings.yes }}</button>
-                <button class="btn btn-warning ml-1" type="button" @click="showaddgrademodal = false">{{  mstrings.no }}</button>
+                <button class="btn btn-warning ml-1" type="button" @click="closemodal">{{  mstrings.no }}</button>
             </div>
         </div>
     </VueModal>
@@ -180,7 +180,18 @@
         itemname: String,
         name: String,
         released: Boolean,
+        close: Function,
     });
+
+    /**
+     * Close modal
+     */
+    function closemodal() {
+        showaddgrademodal.value = false;
+        if (props.close) {
+            props.close();
+        }
+    }
 
     /**
      * The title can be for grade or category
