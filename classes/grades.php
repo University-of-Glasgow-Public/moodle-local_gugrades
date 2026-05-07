@@ -1930,6 +1930,7 @@ class grades {
             AND gradetype <> 'CATEGORY'
             AND gradetype <> 'CONVERTED'
             AND gradetype <> 'RELEASED'
+            AND admingrade = ''
             AND iscurrent = 1";
         $items = $DB->get_records_sql($sql, ['courseid' => $courseid]);
 
