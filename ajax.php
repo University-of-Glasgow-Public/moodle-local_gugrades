@@ -53,6 +53,10 @@ if ($loginrequired) {
     }
 }
 
+// Close the session to allow concurrent requests
+// This must be done BEFORE calling external functions
+session_write_close();
+
 $result = external_api::call_external_function(
     $data['methodname'],
     $params
