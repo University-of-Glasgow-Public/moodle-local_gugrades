@@ -1,7 +1,14 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton v-if="hascapability" color="error" class="mr-1" :disabled="processing" @click="showconfirm = true">
+    <TwButton
+        v-if="hascapability"
+        color="error"
+        class="mr-1"
+        :class="small ? 'btn-sm' : ''"
+        :disabled="processing"
+        @click="showconfirm = true"
+    >
         {{ mstrings.resetassessment }}
     </TwButton>
 
@@ -22,6 +29,7 @@
 
     const props = defineProps<{
         itemid: number;
+        small?: boolean;
     }>();
 
     const emits = defineEmits(['reset']);

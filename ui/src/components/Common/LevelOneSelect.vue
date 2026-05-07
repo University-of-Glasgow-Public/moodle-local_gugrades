@@ -8,10 +8,15 @@
     <div>
         <TwAlert v-if="notsetup">{{ mstrings.notoplevel }}</TwAlert>
         <TwAlert v-if="itemerror">
-            {{ mstrings.changedgradetype }}
+            <p>{{ mstrings.changedgradetype }}
             <ul>
-                <li v-for="item in erroritems">{{ item.itemname }}</li>
-            </ul>
+                <li v-for="item in erroritems" :key="item.gradeitemid" class="tw:flex tw:items-center tw:gap-2">
+                    <span>{{ item.itemname }}</span>
+                    <div class="tw:p-1">
+                        <ResetAssessmentButton :itemid="item.gradeitemid" :small="true" @reset="getLevelOne" />
+                    </div>
+                </li>
+            </ul></p>
         </TwAlert>
         <div class="flex justify-between">
             <select v-if="!notsetup && !itemerror" v-model="categoryid" class="select w-120">
@@ -36,6 +41,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import ResetAssessmentButton from '@/components/Capture/ResetAssessmentButton.vue';
 
     const level1categories = ref< ICategories[] >([]);
     const categoryid = ref(0);
