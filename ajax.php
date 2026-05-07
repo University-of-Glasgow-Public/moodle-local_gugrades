@@ -35,19 +35,22 @@ $data = json_decode($raw, true);
 
 $params = $data['args'];
 $courseid = $params['courseid'];
+$loginrequired = $params['loginrequired'];
 
-// Flag login errors. Note that AJAX_SCRIPT makes sure an exception
-// is caused not a (failed) redirect.
-try {
-    require_login($courseid);
-} catch (require_login_exception $e) {
-    http_response_code(401);
-    echo json_encode([
-        'error' => true,
-        'errorcode' => 'notloggedin',
-        'message' => 'User is not logged in'
-    ]);
-    exit;
+if ($loginrequired) {
+    // Flag login errors. Note that AJAX_SCRIPT makes sure an exception
+    // is caused not a (failed) redirect.
+    try {
+        require_login($courseid);
+    } catch (require_login_exception $e) {
+        http_response_code(401);
+        echo json_encode([
+            'error' => true,
+            'errorcode' => 'notloggedin',
+            'message' => 'User is not logged in'
+        ]);
+        exit;
+    }
 }
 
 $result = external_api::call_external_function(

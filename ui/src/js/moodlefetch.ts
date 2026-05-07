@@ -40,7 +40,8 @@ export const moodleFetch = async (
       args,
       async,
       loginrequired
-    }
+    },
+    timeout: false
   }).json();
 
   return response as object;
