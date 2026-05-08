@@ -52,7 +52,8 @@
     'nord',
     'silk',
     'dark',
-    'dracula'
+    'dracula',
+    'abyss',
     ]
 
     const open = ref(false)
