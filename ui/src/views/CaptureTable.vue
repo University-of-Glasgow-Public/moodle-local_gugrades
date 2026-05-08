@@ -825,6 +825,9 @@
 
         --easy-table-body-even-row-background-color: var(--color-base-300);
         --easy-table-body-even-row-font-color: var(--color-base-content);
+
+        --easy-table-footer-background-color: var(--color-primary);
+        --easy-table-footer-font-color: var(--color-primary-content);
     }
 
     .vue3-easy-data-table__main {
