@@ -690,7 +690,7 @@ class api {
                     iscurrent:      true,
                     iserror:        false,
                     auditcomment:   get_string('import', 'local_gugrades'),
-                    ispoints:       false,
+                    ispoints:       !$mapping->is_scale(),
                 );
             }
 
