@@ -1949,7 +1949,7 @@ class grades {
             AND gradetype <> 'RELEASED'
             AND admingrade = ''
             AND iscurrent = 1";
-        $items = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        $items = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
         $erroritems = [];
         foreach ($items as $item) {
@@ -1975,6 +1975,7 @@ class grades {
                 ];
             }
         }
+        $items->close();
 
         // Check for out of range grades.
         $sql = "SELECT DISTINCT gradeitemid, max(rawgrade) AS maxgrade FROM {local_gugrades_grade}
@@ -1985,7 +1986,7 @@ class grades {
             AND gradetype <> 'RELEASED'
             AND iscurrent = 1
             GROUP BY gradeitemid";
-        $grades = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        $grades = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
         foreach ($grades as $grade) {
             // If there are first grades then check is irrelevant.
@@ -2001,6 +2002,7 @@ class grades {
                 ];
             }
         }
+        $grades->close();
 
         return $erroritems;
     }
