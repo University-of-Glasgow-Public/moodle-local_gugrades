@@ -118,7 +118,7 @@ class import_grades_recursive extends external_api {
 
         // Audit.
         $dryrunaudit = $dryrun ? " (Dry run)" : "";
-        \local_gugrades\audit::write($courseid, 0, $gradeitemid, 'Grades imported - recursive' + $dryrunaudit);
+        \local_gugrades\audit::write($courseid, 0, $gradeitemid, 'Grades imported - recursive' . $dryrunaudit);
 
         return ['itemcount' => $itemcount, 'gradecount' => $gradecount];
     }
