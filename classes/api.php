@@ -708,7 +708,7 @@ class api {
                     iscurrent:      true,
                     iserror:        false,
                     auditcomment:   get_string('import', 'local_gugrades'),
-                    ispoints:       false,
+                    ispoints:       !$mapping->is_scale(),
                 );
             }
 
@@ -1820,7 +1820,7 @@ class api {
         \local_gugrades\grades::delete_grade_item($courseid, $gradeitemid);
         self::recalculate($courseid, $gradecategoryid);
     }
-    
+
     /**
      * Delete a capture column (and its grades) for a grade item
      * Admin-only operation in UI; enforced in external function.
