@@ -23,9 +23,9 @@
                 <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
                 <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
             </select>
-            <div class="border-2 rounded px-2 pt-1 border-red-500">
-                <p class="text-xs mb-0 text-red-500">Regulations used:</p>
-                <p class="mb-0 text-red-500">{{ regulation }}</p>
+            <div class="border-2 border-error/100 rounded px-2 pt-1 bg-error/50">
+                <p class="text-xs mb-0 text-error-content">Regulations used:</p>
+                <p class="mb-0 text-error-content">{{ regulation }}</p>
                 <p v-if="regulationextra" class="mb-0 text-green-500 text-xs text-center uppercase">{{ regulationextra }}</p>
             </div>
         </div>
