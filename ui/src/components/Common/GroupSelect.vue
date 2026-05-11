@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div v-if="showgroupselect" class="mt-2">
-        <select class="select" v-model="groupid">
+        <select class="select w-120" v-model="groupid">
             <option value="0">{{ mstrings.allparticipants }}</option>
             <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
         </select>

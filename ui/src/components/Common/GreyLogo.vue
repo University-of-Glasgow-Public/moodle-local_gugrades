@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div v-if="!loading" class="flex justify-center">
-        <img :src="url" id="mygradeslogo" alt="MyGrades Logo" :class="{'grayscale': monochrome}"/>
+        <img :src="url" id="mygradeslogo" alt="MyGrades Logo" class="border-2 rounded-2xl border-gray-300 px-5 bg-white" :class="{'grayscale': monochrome}"/>
     </div>
 </template>
 
