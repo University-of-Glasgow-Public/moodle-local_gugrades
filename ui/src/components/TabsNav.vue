@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="mt-5">
+    <div class="mt-5" role="navigation">
         <TabGroup :defaultIndex="1">
             <div class="flex justify-between">
                 <TabList class="flex justify-start space-x-1 bg-base-200 p-1 rounded-box w-fit shadow-sm">
@@ -20,7 +20,7 @@
                 <ThemeSelect></ThemeSelect>
             </div>
             <TabPanels >
-                <TabPanel v-for="tab in tabs">
+                <TabPanel v-for="tab in tabs" role="main">
                     <component :is="tab.component" />
                 </TabPanel>
             </TabPanels>

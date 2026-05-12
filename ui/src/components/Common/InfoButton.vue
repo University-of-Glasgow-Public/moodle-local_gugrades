@@ -3,7 +3,7 @@
 
     <!-- info button -->
     <div v-if="!props.text" class="ml-2 tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
-        <button class="btn">
+        <button class="btn" aria-label="Show grade item info">
             <InformationCircleIcon class="size-6 text-black-500"></InformationCircleIcon>
         </button>
     </div>

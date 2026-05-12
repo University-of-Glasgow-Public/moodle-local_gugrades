@@ -1,7 +1,7 @@
 <template>
     <!-- Refresh button -->
     <div class="ml-2 tooltip"  @click="refresh_clicked" :data-tip="mstrings['refreshpage']">
-        <button class="btn">
+        <button class="btn"  aria-label="Refresh table">
             <ArrowPathIcon class="size-6 text-black-500"></ArrowPathIcon>
         </button>
     </div>
