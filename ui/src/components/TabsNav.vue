@@ -1,84 +1,77 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-        <div class="flex justify-between">
-            <div role="tablist" class="tabs tabs-lift">
-                <a role="tab" class="tab" :class="{'tab-active': activetab == 'configure'}" @click="clickTab('configure')" @keydown.enter="clickTab('configure')" tabindex="0">{{ mstrings.configure }}</a>
-                <a role="tab" class="tab" :class="{'tab-active': activetab == 'capture'}" @click="clickTab('capture')" @keydown.enter="clickTab('capture')" tabindex="0">{{ mstrings.assessmentgradecapture }}</a>
-                <a role="tab" class="tab" :class="{'tab-active': activetab == 'conversion'}" @click="clickTab('conversion')" @keydown.enter="clickTab('conversion')" tabindex="0">{{ mstrings.manageconversion }}</a>
-                <a role="tab" class="tab" :class="{'tab-active': activetab == 'aggregation'}" @click="clickTab('aggregation')" @keydown.enter="clickTab('aggregation')" tabindex="0">{{ mstrings.coursegradeaggregation }}</a>
-                <a role="tab" class="tab" :class="{'tab-active': activetab == 'audit'}" @click="clickTab('audit')"  @keydown.enter="clickTab('audit')" tabindex="0">{{ mstrings.auditlog }}</a>
-                <a v-if="settingscapability" role="tab" class="tab" :class="{'tab-active': activetab == 'settings'}" @click="clickTab('settings')"  @keydown.enter="clickTab('settings')" tabindex="0">{{ mstrings.settings }}</a>
+    <div class="mt-5">
+        <TabGroup :defaultIndex="1">
+            <div class="flex justify-between">
+                <TabList class="flex justify-start space-x-1 bg-base-200 p-1 rounded-box w-fit shadow-sm">
+                    <Tab v-for="tab in tabs" v-slot="{ selected }" as="template">
+                        <a
+                            class="tab px-4 py-2 text-sm font-medium rounded-md transition-all duration-200"
+                            :class="{
+                                'bg-primary text-primary-content shadow-md': selected,
+                                'text-base-content/80 hover:bg-base-100 hover:text-base-content': !selected,
+                            }"
+                        >
+                            {{ tab.label }}
+                        </a>
+                    </Tab>
+                </TabList>
+                <ThemeSelect></ThemeSelect>
             </div>
-            <ThemeSelect></ThemeSelect>
-        </div>
+            <TabPanels >
+                <TabPanel v-for="tab in tabs">
+                    <component :is="tab.component" />
+                </TabPanel>
+            </TabPanels>
+        </TabGroup>
+    </div>
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted} from 'vue';
+    import { ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import { moodleFetch } from '@/js/moodlefetch';
-    import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import ThemeSelect from './Common/ThemeSelect.vue';
+    import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 
-    const activetab = ref('capture');
-    const settingscapability = ref(false);
+    import ConfigPage from '@/views/ConfigPage.vue';
+    import CaptureTable from '@/views/CaptureTable.vue';
+    import AggregationTable from '@/views/AggregationTable.vue';
+    import ConversionPage from '@/views/ConversionPage.vue';
+    import SettingsPage from '@/views/SettingsPage.vue';
+    import AuditPage from '@/views/AuditPage.vue';
+
     const debug = ref({});
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
-    let whichtableft = '';
-    let whichtabright = '';
 
-    const props = defineProps({
-        viewaggregation: Boolean,
-    });
+    const tabs = ref([
+        {
+            label: mstrings.value.configure ?? '',
+            component: ConfigPage
+        },
+        {
+            label: mstrings.value.assessmentgradecapture ?? '',
+            component: CaptureTable
+        },
+        {
+            label: mstrings.value.manageconversion ?? '',
+            component: ConversionPage
+        },
+        {
+            label: mstrings.value.coursegradeaggregation ?? '',
+            component: AggregationTable
+        },
+        {
+            label: mstrings.value.auditlog ?? '',
+            component: AuditPage
+        },
+        {
+            label: mstrings.value.settings ?? '',
+            component: SettingsPage
+        },
+    ]);
 
-    const toast = useToast();
-
-    const emit = defineEmits(['tabchange']);
-
-    /**
-     * Detect change of tab and emit result to parent
-     * @param {} item
-     */
-    function clickTab(item: string) {
-        activetab.value = item;
-        emit('tabchange', item);
-    }
-
-    /**
-     * Check capability
-     */
-     onMounted(() => {
-
-        moodleFetch(
-            'local_gugrades_has_capability',
-            {
-                capability: 'local/gugrades:changesettings'
-            }
-        )
-        .then((result: any) => {
-            settingscapability.value = result['hascapability'];
-            whichtableft = ((settingscapability.value) ? 'settings' : 'audit');
-            whichtabright = ((settingscapability.value) ? 'settings' : 'capture');
-        })
-        .catch((error) => {
-            window.console.error(error);
-            debug.value = error;
-        });
-
-    });
 </script>
-
-<style>
-    .navbar-dark .navbar-nav .active > .nav-link {
-        font-weight: bold;
-        text-decoration: underline;
-    }
-
-    .navbar-dark .navbar-nav .nav-link {
-        color: rgba(255, 255, 255, 0.7);
-    }
-</style>
