@@ -1,6 +1,6 @@
 <template>
     <Popover class="relative">
-        <PopoverButton aria-label="Open menu"><EllipsisVerticalIcon class="size-6 text-base-content" tabindex="0"></EllipsisVerticalIcon></PopoverButton>
+        <PopoverButton class="cursor-pointer" aria-label="Open menu"><EllipsisVerticalIcon class="size-6 text-base-content" tabindex="0"></EllipsisVerticalIcon></PopoverButton>
 
         <PopoverPanel class="border-2 border-base-300 rounded-md absolute z-999 top-auto bottom-full mb-2 left-1/2 -translate-x-1/2" v-slot="{ close }">
             <ul v-if="props.categoryid == 0" class="menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">

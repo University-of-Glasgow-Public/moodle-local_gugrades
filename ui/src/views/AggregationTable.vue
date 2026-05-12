@@ -71,7 +71,7 @@
             <template #header="header">
                 <div v-if="header.value == 'back'">
                     <a href="#" @click="expand_clicked(backid)">
-                        <ArrowLeftCircleIcon class="size-6 text-white" />
+                        <CircleArrowLeft />
                     </a>
                 </div>
                 <div v-else class="aggregation-header">
@@ -92,9 +92,9 @@
                     <div v-if="header.categoryid">
                         <a href="#" @click="expand_clicked(header.categoryid)">
                             <span class="badge badge-sm badge-secondary my-2" >
-                                <ChevronDoubleLeftIcon class="size-4" />
+                                <ArrowBigLeftIcon></ArrowBigLeftIcon>
                                 {{ mstrings.expand }}
-                                <ChevronDoubleRightIcon class="size-4" />
+                                <ArrowBigRightIcon></ArrowBigRightIcon>
                             </span>
                         </a>
                     </div>
@@ -237,7 +237,7 @@
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DismissableAlert from '@/components/Common/DismissableAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import { ArrowLeftCircleIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/vue/24/outline';
+    import { ArrowBigLeftIcon, ArrowBigRightIcon, CircleArrowLeft } from '@lucide/vue';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning } from '@/js/Interfaces';
     import type { Header, Item } from "vue3-easy-data-table";
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
@@ -727,43 +727,6 @@
 </script>
 
 <style>
-/*
-    .aggregation-table {
-        --easy-table-header-font-size: 14px;
-        --easy-table-header-height: 50px;
-        --easy-table-header-font-color: white;
-        --easy-table-header-background-color: #4F5961;
-
-        --easy-table-header-item-padding: 10px 15px;
-    }
-
-    .aggregation-header {
-        display: flex;
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .gug_breadcrumb {
-        background-color: #005c8a;
-    }
-
-    .gug_pill {
-        font-size: 125%;
-    }
-
-    .vue3-easy-data-table__main table {
-        border-radius: 25px;
-    }
-
-    .border-lg {
-        border-width: thick !important;
-    }
-
-    .buttons-pagination .item.button.active {
-        color: black !important;
-    }
-        */
-
     .aggregation-table {
         --easy-table-header-background-color: var(--color-primary);
         --easy-table-header-font-color: var(--color-primary-content);

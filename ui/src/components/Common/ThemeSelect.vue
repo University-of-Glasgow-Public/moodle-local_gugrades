@@ -54,6 +54,7 @@
     'dark',
     'dracula',
     'abyss',
+    'uofg',
     ]
 
     const open = ref(false)

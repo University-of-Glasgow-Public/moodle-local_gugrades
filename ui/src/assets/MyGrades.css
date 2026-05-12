@@ -1,2 +1,45 @@
 @import "tailwindcss";
 
+@plugin "daisyui/theme" {
+  name: "uofg";
+  default: true; /* set as default */
+  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+  color-scheme: light; /* color of browser-provided UI */
+
+  --color-base-100: oklch(98% 0.02 240);
+  --color-base-200: oklch(95% 0.03 240);
+  --color-base-300: oklch(92% 0.04 240);
+  --color-base-content: oklch(20% 0.05 240);
+  --color-primary: rgb(1, 20, 81);
+  --color-primary-content: oklch(98% 0.01 240);
+  --color-secondary: rgb(76, 38, 131);
+  --color-secondary-content: oklch(98% 0.01 200);
+  --color-accent: rgb(166, 3, 103);
+  --color-accent-content: oklch(98% 0.01 160);
+  --color-neutral: oklch(50% 0.05 240);
+  --color-neutral-content: oklch(98% 0.01 240);
+  --color-info: rgb(0, 83, 152);
+  --color-info-content: oklch(98% 0.01 220);
+  --color-success: rgb(64, 93, 24);
+  --color-success-content: oklch(98% 0.01 140);
+  --color-warning: rgb(242, 210, 92);
+  --color-warning-content: oklch(20% 0.05 80);
+  --color-error: rgb(125, 34, 57);
+  --color-error-content: oklch(98% 0.01 30);
+
+  /* border radius */
+  --radius-selector: 1rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+
+  /* base sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* border size */
+  --border: 1px;
+
+  /* effects */
+  --depth: 1;
+  --noise: 0;
+}
