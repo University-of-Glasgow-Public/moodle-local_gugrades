@@ -38,12 +38,21 @@
         <NameFilter @selected="filter_selected" ref="namefilterref"></NameFilter>
 
         <!-- Breadcrumb trail -->
-        <div v-if="breadcrumb.length > 1" class="my-3 breadcrumbs max-w-xs text-sm border rounded-md p-2 border-gray-300">
-            <ul class="p-0 m-0">
-                <li v-for="(item, index) in breadcrumb" :key="item.id">
-                    <a href="#" @click="expand_clicked(item.id)">{{ item.shortname }}</a>
-                </li>
-            </ul>
+        <div v-if="breadcrumb.length > 1" class="my-3 overflow-visible">
+            <div class="breadcrumbs text-sm p-2 rounded-box border border-base-300 bg-base-100 tooltip-open">
+                <ul>
+                    <li v-for="(item, index) in breadcrumb" :key="item.id">
+                        <a
+                            href="#"
+                            @click.prevent="expand_clicked(item.id)"
+                            class="tooltip tooltip-right hover:text-primary"
+                            :data-tip="item.fullname"
+                        >
+                        {{ item.shortname }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <!-- Please wait spinner -->

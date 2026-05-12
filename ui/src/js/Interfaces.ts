@@ -255,6 +255,7 @@ export interface IWarning {
 export interface IBreadcrumb {
     id: number;
     shortname: string;
+    fullname: string;
 }
 
 export interface IColumn {
