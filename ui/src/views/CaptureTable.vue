@@ -99,8 +99,8 @@
 
                     <!-- User picture column -->
                     <template #item-slotuserpicture="item">
-                        <a :href="item.profileurl">
-                            <img :src="item.pictureurl" :alt="item.displayname" class="userpicture defaultuserpic" width="35" height="35"/>
+                        <a :href="item.profileurl" class="avatar">
+                            <img :src="item.pictureurl" :alt="item.displayname" class="rounded-full" width="35" height="35"/>
                         </a>
                     </template>
 
