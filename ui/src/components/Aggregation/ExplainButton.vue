@@ -99,7 +99,7 @@
                 <div class="flex justify-center font-bold text-lg">{{ user!.explain }}</div>
             </div>
 
-            <TwButton color="warning" @click="showexplainmodal = false" class="mt-8">{{ mstrings.close }}</TwButton>
+            <TwButton color="warning" @click="closemodal" class="mt-8">{{ mstrings.close }}</TwButton>
         </div>
     </VueModal>
 </template>
@@ -126,7 +126,18 @@
         userid: Number,
         itemid: Number,
         categoryid: Number,
+        close: Function,
     });
+
+    /**
+     * Close modal
+     */
+    function closemodal() {
+        showexplainmodal.value = false;
+        if (props.close) {
+            props.close();
+        }
+    }
 
     /**
      * Alter weights button has been clicked
