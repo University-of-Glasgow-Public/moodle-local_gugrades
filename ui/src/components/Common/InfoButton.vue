@@ -3,8 +3,8 @@
 
     <!-- info button -->
     <div v-if="!props.text" class="ml-2 tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
-        <button class="btn" aria-label="Show grade item info">
-            <InformationCircleIcon class="size-6 text-black-500"></InformationCircleIcon>
+        <button class="btn btn-secondary" aria-label="Show grade item info">
+            <Info></Info>
         </button>
     </div>
 
@@ -63,9 +63,9 @@
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwButton from '@/components/Tailwind/TwButton.vue';
-    import { InformationCircleIcon } from '@heroicons/vue/24/outline'
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
+    import { Info } from '@lucide/vue';
 
     const showinfomodal = ref(false);
     const itemname = ref('');

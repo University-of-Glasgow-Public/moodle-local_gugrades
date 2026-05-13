@@ -1,8 +1,8 @@
 <template>
     <!-- Refresh button -->
     <div class="ml-2 tooltip"  @click="refresh_clicked" :data-tip="mstrings['refreshpage']">
-        <button class="btn"  aria-label="Refresh table">
-            <ArrowPathIcon class="size-6 text-black-500"></ArrowPathIcon>
+        <button class="btn btn-secondary" aria-label="Refresh table">
+            <RefreshCcw></RefreshCcw>
         </button>
     </div>
 </template>
@@ -10,7 +10,7 @@
 <script setup lang="ts">
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import { ArrowPathIcon } from '@heroicons/vue/24/outline'
+    import { RefreshCcw, RefreshCw } from '@lucide/vue';
 
     const emit = defineEmits(['refreshtable']);
     const mstringstore = useMstrings();

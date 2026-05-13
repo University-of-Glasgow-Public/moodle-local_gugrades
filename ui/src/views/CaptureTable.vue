@@ -6,8 +6,8 @@
             <div>
                 <div class="badge badge-primary mb-4" @click="selectcollapse">
                     <span class="inline-flex items-center gap-1">
-                        <ArrowUpCircleIcon v-if="collapsed" class="size-5 text-black-500" />
-                        <ArrowDownCircleIcon v-else class="size-5 text-black-500" />
+                        <CircleArrowUp v-if="collapsed" :size="18" />
+                        <CircleArrowDown v-else :size="18" />
                         {{ collapsed ? mstrings['showcategories'] : mstrings['hidecategories'] }}
                     </span>
                 </div>
@@ -200,7 +200,6 @@
     import CaptureAlerts from '@/components/Capture/CaptureAlerts.vue';
     import CaptureColumnEditCog from '@/components/Capture/CaptureColumnEditCog.vue';
     import EditCaptureCell from '@/components/Capture/EditCaptureCell.vue';
-    import { useWindowScroll, watchDebounced } from '@vueuse/core';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
@@ -209,8 +208,8 @@
     import type { Header, Item } from "vue3-easy-data-table";
     import TablePagination from '@/components/Common/TablePagination.vue';
     import TwButton from '@/components/Tailwind/TwButton.vue';
-    import TwAlert from '@/components/Tailwind/TwAlert.vue';
-    import { ArrowDownCircleIcon, ArrowUpCircleIcon } from '@heroicons/vue/24/outline';
+    import { CircleArrowDown, CircleArrowUp } from '@lucide/vue';
+    import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
 
     const users = ref< ICaptureUser[] >([]);

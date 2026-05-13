@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <a class="ml-1 tooltip cursor-pointer" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
-        <Cog6ToothIcon class="size-6 text-yellow-500"></Cog6ToothIcon>
+        <Settings class="text-warning"></Settings>
     </a>
     <a
         v-if="candelete"
@@ -11,7 +11,7 @@
         :data-tip="mstringstore.getMstring('deletecolumn')"
         @click.prevent="delete_clicked"
     >
-        <TrashIcon class="size-6 text-red-600"></TrashIcon>
+        <Trash2 class="text-error"></Trash2>
     </a>
     <ConfirmModal
         :show="showconfirm"
@@ -30,7 +30,7 @@
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
-    import { Cog6ToothIcon, TrashIcon } from '@heroicons/vue/24/outline';
+    import { Settings, Trash2 } from '@lucide/vue';
 
     const props = defineProps({
         itemid: {

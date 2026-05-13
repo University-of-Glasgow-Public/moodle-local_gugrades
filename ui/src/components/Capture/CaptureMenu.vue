@@ -1,6 +1,6 @@
 <template>
   <Popover class="relative">
-    <PopoverButton class="cursor-pointer" aria-label="Open menu"><EllipsisVerticalIcon class="size-6 text-base_content" tabindex="0"></EllipsisVerticalIcon></PopoverButton>
+    <PopoverButton class="cursor-pointer" aria-label="Open menu"><EllipsisVertical :size="18" class="text-base_content" tabindex="0"></EllipsisVertical></PopoverButton>
 
     <PopoverPanel class="border-2 border-base-300 rounded-md absolute z-999 top-auto bottom-full mb-2 left-1/2 -translate-x-1/2" v-slot="{ close }">
         <ul class="menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">
@@ -14,12 +14,12 @@
 </template>
 
 <script setup lang="ts">
-    import { EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
     import HistoryButton from '@/components/Capture/HistoryButton.vue';
     import ImportUserGradeButton from '@/components/Capture/ImportUserGradeButton.vue';
     import AddGradeButton from '@/components/Capture/AddGradeButton.vue';
     import HideShowButton from '@/components/Capture/HideShowButton.vue';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
+    import { EllipsisVertical } from '@lucide/vue';
 
     const props = defineProps({
         userid: Number,

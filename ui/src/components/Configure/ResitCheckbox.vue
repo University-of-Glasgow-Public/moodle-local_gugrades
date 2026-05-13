@@ -1,8 +1,8 @@
 <template>
     <div class="flex">
         <a href="#/" @click="$emit('checked', itemid)" class="plainlink" :style="indentstyle">
-            <CheckCircleIcon v-if="checked" class="size-6 text-black-500" tabindex="0"></CheckCircleIcon>
-            <PlusCircleIcon v-else class="size-6 text-black-500" tabindex="0"></PlusCircleIcon>
+            <SquareCheck v-if="checked" tabindex="0"></SquareCheck>
+            <Square v-else tabindex="0"></Square>
         </a>
         <span class="badge badge-pill ml-2"  :class="badgeclass">{{ mstrings.reassessment }}?</span>
     </div>
@@ -12,7 +12,7 @@
     import { computed } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import { PlusCircleIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
+    import { SquareCheck, Square } from '@lucide/vue';
 
     const props = defineProps({
         itemid: Number,

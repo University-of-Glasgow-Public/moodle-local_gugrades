@@ -5,8 +5,8 @@
         </li>
         <li v-for="category in props.nodes.categories" :key="category.id">
             <div class="font-bold flex justify-start space-x-4">
-                <FolderIcon v-if="props.depth == 1" class="size-5 text-black-500 mr-2"></FolderIcon>
-                <FolderOpenIcon v-else class="size-5 text-black-500 mr-2"></FolderOpenIcon>
+                <Folder v-if="props.depth == 1" :size="18" class="mr-2"></Folder>
+                <FolderOpen v-else :size="18" class="mr-2"></FolderOpen>
                 {{ category.category.fullname }}
             </div>
             <ActivityTree :nodes="category" @activityselected="sub_activity_click" :depth="props.depth + 1"></ActivityTree>
@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-    import { FolderIcon, FolderOpenIcon } from '@heroicons/vue/24/outline';
+    import { FolderOpen, Folder } from '@lucide/vue';
 
     const props = defineProps({
         nodes: {
