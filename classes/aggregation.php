@@ -646,6 +646,7 @@ class aggregation {
                 $breadcrumb[] = [
                     'id' => $id,
                     'shortname' => shorten_text($pathcat->fullname, SHORTNAME_LENGTH),
+                    'fullname' => $pathcat->fullname,
                 ];
             }
 
