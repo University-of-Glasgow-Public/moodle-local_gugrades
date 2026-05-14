@@ -1,9 +1,7 @@
 <template>
-    <div class="w-full">
+    <div class="w-full flex flex-start gap-2 mb-4">
         <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
-        <div>
-            <ActivitySelect v-if="showactivityselect" :categoryid="level1category" :currentitem="itemid" @activityselected="activity_selected"></ActivitySelect>
-        </div>
+        <ActivitySelect v-if="showactivityselect" :categoryid="level1category" :currentitem="itemid" @activityselected="activity_selected"></ActivitySelect>
         <GroupSelect v-if="itemid" @groupselected="groupselected"></GroupSelect>
     </div>
 </template>

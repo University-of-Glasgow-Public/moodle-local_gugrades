@@ -1,8 +1,8 @@
 <template>
     <DebugDisplay :debug="serverdebug"></DebugDisplay>
 
-    <div class="border rounded-md p-2 mt-2 border-gray-300">
-        <div>
+    <div class="border rounded-md p-2 mt-2 border-gray-300 shadow-sm">
+        <div class="flex gap-2 justify-start mb-4">
             <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
             <GroupSelect v-if="level1category" @groupselected="groupselected"></GroupSelect>
         </div>

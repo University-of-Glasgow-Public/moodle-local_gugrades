@@ -1,19 +1,22 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="mt-2 border-solid border-2 border-gray-500 p-3 rounded-md w-120" v-if="loaded">
-        <div v-if="collapsed" @click="open_selection" class="cursor-pointer row">
-            <div v-if="selectedactivity" class="col-10">
-                {{ mstrings.selected }}: {{ selectedactivity.itemname }}
+    <div>
+        <div class="text-sm">ACTIVITY</div>
+        <div class="border-solid border border-base-300 px-3 py-2 rounded-md w-120" v-if="loaded">
+            <div v-if="collapsed" @click="open_selection" class="cursor-pointer row">
+                <div v-if="selectedactivity" class="col-10">
+                    {{ mstrings.selected }}: {{ selectedactivity.itemname }}
+                </div>
+                <div class="col-2 text-right">
+                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                </div>
             </div>
-            <div class="col-2 text-right">
-                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+            <div v-else>
+                <b>{{ categoryname }}</b>
+                <ActivityTree v-if="!treeerror" :nodes="activitytree" @activityselected="activity_selected" :depth="1"></ActivityTree>
+                <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
             </div>
-        </div>
-        <div v-else>
-            <b>{{ categoryname }}</b>
-            <ActivityTree v-if="!treeerror" :nodes="activitytree" @activityselected="activity_selected" :depth="1"></ActivityTree>
-            <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
         </div>
     </div>
 </template>

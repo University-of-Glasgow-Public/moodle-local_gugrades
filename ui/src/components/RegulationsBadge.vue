@@ -1,5 +1,5 @@
 <template>
-    <button class="btn btn-warning btn-soft text-sm text-error">
+    <button class="btn btn-warning btn-soft text-sm text-error border-warning border-2">
         <Scale :size="16" />
         Regulations: <b>{{ regulation }}
         <span v-if="regulationextra" class="text-success uppercase">{{ regulationextra }}</span></b>

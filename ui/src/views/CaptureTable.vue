@@ -2,16 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <div class="border rounded-md p-2 mt-2 border-gray-300">
-            <div>
-                <div class="badge badge-primary mb-4" @click="selectcollapse">
-                    <span class="inline-flex items-center gap-1">
-                        <CircleArrowUp v-if="collapsed" :size="18" />
-                        <CircleArrowDown v-else :size="18" />
-                        {{ collapsed ? mstrings['showcategories'] : mstrings['hidecategories'] }}
-                    </span>
-                </div>
-            </div>
+        <div class="border rounded-md p-2 mt-2 border-gray-300 shadow-sm">
 
             <div id="captureselect" class="overflow-hidden transition-all duration-300"
                 :class="collapsed ? 'max-h-0 opacity-0' : 'max-h-screen opacity-100'">
