@@ -1,7 +1,7 @@
 <template>
     <vue-awesome-paginate
-        :total-items="rowsCount"
-        :items-per-page="rowsPerPage"
+        :total-items="totalItems"
+        :items-per-page="itemsPerPage"
         :max-pages-shown="5"
         v-model="currentPage"
         @click="handle_click"
@@ -12,8 +12,8 @@
     import { ref, onMounted } from 'vue';
 
     interface PaginationProps {
-        rowsPerPage: number;
-        rowsCount: number;
+        totalItems: number;
+        itemsPerPage: number;
         startPage: number;
     }
 

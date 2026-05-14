@@ -35,7 +35,12 @@
     <div v-if="level1category && aggregationsupported" class="mt-2">
 
         <!-- Filter on initials -->
-        <NameFilter @selected="filter_selected" ref="namefilterref"></NameFilter>
+        <ResultsFilter
+            v-if="!loading"
+            @applyfilter="applyFilter"
+            :itemid="gradeitemid"
+            :filterheaders="filterheaders">
+        </ResultsFilter>
 
         <!-- Breadcrumb trail -->
         <div v-if="breadcrumb.length > 1" class="my-3 overflow-visible">
@@ -62,6 +67,7 @@
 
         <EasyDataTable
             v-if="!loading"
+            ref="dataTable"
             alternating
             :key="datatablekey"
             :current-page="currentpage"
@@ -74,8 +80,9 @@
             :items="users"
             :headers="headers"
             :filter-options="table_filter"
+            :rows-per-page="rowsPerPageActiveOption"
             :rows-items="[25,50,100,250]"
-            @update-page-items="pagination_change"
+            @update-page-items="updatePageItems"
         >
 
             <!-- additional information in header cells -->
@@ -222,8 +229,8 @@
             <!-- Override pagination -->
             <template #pagination>
                 <TablePagination
-                    :rowsPerPage="rowsperpage"
-                    :rowsCount="users.length"
+                    :totalItems="totalitems"
+                    :itemsPerPage="itemsperpage"
                     :startPage="currentpage"
                     @pagechange="page_changed"
                 ></TablePagination>
@@ -279,13 +286,13 @@
     const level1category = ref(0);
     const loading = ref(true);
     const currentpage = ref(1);
-    const rowsperpage = ref(25);
     const datatablekey = ref(1);
     const aggregationsupported = ref(true);
     const categoryid = ref(0);
     const gradeitemid = ref(0);
     const groupid = ref(0);
-    const items = ref([]);
+    const itemsperpage = ref(25);
+    const totalitems = ref(0);
     const users = ref< IUser[] >([]);
     const columns = ref< IColumn[] >([]);
     const categories = ref([]);
@@ -310,6 +317,14 @@
     const staffuserid = ref(0);
     const caneditgrades = ref(false);
     const completionused = ref(false);
+    const filterheaders = ref<any []>([]);
+    // pagination related.
+    const dataTable = ref();
+    const props = {
+        dataTable: dataTable,
+    }
+    const rowsPerPageActiveOption = computed(() => dataTable.value?.rowsPerPageActiveOption);
+    const clientItemsLength = computed(() => dataTable.value?.clientItemsLength);
 
     /**
      * onMounted, get write grades capability
@@ -367,10 +382,19 @@
     /**
      * Number of pages changed
      */
-    function pagination_change(rows: any) {
-        rowsperpage.value = rows.length;
-        currentpage.value = 1;
-        datatablekey.value++;
+    // function pagination_change(rows: any) {
+    //     console.log('pagination_change called rows:', rows.length);
+    //     rowsperpage.value = rows.length;
+    //     currentpage.value = 1;
+    //     datatablekey.value++;
+    // }
+
+    /**
+     * This gets triggered whenever the data changes. Keep the buttons in the footer consistent.
+     */
+    function updatePageItems() {
+        totalitems.value = clientItemsLength.value;
+        itemsperpage.value = rowsPerPageActiveOption.value;
     }
 
     /**
@@ -557,6 +581,12 @@
                 released: column.released,
                 resititem: column.isresitgradeitem,
             });
+
+            // MGU-1406 - Filter feature.
+            filterheaders.value.push({ 
+                label : column.shortname,
+                value: column.fieldname
+            });
         });
 
         // Items that only display on "top level" page.
@@ -569,12 +599,24 @@
                 infocol: true,
             });
 
+            // MGU-1406 - Filter feature.
+            filterheaders.value.push({
+                label: mstringstore.getMstring('resitrequired'),
+                value: "resitrequired",
+            });
+
             // Completion %age
             if (completionused.value) {
                 heads.push({
                     text: mstringstore.getMstring('completed'),
                     value: "completed",
                     infocol: true,
+                });
+
+                // MGU-1406 - Filter feature.
+                filterheaders.value.push({
+                    label: mstringstore.getMstring('completed'),
+                    value: "completed",
                 });
             }
 
@@ -618,11 +660,12 @@
     });
 
     /**
-     * Firstname/lastname filter selected
+     * Filter the selected attributes
      * @param {*} first
      * @param {*} last
      */
-     function filter_selected(first: string, last: string) {
+    function applyFilter(first: string, last: string) {
+        console.log('applyFilter called: first:', first, ' last:', last);
         if (first == 'all') {
             first = '';
         }
@@ -701,6 +744,7 @@
         .then((result: any) => {
             aggregationsupported.value = result.aggregationsupported;
             users.value = result.users;
+            totalitems.value = users.value.length;
             warnings.value = result.warnings;
             columns.value = result.columns;
             breadcrumb.value = result.breadcrumb;

@@ -47,10 +47,13 @@
             </CaptureAlerts>
         </div>
 
-
-
-        <div v-if="itemid && gradesupported" class="mt-2">
-            <NameFilter v-if="!usershidden" @selected="filter_selected" ref="namefilterref"></NameFilter>
+        <div v-if="itemid && gradesupported" class="tw:mt-2">
+            <ResultsFilter 
+                v-if="showtable && loaded" 
+                @applyfilter="applyFilter"
+                :itemid="itemid"
+                :filterheaders="filterheaders">
+            </ResultsFilter>
 
             <!-- Please wait spinner -->
             <PleaseWait v-if="!loaded"></PleaseWait>
@@ -78,8 +81,8 @@
                     :body-item-class-name="table_item_class"
                     :header-item-class-name="header_item_class"
                     :filter-options="table_filter"
-                    @update-page-items="pagination_change"
-                    :rows-per-page="rowsperpage"
+                    @update-page-items="updatePageItems"
+                    :rows-per-page="rowsPerPageActiveOption"
                     :rows-items="[25,50,100,250]"
                     :style="{ overflow: 'visible' }"
                     >
@@ -163,8 +166,8 @@
                     <template #pagination>
                         <span v-if="ineditcellmode">{{ mstrings['pleasesavefirst'] }}</span>
                         <TablePagination v-else
-                            :rowsPerPage="rowsperpage"
-                            :rowsCount="users.length"
+                            :totalItems="totalitems"
+                            :itemsPerPage="itemsperpage"
                             :startPage="currentpage"
                             @pagechange="page_changed"
                         ></TablePagination>
@@ -211,9 +214,9 @@
     const itemid = ref(0);
     const categoryid = ref(0);
     const groupid = ref(0);
-    const totalrows = ref(0);
+    const totalitems = ref(0);
     const currentpage = ref(1);
-    const rowsperpage = ref(25);
+    const itemsperpage = ref(25);
     const datatablekey = ref(1);
     const usershidden = ref(false);
     const namefilterref = ref(null);
@@ -263,6 +266,8 @@
         dataTable: dataTable,
     }
     const {monochrome, updateLogo} = useLogo();
+    const rowsPerPageActiveOption = computed(() => dataTable.value?.rowsPerPageActiveOption);
+    const clientItemsLength = computed(() => dataTable.value?.clientItemsLength);
 
     /**
      * onMounted, get write grades capability
@@ -351,7 +356,7 @@
         gradelocked.value = false;
         columns.value = [];
         userids.value = [];
-        totalrows.value = 0;
+        totalitems.value = 0;
         showconversion.value = false;
         converted.value = false;
         released.value = false;
@@ -533,6 +538,11 @@
                 columnid: column.id,
                 other: column.other,
             });
+            // MGU-1406 - Filter feature.
+            filterheaders.value.push({ 
+                label : column.description,
+                value: 'GRADE' + column.id
+            });
         });
 
         // Space for the buttons column
@@ -653,7 +663,7 @@
             gradelocked.value = result.gradelocked;
             columns.value = result.columns;
             userids.value = users.value.map(u => u.id);
-            totalrows.value = users.value.length;
+            totalitems.value = users.value.length;
             showconversion.value = result.showconversion;
             converted.value = result.converted;
             released.value = result.released;
@@ -764,6 +774,31 @@
     const showtable = computed(() => {
         return users.value.length != 0;
     });
+
+    /**
+     * This gets triggered whenever the data changes. Keep the buttons in the footer consistent.
+     */
+    function updatePageItems() {
+        totalitems.value = clientItemsLength.value;
+        itemsperpage.value = rowsPerPageActiveOption.value;
+    }
+
+    /**
+     * Filter the selected attributes
+     * @param {*} first
+     * @param {*} last
+     */
+    function applyFilter(first: string, last: string) {
+        console.log('applyFilter called: first:', first, ' last:', last);
+        if (first == 'all') {
+            first = '';
+        }
+        if (last == 'all') {
+            last = '';
+        }
+        firstname.value = first;
+        lastname.value = last;
+    }
 
 </script>
 
