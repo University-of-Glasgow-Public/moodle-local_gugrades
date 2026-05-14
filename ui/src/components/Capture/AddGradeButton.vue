@@ -96,8 +96,8 @@
                 />
             </FormKit>
 
-            <div v-if="overridden" class="border rounded mt-3 p-4">
-                <TwAlert>{{ mstrings.categoryremoveoverride }}</TwAlert>
+            <div v-if="overridden" class="my-3">
+                <TwAlert class="mb-3">{{ mstrings.categoryremoveoverride }}</TwAlert>
                 <TwButton color="primary" @click="removeoverride">{{ mstrings.remove }}</TwButton>
             </div>
 
@@ -241,7 +241,7 @@
             ];
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             debug.value = error;
             closemodal();
         });

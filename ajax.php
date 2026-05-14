@@ -35,7 +35,7 @@ $data = json_decode($raw, true);
 
 $params = $data['args'];
 $courseid = $params['courseid'];
-$loginrequired = $params['loginrequired'];
+$loginrequired = $data['loginrequired'];
 
 if ($loginrequired) {
     // Flag login errors. Note that AJAX_SCRIPT makes sure an exception
@@ -62,7 +62,7 @@ $result = external_api::call_external_function(
     $params
 );
 
-// If the external function fails, send back the who $result json encoded.
+// If the external function fails, send back the $result json encoded.
 if (!empty($result['error'])) {
     http_response_code(500);
     echo json_encode($result);

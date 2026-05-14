@@ -1,9 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" :disabled="!props.show || !enable" @click="showcsvmodal = true">
+    <button :disabled="!props.show || !enable" @click="showcsvmodal = true" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <FileUp :size="18" />
         {{ mstrings['csvimport'] }}
-    </TwButton>
+    </button>
 
     <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['csvimport']">
 
@@ -99,6 +100,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { IErrorList, IGradetype } from '@/js/Interfaces';
+    import { FileUp } from '@lucide/vue';
 
     interface IHeader {
         text: string;

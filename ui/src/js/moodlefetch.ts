@@ -70,7 +70,7 @@ export const moodleFetch = async (
     throwHttpErrors: false,
   }).json<MoodleResponse>();
 
-  if ('error' in response && response.error) {
+  if ('error' in response && response.error && 'exception' in response) {
       throw response.exception;
   }
 

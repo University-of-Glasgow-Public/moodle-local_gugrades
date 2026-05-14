@@ -1,7 +1,8 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="release_button_clicked" :disabled="!enable">
+    <button @click="release_button_clicked" :disabled="!enable" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <LockKeyholeOpen :size="18" />
         <span v-if="props.released">
             <span v-if="grouprelease">{{ mstrings['unreleasegradesgroup'] }}</span>
             <span v-else>{{ mstrings['unreleasegrades'] }}</span>
@@ -10,7 +11,7 @@
             <span v-if="grouprelease">{{ mstrings['releasegradesgroup'] }}</span>
             <span v-else>{{ mstrings['releasegrades'] }}</span>
         </span>
-    </TwButton>
+    </button>
 
     <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['releasegrades']">
 
@@ -63,6 +64,7 @@
     import { useLogo } from '@/js/monochromelogo';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
+    import { LockKeyholeOpen } from '@lucide/vue';
 
     const showreleasemodal = ref(false);
     const loading = ref(false);

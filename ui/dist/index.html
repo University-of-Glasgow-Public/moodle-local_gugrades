@@ -5,30 +5,10 @@
     <link rel="icon" href="./favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University of Glasgow MyGrades</title>
-    <script type="module" crossorigin src="./assets/index-BhIIckg8.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index--KJA20tX.css">
+    <script type="module" crossorigin src="./assets/index-HATS9XUw.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BqzOoQh5.css">
   </head>
   <body>
-    <!-- Link to the course view -->
-    <a id="courseLink" href="#" class="btn m-4">Back to course</a>
-    <script>
-        // Extract the base URL
-        const currentUrl = window.location.href;
-        const baseUrl = currentUrl.split('/local/gugrades/ui/dist')[0];
-
-        // Extract the courseid from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseId = urlParams.get('courseid');
-
-        // Create the link to the course view
-        if (courseId) {
-          const courseLink = document.getElementById('courseLink');
-          courseLink.href = `${baseUrl}/course/view.php?id=${courseId}`;
-          //courseLink.textContent = `Go to Course ${courseId}`;
-        } else {
-          console.error('No courseid parameter found in the URL.');
-        }
-    </script>
     <div id="app"></div>
   </body>
 </html>

@@ -1,7 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" class="mr-1" @click="conversion_clicked()">{{ mstrings.convertgrades }}</TwButton>
+    <button @click="conversion_clicked" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <Rotate3d :size="18" />
+        {{ mstrings.convertgrades }}
+    </button>
 
     <VueModal v-model="showselectmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.conversionselect">
 
@@ -16,7 +19,7 @@
 
             <!--  If no map is currently selected, show the selection dialogue -->
             <div v-if="!selection">
-                <TwAlert v-if="nomaps && loaded" class="warning">{{ mstrings.nomaps }}</TwAlert>
+                <TwAlert v-if="nomaps && loaded" class="mb-4" color="warning">{{ mstrings.nomaps }}</TwAlert>
 
                 <EasyDataTable class="mb-2" v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true">
                     <template #item-select="item">
@@ -55,6 +58,7 @@
     import TwButton from '../Tailwind/TwButton.vue';
     import type { Header } from "vue3-easy-data-table";
     import type { IMap } from '@/js/Interfaces';
+    import { Rotate3d } from '@lucide/vue';
 
     const maps = ref< IMap[] >([]);
     const nomaps = ref(true);

@@ -7,26 +7,6 @@
     <title>University of Glasgow MyGrades</title>
   </head>
   <body>
-    <!-- Link to the course view -->
-    <a id="courseLink" href="#" class="btn m-4">Back to course</a>
-    <script>
-        // Extract the base URL
-        const currentUrl = window.location.href;
-        const baseUrl = currentUrl.split('/local/gugrades/ui/dist')[0];
-
-        // Extract the courseid from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseId = urlParams.get('courseid');
-
-        // Create the link to the course view
-        if (courseId) {
-          const courseLink = document.getElementById('courseLink');
-          courseLink.href = `${baseUrl}/course/view.php?id=${courseId}`;
-          //courseLink.textContent = `Go to Course ${courseId}`;
-        } else {
-          console.error('No courseid parameter found in the URL.');
-        }
-    </script>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

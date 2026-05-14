@@ -1,10 +1,11 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="import_button_click" :disabled="!enable">
+    <button @click="import_button_click" :disabled="!enable" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <Download :size="18" />
         <span v-if="groupimport">{{ mstrings['importgradesgroup'] }}</span>
         <span v-else>{{ mstrings['importgrades'] }}</span>
-    </TwButton>
+    </button>
 
     <VueModal v-model="showimportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['importgrades']">
 
@@ -133,6 +134,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import type { IGradetype, IFormkitOption } from '@/js/Interfaces';
+    import { Download } from '@lucide/vue';
 
     interface IFormkitOptions {
         label: string;

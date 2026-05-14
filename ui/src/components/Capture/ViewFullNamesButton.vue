@@ -1,10 +1,11 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="toggle_view">
+    <button @click="toggle_view" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <Binoculars :size="18" />
         <span v-if="!togglereveal">{{ mstrings.viewfullnames }}</span>
         <span v-if="togglereveal">{{ mstrings.hidefullnames }}</span>
-    </TwButton>
+    </button>
 </template>
 
 <script setup lang="ts">
@@ -13,7 +14,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useMstrings } from '@/stores/mstrings.js';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
+    import { Binoculars } from '@lucide/vue';
 
     const hascapability = ref(false);
     const togglereveal = ref(false);

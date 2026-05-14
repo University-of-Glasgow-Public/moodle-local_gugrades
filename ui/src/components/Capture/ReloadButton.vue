@@ -1,8 +1,8 @@
 <template>
     <!-- Refresh button -->
-    <div class="ml-2 tooltip"  @click="refresh_clicked" :data-tip="mstrings['refreshpage']">
-        <button class="btn btn-secondary" aria-label="Refresh table">
-            <RefreshCcw></RefreshCcw>
+    <div class="tooltip"  @click="refresh_clicked" :data-tip="mstrings['refreshpage']">
+        <button class="btn btn-outline mr-2 btn-sm" aria-label="Refresh table">
+            <RefreshCcw :size="18"></RefreshCcw>
         </button>
     </div>
 </template>

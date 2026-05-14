@@ -2,9 +2,9 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <!-- info button -->
-    <div v-if="!props.text" class="ml-2 tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
-        <button class="btn btn-secondary" aria-label="Show grade item info">
-            <Info></Info>
+    <div v-if="!props.text" class="tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
+        <button class="btn btn-outline mr-2 btn-sm" aria-label="Show grade item info">
+            <Info :size="18"></Info>
         </button>
     </div>
 

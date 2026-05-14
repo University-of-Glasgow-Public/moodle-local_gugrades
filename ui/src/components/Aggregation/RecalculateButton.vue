@@ -1,7 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" class="mr-1" @click="recalculate_clicked()">{{ mstrings.recalculate }}</TwButton>
+    <button @click="recalculate_clicked" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <Sigma :size="18" />
+        {{ mstrings.recalculate }}
+    </button>
 
     <VueModal v-model="showrecalculatemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.recalculate">
         <div v-if="loading">
@@ -27,6 +30,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import { Sigma } from '@lucide/vue'
 
     const showrecalculatemodal = ref(false);
     const loading = ref(false);

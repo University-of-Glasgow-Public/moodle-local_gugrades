@@ -1,10 +1,11 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" :disabled="props.disabled" @click="showreleasemodal=true">
-            <span v-if="grouprelease"><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgroup }}</span>
-            <span v-else><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgrade }}</span>
-    </TwButton>
+    <button @click="showreleasemodal=true" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <Rocket :size="18" />
+        <span v-if="grouprelease"><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgroup }}</span>
+        <span v-else><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgrade }}</span>
+    </button>
 
     <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.releaseaggregatedgrade">
 
@@ -59,6 +60,7 @@
     import { useLogo } from '@/js/monochromelogo';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import { Rocket } from '@lucide/vue';
 
     const showreleasemodal = ref(false);
     const loading = ref(false);

@@ -1,16 +1,15 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton
+    <button
         v-if="hascapability"
-        color="error"
-        class="mr-1"
-        :class="small ? 'btn-sm' : ''"
         :disabled="processing"
         @click="showconfirm = true"
-    >
+        class="btn btn-outline btn-error mr-2 btn-sm"
+        >
+        <Bomb :size="18" />
         {{ mstrings.resetassessment }}
-    </TwButton>
+    </button>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetassessmentconfirm" @confirm="confirmreset"></ConfirmModal>
     <PleaseWait v-if="processing"></PleaseWait>
@@ -25,7 +24,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
-    import TwButton from '../Tailwind/TwButton.vue';
+    import { Bomb } from '@lucide/vue';
 
     const props = defineProps<{
         itemid: number;

@@ -1,7 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" class="mr-1" @click="open_modal()">{{ mstrings.exportaggregation }}</TwButton>
+    <button @click="open_modal" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <Save :size="18" />
+        {{ mstrings.exportaggregation }}
+    </button>
 
     <VueModal v-model="showexportmodal" :enableClose="false" modalClass="rounded max-w-3xl overflow-y-auto" :title="mstrings.exportaggregation">
 
@@ -81,6 +84,7 @@
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import type { IAggregationExportPlugin, IMenuItem, IAggregationExportForm } from '@/js/Interfaces';
+    import { Save } from '@lucide/vue';
 
     const showexportmodal = ref(false);
     const allnone = ref(false);

@@ -1,8 +1,8 @@
 <template>
-    <button v-if="disabled" :disabled="disabled" class="btn mr-1 btn-disabled btn-dash" tabindex="-1" role="button" aria-disabled="true">
+    <button v-if="disabled" :disabled="disabled" class="btn mr-1 btn-outline btn-dash btn-sm" tabindex="-1" role="button" aria-disabled="true">
         <slot></slot>
     </button>
-    <button v-else class="btn mr-1" :class="btnclasses" v-bind="$attrs">
+    <button v-else class="btn btn-outline btn-sm mr-1" :class="btnclasses" v-bind="$attrs">
         <slot></slot>
     </button>
 </template>

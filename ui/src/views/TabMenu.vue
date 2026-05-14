@@ -6,8 +6,6 @@
     <PleaseWait v-if="waiting" message="Setting up MyGrades"></PleaseWait>
 
     <div v-if="!waiting">
-        <GreyLogo></GreyLogo>
-
         <TWAlert v-if="!available" color="error">
             MyGrades cannot be used in this course as it has too many enrolled participants.
         </TWAlert>
@@ -22,7 +20,6 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import TabsNav from '@/components/TabsNav.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import GreyLogo from '@/components/Common/GreyLogo.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import RegulationCheck from '@/components/RegulationCheck.vue';

@@ -1,9 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="add_multiple_button_click()" :disabled="!enable">
+    <button @click="add_multiple_button_click()" :disabled="!enable" class="btn btn-outline btn-secondary mr-2 btn-sm">
+        <BetweenVerticalStart :size="18" />
         {{ mstrings['addmultiple'] }}
-    </TwButton>
+    </button>
 
     <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['addmultiple']">
         <FormKit type="form" @submit="submit_form">
@@ -52,6 +53,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { IEmitEditColumn } from '@/js/Interfaces';
+    import { BetweenVerticalStart } from '@lucide/vue';
 
     interface GradeType {
         label: string;

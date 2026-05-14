@@ -1,8 +1,8 @@
 <template>
   <div class="relative inline-block" id="theme-dropdown">
     <!-- trigger button -->
-    <button class="btn" @click.stop="toggle">
-      Theme
+    <button class="btn btn-outline" @click.stop="toggle">
+      <Palette /> Theme
     </button>
 
     <!-- dropdown -->
@@ -31,6 +31,7 @@
 
 <script setup lang="ts">
     import { ref, onMounted, onBeforeUnmount } from 'vue'
+    import { Palette } from '@lucide/vue';
 
     const themes = [
     'light',

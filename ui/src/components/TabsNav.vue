@@ -1,24 +1,21 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="mt-5" role="navigation">
+    <div class="mt-0 w-full" role="navigation">
         <TabGroup :defaultIndex="1">
-            <div class="flex justify-between">
-                <TabList class="flex justify-start space-x-1 bg-base-200 p-1 rounded-box w-fit shadow-sm">
-                    <Tab v-for="tab in tabs" v-slot="{ selected }" as="template">
-                        <a
-                            class="tab px-4 py-2 text-sm font-medium rounded-md transition-all duration-200"
-                            :class="{
-                                'bg-primary text-primary-content shadow-md': selected,
-                                'text-base-content/80 hover:bg-base-100 hover:text-base-content': !selected,
-                            }"
-                        >
-                            {{ tab.label }}
-                        </a>
-                    </Tab>
-                </TabList>
-                <ThemeSelect></ThemeSelect>
-            </div>
+            <TabList class="flex justify-start space-x-1 bg-base-100 p-1 border border-base-300 rounded-b-md w-full shadow-sm focus:outline-none">
+                <Tab v-for="tab in tabs" v-slot="{ selected }" as="template">
+                    <a
+                        class="tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none"
+                        :class="{
+                            'link-primary border-b-2 border-primary': selected,
+                            'text-base-content/80 hover:bg-base-100 hover:text-base-content': !selected,
+                        }"
+                    >
+                        <component :is="tab.icon" :size="16" class="mr-1" /> {{ tab.label }}
+                    </a>
+                </Tab>
+            </TabList>
             <TabPanels >
                 <TabPanel v-for="tab in tabs" role="main">
                     <component :is="tab.component" />
@@ -33,8 +30,8 @@
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import ThemeSelect from './Common/ThemeSelect.vue';
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
+    import { MonitorCog, Camera, Calculator, Shield, Settings2, Table } from '@lucide/vue';
 
     import ConfigPage from '@/views/ConfigPage.vue';
     import CaptureTable from '@/views/CaptureTable.vue';
@@ -50,27 +47,33 @@
     const tabs = ref([
         {
             label: mstrings.value.configure ?? '',
-            component: ConfigPage
+            component: ConfigPage,
+            icon: MonitorCog,
         },
         {
             label: mstrings.value.assessmentgradecapture ?? '',
-            component: CaptureTable
+            component: CaptureTable,
+            icon: Camera,
         },
         {
             label: mstrings.value.manageconversion ?? '',
-            component: ConversionPage
+            component: ConversionPage,
+            icon: Table
         },
         {
             label: mstrings.value.coursegradeaggregation ?? '',
-            component: AggregationTable
+            component: AggregationTable,
+            icon: Calculator
         },
         {
             label: mstrings.value.auditlog ?? '',
-            component: AuditPage
+            component: AuditPage,
+            icon: Shield
         },
         {
             label: mstrings.value.settings ?? '',
-            component: SettingsPage
+            component: SettingsPage,
+            icon: Settings2
         },
     ]);
 
