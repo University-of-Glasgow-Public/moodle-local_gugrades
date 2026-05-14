@@ -307,3 +307,12 @@ export interface IEmitEditColumn {
     notes: string;
     columnid: number;
 }
+
+/**
+ * Alerts block
+ */
+export interface IError {
+    warning: string;
+    help: string;
+    level: string;
+}
