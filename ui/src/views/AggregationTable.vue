@@ -163,11 +163,11 @@
             <template #item-resitrequired="item">
                 <a v-if="caneditgrades" class="cursor-pointer" @click.prevent="resit_clicked(item.id, !item.resitrequired)">
                     <span v-if="item.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="badge badge-secondary">{{ mstrings.no }}</span>
+                    <span v-else class="badge badge-secondary badge-soft">{{ mstrings.no }}</span>
                 </a>
                 <span v-if="!caneditgrades">
                     <span v-if="item.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="badge badge-secondary">{{ mstrings.no }}</span>
+                    <span v-else class="badge badge-secondary badge-soft">{{ mstrings.no }}</span>
                 </span>
             </template>
 
