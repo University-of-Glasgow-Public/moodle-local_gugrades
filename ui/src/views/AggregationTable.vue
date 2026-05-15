@@ -1,32 +1,32 @@
 <template>
     <DebugDisplay :debug="serverdebug"></DebugDisplay>
 
-    <div class="bg-base-100 border rounded-md p-2 mt-2 border-gray-300 shadow-sm">
-        <div class="flex gap-2 justify-start mb-4">
-            <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
-            <GroupSelect v-if="level1category" @groupselected="groupselected"></GroupSelect>
+    <div class="bg-base-100 border rounded-md mt-2 border-gray-300 shadow-sm">
+
+        <div class="p-2">
+            <div class="flex gap-2 justify-start mb-4">
+                <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
+                <GroupSelect v-if="level1category" @groupselected="groupselected"></GroupSelect>
+            </div>
+
+            <!-- Buttons line -->
+            <AggregationButtons
+                v-if="level1category && aggregationsupported"
+                :categoryid="categoryid"
+                :gradeitemid="gradeitemid"
+                :groupid="groupid"
+                :toplevel="toplevel"
+                :atype="atype"
+                :allowconversion="allowconversion"
+                :allowrelease="allowrelease"
+                :released="released"
+                :staffuserid="staffuserid"
+                :caneditgrades="caneditgrades"
+                @refreshtable="table_update"
+                ></AggregationButtons>
         </div>
 
-        <!-- display warnings -->
-        <div v-if="level1category">
-            <DismissableAlert v-for="warning in warnings" :message="warning.message"></DismissableAlert>
-        </div>
-
-        <!-- Buttons line -->
-        <AggregationButtons
-            v-if="level1category && aggregationsupported"
-            :categoryid="categoryid"
-            :gradeitemid="gradeitemid"
-            :groupid="groupid"
-            :toplevel="toplevel"
-            :atype="atype"
-            :allowconversion="allowconversion"
-            :allowrelease="allowrelease"
-            :released="released"
-            :staffuserid="staffuserid"
-            :caneditgrades="caneditgrades"
-            @refreshtable="table_update"
-            ></AggregationButtons>
+        <AlertsBlock :errors="errors" />
     </div>
 
     <!-- Aggregation is not possible -->
@@ -39,7 +39,7 @@
 
         <!-- Breadcrumb trail -->
         <div v-if="breadcrumb.length > 1" class="my-3 overflow-visible">
-            <div class="breadcrumbs text-sm p-2 rounded-box border border-base-300 bg-primary/50 shadow-sm tooltip-open">
+            <div class="breadcrumbs text-sm p-2 rounded-box border border-primary/50 bg-primary/20 text-primary shadow-sm tooltip-open">
                 <ul>
                     <li><FolderOpen :size="18" /></li>
                     <li v-for="(item, index) in breadcrumb" :key="item.id">
@@ -247,10 +247,11 @@
     import DismissableAlert from '@/components/Common/DismissableAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { ArrowBigRight, ArrowBigLeft, FolderOpen } from '@lucide/vue';
-    import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning } from '@/js/Interfaces';
+    import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning, IError } from '@/js/Interfaces';
     import type { Header, Item } from "vue3-easy-data-table";
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import TablePagination from '@/components/Common/TablePagination.vue';
+    import AlertsBlock from '@/components/Common/AlertsBlock.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -663,6 +664,19 @@
     }
 
     /**
+     * convert warnings to errors
+     */
+    const errors = computed< IError[] >(() => {
+        return warnings.value.map(warning => {
+            return {
+                warning: warning.message,
+                help: '',
+                level: 'warning'
+            }
+        });
+    });
+
+    /**
      * Update table (when something changes)
      */
     function table_update() {
@@ -736,21 +750,5 @@
 </script>
 
 <style>
-    .aggregation-table {
-        --easy-table-header-background-color: var(--color-primary);
-        --easy-table-header-font-color: var(--color-primary-content);
 
-        --easy-table-body-row-background-color: var(--color-base-100);
-        --easy-table-body-row-font-color: var(--color-base-content);
-
-        --easy-table-body-even-row-background-color: var(--color-base-300);
-        --easy-table-body-even-row-font-color: var(--color-base-content);
-
-        --easy-table-footer-background-color: var(--color-primary);
-        --easy-table-footer-font-color: var(--color-primary-content);
-    }
-
-    .vue3-easy-data-table__main {
-        overflow: visible !important;
-    }
 </style>

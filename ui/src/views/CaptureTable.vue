@@ -2,15 +2,13 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <div class="border rounded-md p-2 mt-6 bg-base-100 border-gray-300 shadow-sm">
+        <div class="border rounded-md mt-6 bg-base-100 border-gray-300 shadow-sm">
 
-            <div id="captureselect" class="overflow-hidden transition-all duration-300"
+            <div id="captureselect" class="p-2 overflow-hidden transition-all duration-300"
                 :class="collapsed ? 'max-h-0 opacity-0' : 'max-h-screen opacity-100'">
                 <CaptureSelect @selecteditemid="selecteditemid"></CaptureSelect>
 
                 <div v-if="itemid">
-
-
                     <CaptureButtons
                         v-if="gradesupported"
                         :loaded="loaded"
@@ -36,18 +34,20 @@
                     </CaptureButtons>
                 </div>
             </div>
+
+            <CaptureAlerts
+                v-if="itemid"
+                :gradesupported="gradesupported"
+                :aggregationsupported="aggregationsupported"
+                :unsupportedscales="unsupportedscales"
+                :gradehidden="gradehidden"
+                :gradelocked="gradelocked"
+                :noids="!showcsvimport"
+                >
+            </CaptureAlerts>
         </div>
 
-        <CaptureAlerts
-            v-if="itemid"
-            :gradesupported="gradesupported"
-            :aggregationsupported="aggregationsupported"
-            :unsupportedscales="unsupportedscales"
-            :gradehidden="gradehidden"
-            :gradelocked="gradelocked"
-            :noids="!showcsvimport"
-            >
-        </CaptureAlerts>
+
 
         <div v-if="itemid && gradesupported" class="mt-2">
             <NameFilter v-if="!usershidden" @selected="filter_selected" ref="namefilterref"></NameFilter>
