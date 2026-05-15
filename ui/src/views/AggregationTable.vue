@@ -107,8 +107,8 @@
                     </div>
                 </div>
                 <div v-if="header.categoryid">
-                    <button class="btn btn-sm ml-2" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
-                        <ArrowBigRight :size="18" />
+                    <button class="btn btn-sm btn-soft ml-2" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
+                        <ArrowBigRight :size="18" :stroke-width="1" />
                     </button>
                 </div>
             </template>
