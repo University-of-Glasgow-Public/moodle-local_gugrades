@@ -807,7 +807,7 @@
     .vue3-easy-data-table__main {
         overflow: visible !important;
     }
-        */
+
 
     .capture-table {
         --easy-table-header-background-color: var(--color-primary);
@@ -826,4 +826,5 @@
     .vue3-easy-data-table__main {
         overflow: visible !important;
     }
+        */
 </style>

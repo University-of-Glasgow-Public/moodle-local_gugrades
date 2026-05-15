@@ -1,5 +1,5 @@
 <template>
-    <div id="mygrades_container" class="px-4 mb-8">
+    <div id="mygrades_container" class="px-4 mb-8 bg-base-200">
         <PageHeader />
         <TabMenu />
     </div>

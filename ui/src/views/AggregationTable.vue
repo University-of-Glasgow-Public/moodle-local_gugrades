@@ -79,37 +79,35 @@
             <!-- additional information in header cells -->
             <template #header="header">
                 <div v-if="header.value == 'back'">
-                    <a href="#" @click="expand_clicked(backid)">
-                        <CircleArrowLeft />
-                    </a>
+                    <button class="btn" @click="expand_clicked(backid)">
+                        <ArrowBigLeft :size="18" /> Back
+                    </button>
                 </div>
-                <div v-else class="aggregation-header">
-                    <div class="tooltip tooltip-success" :data-tip="header.fullname">
+                <div v-else class="aggregation-header flex gap-x-2">
+                    <div>
+                        <div class="tooltip tooltip-success" :data-tip="header.fullname">
 
-                        <div>
-                            <!-- column title -->
-                            <InfoButton v-if="header.gradeitemid" :itemid="header.gradeitemid" :text="header.text" size="lg" color="text-warning"></InfoButton>
-                            <span v-else>{{ header.text }}</span>
+                            <div>
+                                <!-- column title -->
+                                <InfoButton v-if="header.gradeitemid" :itemid="header.gradeitemid" :text="header.text" size="lg" color="text-warning"></InfoButton>
+                                <span v-else>{{ header.text }}</span>
+                            </div>
+                            <div v-if="!header.infocol && showweights">{{ header.weight }}%</div>
+                            <div v-if="header.gradetype">{{ header.gradetype }} <span v-if="!header.isscale">({{ header.grademax }})</span></div>
+                            <div v-if="header.resititem" class="badge badge-success">{{ mstrings.reassessment}}</div>
                         </div>
-                        <div v-if="!header.infocol && showweights">{{ header.weight }}%</div>
-                        <div v-if="header.gradetype">{{ header.gradetype }} <span v-if="!header.isscale">({{ header.grademax }})</span></div>
-                        <div v-if="header.resititem" class="badge badge-success">{{ mstrings.reassessment}}</div>
+                        <div class="py-1" v-if="header.strategy">
+                            <i>{{ header.strategy }}</i>
+                        </div>
+                        <div v-if="header.atype">
+                            ({{ formattedatype }})
+                        </div>
                     </div>
-                    <div class="py-1" v-if="header.strategy">
-                        <i>{{ header.strategy }}</i>
-                    </div>
-                    <div v-if="header.categoryid">
-                        <a href="#" @click="expand_clicked(header.categoryid)">
-                            <span class="badge badge-sm badge-secondary my-2" >
-                                <ArrowBigLeftIcon></ArrowBigLeftIcon>
-                                {{ mstrings.expand }}
-                                <ArrowBigRightIcon></ArrowBigRightIcon>
-                            </span>
-                        </a>
-                    </div>
-                    <div v-if="header.atype">
-                        ({{ formattedatype }})
-                    </div>
+                </div>
+                <div v-if="header.categoryid">
+                    <button class="btn btn-sm ml-2" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
+                        <ArrowBigRight :size="18" />
+                    </button>
                 </div>
             </template>
 
@@ -246,7 +244,7 @@
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DismissableAlert from '@/components/Common/DismissableAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import { ArrowBigLeftIcon, ArrowBigRightIcon, CircleArrowLeft } from '@lucide/vue';
+    import { ArrowBigRight, ArrowBigLeft } from '@lucide/vue';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning } from '@/js/Interfaces';
     import type { Header, Item } from "vue3-easy-data-table";
     import TwAlert from '@/components/Tailwind/TwAlert.vue';

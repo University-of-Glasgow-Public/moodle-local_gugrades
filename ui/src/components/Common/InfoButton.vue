@@ -9,7 +9,7 @@
     </div>
 
     <!-- info link -->
-    <a v-if="props.text" class="text-white underline cursor-pointer" @click="info_clicked">{{ props.text }}</a>
+    <a v-if="props.text" class="text-primary underline cursor-pointer" @click="info_clicked">{{ props.text }}</a>
 
     <!-- modal to show info-->
     <VueModal v-model="showinfomodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="itemname">

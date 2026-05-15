@@ -1,5 +1,5 @@
 <template>
-    <div class="navbar bg-base-200 border-x border-t border-base-300 rounded-t-md flex justify-between mt-4 px-6">
+    <div class="navbar bg-base-100 border-x border-t border-base-300 rounded-t-md flex justify-between mt-4 px-6">
         <div>
             <a :href="courseurl" class="text-sm" ><MoveLeft :size="18" class="inline" /> Back to course</a>
         </div>
