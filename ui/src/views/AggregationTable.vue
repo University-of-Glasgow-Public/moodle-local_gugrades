@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="serverdebug"></DebugDisplay>
 
-    <div class="border rounded-md p-2 mt-2 border-gray-300 shadow-sm">
+    <div class="bg-base-100 border rounded-md p-2 mt-2 border-gray-300 shadow-sm">
         <div class="flex gap-2 justify-start mb-4">
             <LevelOneSelect  @levelchange="levelOneChange"></LevelOneSelect>
             <GroupSelect v-if="level1category" @groupselected="groupselected"></GroupSelect>
@@ -39,14 +39,16 @@
 
         <!-- Breadcrumb trail -->
         <div v-if="breadcrumb.length > 1" class="my-3 overflow-visible">
-            <div class="breadcrumbs text-sm p-2 rounded-box border border-base-300 bg-base-100 tooltip-open">
+            <div class="breadcrumbs text-sm p-2 rounded-box border border-base-300 bg-primary/50 shadow-sm tooltip-open">
                 <ul>
+                    <li><FolderOpen :size="18" /></li>
                     <li v-for="(item, index) in breadcrumb" :key="item.id">
                         <a
                             href="#"
                             @click.prevent="expand_clicked(item.id)"
                             class="tooltip tooltip-right hover:text-primary"
                             :data-tip="item.fullname"
+                            :class="{ 'font-bold': index == breadcrumb.length - 1}"
                         >
                         {{ item.shortname }}
                         </a>
@@ -244,7 +246,7 @@
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DismissableAlert from '@/components/Common/DismissableAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import { ArrowBigRight, ArrowBigLeft } from '@lucide/vue';
+    import { ArrowBigRight, ArrowBigLeft, FolderOpen } from '@lucide/vue';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning } from '@/js/Interfaces';
     import type { Header, Item } from "vue3-easy-data-table";
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
