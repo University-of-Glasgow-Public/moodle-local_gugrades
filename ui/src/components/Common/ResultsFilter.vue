@@ -160,7 +160,7 @@
      */
     function filterButtonClick() {
         showfiltermodal.value = true;
-        get_gradeoptions();
+        //get_gradeoptions();
     }
 
     /**

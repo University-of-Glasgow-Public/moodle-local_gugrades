@@ -245,7 +245,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
-    import NameFilter from '@/components/Common/NameFilter.vue';
+    import ResultsFilter from '@/components/Common/ResultsFilter.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue';
     import InfoButton from '@/components/Common/InfoButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
@@ -255,6 +255,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { ArrowBigRight, ArrowBigLeft, FolderOpen } from '@lucide/vue';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning, IError } from '@/js/Interfaces';
+    import type { FilterOptions } from '@/js/filteroptions';
     import type { Header, Item } from "vue3-easy-data-table";
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import TablePagination from '@/components/Common/TablePagination.vue';
@@ -349,26 +350,23 @@
     /**
      * Table name filter
      */
-     const table_filter = computed(() => {
-        const options = [];
+    const table_filter = computed((): FilterOptions[] => {
+        const filterOptionsArray: FilterOptions[] = [];
+        filterOptionsArray.push({
+            field: 'firstinitial',
+            criteria: firstname.value,
+            comparison: (value, criteria): boolean => (value != null && criteria != null &&
+            typeof value === 'string' && value.includes(`${criteria}`)),
+        });
+        filterOptionsArray.push({
+            field: 'lastinitial',
+            criteria: lastname.value,
+            comparison: (value, criteria): boolean => (value != null && criteria != null &&
+            typeof value === 'string' && value.includes(`${criteria}`)),
+        });
 
-        if (firstname.value != '') {
-            options.push({
-                field: 'firstinitial',
-                comparison: '=',
-                criteria: firstname.value,
-            });
-        }
-
-        if (lastname.value != '') {
-            options.push({
-                field: 'lastinitial',
-                comparison: '=',
-                criteria: lastname.value,
-            });
-        }
-
-        return options;
+        console.log('table_filter computed called: first:', firstname.value, ' last:', lastname.value, ' filterOptionsArray:', filterOptionsArray);
+        return filterOptionsArray;
     });
 
     /**
@@ -547,6 +545,8 @@
      */
     const headers = computed< IAggregationHeader[] >(() => {
         let heads = [];
+        // MGU-1406 - Filter feature. Ensure this is empty each time, to stop the same items stacking up.
+        filterheaders.value = [];
 
         // User identification.
         heads.push({text: 'firstinitial', value: 'firstinitial'});
@@ -674,10 +674,6 @@
         }
         firstname.value = first;
         lastname.value = last;
-
-        // Reset page
-        //currentpage.value = 1;
-        //table_update();
     }
 
     /**

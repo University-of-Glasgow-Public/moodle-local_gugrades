@@ -47,7 +47,7 @@
             </CaptureAlerts>
         </div>
 
-        <div v-if="itemid && gradesupported" class="tw:mt-2">
+        <div v-if="itemid && gradesupported" class="mt-2">
             <ResultsFilter 
                 v-if="showtable && loaded" 
                 @applyfilter="applyFilter"
@@ -189,7 +189,7 @@
 <script setup lang="ts">
     import {ref, computed, watch, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
-    import NameFilter from '@/components/Common/NameFilter.vue';
+    import ResultsFilter from '@/components/Common/ResultsFilter.vue';
     import CaptureSelect from '@/components/Capture/CaptureSelect.vue';
     import CaptureMenu from '@/components/Capture/CaptureMenu.vue';
     import { useToast } from "vue-toastification";
@@ -205,9 +205,9 @@
     import type { Header, Item } from "vue3-easy-data-table";
     import TablePagination from '@/components/Common/TablePagination.vue';
     import TwButton from '@/components/Tailwind/TwButton.vue';
-    import { CircleArrowDown, CircleArrowUp } from '@lucide/vue';
     import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
+    import type { FilterOptions } from '@/js/filteroptions';
 
     const users = ref< ICaptureUser[] >([]);
     const userids = ref< number[] >([]);
@@ -219,7 +219,6 @@
     const itemsperpage = ref(25);
     const datatablekey = ref(1);
     const usershidden = ref(false);
-    const namefilterref = ref(null);
     const itemtype = ref('');
     const itemname = ref('');
     const gradesupported = ref(true);
@@ -255,8 +254,8 @@
     const firstname = ref('');
     const lastname = ref('');
     const staffuserid = ref(0);
-    const collapseclasses = ref(['collapse', 'show']);
     const caneditgrades = ref(false);
+    const filterheaders = ref<any []>([]);
     const toast = useToast();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
@@ -298,37 +297,25 @@
     }
 
     /**
-     * Number of pages changed
-     */
-    function pagination_change(rows: any) {
-        rowsperpage.value = rows.length;
-        currentpage.value = 1;
-        datatablekey.value++;
-    }
-
-    /**
      * Table name filter
      */
-    const table_filter = computed(() => {
-        const options = [];
+    const table_filter = computed((): FilterOptions[] => {
+        const filterOptionsArray: FilterOptions[] = [];
+        filterOptionsArray.push({
+            field: 'firstinitial',
+            criteria: firstname.value,
+            comparison: (value, criteria): boolean => (value != null && criteria != null &&
+            typeof value === 'string' && value.includes(`${criteria}`)),
+        });
+        filterOptionsArray.push({
+            field: 'lastinitial',
+            criteria: lastname.value,
+            comparison: (value, criteria): boolean => (value != null && criteria != null &&
+            typeof value === 'string' && value.includes(`${criteria}`)),
+        });
 
-        if (firstname.value != '') {
-            options.push({
-                field: 'firstinitial',
-                comparison: '=',
-                criteria: firstname.value,
-            });
-        }
-
-        if (lastname.value != '') {
-            options.push({
-                field: 'lastinitial',
-                comparison: '=',
-                criteria: lastname.value,
-            });
-        }
-
-        return options;
+        console.log('table_filter computed called: first:', firstname.value, ' last:', lastname.value, ' filterOptionsArray:', filterOptionsArray);
+        return filterOptionsArray;
     });
 
     /**
@@ -399,14 +386,6 @@
         if ((header.value == 'firstinitial') || (header.value == 'lastinitial')) {
             return 'hidden';
         }
-    }
-
-    /**
-     * Collapse selection area
-     */
-    function selectcollapse() {
-
-        collapsed.value = !collapsed.value;
     }
 
     /**
@@ -738,26 +717,6 @@
             window.console.error(error);
             debug.value = error;
         });
-    }
-
-    /**
-     * Firstname/lastname filter selected
-     * @param {*} first
-     * @param {*} last
-     */
-    function filter_selected(first: string, last: string) {
-        if (first == 'all') {
-            first = '';
-        }
-        if (last == 'all') {
-            last = '';
-        }
-        firstname.value = first;
-        lastname.value = last;
-
-        // Reset page
-        //currentpage.value = 1;
-        //get_page_data(itemid.value, groupid.value);
     }
 
     /**
