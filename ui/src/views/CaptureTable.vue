@@ -68,6 +68,7 @@
 
                 <!-- Note. The array 'users' contains the lines of data. One record for each user -->
                 <EasyDataTable
+                    ref="dataTable"
                     alternating
                     :key="datatablekey"
                     :current-page="currentpage"
