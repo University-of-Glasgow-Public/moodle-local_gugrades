@@ -98,7 +98,7 @@
                         </a>
                     </template>
 
-                    <!-- Provisional column -->
+                    <!-- Latest grade column -->
                     <template v-slot:[provisionalslot]="item">
                         <div v-if="item[provisionalid]">
                             <span v-if="item.gradehidden && !item.gradebookhidden" class="border-2 border-yellow-500 border-rounded-md p-1">{{ item[provisionalid] }}</span>
@@ -106,7 +106,6 @@
                             <span v-if="!item.gradebookhidden && !item.gradehidden">{{ item[provisionalid] }}</span>
                         </div>
                     </template>
-
 
                     <!-- switch to input for bulk editing (if selected) -->
                     <template v-slot:[editcolumnslot]="item">
@@ -202,7 +201,7 @@
     import type { Header, Item } from "vue3-easy-data-table";
     import TablePagination from '@/components/Common/TablePagination.vue';
     import TwButton from '@/components/Tailwind/TwButton.vue';
-    import { CircleArrowDown, CircleArrowUp } from '@lucide/vue';
+    import { gradecolors } from '@/js/GradeColors';
     import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
 

@@ -1,24 +1,24 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="mt-5">
-        <LevelOneSelect  @levelchange="levelOneChange" @regulationextra="getregextra"></LevelOneSelect>
-    </div>
+    <div class="border rounded-md mt-4 bg-base-100 border-gray-300 shadow-sm p-4">
+        <div class="mt-5">
+            <LevelOneSelect  @levelchange="levelOneChange" @regulationextra="getregextra"></LevelOneSelect>
+        </div>
 
-    <div class="divider"></div>
+        <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
 
-    <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
-
-    <div v-if="showresitoption && caneditgrades" class="my-2">
-        <button v-if="!configuringresits" type="button" class="btn btn-accent" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
-        <div v-else>
-            <div class="alert alert-primary mb-2" v-html="mstrings['resit_help']"></div>
-            <button type="button" class="btn btn-success" @click="click_finish">{{ mstrings['finish'] }}</button>
+        <div v-if="(showresitoption || engineering) && caneditgrades" class="my-2">
+            <button v-if="!configuringresits" type="button" class="btn btn-accent btn-outline" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
+            <div v-else>
+                <div class="alert alert-primary mb-2" v-html="mstrings['resit_help']"></div>
+                <button type="button" class="btn btn-success btn-outline" @click="click_finish">{{ mstrings['finish'] }}</button>
+            </div>
         </div>
     </div>
 
     <div v-if="loaded && !treeerror">
-        <table id="config_table" class="table table-zebra">
+        <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
             <tbody>
                 <ConfigTree
                     :nodes="activitytree"
@@ -40,7 +40,6 @@
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import ConfigTree from '@/components/Configure/ConfigTree.vue';
     import ConfigError from '@/components/ConfigError.vue';
-    import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import { usePopulateTrees } from '../js/setuptrees.js';
     import { useMstrings } from '@/stores/mstrings.js';
@@ -84,7 +83,6 @@
      */
     function getregextra(regextra: string) {
         engineering.value = regextra == 'Engineering';
-        console.log(regextra);
     }
 
     /**

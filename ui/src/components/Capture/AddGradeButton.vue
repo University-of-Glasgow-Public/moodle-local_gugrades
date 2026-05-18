@@ -194,6 +194,13 @@
     }
 
     /**
+     * Grade has been changed.
+     */
+    function grade_added() {
+        emit('gradeadded');
+    }
+
+    /**
      * The title can be for grade or category
      */
     const buttontitle = computed(() => {
@@ -290,7 +297,7 @@
             }
         )
         .then(() => {
-            emit('gradeadded');
+            grade_added();
             toast.success(mstringstore.getMstring('gradeadded'));
 
             // If the grade was released then we have more stuff to do
@@ -325,7 +332,7 @@
         .then(() => {
 
             // This will be sufficient to re-aggregate and so on.
-            emit('gradeadded');
+            grade_added();
             closemodal();
             toast.success(mstringstore.getMstring('gradesreleased'));
         })
@@ -360,17 +367,15 @@
             }
         )
         .then(() => {
-            emit('gradeadded');
+            grade_added();
             recalculate_user();
             toast.success(mstringstore.getMstring('gradeadded'));
+            closemodal();
         })
         .catch((error) => {
             window.console.error(error);
             debug.value = error;
             closemodal();
         });
-
-        // close the modal
-        closemodal();
     }
 </script>

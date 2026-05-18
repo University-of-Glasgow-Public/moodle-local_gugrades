@@ -98,7 +98,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $data = (object) $data;
         $oldid = $data->id;
         $data->courseid = $this->task->get_courseid();
-        $data->categoryid = 0 - $data->categoryid;
+        $data->categoryid = 0 - $data->gradecategoryid;
         $data->gradeitemid = 0 - $data->gradeitemid;
 
         $DB->insert_record('local_gugrades_resit', $data);

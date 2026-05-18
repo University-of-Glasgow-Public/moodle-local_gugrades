@@ -5,7 +5,7 @@
         <PopoverPanel class="border-2 border-base-300 rounded-md absolute z-999 top-auto bottom-full mb-2 left-1/2 -translate-x-1/2" v-slot="{ close }">
             <ul v-if="props.categoryid == 0" class="menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">
                 <li v-if="caneditgrades" >
-                    <AddGradeButton :itemid="props.itemid" :selectedcategoryid="props.selectedcategoryid" :userid="props.userid" :name="props.name" :itemname="props.itemname" :released="props.released" @gradeadded = "grade_added()" :close="close"></AddGradeButton>
+                    <AddGradeButton :itemid="props.itemid" :selectedcategoryid="props.selectedcategoryid" :userid="props.userid" :name="props.name" :itemname="props.itemname" :released="props.released" @gradeadded="grade_added" :close="close"></AddGradeButton>
                 </li>
                 <li><HistoryButton :userid="props.userid" :itemid="props.itemid" :name="props.name" :itemname="props.itemname" :close="close"></HistoryButton></li>
                 <li v-if="caneditgrades"><HideShowButton :gradehidden="props.gradehidden" :itemid="props.itemid" :userid="props.userid" @changed="grade_added()" :close="close"></HideShowButton></li>
@@ -20,7 +20,7 @@
                     :itemname="props.itemname"
                     :released="props.released"
                     :close="close"
-                    @gradeadded = "grade_added()">
+                    @gradeadded="grade_added">
                 </AddGradeButton></li>
                 <li><HistoryButton :userid="props.userid" :itemid="props.itemid" :name="props.name" :itemname="props.itemname" :close="close"></HistoryButton></li>
                 <li v-if="props.showweights && !props.overridden && caneditgrades"><AlterButton :userid="props.userid" :itemid="props.itemid" :categoryid="props.categoryid" @weightsaltered="grade_added()" :close="close"></AlterButton></li>

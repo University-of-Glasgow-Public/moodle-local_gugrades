@@ -22,6 +22,7 @@
     <template v-for="category in props.nodes.categories" :key="category.id">
         <tr class="pb-2" :class="{ 'bg-light': category.category.even }">
             <td v-if="resitconfig" class="px-2 resit_select">
+                {{ depth }}
                 <ResitCheckbox v-if="!resitfade" :itemid="category.category.itemid" :checkeditemid="resititemid" @checked="resit_clicked" :depth="depth"></ResitCheckbox>
             </td>
             <td :style="indentstyle">
@@ -48,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, inject, computed, onMounted} from 'vue';
+    import {ref, computed, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
     import ConfigTreeIcon from '@/components/Configure/ConfigTreeIcon.vue';
     import ResitCheckbox from '@/components/Configure/ResitCheckbox.vue';
