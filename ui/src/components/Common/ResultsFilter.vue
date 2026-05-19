@@ -63,7 +63,7 @@
         <div class="mt-2 pt-2">
             <TwButton color="secondary" @click="resetFilter()">{{ mstrings['filterreset'] }}</TwButton>
             <TwButton color="primary" @click="applyFilter()">{{ mstrings['filterapply'] }}</TwButton>
-            <TwButton color="warning" @click="showfiltermodal = false">{{ mstrings['cancel'] }}</TwButton>
+            <TwButton color="warning" @click="cancelFilter">{{ mstrings['cancel'] }}</TwButton>
         </div>
     </VueModal>
 
@@ -88,6 +88,8 @@
     const debug = ref({});
     const firstinitial = ref('all');
     const lastinitial = ref('all');
+    const tmpfirstinitial = ref('all');
+    const tmplastinitial = ref('all');
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const showfiltermodal = ref(false);
@@ -123,7 +125,7 @@
             'local_gugrades_get_add_grade_form',
             {
                 gradeitemid: props.itemid,
-                userid: 0,
+                userid: 3908,
             }
         )
         .then((result: any) => {
@@ -148,11 +150,11 @@
      * Process letter selected in one of the bars
      */
     function firstInitialSelected(letter: string) {
-        firstinitial.value = letter;
+        tmpfirstinitial.value = letter;
     }
 
     function lastInitialSelected(letter: string) {
-        lastinitial.value = letter;
+        tmplastinitial.value = letter;
     }
 
     /**
@@ -160,26 +162,37 @@
      */
     function filterButtonClick() {
         showfiltermodal.value = true;
-        //get_gradeoptions();
+        get_gradeoptions();
     }
 
     /**
      * Reset the filters.
      */
     function resetFilter() {
-        firstinitial.value = 'all';
-        lastinitial.value = 'all';
         resetfilter.value = true;
+        tmpfirstinitial.value = 'all';
+        tmplastinitial.value = 'all';
         reset('whichcolumn', '');
         reset('conditions', '');
         reset('columnvalues', '');
     }
 
     /**
-     * Apply the selected filters
+     * Apply the selected filters.
+     * We emit the tmp variable values here and then set the [first|last]initial.
+     * Setting just the [first|last]initial means they 'stick' if the action is 
+     * cancelled and the modal is then reopened, for example.
      */
     function applyFilter() {
-        emit('applyfilter', firstinitial.value, lastinitial.value);
+        emit('applyfilter', tmpfirstinitial.value, tmplastinitial.value);
+        firstinitial.value = tmpfirstinitial.value;
+        lastinitial.value = tmplastinitial.value;
+        showfiltermodal.value = false;
+    }
+
+    function cancelFilter() {
+        tmpfirstinitial.value = firstinitial.value;
+        tmplastinitial.value = lastinitial.value;
         showfiltermodal.value = false;
     }
 </script>

@@ -45,8 +45,6 @@
         firstinitial.value = 'all';
         lastinitial.value = 'all';
         resetfilter.value = false;
-        emit('firstinitialselected', firstinitial.value);
-        emit('lastinitialselected', lastinitial.value);
     });
 
 </script>

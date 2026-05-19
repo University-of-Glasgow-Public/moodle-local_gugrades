@@ -486,6 +486,8 @@
      */
     const headers = computed(() => {
         let heads = [];
+        // MGU-1406 - Filter feature. Ensure this is empty each time, to stop the same items stacking up.
+        filterheaders.value = [];
         if (!usershidden.value) {
             heads.push({text: 'firstinitial', value: 'firstinitial'}),
             heads.push({text: 'lastinitial', value: 'firstinitial'}),
