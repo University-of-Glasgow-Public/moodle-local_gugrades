@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version      = 2026051500;
-$plugin->requires     = 2025100600; // Moodle 5.1.
+$plugin->requires     = 2024100700; // Moodle 4.5.
 $plugin->component    = 'local_gugrades';
 
 $plugin->maturity     = MATURITY_BETA;
