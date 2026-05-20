@@ -303,6 +303,7 @@ $string['mod'] = 'Activity';
 $string['module'] = 'Activity';
 $string['moodlegrade'] = 'Moodle grade';
 $string['mycampusexport'] = 'MyCampus export';
+$string['mygrades'] = 'MyGrades';
 $string['mygradesbeta'] = 'MyGrades (Beta)';
 $string['name'] = 'Name';
 $string['next'] = 'Next...';
