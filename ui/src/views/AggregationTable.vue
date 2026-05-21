@@ -125,11 +125,11 @@
                     <span :class="itemclasses(item[header.value])">
                         <s v-if="item[header.value].dropped">
                             <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                            <span v-else>{{ item[header.value].data }}</span>
+                            <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span>
                         </s>
                         <span v-else>
                             <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                            <span v-else>{{ item[header.value].data }}</span>
+                            <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span>
                         </span>
                     </span>
 
@@ -252,6 +252,7 @@
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import TablePagination from '@/components/Common/TablePagination.vue';
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
+    import { gradecolors } from '@/js/GradeColors';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -326,10 +327,25 @@
             caneditgrades.value = result.hascapability;
         })
         .catch((error) => {
-            window.console.log(error);
+            console.error(error);
             debug.value = error;
         });
-    })
+    });
+
+    /**
+     * Work out the fancy color class for grades
+     */
+    function gradecolorclass(grade: string): string[] {
+        let colorclass: string[] = [];
+        if (grade in gradecolors) {
+            const classes = gradecolors[grade]!;
+            colorclass = ['px-2.5', 'py-0.5', 'rounded-md', 'text-xs', 'font-semibold', 'inline-block'];
+            colorclass.push(classes.bg);
+            colorclass.push(classes.text);
+        }
+
+        return colorclass;
+    }
 
     /**
      * Table name filter

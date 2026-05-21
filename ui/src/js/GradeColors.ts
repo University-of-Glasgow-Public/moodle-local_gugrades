@@ -1,5 +1,5 @@
 
-export const gradecolors =
+export const gradecolors: { [key: string]: { bg: string; text: string } } =
   {
     "A1": { "bg": "bg-green-100",  "text": "text-green-900"  },
     "A2": { "bg": "bg-green-100",  "text": "text-green-800"  },

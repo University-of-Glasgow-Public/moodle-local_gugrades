@@ -46,32 +46,32 @@
 
     const tabs = ref([
         {
-            label: mstrings.value.configure ?? '',
+            label: mstrings.value.configure ?? 'Reassessment management',
             component: ConfigPage,
             icon: MonitorCog,
         },
         {
-            label: mstrings.value.assessmentgradecapture ?? '',
+            label: mstrings.value.assessmentgradecapture ?? 'Assessment grade capture',
             component: CaptureTable,
             icon: Camera,
         },
         {
-            label: mstrings.value.manageconversion ?? '',
+            label: mstrings.value.manageconversion ?? 'Manage conversion maps',
             component: ConversionPage,
             icon: Table
         },
         {
-            label: mstrings.value.coursegradeaggregation ?? '',
+            label: mstrings.value.coursegradeaggregation ?? 'Course grade aggregation',
             component: AggregationTable,
             icon: Calculator
         },
         {
-            label: mstrings.value.auditlog ?? '',
+            label: mstrings.value.auditlog ?? 'Audit log',
             component: AuditPage,
             icon: Shield
         },
         {
-            label: mstrings.value.settings ?? '',
+            label: mstrings.value.settings ?? 'Settings',
             component: SettingsPage,
             icon: Settings2
         },
