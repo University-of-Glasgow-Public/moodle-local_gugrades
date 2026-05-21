@@ -23,5 +23,11 @@ export const gradecolors: { [key: string]: { bg: string; text: string } } =
     "F3": { "bg": "bg-orange-50",  "text": "text-orange-700" },
     "G1": { "bg": "bg-rose-100",   "text": "text-rose-900"   },
     "G2": { "bg": "bg-rose-50",    "text": "text-rose-700"   },
-    "H":  { "bg": "bg-neutral-100","text": "text-neutral-600" }
+    "H":  { "bg": "bg-neutral-100","text": "text-neutral-600" },
+    "A0": { "bg": "bg-green-100",  "text": "text-green-900"  },
+    "B0": { "bg": "bg-teal-100",   "text": "text-teal-900"   },
+    "C0": { "bg": "bg-sky-50",     "text": "text-sky-700"    },
+    "D0": { "bg": "bg-indigo-100", "text": "text-indigo-900" },
+    "E0": { "bg": "bg-amber-100",  "text": "text-amber-900"  },
+    "F0": { "bg": "bg-orange-100", "text": "text-orange-900" },
   };
