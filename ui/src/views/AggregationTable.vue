@@ -179,7 +179,7 @@
             <!-- Releasegrade -->
             <template #item-releasegrade="item">
                 <div v-if="!toplevel">
-                    {{ item.releasegrade }}
+                    <span :class="gradecolorclass(item.releasegrade)">{{ item.releasegrade }}</span>
                     <span v-if="item.mismatch">
                         <br />
                         <span class="badge badge-error mt-1">MISMATCH</span>
@@ -192,7 +192,7 @@
                 <div class="inline-flex items-center gap-1">
                     <div>
                         <span v-if="item.error">{{ item.error }}</span>
-                        <span :class="itemclasses(item)" v-else>{{ item.displaygrade }}</span>
+                        <span :class="itemclasses(item).concat(gradecolorclass(item.displaygrade))" v-else>{{ item.displaygrade }}</span>
                         <span v-if="item.alteredweight">
                             <br />
                             <span class="badge badge-warning mt-1">ALTERED</span>
