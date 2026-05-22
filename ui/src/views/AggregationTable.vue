@@ -125,11 +125,13 @@
                     <span :class="itemclasses(item[header.value])">
                         <s v-if="item[header.value].dropped">
                             <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                            <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span>
+                            <GradeColor v-else :grade="item[header.value].data"></GradeColor>
+                            <!-- <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span> -->
                         </s>
                         <span v-else>
                             <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                            <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span>
+                            <GradeColor v-else :grade="item[header.value].data"></GradeColor>
+                            <!-- <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span> -->
                         </span>
                     </span>
 
@@ -179,7 +181,8 @@
             <!-- Releasegrade -->
             <template #item-releasegrade="item">
                 <div v-if="!toplevel">
-                    <span :class="gradecolorclass(item.releasegrade)">{{ item.releasegrade }}</span>
+                    <GradeColor :grade="item.releasegrade"></GradeColor>
+                    <!--<span :class="gradecolorclass(item.releasegrade)">{{ item.releasegrade }}</span> -->
                     <span v-if="item.mismatch">
                         <br />
                         <span class="badge badge-error mt-1">MISMATCH</span>
@@ -192,7 +195,8 @@
                 <div class="inline-flex items-center gap-1">
                     <div>
                         <span v-if="item.error">{{ item.error }}</span>
-                        <span :class="itemclasses(item).concat(gradecolorclass(item.displaygrade))" v-else>{{ item.displaygrade }}</span>
+                        <GradeColor v-else :grade="item.displaygrade"></GradeColor>
+                        <!-- <span :class="itemclasses(item).concat(gradecolorclass(item.displaygrade))" v-else>{{ item.displaygrade }}</span> -->
                         <span v-if="item.alteredweight">
                             <br />
                             <span class="badge badge-warning mt-1">ALTERED</span>
@@ -252,7 +256,7 @@
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
     import TablePagination from '@/components/Common/TablePagination.vue';
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
-    import { gradecolors } from '@/js/GradeColors';
+    import GradeColor from '@/components/Common/GradeColor.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -331,21 +335,6 @@
             debug.value = error;
         });
     });
-
-    /**
-     * Work out the fancy color class for grades
-     */
-    function gradecolorclass(grade: string): string[] {
-        let colorclass: string[] = [];
-        if (grade in gradecolors) {
-            const classes = gradecolors[grade]!;
-            colorclass = ['px-2.5', 'py-0.5', 'rounded-md', 'text-xs', 'font-semibold', 'inline-block'];
-            colorclass.push(classes.bg);
-            colorclass.push(classes.text);
-        }
-
-        return colorclass;
-    }
 
     /**
      * Table name filter

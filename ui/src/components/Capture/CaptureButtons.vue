@@ -11,6 +11,7 @@
         <ResetAssessmentButton v-if="caneditgrades" :itemid="props.itemid" @reset="emit('refreshtable')"></ResetAssessmentButton>
         <InfoButton :itemid="props.itemid" size="xl"></InfoButton>
         <ReloadButton size="3" @refreshtable="refresh_clicked"></ReloadButton>
+        <HelpButton class="ml-10" title="Help with capture buttons"/>
     </div>
 </template>
 
@@ -25,6 +26,7 @@
     import ReloadButton from '@/components/Capture/ReloadButton.vue';
     import ExportCaptureButton from '@/components/Capture/ExportCaptureButton.vue';
     import ResetAssessmentButton from '@/components/Capture/ResetAssessmentButton.vue';
+    import HelpButton from '../Common/HelpButton.vue';
     import type { IEmitEditColumn } from '@/js/Interfaces';
 
     const props = defineProps({

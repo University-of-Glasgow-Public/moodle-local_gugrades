@@ -109,7 +109,7 @@
 
                     <!-- Template for grade items -->
                     <template v-for="column in columns" v-slot:['item-GRADE'+column.id]="item">
-                        <span :class="gradecolorclass(item['GRADE' + column.id])">{{ item['GRADE' + column.id] }}</span>
+                        <GradeColor :grade="item['GRADE' + column.id]"></GradeColor>
                     </template>
 
                     <!-- switch to input for bulk editing (if selected) -->
@@ -206,7 +206,7 @@
     import type { Header, Item } from "vue3-easy-data-table";
     import TablePagination from '@/components/Common/TablePagination.vue';
     import TwButton from '@/components/Tailwind/TwButton.vue';
-    import { gradecolors } from '@/js/GradeColors';
+    import GradeColor from '@/components/Common/GradeColor.vue';
     import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
 
@@ -287,19 +287,6 @@
             debug.value = error;
         });
     });
-
-    /**
-     * Work out the fancy color class for grades
-     */
-    function gradecolorclass(grade: string) {
-        let colorclass = '';
-        if (grade in gradecolors) {
-            const classes = gradecolors[grade];
-            colorclass = classes?.bg + ' ' + classes?.text + ' px-2.5 py-0.5 rounded-md text-xs font-semibold inline-block';
-        }
-
-        return colorclass;
-    }
 
     /**
      * Page changed by pagination

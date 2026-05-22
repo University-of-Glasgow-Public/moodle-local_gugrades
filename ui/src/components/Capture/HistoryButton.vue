@@ -13,6 +13,11 @@
         <TwAlert v-if="grades.length == 0">{{ mstrings.nohistory }}</TwAlert>
 
         <EasyDataTable v-else :headers="headers" :items="grades">
+
+            <template #item-displaygrade="item">
+                <GradeColor :grade="item.displaygrade"></GradeColor>
+            </template>
+
         </EasyDataTable>
 
         <div class="flex justify-end mt-5">
@@ -30,6 +35,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
+    import GradeColor from '../Common/GradeColor.vue';
 
     interface IHeader {
         text: string;

@@ -98,6 +98,7 @@
     })
 
     onMounted(() => {
+        itemerror.value = false;
         getLevelOne();
         if (selected.value != 0) {
             emit('levelchange', selected.value);
