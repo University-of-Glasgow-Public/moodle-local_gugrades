@@ -2775,4 +2775,28 @@ class api {
         // Check that all latest_grades are up to date.
         \local_gugrades\grades::missing_latest($courseid);
     }
+
+    /**
+     * Get help text
+     * @param string subject
+     * @return string
+     */
+    public static function get_help(string $subject) {
+        global $CFG;
+
+        // Work out what the filename would be
+        $filename = $CFG->dirroot . '/local/gugrades/help/' . $subject . '.html';
+
+        // Does file exist?
+        if (!file_exists($filename)) {
+            throw new \moodle_exception('Help file not found. File path - ' . $filename);
+        }
+
+        // Read file contents.
+        $help = file_get_contents($filename);
+
+        return [
+            'help' => $help,
+        ];
+    }
 }

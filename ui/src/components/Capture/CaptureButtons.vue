@@ -11,7 +11,7 @@
         <ResetAssessmentButton v-if="caneditgrades" :itemid="props.itemid" @reset="emit('refreshtable')"></ResetAssessmentButton>
         <InfoButton :itemid="props.itemid" size="xl"></InfoButton>
         <ReloadButton size="3" @refreshtable="refresh_clicked"></ReloadButton>
-        <HelpButton class="ml-10" title="Help with capture buttons"/>
+        <HelpButton class="ml-10" title="Help with capture buttons" subject="capturebuttons"/>
     </div>
 </template>
 

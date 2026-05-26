@@ -1,6 +1,6 @@
 <template>
     <div class="tooltip" :data-tip="title" v-bind="$attrs">
-        <button class="btn btn-primary btn-circle btn-outline btn-sm" @click="isOpen = true"><CircleQuestionMark :size="18"></CircleQuestionMark></button>
+        <button class="btn btn-primary btn-circle btn-outline btn-sm" @click="click_help"><CircleQuestionMark :size="18"></CircleQuestionMark></button>
     </div>
 
 <!-- HeadlessUI Dialog -->
@@ -58,8 +58,7 @@
               <!-- Body -->
               <div class="px-5 py-4 space-y-3">
                 <slot>
-                  <p class="text-sm text-base-content leading-relaxed">
-                    No help text provided.
+                  <p class="text-sm text-base-content leading-relaxed prose" v-html="help">
                   </p>
                 </slot>
               </div>
@@ -86,17 +85,39 @@
 <script setup lang="ts">
     import { ref } from 'vue';
     import {
-    Dialog,
-    DialogPanel,
-    DialogTitle,
-    TransitionRoot,
-    TransitionChild,
+      Dialog,
+      DialogPanel,
+      DialogTitle,
+      TransitionRoot,
+      TransitionChild,
     } from '@headlessui/vue';
     import { CircleQuestionMark } from '@lucide/vue';
+    import { moodleFetch } from '@/js/moodlefetch';
 
-    defineProps<{
-        title: string
+    const props = defineProps<{
+        title: string,
+        subject: string,
     }>()
 
-    const isOpen = ref(false)
+    const isOpen = ref(false);
+    const help = ref('');
+
+    /**
+     * Click help button
+     */
+    function click_help() {
+        moodleFetch(
+            'local_gugrades_get_help',
+            {
+                subject: props.subject,
+            }
+        )
+        .then((result: any) => {
+            help.value = result.help;
+            isOpen.value = true;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
 </script>

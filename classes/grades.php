@@ -820,6 +820,27 @@ class grades {
     }
 
     /**
+     * Get single current grade record for overwrite, deleting any duplicates.
+     * @param array $params
+     * @return object|false
+     */
+    private static function get_current_grade_record(array $params) {
+        global $DB;
+
+        $records = $DB->get_records('local_gugrades_grade', $params, 'id DESC');
+        if (!$records) {
+            return false;
+        }
+
+        $record = array_shift($records);
+        foreach ($records as $dupe) {
+            $DB->delete_records('local_gugrades_grade', ['id' => $dupe->id]);
+        }
+
+        return $record;
+    }
+
+    /**
      * Write grade to local_gugrades_grade table
      * NOTE: $overwrite means that we don't make multiple copies (for aggregated categories)
      *
@@ -935,7 +956,7 @@ class grades {
                 'columnid' => $column->id,
                 'iscurrent' => 1,
             ];
-            if ($gugrade = $DB->get_record('local_gugrades_grade', $params)) {
+            if ($gugrade = self::get_current_grade_record($params)) {
                 $gugrade->rawgrade = $rawgrade;
                 $gugrade->admingrade = $admingrade;
                 $gugrade->convertedgrade = $convertedgrade;

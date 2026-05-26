@@ -87,6 +87,7 @@ $services = [
             'local_gugrades_regulation_check',
             'local_gugrades_reset_grade_item',
             'local_gugrades_delete_capture_column',
+            'local_gugrades_get_help',
         ],
         'requiredcapability' => 'local/gugrades:view',
         'restrictedusers' => 1,
@@ -456,6 +457,12 @@ $functions = [
         'capabilities' => 'local/gugrades:resetcourse',
         'description' => 'Delete a capture column (and its MyGrades data) for a grade item.',
         'type' => 'write',
+        'ajax' => true,
+    ],
+    'local_gugrades_get_help' => [
+        'classname' => 'local_gugrades\external\get_help',
+        'description' => 'Get the help page for a given subject',
+        'type' => 'read',
         'ajax' => true,
     ],
 ];

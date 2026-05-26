@@ -566,7 +566,7 @@ class aggregation {
         $user->itemname = $gcat->fullname;
 
         // Mismatch (can possibly do better).
-        $released = \local_gugrades\grades::is_grades_released($courseid, $gradecatitem->id);
+        // $released = \local_gugrades\grades::is_grades_released($courseid, $gradecatitem->id);
 
         // Cache result.
         if (!$isunittest) {
@@ -951,7 +951,8 @@ class aggregation {
 
         // Is the category in the cache. If not (re)build
         // (and cache) that part of the category tree.
-        return self::recurse_tree($courseid, $gradecategoryid, false);
+        //return self::recurse_tree($courseid, $gradecategoryid, false);
+
         if (!$isunittest && $gradecategory = $cache->get($cachetag . $gradeitem->id)) {
             return $gradecategory;
         } else {
@@ -973,12 +974,24 @@ class aggregation {
 
             // There can be multiple reasons (which we don't know here), so we'll just mark them
             // all to make our lives easier.
+            $sql = "UPDATE {local_gugrades_grade}
+                SET dropped = 1, normalisedweight = null
+                WHERE gradeitemid = :itemid
+                AND userid = :userid
+                AND iscurrent = 1";
+            $DB->execute($sql, [
+                'itemid' => $itemid,
+                'userid' => $userid,
+            ]);
+
+            /*
             $grades = $DB->get_records('local_gugrades_grade', ['gradeitemid' => $itemid, 'userid' => $userid, 'iscurrent' => 1]);
             foreach ($grades as $grade) {
                 $grade->dropped = 1;
                 $grade->normalisedweight = null;
                 $DB->update_record('local_gugrades_grade', $grade);
             }
+            */
         }
     }
 
@@ -1003,11 +1016,24 @@ class aggregation {
 
             // There can be multiple reasons (which we don't know here), so we'll just mark them
             // all to make our lives easier.
+            $sql = "UPDATE {local_gugrades_grade}
+                SET normalisedweight = :normalisedweight
+                WHERE gradeitemid = :itemid
+                AND userid = :userid
+                AND iscurrent = 1";
+            $DB->execute($sql, [
+                'normalisedweight' => $normalisedweight,
+                'itemid' => $itemid,
+                'userid' => $userid,
+            ]);
+
+            /*
             $grades = $DB->get_records('local_gugrades_grade', ['gradeitemid' => $itemid, 'userid' => $userid, 'iscurrent' => 1]);
             foreach ($grades as $grade) {
                 $grade->normalisedweight = $normalisedweight;
                 $DB->update_record('local_gugrades_grade', $grade);
             }
+            */
         }
     }
 
@@ -1229,14 +1255,21 @@ class aggregation {
                     [$childcategorytotal, $rawgrade, $admingrade, $display, $completion, $error, $notavailable] =
                         $overriddencategory;
                 } else {
-                    [$childcategorytotal, $rawgrade, $admingrade, $display, $completion, $error, $explain, $notavailable] =
-                        self::aggregate_user(
+                    $agg = self::aggregate_user(
                             $courseid,
                             $child,
                             $userid,
                             $level + 1,
                             $skipdroplow
                         );
+                    $childcategorytotal = $agg->total;
+                    $rawgrade = $agg->rawgrade;
+                    $admingrade = $agg->admingrade;
+                    $display = $agg->display;
+                    $completion = $agg->completion;
+                    $error = $agg->error;
+                    $explain = $agg->explain;
+                    $notavailable = $agg->notavailable;
                 }
                 $item = (object)[
                     'itemid' => $child->itemid,
@@ -1331,7 +1364,17 @@ class aggregation {
         ];
         self::write_aggregated_category($courseid, $userid, $aggregatedcategory);
 
-        return [$total, $rawgrade, $admingrade, $display, $completion, $error, $explain, $notavailable];
+        //return [$total, $rawgrade, $admingrade, $display, $completion, $error, $explain, $notavailable];
+        return (object)[
+            'total' => $total,
+            'rawgrade' => $rawgrade,
+            'admingrade' => $admingrade,
+            'display' => $display,
+            'completion' => $completion,
+            'error' => $error,
+            'explain' => $explain,
+            'notavailable' => $notavailable,
+        ];
     }
 
     /**
@@ -1367,7 +1410,7 @@ class aggregation {
 
         // Aggregate this user.
         $aggregatedresult = self::aggregate_user($courseid, $tree, $userid, $level, $skipdroplow);
-        [, , , , , , $explain] = $aggregatedresult;
+        $explain = $aggregatedresult->explain;
 
         return $explain;
     }
