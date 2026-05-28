@@ -2,13 +2,13 @@
      <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div id="managemaps">
-        <TwAlert v-html="mstrings.conversionhelp" class="my-6"></TwAlert>
 
         <!-- show available maps -->
         <div v-if="!editmap && loaded">
-            <TwAlert v-if="!maps.length" color="warning">{{ mstrings.noconversionmaps }}</TwAlert>
+            <TwAlert v-if="!maps.length" color="warning" class="mt-5">{{ mstrings.noconversionmaps }}</TwAlert>
 
             <EasyDataTable
+                class="mt-5"
                 v-if="loaded && maps.length"
                 :headers="headers"
                 :items="maps"
