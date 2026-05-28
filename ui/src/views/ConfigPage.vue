@@ -3,7 +3,7 @@
 
     <div class="border rounded-md mt-4 bg-base-100 border-gray-300 shadow-sm p-4">
         <div class="mt-5">
-            <LevelOneSelect  @levelchange="levelOneChange" @regulationextra="getregextra"></LevelOneSelect>
+            <LevelOneSelect  @levelchange="levelOneChange" @regulation="getregulation"></LevelOneSelect>
         </div>
 
         <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
@@ -17,7 +17,11 @@
         </div>
     </div>
 
-    <div v-if="loaded && !treeerror">
+    <template v-if="loaded && !treeerror && newpage">
+        <CategoryConfig :categoryid="categoryid" :nodes="activitytree"></CategoryConfig>
+    </template>
+
+    <div v-if="loaded && !treeerror && !newpage">
         <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
             <tbody>
                 <ConfigTree
@@ -37,13 +41,14 @@
     import {ref, onMounted} from 'vue';
     import { storeToRefs } from 'pinia';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
+    import LevelOneSelect, { type IRegulationEmit } from '@/components/Common/LevelOneSelect.vue';
     import ConfigTree from '@/components/Configure/ConfigTree.vue';
     import ConfigError from '@/components/ConfigError.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import { usePopulateTrees } from '../js/setuptrees.js';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
+    import CategoryConfig from '@/components/Configure/CategoryConfig.vue';
 
     const categoryid = ref(0);
     const activitytree = ref();
@@ -53,6 +58,7 @@
     const configuringresits = ref(false);
     const caneditgrades = ref(false);
     const engineering = ref(false);
+    const newpage = ref(false);
     const debug = ref({});
     const treeerror = ref('');
     const mstringstore = useMstrings();
@@ -81,8 +87,9 @@
     /**
      * Get regulationextra emmited from Level1Select
      */
-    function getregextra(regextra: string) {
-        engineering.value = regextra == 'Engineering';
+    function getregulation(regulation: IRegulationEmit) {
+        newpage.value = regulation.regulationshort == 'from2026';
+        engineering.value = regulation.regulationextra == 'Engineering';
     }
 
     /**

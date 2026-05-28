@@ -560,6 +560,7 @@ class api {
         return [
             'categories' => $results,
             'erroritems' => $erroritems,
+            'regulationshort' => $regulation->shortname(),
             'regulation' => $regulation->displayname(),
             'regulationextra' => $regulationextra,
         ];

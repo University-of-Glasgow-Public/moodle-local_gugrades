@@ -52,7 +52,13 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
-    const emit = defineEmits(['levelchange', 'regulationextra']);
+    const emit = defineEmits(['levelchange', 'regulation']);
+
+    export interface IRegulationEmit {
+        regulationshort: string;
+        regulation: string;
+        regulationextra: string;
+    }
 
     // Get the top level categories
     function getLevelOne() {
@@ -69,8 +75,12 @@
             notsetup.value = level1categories.value.length == 0;
             itemerror.value = erroritems.value.length > 0;
 
-            // Emit regulation extra to parent component
-            emit('regulationextra', regulationextra.value);
+            // Emit regulation info to parent component
+            emit('regulation', {
+                regulationshort: result.regulationshort,
+                regulation: result.regulation,
+                regulationextra: result.regulationextra
+            });
 
             // If it's already been selected on another tab...
             selected.value = level1store.getvalidcategoryid(level1categories.value);

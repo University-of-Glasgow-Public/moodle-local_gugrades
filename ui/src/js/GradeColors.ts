@@ -30,4 +30,5 @@ export const gradecolors: { [key: string]: { bg: string; text: string } } =
     "D0": { "bg": "bg-indigo-100", "text": "text-indigo-900" },
     "E0": { "bg": "bg-amber-100",  "text": "text-amber-900"  },
     "F0": { "bg": "bg-orange-100", "text": "text-orange-900" },
+    "G0": { "bg": "bg-rose-100",   "text": "text-rose-900"   },
   };

@@ -1,109 +1,181 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwAlert class="mb-2">{{  mstrings.examplevalues }}</TwAlert>
+    <div class="bg-base-100 border border-base-300 rounded-md mt-4 p-6">
 
-    <FormKit v-if="loaded" type="form" submit-label="Save" :disabled="!caneditgrades" @submit="submit_form">
-        <FormKit
-            type="text"
-            outer-class="mb-3"
-            :label="mstrings.conversionmapname"
-            :actions="ordervalidated"
-            :disabled="!caneditgrades"
-            validation-visibility="live"
-            validation="required"
-            name="mapname"
-            v-model="mapname"
-        ></FormKit>
-        <!--
-        <FormKit
-            type="submit"
-            label="Save"
-        />
-        -->
-        <FormKit
-            type="text"
-            outer-class="mb-3"
-            :label="mstrings.maxgrade"
-            :disabled="!caneditgrades"
-            number="float"
-            validation="required|between:0,200"
-            validation-visibility="live"
-            name="maxgrade"
-            v-model="maxgrade"
-        ></FormKit>
-        <FormKit
-            type="select"
-            :label="mstrings.scaletype"
-            :disabled="(props.mapid != 0) || !caneditgrades"
-            name="scaletype"
-            v-model="scaletype"
-            value="schedulea"
-            :options="scaletypeoptions"
-        ></FormKit>
-        <div class="mt-3"></div>
-        <FormKit
-            :label="mstrings.entrytype"
-            v-model="entrytype"
-            type="radio"
-            :options="entrytypeoptions"
-            :disabled="!caneditgrades"
-        ></FormKit>
-        <div class="flex">
-            <div class="w-24 font-bold"><h3>{{ mstrings.band }}</h3></div>
-            <div class="w-60 mr-5 font-bold"><h3>{{ mstrings.percentage}}</h3></div>
-            <div class="w-60 font-bold"><h3>{{ mstrings.points }}</h3></div>
-        </div>
+        <FormKit v-if="loaded" type="form" submit-label="Save" :disabled="!caneditgrades" @submit="submit_form">
 
-        <div  class="flex" v-for="item in items" :key="item.band">
-            <div class="pt-2">
-                <h3 class="w-24">{{  item.band  }}</h3>
-            </div>
-            <div class="w-60 mr-5">
+            <div class="flex gap-2">
+
+                <!-- Map name -->
                 <FormKit
                     type="text"
-                    number="float"
-                    outer-class="mb-3"
-                    :disabled="(entrytype != 'percentage') || (item.band == 'H') || !caneditgrades"
-                    validation="between:0,100"
-                    validation-visibility="blur"
-                    :validation-messages="{
-                        between: 'Percentage must be between 0 and 100',
-                        validate_order: 'Values must be in ascending sequence',
-                    }"
-                    :model-value="item.boundpc?.toString() ?? ''"
-                    @input="(event) => handleInput(item, event)"
+                    outer-class="w-60"
+                    :label="mstrings.conversionmapname"
+                    :actions="ordervalidated"
+                    :disabled="!caneditgrades"
+                    validation-visibility="live"
+                    validation="required"
+                    name="mapname"
+                    v-model="mapname"
                 ></FormKit>
-            </div>
-            <div class="w-60">
+
+                <!-- Max point grade -->
                 <FormKit
                     type="text"
+                    outer-class="w-60"
+                    :label="mstrings.maxgrade"
+                    :disabled="!caneditgrades || (entrytype == 'percentage')"
                     number="float"
-                    outer-class="mb-3"
-                    :disabled="(entrytype != 'points') || (item.band == 'H') || !caneditgrades"
-                    :validation-rules="{ validate_points }"
-                    validation="validate_points|validate_order"
-                    validation-visibility="blur"
-                    :validation-messages="{
-                        validate_points: 'Number must be between 0 and ' + maxgrade,
-                        validate_order: 'Values must be in ascending sequence',
-                    }"
-                    :model-value="item.boundpoints?.toString() ?? ''"
-                    @input="(event) => handleInput(item, event)"
+                    validation="required|between:0,200"
+                    validation-visibility="live"
+                    name="maxgrade"
+                    v-model="maxgrade"
+                ></FormKit>
+
+                <!-- Scale type -->
+                <FormKit
+                    type="select"
+                    outer-class="w-60"
+                    :label="mstrings.scaletype"
+                    :disabled="(props.mapid != 0) || !caneditgrades"
+                    name="scaletype"
+                    v-model="scaletype"
+                    value="schedulea"
+                    :options="scaletypeoptions"
                 ></FormKit>
             </div>
+
+            <div class="mt-3"></div>
+
+            <FormKit
+                class="mb-4"
+                :label="mstrings.entrytype"
+                v-model="entrytype"
+                type="radio"
+                :options="entrytypeoptions"
+                :disabled="!caneditgrades"
+                options-class="flex flex-row gap-4 list-none p-0 m-0"
+                option-class="flex items-center"
+                input-class="appearance-none w-4 h-4 rounded-full border-2 border-solid border-gray-400 mr-2 shrink-0 cursor-pointer checked:border-gray-800 checked:bg-[radial-gradient(circle,_#2C2C2A_40%,_transparent_41%)]"
+                label-class="text-[13px] text-gray-400 cursor-pointer"
+            />
+
+            <div class="divider"></div>
+
+            <div :class="isScheduleA ? 'grid grid-cols-2 gap-x-6' : 'flex flex-col'">
+
+                <!-- Left column -->
+                <div>
+                    <div class="flex">
+                        <div class="w-24 font-bold"><h3>{{ mstrings.band }}</h3></div>
+                        <div class="w-60 mr-5 font-bold"><h3>{{ mstrings.percentage }}</h3></div>
+                        <div class="w-60 font-bold"><h3>{{ mstrings.points }}</h3></div>
+                    </div>
+                    <div  class="flex" v-for="item in leftItems" :key="item.band">
+                        <div class="pt-2">
+                            <h3 class="w-24">
+                                <span :class="item.colorclass"><Circle :size="14" class="lucideFill inline" /></span>
+                                {{  item.band  }}
+                            </h3>
+                        </div>
+                        <div class="w-60 mr-5">
+                            <FormKit
+                                type="text"
+                                number="float"
+                                outer-class="mb-3"
+                                :disabled="(entrytype != 'percentage') || (item.band == 'H') || !caneditgrades"
+                                validation="between:0,100"
+                                validation-visibility="blur"
+                                :validation-messages="{
+                                    between: 'Percentage must be between 0 and 100',
+                                    validate_order: 'Values must be in ascending sequence',
+                                }"
+                                :model-value="item.boundpc?.toString() ?? ''"
+                                @input="(event) => handleInput(item, event)"
+                            ></FormKit>
+                        </div>
+                        <div class="w-60">
+                            <FormKit
+                                type="text"
+                                number="float"
+                                outer-class="mb-3"
+                                :disabled="(entrytype != 'points') || (item.band == 'H') || !caneditgrades"
+                                :validation-rules="{ validate_points }"
+                                validation="validate_points|validate_order"
+                                validation-visibility="blur"
+                                :validation-messages="{
+                                    validate_points: 'Number must be between 0 and ' + maxgrade,
+                                    validate_order: 'Values must be in ascending sequence',
+                                }"
+                                :model-value="item.boundpoints?.toString() ?? ''"
+                                @input="(event) => handleInput(item, event)"
+                            ></FormKit>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right column (Schedule A only) -->
+                <div v-if="isScheduleA">
+                    <div class="flex">
+                        <div class="w-24 font-bold"><h3>{{ mstrings.band }}</h3></div>
+                        <div class="w-60 mr-5 font-bold"><h3>{{ mstrings.percentage }}</h3></div>
+                        <div class="w-60 font-bold"><h3>{{ mstrings.points }}</h3></div>
+                    </div>
+                    <div class="flex" v-for="item in rightItems" :key="item.band">
+                        <div class="pt-2">
+                            <h3 class="w-24">
+                                <span :class="item.colorclass"><Circle :size="14" class="lucideFill inline" /></span>
+                                {{  item.band  }}
+                            </h3>
+                        </div>
+                        <div class="w-60 mr-5">
+                            <FormKit
+                                type="text"
+                                number="float"
+                                outer-class="mb-3"
+                                :disabled="(entrytype != 'percentage') || (item.band == 'H') || !caneditgrades"
+                                validation="between:0,100"
+                                validation-visibility="blur"
+                                :validation-messages="{
+                                    between: 'Percentage must be between 0 and 100',
+                                    validate_order: 'Values must be in ascending sequence',
+                                }"
+                                :model-value="item.boundpc?.toString() ?? ''"
+                                @input="(event) => handleInput(item, event)"
+                            ></FormKit>
+                        </div>
+                        <div class="w-60">
+                            <FormKit
+                                type="text"
+                                number="float"
+                                outer-class="mb-3"
+                                :disabled="(entrytype != 'points') || (item.band == 'H') || !caneditgrades"
+                                :validation-rules="{ validate_points }"
+                                validation="validate_points|validate_order"
+                                validation-visibility="blur"
+                                :validation-messages="{
+                                    validate_points: 'Number must be between 0 and ' + maxgrade,
+                                    validate_order: 'Values must be in ascending sequence',
+                                }"
+                                :model-value="item.boundpoints?.toString() ?? ''"
+                                @input="(event) => handleInput(item, event)"
+                            ></FormKit>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="!ordervalidated" class="alert alert-danger my-3">
+                {{ mstrings.mapnotinorder }}
+            </div>
+        </FormKit>
+
+        <div class="flex justify-end">
+            <TwButton color="warning" @click="cancel_button">{{ mstrings.cancel }}</TwButton>
         </div>
 
-        <div v-if="!ordervalidated" class="alert alert-danger my-3">
-            {{ mstrings.mapnotinorder }}
-        </div>
-    </FormKit>
-
-    <div class="flex justify-end">
-        <TwButton color="warning" @click="cancel_button">{{ mstrings.cancel }}</TwButton>
     </div>
-
-
 </template>
 
 <script setup lang="ts">
@@ -117,13 +189,15 @@
     import type { IConversionMap } from '@/js/Interfaces';
     import type { FormKitNode } from '@formkit/core';
     import TwButton from '../Tailwind/TwButton.vue';
-import TwAlert from '../Tailwind/TwAlert.vue';
+    import { gradecolors } from '@/js/GradeColors';
+    import { Circle } from '@lucide/vue';
 
     interface IBandItem {
         band: string;
         boundpc: number | null;
         boundpoints: number | null;
         grade: number;
+        colorclass: string;
     }
 
     const mstringstore = useMstrings();
@@ -154,6 +228,16 @@ import TwAlert from '../Tailwind/TwAlert.vue';
     });
 
     const emits = defineEmits(['close']);
+
+    const isScheduleA = computed(() => scaletype.value === 'schedulea');
+
+    // Split items array into two columns (or just the left one if ScheduleB)
+    const leftItems = computed(() =>
+        isScheduleA.value ? items.value.slice(0, Math.ceil(items.value.length / 2)) : items.value
+    )
+    const rightItems = computed(() =>
+        isScheduleA.value ? items.value.slice(Math.ceil(items.value.length / 2)) : []
+    )
 
     /**
      * Round values to 5 decimal place
@@ -186,6 +270,7 @@ import TwAlert from '../Tailwind/TwAlert.vue';
                 grade: item.grade,
                 boundpc: ((item.bound !== 0) ? item.bound : null),
                 boundpoints: ((item.bound !== 0) ? precision(item.bound * maxgrade.value / 100, 5) : null),
+                colorclass: gradecolors[item.band]!.text,
             });
         });
     }
@@ -360,6 +445,8 @@ import TwAlert from '../Tailwind/TwAlert.vue';
             rawmap.value = result.map;
 
             build_items();
+            console.log(isScheduleA);
+            console.log(leftItems);
 
             loaded.value = true;
         })
@@ -376,3 +463,9 @@ import TwAlert from '../Tailwind/TwAlert.vue';
         update_map();
     })
 </script>
+
+<style>
+    .lucideFill {
+        fill: currentColor;
+    }
+</style>

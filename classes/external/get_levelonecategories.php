@@ -79,6 +79,7 @@ class get_levelonecategories extends external_api {
                     'itemname' => new external_value(PARAM_TEXT, 'Grade item name'),
                 ])
             ),
+            'regulationshort' => new external_value(PARAM_TEXT, 'Regulation shortname'),
             'regulation' => new external_value(PARAM_TEXT, 'Description of regulations used for this course.'),
             'regulationextra' => new external_value(PARAM_TEXT, 'Additional options applied to regulation (e.g. School)'),
         ]);
