@@ -445,8 +445,6 @@
             rawmap.value = result.map;
 
             build_items();
-            console.log(isScheduleA);
-            console.log(leftItems);
 
             loaded.value = true;
         })
