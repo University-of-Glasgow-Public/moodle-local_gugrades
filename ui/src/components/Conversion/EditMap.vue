@@ -44,6 +44,8 @@
                     value="schedulea"
                     :options="scaletypeoptions"
                 ></FormKit>
+
+                <HelpButton class="ml-10 pt-11" title="Help with editing maps" subject="editmap"/>
             </div>
 
             <div class="mt-3"></div>
@@ -191,6 +193,7 @@
     import TwButton from '../Tailwind/TwButton.vue';
     import { gradecolors } from '@/js/GradeColors';
     import { Circle } from '@lucide/vue';
+    import HelpButton from '../Common/HelpButton.vue';
 
     interface IBandItem {
         band: string;
