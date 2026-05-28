@@ -270,7 +270,7 @@
                 grade: item.grade,
                 boundpc: ((item.bound !== 0) ? item.bound : null),
                 boundpoints: ((item.bound !== 0) ? precision(item.bound * maxgrade.value / 100, 5) : null),
-                colorclass: gradecolors[item.band]!.text,
+                colorclass: gradecolors[item.band]!.dot,
             });
         });
     }
