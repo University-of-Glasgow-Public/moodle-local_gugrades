@@ -90,6 +90,7 @@ $string['close'] = 'Close';
 $string['comment'] = 'Comment';
 $string['completed'] = 'Completed';
 $string['configerror'] = 'MyGrades cannot continue due to configuration error(s) in this grade category';
+$string['configuration'] = 'Configuration';
 $string['configure'] = 'Reassessment management';
 $string['configurereassessments'] = 'Configure reassessments';
 $string['confirm'] = 'Confirm';

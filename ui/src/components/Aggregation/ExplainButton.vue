@@ -7,99 +7,113 @@
 
     <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.explain">
 
+        <template #titlebar>
+            <div class="p-4 font-semibold flex justify-start gap-2 align-middle border-b border-base-300">
+                <CircleAlert :size="14" class="mt-1"/>Grade aggregation explanation
+            </div>
+        </template>
+
         <TwAlert v-if="loading">{{ mstrings.pleasewait }}</TwAlert>
 
         <div v-if="!loading" class="scrollable-content">
 
             <!-- user stuffs -->
-            <div class="flex justify-center items-center mb-8">
-                <div class="flex items-center space-x-2">
-                    <div class="avatar">
-                        <div class="w-12 rounded-full">
-                            <a :href="user!.profileurl" target="_profile">
-                                <img :src="user!.pictureurl" :alt="user!.displayname" class="userpicture defaultuserpic" width="35" height="35"/>
-                            </a>
-                        </div>
+            <div class="flex justify-start gap-4 items-start mb-8 pb-2 border-b border-base-300">
+                <div class="avatar">
+                    <div class="ring-base-300 ring-offset-base-100 w-12 rounded-full ring-2 ring-offset-2">
+                        <a :href="user!.profileurl" target="_profile">
+                            <img :src="user!.pictureurl" :alt="user!.displayname" class="userpicture defaultuserpic" width="35" height="35"/>
+                        </a>
                     </div>
-                    <h1 class="text-lg font-bold">{{ user!.displayname }}</h1>
+                </div>
+                <div>
+                    <div class="text-lg font-bold">{{ user!.displayname }}</div>
+                    <div>{{ mstrings.idnumber }} {{ user!.idnumber }}</div>
                 </div>
             </div>
 
-            <!-- details -->
-            <div class="overflow-x-auto">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th>{{ mstrings.idnumber }}</th>
-                            <td>{{ user!.idnumber }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ mstrings.completed }}</th>
-                            <td>{{ user!.completed }}&percnt;</td>
-                        </tr>
-                        <tr>
-                            <th>{{ mstrings.gradecategory }}</th>
-                            <td>{{ user!.itemname }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ mstrings.aggregatedgrade }}</th>
-                            <td>{{ user!.displaygrade }}</td>
-                        </tr>
-                        <tr v-if="user!.rawgrade">
-                            <th>{{ mstrings.rawgrade }}</th>
-                            <td>{{ user!.rawgrade }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ mstrings.overridden }}</th>
-                            <td><YesNo :yes="user!.overridden"></YesNo></td>
-                        </tr>
-                        <tr v-if="user!.showweights">
-                            <th>{{ mstrings.alteredweights }}</th>
-                            <td><YesNo :yes="user!.alteredweight"></YesNo></td>
-                        </tr>
-                        <tr>
-                            <th>{{ mstrings.strategy }}</th>
-                            <td>{{ user!.strategy }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ mstrings.gradetype }}</th>
-                            <td>{{ user!.formattedatype }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- grade, completed, type -->
+            <div class="flex gap-4 border-b border-base-300 pb-3">
+                <div class="flex-1 text-left">
+                    <div class="uppercase">{{ mstrings.aggregatedgrade }}</div>
+                    <div class="text-info">{{ user!.displaygrade }}</div>
+                </div>
+                <div class="flex-1 pl-4 border-l border-base-300">
+                    <div class="uppercase">{{ mstrings.completed }}</div>
+                    <div class="font-bold">{{ user!.completed }}%</div>
+                </div>
+                <div class="flex-1 pl-4 border-l border-base-300">
+                    <div class="uppercase">{{ mstrings.gradetype }}</div>
+                    <div class="font-bold">{{ user!.formattedatype }}</div>
+                </div>
             </div>
 
-            <!-- component grades -->
-            <div>
-                <h5 class="mt-8">{{ mstrings.grades }}</h5>
-                <table class="table">
-                    <tbody>
-                        <tr v-for="field in user!.fields">
-                            <th>{{ field.fullname }}</th>
-                            <td>
-                                <ul class="list-unstyled">
-                                    <li><b>{{ field.display }}</b></li>
-                                    <li v-if="!field.available">{{ mstrings.notavailable }}</li>
-                                    <li v-if="field.dropped">{{ mstrings.dropped }}</li>
-                                    <li v-if="field.hidden">{{ mstrings.hidden }}</li>
-                                    <li v-if="field.overridden">{{ mstrings.overridden }}</li>
-                                    <li v-if="user!.showweights">{{ mstrings.weight }}: {{ field.weight }}%</li>
-                                    <li v-if="user!.showweights && field.normalisedweight">{{ mstrings.normalisedweight }}: {{ field.normalisedweight }}&percnt;</li>
-                                    <li v-if="user!.showweights && user!.alteredweight">{{ mstrings.alteredweight }}: {{ field.alteredweight }}&percnt;</li>
-                                </ul>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- configuration -->
+            <div class="uppercase my-2">{{ mstrings.configuration }}</div>
+            <div class="grid grid-cols-2 gap-4 mb-6 border-b border-base-300 pb-6 text-sm">
+                <div class="flex justify-between items-end relative">
+                    <div>{{ mstrings.strategy }}</div>
+                    <div class="font-bold">{{ user!.strategy }}</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
+                </div>
+                <div class="flex justify-between items-end relative">
+                    <div>{{ mstrings.gradecategory }}</div>
+                    <div class="font-bold">{{ user!.itemname }}</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
+                </div>
+                <div class="flex justify-between items-end relative">
+                    <div>{{ mstrings.overridden }}</div>
+                    <div class="font-bold"><YesNo :yes="user!.overridden"></YesNo></div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
+                </div>
+                <div class="flex justify-between items-end relative">
+                    <div>{{ mstrings.scale }}</div>
+                    <div class="font-bold">{{ user!.formattedatype }}</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
+                </div>
+            </div>
+
+            <!-- Grades -->
+            <div class="mb-6 border-b border-base-300 pb-6">
+                <div class="uppercase my-2">{{ mstrings.grades }}</div>
+                <div v-for="field in user!.fields" class="bg-warning/50 text-warning-content rounded-md shadow-md mb-2 p-3">
+                    <div class="border-warning border-b pb-2">
+                        <div class="flex justify-between pb-2">
+                            <div class="font-semibold">{{ field.fullname }}</div>
+                            <div class="font-semibold">{{ field.display }}</div>
+                        </div>
+                        <div class="flex justify-start space-x-1">
+                            <div v-if="!field.available" class="badge badge-error">{{ mstrings.notavailable }}</div>
+                            <div v-if="field.dropped" class="badge badge-error">{{ mstrings.dropped }}</div>
+                            <div v-if="field.hidden" class="badge badge-error">{{ mstrings.hidden }}</div>
+                            <div v-if="field.overridden" class="badge badge-error">{{ mstrings.overridden }}</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-start space-x-2 py-2">
+                        <div v-if="user!.showweights">
+                            <div class="text-sm">{{ mstrings.weight }}</div>
+                            <div>{{ field.weight }}&percnt;</div>
+                        </div>
+                        <div v-if="user!.showweights && field.normalisedweight">
+                            <div class="text-sm">{{mstrings.normalisedweight }}</div>
+                            <div>{{ field.normalisedweight }}&percnt;</div>
+                        </div>
+                        <div v-if="user!.showweights && field.alteredweight">
+                            <div class="text-sm">{{mstrings.alteredweight }}</div>
+                            <div>{{ field.alteredweight }}&percnt;</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- explanation -->
-            <div>
-                <h5 class="mt-8">{{ mstrings.explanation }}</h5>
-                <div class="flex justify-center font-bold text-lg">{{ user!.explain }}</div>
+            <div class="alert alert-warning bg-warning/50">
+                {{ user!.explain }}
             </div>
 
-            <TwButton color="warning" @click="closemodal" class="mt-8">{{ mstrings.close }}</TwButton>
+            <div class="flex justify-end">
+                <TwButton color="warning" @click="closemodal" class="mt-8">{{ mstrings.close }}</TwButton>
+            </div>
         </div>
     </VueModal>
 </template>
@@ -113,6 +127,7 @@
     import YesNo from '@/components/YesNo.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import { CircleAlert } from '@lucide/vue';
     import type { IUser } from '@/js/Interfaces';
 
     const showexplainmodal = ref(false);

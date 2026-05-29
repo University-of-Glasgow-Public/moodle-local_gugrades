@@ -2,7 +2,6 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div class="bg-base-100 border border-base-300 rounded-md mt-4 p-6">
-
         <FormKit v-if="loaded" type="form" submit-label="Save" :disabled="!caneditgrades" @submit="submit_form">
 
             <div class="flex gap-2">
@@ -45,7 +44,8 @@
                     :options="scaletypeoptions"
                 ></FormKit>
 
-                <HelpButton class="ml-10 pt-11" title="Help with editing maps" subject="editmap"/>
+                <HelpButton class="mt-11" title="Help with editing maps" subject="editmap"/>
+
             </div>
 
             <div class="mt-3"></div>

@@ -1,6 +1,6 @@
 <template>
     <div class="tooltip" :data-tip="title" v-bind="$attrs">
-        <button class="btn btn-primary btn-circle btn-outline btn-sm" @click="click_help"><CircleQuestionMark :size="18"></CircleQuestionMark></button>
+        <button class="btn btn-primary btn-circle btn-outline btn-sm" @click.prevent="click_help"><CircleQuestionMark :size="18"></CircleQuestionMark></button>
     </div>
 
 <!-- HeadlessUI Dialog -->
@@ -91,7 +91,7 @@
       TransitionRoot,
       TransitionChild,
     } from '@headlessui/vue';
-    import { CircleQuestionMark } from '@lucide/vue';
+    import { CircleQuestionMark, MoveLeft } from '@lucide/vue';
     import { moodleFetch } from '@/js/moodlefetch';
 
     const props = defineProps<{
