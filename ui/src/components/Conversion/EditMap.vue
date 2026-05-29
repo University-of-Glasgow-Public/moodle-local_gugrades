@@ -76,7 +76,7 @@
                     </div>
                     <div  class="flex" v-for="item in leftItems" :key="item.band">
                         <div class="pt-2">
-                            <h3 class="w-24">
+                            <h3 class="w-24 flex items-center">
                                 <span :class="item.colorclass"><Circle :size="14" class="lucideFill inline" /></span>
                                 {{  item.band  }}
                             </h3>

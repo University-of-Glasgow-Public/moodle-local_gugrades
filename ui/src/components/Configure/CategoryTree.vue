@@ -18,10 +18,16 @@
 
 <script setup lang="ts">
     import { onMounted } from 'vue';
-    const props = defineProps<{
-        nodes: object,
-        depth: number,
-    }>();
+    const props = defineProps({
+        nodes: {
+            type: Object,
+            required: true
+        },
+        depth: {
+            type: Number,
+            required: true
+        },
+    });
 
     onMounted(() => {
     })
