@@ -78,7 +78,7 @@
             <!-- Grades -->
             <div class="mb-6 border-b border-base-300 pb-6">
                 <div class="uppercase my-2">{{ mstrings.grades }}</div>
-                <div v-for="field in user!.fields" class="bg-warning/50 text-warning-content rounded-md shadow-md mb-2 px-3 py-1">
+                <div v-for="field in user!.fields" class="bg-warning/20 text-warning-content rounded-md shadow-md mb-2 px-3 py-1">
                     <div class="border-warning border-b pb-1">
                         <div class="flex justify-between pb-1">
                             <div class="font-semibold">{{ field.fullname }}</div>
