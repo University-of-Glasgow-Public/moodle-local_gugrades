@@ -8,8 +8,14 @@
     <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.explain">
 
         <template #titlebar>
-            <div class="p-4 font-semibold flex justify-start gap-2 align-middle border-b border-base-300">
-                <CircleAlert :size="14" class="mt-1"/>Grade aggregation explanation
+            <div class="p-4 font-semibold flex justify-between gap-2 align-middle border-b border-base-300">
+                <div class="flex justify-start gap-2">
+                    <CircleAlert :size="14" class="mt-1"/>
+                    <span>Grade aggregation explanation</span>
+                </div>
+                <div>
+                    <button class="btn btn-outline btn-sm" @click="closemodal"><X :size="18"/></button>
+                </div>
             </div>
         </template>
 
@@ -50,46 +56,42 @@
 
             <!-- configuration -->
             <div class="uppercase my-2">{{ mstrings.configuration }}</div>
-            <div class="grid grid-cols-2 gap-4 mb-6 border-b border-base-300 pb-6 text-sm">
-                <div class="flex justify-between items-end relative">
+            <div class="grid grid-cols-2 gap-4 border-b border-base-300 pb-1.5 text-sm">
+                <div class="">
                     <div>{{ mstrings.strategy }}</div>
                     <div class="font-bold">{{ user!.strategy }}</div>
-                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
                 </div>
-                <div class="flex justify-between items-end relative">
+                <div class="">
                     <div>{{ mstrings.gradecategory }}</div>
                     <div class="font-bold">{{ user!.itemname }}</div>
-                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
                 </div>
-                <div class="flex justify-between items-end relative">
+                <div class="">
                     <div>{{ mstrings.overridden }}</div>
                     <div class="font-bold"><YesNo :yes="user!.overridden"></YesNo></div>
-                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
                 </div>
-                <div class="flex justify-between items-end relative">
+                <div class="">
                     <div>{{ mstrings.scale }}</div>
                     <div class="font-bold">{{ user!.formattedatype }}</div>
-                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-base-300 -mb-1"></div>
                 </div>
             </div>
 
             <!-- Grades -->
             <div class="mb-6 border-b border-base-300 pb-6">
                 <div class="uppercase my-2">{{ mstrings.grades }}</div>
-                <div v-for="field in user!.fields" class="bg-warning/50 text-warning-content rounded-md shadow-md mb-2 p-3">
-                    <div class="border-warning border-b pb-2">
-                        <div class="flex justify-between pb-2">
+                <div v-for="field in user!.fields" class="bg-warning/50 text-warning-content rounded-md shadow-md mb-2 px-3 py-1">
+                    <div class="border-warning border-b pb-1">
+                        <div class="flex justify-between pb-1">
                             <div class="font-semibold">{{ field.fullname }}</div>
                             <div class="font-semibold">{{ field.display }}</div>
                         </div>
                         <div class="flex justify-start space-x-1">
                             <div v-if="!field.available" class="badge badge-error">{{ mstrings.notavailable }}</div>
-                            <div v-if="field.dropped" class="badge badge-error">{{ mstrings.dropped }}</div>
+                            <div v-if="field.dropped || true" class="badge badge-error">{{ mstrings.dropped }}</div>
                             <div v-if="field.hidden" class="badge badge-error">{{ mstrings.hidden }}</div>
                             <div v-if="field.overridden" class="badge badge-error">{{ mstrings.overridden }}</div>
                         </div>
                     </div>
-                    <div class="flex justify-start space-x-2 py-2">
+                    <div class="flex justify-start space-x-2 pt-1">
                         <div v-if="user!.showweights">
                             <div class="text-sm">{{ mstrings.weight }}</div>
                             <div>{{ field.weight }}&percnt;</div>
@@ -127,7 +129,7 @@
     import YesNo from '@/components/YesNo.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
-    import { CircleAlert } from '@lucide/vue';
+    import { CircleAlert, X } from '@lucide/vue';
     import type { IUser } from '@/js/Interfaces';
 
     const showexplainmodal = ref(false);
