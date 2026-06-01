@@ -93,7 +93,7 @@
 
                     <!-- notes -->
                      <template #item-slotnote="item">
-                        <NoteButton />
+                        <NoteButton :userid="item.id" :name="item.displayname" :shortnote="item.shortnote"/>
                      </template>
 
                     <!-- User picture column -->
@@ -518,7 +518,6 @@ import NoteButton from '@/components/Common/NoteButton.vue';
             heads.push({text: mstrings.value['note'], value: "slotnote"});
             heads.push({text: mstrings.value['firstnamelastname'], value: "displayname", sortable: true})
         } else {
-            heads.push({text: mstrings.value['note'], value: "slotnote"});
             heads.push({text: mstrings.value['participant'], value: "displayname", sortable: true});
         }
         heads.push({text: mstrings.value['idnumber'], value: "idnumber", sortable: true});

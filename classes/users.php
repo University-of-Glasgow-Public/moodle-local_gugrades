@@ -25,6 +25,8 @@
 
 namespace local_gugrades;
 
+define('SHORTNAME_LENGTH', 30);
+
 /**
  * Group functions used to manipulate user-related data
  */
@@ -210,7 +212,7 @@ class users {
      * @return object
      */
     public static function add_picture_and_profile_to_user_record(int $courseid, object $user) {
-        global $PAGE;
+        global $PAGE, $DB;
 
         $cache = \cache::make('local_gugrades', 'userpicture');
         if ($pictureurl = $cache->get($user->id)) {
@@ -225,6 +227,13 @@ class users {
         // Also add profile url while we are here.
         $profile = new \moodle_url('/user/view.php', ['course' => $courseid, 'id' => $user->id]);
         $user->profileurl = $profile->out(false);
+
+        // Also add short note
+        if ($noterecord = $DB->get_record('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $user->id])) {
+            $user->shortnote = shorten_text(html_to_text($noterecord->note), SHORTNAME_LENGTH);
+        } else {
+            $user->shortnote = '';
+        }
 
         return $user;
     }

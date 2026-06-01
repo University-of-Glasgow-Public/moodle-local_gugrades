@@ -2800,4 +2800,47 @@ class api {
             'help' => $help,
         ];
     }
+
+    /**
+     * Write user note
+     * @param int $courseid
+     * @param int $userid
+     * @param string $note
+     */
+    public static function write_note(int $courseid, int $userid, string $note) {
+        global $DB;
+
+        if (!$note) {
+            $DB->delete_records('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $userid]);
+            return;
+        }
+
+        if ($noterecord = $DB->get_record('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $userid])) {
+            $noterecord->note = $note;
+            $DB->update_record('local_gugrades_notes', $noterecord);
+        } else {
+            $noterecord = (object)[
+                'courseid' => $courseid,
+                'userid' => $userid,
+                'note' => $note,
+            ];
+            $DB->insert_record('local_gugrades_notes', $noterecord);
+        }
+    }
+
+    /**
+     * Read user note
+     * @param int $courseid
+     * @param int $userid
+     * @return string
+     */
+    public static function read_note(int $courseid, int $userid) {
+        global $DB;
+
+        if ($noterecord = $DB->get_record('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $userid])) {
+            return $noterecord->note;
+        } else {
+            return '';
+        }
+    }
 }

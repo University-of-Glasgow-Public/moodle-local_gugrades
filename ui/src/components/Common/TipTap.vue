@@ -1,28 +1,3 @@
-<script setup lang="ts">
-import { onBeforeUnmount } from 'vue'
-import { useEditor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
-
-const props = defineProps<{
-    modelValue: string
-}>()
-
-const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
-}>()
-
-const editor = useEditor({
-    content: props.modelValue,
-    extensions: [StarterKit],
-    onUpdate: ({ editor }) => {
-        emit('update:modelValue', editor.getHTML())
-    }
-})
-
-onBeforeUnmount(() => {
-    editor.value?.destroy()
-})
-</script>
 
 <template>
     <div class="border border-gray-200 rounded-md overflow-hidden">
@@ -45,7 +20,34 @@ onBeforeUnmount(() => {
         </div>
         <EditorContent
             :editor="editor"
-            class="prose prose-sm max-w-none p-3 min-h-32 focus:outline-none"
+            class="prose prose-sm max-w-none p-1 min-h-32 [&_.ProseMirror]:outline-none"
         />
     </div>
 </template>
+
+<script setup lang="ts">
+    import { onBeforeUnmount } from 'vue'
+    import { useEditor, EditorContent } from '@tiptap/vue-3'
+    import StarterKit from '@tiptap/starter-kit'
+
+    const props = defineProps<{
+        modelValue: string
+    }>();
+
+    const emit = defineEmits<{
+        (e: 'update:modelValue', value: string): void
+    }>();
+
+    const editor = useEditor({
+        content: props.modelValue,
+        extensions: [StarterKit],
+        onUpdate: ({ editor }) => {
+            emit('update:modelValue', editor.getHTML())
+        }
+    });
+
+    onBeforeUnmount(() => {
+        editor.value?.destroy()
+    });
+</script>
+

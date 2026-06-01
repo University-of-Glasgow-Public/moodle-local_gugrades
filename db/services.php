@@ -88,6 +88,8 @@ $services = [
             'local_gugrades_reset_grade_item',
             'local_gugrades_delete_capture_column',
             'local_gugrades_get_help',
+            'local_gugrades_write_note',
+            'local_gugrades_read_note',
         ],
         'requiredcapability' => 'local/gugrades:view',
         'restrictedusers' => 1,
@@ -462,6 +464,18 @@ $functions = [
     'local_gugrades_get_help' => [
         'classname' => 'local_gugrades\external\get_help',
         'description' => 'Get the help page for a given subject',
+        'type' => 'read',
+        'ajax' => true,
+    ],
+    'local_gugrades_write_note' => [
+        'classname' => 'local_gugrades\external\write_note',
+        'description' => 'Write a student note to database',
+        'type' => 'write',
+        'ajax' => true,
+    ],
+    'local_gugrades_read_note' => [
+        'classname' => 'local_gugrades\external\read_note',
+        'description' => 'Read a student note from database',
         'type' => 'read',
         'ajax' => true,
     ],
