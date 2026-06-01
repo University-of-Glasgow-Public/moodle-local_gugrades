@@ -8,6 +8,7 @@
     const props = withDefaults(
     defineProps<{
         grade: string;
+        size?: string;
         otherclasses?: string[];
     }>(),
         {
@@ -22,7 +23,12 @@
         let colorclass: string[] = [];
         if (grade in gradecolors) {
             const classes = gradecolors[grade]!;
-            colorclass = ['px-2.5', 'py-0.5', 'rounded-md', 'text-xs', 'font-semibold', 'inline-block'];
+            colorclass = ['px-2.5', 'py-0.5', 'rounded-md', 'font-semibold', 'inline-block'];
+            if (props.size) {
+                colorclass.push(props.size);
+            } else {
+                colorclass.push('text-sm');
+            }
             colorclass.push(classes.bg);
             colorclass.push(classes.text);
         }

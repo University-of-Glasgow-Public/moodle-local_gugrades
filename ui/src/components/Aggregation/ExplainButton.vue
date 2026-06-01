@@ -42,7 +42,7 @@
             <div class="flex gap-4 border-b border-base-300 pb-3">
                 <div class="flex-1 text-left">
                     <div class="uppercase">{{ mstrings.aggregatedgrade }}</div>
-                    <div class="text-info">{{ user!.displaygrade }}</div>
+                    <div class="text-info"><GradeColor :grade="user!.displaygrade"/></div>
                 </div>
                 <div class="flex-1 pl-4 border-l border-base-300">
                     <div class="uppercase">{{ mstrings.completed }}</div>
@@ -82,11 +82,11 @@
                     <div class="border-warning border-b pb-1">
                         <div class="flex justify-between pb-1">
                             <div class="font-semibold">{{ field.fullname }}</div>
-                            <div class="font-semibold">{{ field.display }}</div>
+                            <div class="font-semibold"><GradeColor :grade="field.display" size="text-lg"/></div>
                         </div>
                         <div class="flex justify-start space-x-1">
                             <div v-if="!field.available" class="badge badge-error">{{ mstrings.notavailable }}</div>
-                            <div v-if="field.dropped || true" class="badge badge-error">{{ mstrings.dropped }}</div>
+                            <div v-if="field.dropped" class="badge badge-error">{{ mstrings.dropped }}</div>
                             <div v-if="field.hidden" class="badge badge-error">{{ mstrings.hidden }}</div>
                             <div v-if="field.overridden" class="badge badge-error">{{ mstrings.overridden }}</div>
                         </div>
@@ -114,7 +114,7 @@
             </div>
 
             <div class="flex justify-end">
-                <TwButton color="warning" @click="closemodal" class="mt-8">{{ mstrings.close }}</TwButton>
+                <TwButton color="warning" @click="closemodal" class="mt-8 font-semibold">{{ mstrings.close }}</TwButton>
             </div>
         </div>
     </VueModal>
@@ -131,6 +131,7 @@
     import TwButton from '../Tailwind/TwButton.vue';
     import { CircleAlert, X } from '@lucide/vue';
     import type { IUser } from '@/js/Interfaces';
+import GradeColor from '../Common/GradeColor.vue';
 
     const showexplainmodal = ref(false);
     const debug = ref({});
@@ -172,6 +173,7 @@
         )
         .then((result: any) => {
             user.value = result;
+            console.log(result);
 
             loading.value = false;
         })

@@ -2070,7 +2070,7 @@ class api {
 
         // Get categories and items at this level.
         // Skip getting users, we don't need them.
-        [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid, true);
+        [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid, false);
 
         // Get user aggregation data.
         $context = \context_course::instance($courseid);
