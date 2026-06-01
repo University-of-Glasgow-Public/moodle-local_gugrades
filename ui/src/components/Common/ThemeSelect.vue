@@ -61,9 +61,9 @@
     const open = ref(false)
 
     function setTheme(theme: string) {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-    open.value = false
+      document.documentElement.setAttribute('data-theme', theme)
+      localStorage.setItem('theme', theme)
+      open.value = false
     }
 
     function toggle() {
@@ -71,17 +71,17 @@
     }
 
     function handleClickOutside(e: MouseEvent) {
-    const el = document.getElementById('theme-dropdown')
-    if (el && !el.contains(e.target as Node)) {
-        open.value = false
-    }
+      const el = document.getElementById('theme-dropdown')
+      if (el && !el.contains(e.target as Node)) {
+          open.value = false
+      }
     }
 
     onMounted(() => {
-    document.addEventListener('click', handleClickOutside)
+      document.addEventListener('click', handleClickOutside)
     })
 
     onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside)
+       document.removeEventListener('click', handleClickOutside)
     })
 </script>
