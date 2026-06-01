@@ -91,6 +91,11 @@
                         <CaptureColumnEditCog v-if="header.editable  && !ineditcellmode && caneditgrades" :header="header" :itemid="itemid" @editcolumn="editcog_clicked" @columnchanged="refresh"></CaptureColumnEditCog>
                     </template>
 
+                    <!-- notes -->
+                     <template #item-slotnote="item">
+                        <NoteButton />
+                     </template>
+
                     <!-- User picture column -->
                     <template #item-slotuserpicture="item">
                         <a :href="item.profileurl" class="avatar">
@@ -209,6 +214,7 @@
     import GradeColor from '@/components/Common/GradeColor.vue';
     import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
+import NoteButton from '@/components/Common/NoteButton.vue';
 
     const users = ref< ICaptureUser[] >([]);
     const userids = ref< number[] >([]);
@@ -509,8 +515,10 @@
             heads.push({text: 'firstinitial', value: 'firstinitial'}),
             heads.push({text: 'lastinitial', value: 'firstinitial'}),
             heads.push({text: mstrings.value['userpicture'], value: "slotuserpicture"});
+            heads.push({text: mstrings.value['note'], value: "slotnote"});
             heads.push({text: mstrings.value['firstnamelastname'], value: "displayname", sortable: true})
         } else {
+            heads.push({text: mstrings.value['note'], value: "slotnote"});
             heads.push({text: mstrings.value['participant'], value: "displayname", sortable: true});
         }
         heads.push({text: mstrings.value['idnumber'], value: "idnumber", sortable: true});

@@ -324,6 +324,7 @@ $string['normalisedweight'] = 'Normalised weight';
 $string['noselectfields'] = 'There are no options for this export type. Click Next... to continue.';
 $string['notallscales'] = 'Cannot aggregate. All grades must first be (converted to) Schedule A or B.';
 $string['notavailable'] = 'Not available';
+$string['note'] = 'Note';
 $string['notes'] = 'Notes';
 $string['nothingtodisplay'] = 'Nothing to display';
 $string['nothingtoimport'] = 'Nothing to import';
