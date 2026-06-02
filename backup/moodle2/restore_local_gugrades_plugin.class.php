@@ -54,6 +54,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $paths[] = new restore_path_element('gugrades_audit', $coursepath . '/gugrades_audits/gugrades_audit');
         $paths[] = new restore_path_element('gugrades_hidden', $coursepath . '/gugrades_hiddens/gugrades_hidden');
         $paths[] = new restore_path_element('gugrades_resit', $coursepath . '/gugrades_resits/gugrades_resit');
+        $paths[] = new restore_path_element('gugrades_note', $coursepath . '/gugrades_notes/gugrades_note');
 
         return $paths;
     }
@@ -222,7 +223,21 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $data->courseid = $this->task->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $DB->insert_record('local_gugrades_hidden', $data);
+        $DB->insert_record('local_gugrades_resitrequired', $data);
+    }
+
+    /**
+     * Process notes
+     * @param array $data
+     */
+    public function process_gugrades_note($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $data->courseid = $this->task->get_courseid();
+        $data->userid = $this->get_mappingid('user', $data->userid);
+
+        $DB->insert_record('local_gugrades_notes', $data);
     }
 
     /**

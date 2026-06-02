@@ -176,6 +176,14 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
             $resits->add_child($resit);
             $resits->set_source_table('local_gugrades_resitrequired', ['courseid' => backup::VAR_COURSEID]);
             $gugrades->add_child($resits);
+
+            // Backup notes
+            $notes = new backup_nested_element('gugrades_notes');
+            $note = new backup_nested_element('gugrades_note', null, ['userid', 'note']);
+            $note->annotate_ids('user', 'userid');
+            $notes->add_child($note);
+            $note->set_source_table('local_gugrades_notes', ['courseid' => backup::VAR_COURSEID]);
+            $gugrades->add_child($notes);
         }
 
         // Finally.

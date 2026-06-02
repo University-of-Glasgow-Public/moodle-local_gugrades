@@ -721,7 +721,6 @@ import NoteButton from '@/components/Common/NoteButton.vue';
             }
         )
         .then((result: any) => {
-            console.log(result);
             const updateduser = add_user_grades(result, columns.value);
 
             // If this seems to have added more columns then do a page reload.
