@@ -38,6 +38,8 @@
         }
     });
 
+    const emits = defineEmits(['updated']);
+
     const noteopen = ref(false);
     const note = ref('');
 
@@ -59,6 +61,9 @@
         moodleFetch('local_gugrades_write_note', {
             userid: props.userid,
             note: note.value,
+        })
+        .then(() => {
+            emits('updated');
         })
         .catch((error) => {
             console.error(error);

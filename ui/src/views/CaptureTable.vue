@@ -93,7 +93,7 @@
 
                     <!-- notes -->
                      <template #item-slotnote="item">
-                        <NoteButton :userid="item.id" :name="item.displayname" :shortnote="item.shortnote"/>
+                        <NoteButton :userid="item.id" :name="item.displayname" :shortnote="item.shortnote" @updated="get_user_data(item.id)"/>
                      </template>
 
                     <!-- User picture column -->
@@ -721,6 +721,7 @@ import NoteButton from '@/components/Common/NoteButton.vue';
             }
         )
         .then((result: any) => {
+            console.log(result);
             const updateduser = add_user_grades(result, columns.value);
 
             // If this seems to have added more columns then do a page reload.
