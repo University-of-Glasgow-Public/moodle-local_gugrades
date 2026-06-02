@@ -161,6 +161,11 @@
                 </a>
             </template>
 
+            <!-- notes -->
+            <template #item-slotnote="item">
+                <NoteButton :userid="item.id" :name="item.displayname" :shortnote="item.shortnote" @updated="grade_changed(item.id)"/>
+            </template>
+
             <!-- Resit required -->
             <template #item-resitrequired="item">
                 <a v-if="caneditgrades" class="cursor-pointer" @click.prevent="resit_clicked(item.id, !item.resitrequired)">
@@ -257,6 +262,7 @@
     import TablePagination from '@/components/Common/TablePagination.vue';
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
     import GradeColor from '@/components/Common/GradeColor.vue';
+    import NoteButton from '@/components/Common/NoteButton.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -533,6 +539,7 @@
         heads.push({text: 'firstinitial', value: 'firstinitial'});
         heads.push({text: 'lastinitial', value: 'firstinitial'});
         heads.push({text: mstringstore.getMstring('userpicture'), value: "slotuserpicture", infocol: true});
+        heads.push({text: mstrings.value['note'], value: "slotnote", infocol: true});
         heads.push({text: mstringstore.getMstring('firstnamelastname'), value: "displayname", sortable: true, infocol: true})
         heads.push({text: mstringstore.getMstring('idnumber'), value: "idnumber", sortable: true, infocol: true});
 
