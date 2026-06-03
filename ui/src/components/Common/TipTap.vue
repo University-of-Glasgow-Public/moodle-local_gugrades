@@ -20,7 +20,7 @@
         </div>
         <EditorContent
             :editor="editor"
-            class="prose prose-sm max-w-none p-1 min-h-32 [&_.ProseMirror]:outline-none"
+            class="prose prose-sm max-w-none p-3 min-h-32 [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-28 [&_.ProseMirror]:cursor-text"
         />
     </div>
 </template>
