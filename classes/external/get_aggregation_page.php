@@ -126,6 +126,7 @@ class get_aggregation_page extends external_api {
                     'lastinitial' => new external_value(PARAM_TEXT, 'Last initial for filtering'),
                     'itemname' => new external_value(PARAM_TEXT, 'Name of grade item'),
                     'pictureurl' => new external_value(PARAM_URL, 'URL of user avatar'),
+                    'shortnote' => new external_value(PARAM_TEXT, 'Shortened note text'),
                     'profileurl' => new external_value(PARAM_URL, 'Like to user profile page'),
                     'idnumber' => new external_value(PARAM_TEXT, 'User ID number'),
                     'resitrequired' => new external_value(PARAM_BOOL, 'Is resit required?'),

@@ -93,7 +93,7 @@
 
                     <!-- notes -->
                      <template #item-slotnote="item">
-                        <NoteButton :userid="item.id" :name="item.displayname" :shortnote="item.shortnote"/>
+                        <NoteButton :userid="item.id" :name="item.displayname" :shortnote="item.shortnote" @updated="get_user_data(item.id)"/>
                      </template>
 
                     <!-- User picture column -->

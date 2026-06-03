@@ -22,6 +22,13 @@ export default defineConfig({
     cssMinify: 'esbuild',
     commonjsOptions: {
       include: [/vue3-easy-data-table/, /node_modules/]
+    },
+    rollupOptions: {
+      output: {
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`
+      }
     }
   },
   optimizeDeps: {
