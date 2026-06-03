@@ -424,7 +424,7 @@ class aggregation {
         // There must be at least one.
         $nitems = count($items);
         if ($nitems == 0) {
-            throw new \moodle_exception('No CATEGORY record found');
+            throw new \moodle_exception('No CATEGORY record found. gradeitemid = ' . $gradeitemid . ' userid = ' . $userid);
         }
 
         // Get the item we are going to return.
@@ -763,7 +763,7 @@ class aggregation {
         } else if ($sumscheduleaweights < ($sumofweights / 2)) {
             $atype = \local_gugrades\GRADETYPE_SCHEDULEB;
         } else {
-            throw new \moodle_exception('Cannot evaluate aggregation type');
+            throw new \moodle_exception('Cannot evaluate aggregation type - atype = ' . $atype);
         }
 
         // If we have decided it's points but a conversion map has been applied,
