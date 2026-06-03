@@ -48,6 +48,7 @@
             userid: props.userid,
         })
         .then((result: any) => {
+            console.log(result);
             note.value = result.note;
         })
         .catch((error) => {

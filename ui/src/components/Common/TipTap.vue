@@ -1,4 +1,3 @@
-
 <template>
     <div class="border border-gray-200 rounded-md overflow-hidden">
         <div v-if="editor" class="flex gap-1 p-2 border-b border-gray-200 bg-gray-50">
@@ -26,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-    import { onBeforeUnmount } from 'vue'
+    import { watch, onBeforeUnmount } from 'vue'
     import { useEditor, EditorContent } from '@tiptap/vue-3'
     import StarterKit from '@tiptap/starter-kit'
 
@@ -46,8 +45,16 @@
         }
     });
 
+    watch(
+        () => props.modelValue,
+        (newValue) => {
+            if (editor.value && newValue !== editor.value.getHTML()) {
+                editor.value.commands.setContent(newValue, false)
+            }
+        }
+    );
+
     onBeforeUnmount(() => {
         editor.value?.destroy()
     });
 </script>
-
