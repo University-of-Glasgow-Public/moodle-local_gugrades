@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+  --font-sans: 'Inter', sans-serif;
+}
+
 @plugin "daisyui/theme" {
   name: "uofg";
   default: true; /* set as default */
