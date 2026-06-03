@@ -45,52 +45,6 @@
         </div>
     </HeadlessModal>
 
-    <!-- modal to show info-->
-    <!--
-    <VueModal v-model="showinfomodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="itemname">
-
-        <div class="overflow-x-auto">
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <th>{{ mstrings['name'] }}</th>
-                        <td v-if="link == ''">{{ itemname }}</td>
-                        <td v-else><a :href="link" target="_blank">{{ itemname }}</a></td>
-                    </tr>
-                    <tr>
-                        <th>{{ mstrings['type'] }}</th>
-                        <td>{{ itemtype }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ mstrings['module'] }}</th>
-                        <td>{{ itemmodule }}</td>
-                    </tr>
-                    <tr v-if="isscale">
-                        <th>{{  mstrings['scale'] }}</th>
-                        <td>{{ scalename }}</td>
-                    </tr>
-                    <tr v-if="!isscale && grademax">
-                        <th>{{ mstrings['maxgrade'] }}</th>
-                        <td>{{ grademax }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ mstrings['weight'] }}</th>
-                        <td>{{  weight }}</td>
-                    </tr>
-                    <tr v-if="categoryerror">
-                        <td colspan="2" class="alert alert-warning">
-                            {{ mstrings['categoryerror'] }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="flex justify-end mt-5">
-            <TwButton color="warning" @click="showinfomodal = false">{{ mstrings['close'] }}</TwButton>
-        </div>
-    </VueModal>
--->
 </template>
 
 <script setup lang="ts">
@@ -98,7 +52,6 @@
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwButton from '@/components/Tailwind/TwButton.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import { Info, MessageCircleWarning } from '@lucide/vue';
