@@ -11,7 +11,42 @@
     <!-- info link -->
     <a v-if="props.text" class="text-primary underline cursor-pointer" @click="info_clicked">{{ props.text }}</a>
 
+    <HeadlessModal :isopen="showinfomodal" @closed="showinfomodal = false">
+        <template #title>
+            <div class="flex justify-start gap-2">
+                <MessageCircleWarning />{{ itemname }}
+            </div>
+        </template>
+
+        <div class="grid grid-cols-2 gap-2">
+            <div class="flex flex-col bg-warning/20 p-2 text-sm rounded">
+                <span class="uppercase">{{ mstrings.type }}</span>
+                <span class="font-bold">{{ itemtype }}</span>
+            </div>
+            <div class="flex flex-col bg-warning/20 p-2 text-sm rounded">
+                <span class="uppercase">{{ mstrings.module }}</span>
+                <span class="font-bold">{{ itemmodule }}</span>
+            </div>
+            <div v-if="isscale" class="flex flex-col bg-warning/20 p-2 text-sm rounded">
+                <span class="uppercase">{{ mstrings.scale }}</span>
+                <span class="font-bold">{{ scalename }}</span>
+            </div>
+            <div v-if="!isscale && grademax" class="flex flex-col bg-warning/20 p-2 text-sm rounded">
+                <span class="uppercase">{{ mstrings.maxgrade }}</span>
+                <span class="font-bold">{{ grademax }}</span>
+            </div>
+            <div class="flex flex-col bg-warning/20 p-2 text-sm rounded">
+                <span class="uppercase">{{ mstrings.weight }}</span>
+                <span class="font-bold">{{ weight }}&percnt;</span>
+            </div>
+            <div v-if="categoryerror" class="col-span-2 bg-warning/20 p-2 text-sm rounded">
+                <span class="text-error">{{ mstrings.categoryerror }}</span>
+            </div>
+        </div>
+    </HeadlessModal>
+
     <!-- modal to show info-->
+    <!--
     <VueModal v-model="showinfomodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="itemname">
 
         <div class="overflow-x-auto">
@@ -55,6 +90,7 @@
             <TwButton color="warning" @click="showinfomodal = false">{{ mstrings['close'] }}</TwButton>
         </div>
     </VueModal>
+-->
 </template>
 
 <script setup lang="ts">
@@ -65,7 +101,8 @@
     import TwButton from '@/components/Tailwind/TwButton.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import { Info } from '@lucide/vue';
+    import { Info, MessageCircleWarning } from '@lucide/vue';
+    import HeadlessModal from '../Tailwind/HeadlessModal.vue';
 
     const showinfomodal = ref(false);
     const itemname = ref('');
