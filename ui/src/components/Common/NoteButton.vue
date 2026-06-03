@@ -8,7 +8,7 @@
 
     <HeadlessModal :isopen="noteopen" @closed="closenote">
         <template #title>
-            {{ props.name }}
+            Note: {{ props.name }}
         </template>
 
         <TipTap v-model="note"></TipTap>
