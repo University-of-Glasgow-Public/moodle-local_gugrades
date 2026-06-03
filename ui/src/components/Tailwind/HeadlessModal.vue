@@ -2,7 +2,7 @@
 
 <!-- HeadlessUI Dialog -->
   <TransitionRoot appear :show="props.isopen" as="template">
-    <Dialog as="div" class="relative z-50" @close="emits('closed')">
+    <Dialog as="div" class="relative z-50" :initial-focus="initialFocusEl" @close="emits('closed')">
 
       <!-- Backdrop -->
       <TransitionChild
@@ -31,6 +31,8 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel class="w-full max-w-md bg-base-100 rounded-xl shadow-xl overflow-hidden">
+
+              <span ref="initialFocusEl" tabindex="-1" class="sr-only" />
 
               <!-- Header -->
               <div class="bg-primary px-5 py-4 flex items-center gap-3">
@@ -88,6 +90,8 @@
       TransitionRoot,
       TransitionChild,
     } from '@headlessui/vue';
+
+    const initialFocusEl = ref<HTMLElement | null>(null);
 
     const props = defineProps<{
         isopen?: boolean;

@@ -1,9 +1,9 @@
 <template>
     <div v-if="props.shortnote" class="tooltip" :data-tip="props.shortnote">
-        <button class="btn btn-warning btn-xs" @click.prevent="opennote"><NotepadText :size="12" /> Note</button>
+        <button class="btn btn-warning btn-xs" @click.stop.prevent="opennote"><NotepadText :size="12" /> Note</button>
     </div>
     <div v-else>
-        <button class="btn btn-xs btn-dash" @click.prevent="opennote"><Plus :size="12" /> Note</button>
+        <button class="btn btn-xs btn-dash" @click.stop.prevent="opennote"><Plus :size="12" /> Note</button>
     </div>
 
     <HeadlessModal :isopen="noteopen" @closed="closenote">
@@ -11,7 +11,7 @@
             Note: {{ props.name }}
         </template>
 
-        <TipTap v-model="note"></TipTap>
+        <textarea v-model="note" class="w-full min-h-32 p-2 border border-gray-200 rounded"></textarea>
 
     </HeadlessModal>
 </template>
@@ -20,7 +20,6 @@
     import { ref } from 'vue';
     import { Plus, NotepadText } from '@lucide/vue';
     import HeadlessModal from '../Tailwind/HeadlessModal.vue';
-    import TipTap from './TipTap.vue';
     import { moodleFetch } from '@/js/moodlefetch';
 
     const props = defineProps({
@@ -42,23 +41,26 @@
 
     const noteopen = ref(false);
     const note = ref('');
+    const editorReady = ref(false);
 
     function opennote() {
         moodleFetch('local_gugrades_read_note', {
-            userid: props.userid,
+            userid: props.userid
         })
         .then((result: any) => {
-            console.log(result);
             note.value = result.note;
+            noteopen.value = true;
+            setTimeout(() => editorReady.value = true, 200);
         })
         .catch((error) => {
             console.error(error);
-        });
-
-        noteopen.value = true;
+        })
     }
 
     function closenote() {
+        editorReady.value = false;
+        noteopen.value = false;
+
         moodleFetch('local_gugrades_write_note', {
             userid: props.userid,
             note: note.value,
@@ -70,6 +72,5 @@
             console.error(error);
         });
 
-        noteopen.value = false;
     }
 </script>

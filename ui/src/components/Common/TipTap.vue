@@ -40,6 +40,7 @@
     const editor = useEditor({
         content: props.modelValue,
         extensions: [StarterKit],
+        autofocus: false,
         onUpdate: ({ editor }) => {
             emit('update:modelValue', editor.getHTML())
         }
