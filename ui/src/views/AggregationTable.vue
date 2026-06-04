@@ -283,6 +283,7 @@
         showweights?: boolean;
         slot?: string;
         weight?: number;
+        atype?: string;
     }
 
     const mstringstore = useMstrings();
@@ -529,33 +530,33 @@
     };
 
     /**
+     * mstring helper
+     */
+    const ms = (key: string): string => mstringstore.getMstring(key) ?? '';
+
+    /**
      * Create list of headers for EasyDataTable
      * (infocol = true, means that the column has no grade data)
      */
-    const headers = computed< IAggregationHeader[] >(() => {
-        let heads = [];
+    const headers = computed<IAggregationHeader[]>(() => {
+        let heads: IAggregationHeader[] = [];
 
         // User identification.
         heads.push({text: 'firstinitial', value: 'firstinitial'});
         heads.push({text: 'lastinitial', value: 'firstinitial'});
-        heads.push({text: mstringstore.getMstring('userpicture'), value: "slotuserpicture", infocol: true});
-        heads.push({text: mstrings.value['note'], value: "slotnote", infocol: true});
-        heads.push({text: mstringstore.getMstring('firstnamelastname'), value: "displayname", sortable: true, infocol: true})
-        heads.push({text: mstringstore.getMstring('idnumber'), value: "idnumber", sortable: true, infocol: true});
+        heads.push({text: ms('userpicture'), value: "slotuserpicture", infocol: true});
+        heads.push({text: mstrings.value['note'] ?? '', value: "slotnote", infocol: true});
+        heads.push({text: ms('firstnamelastname'), value: "displayname", sortable: true, infocol: true});
+        heads.push({text: ms('idnumber'), value: "idnumber", sortable: true, infocol: true});
 
-        // 'Back' button column on everything but "top level"
         if (!toplevel.value) {
-            heads.push({
-                text: '??', // Dealt with by template
-                value: "back", // Fake
-            });
+            heads.push({text: '??', value: "back"});
         }
 
-        // Grade categories and items.
         columns.value.forEach(column => {
             heads.push({
                 gradeitemid: column.gradeitemid,
-                text: column.shortname,
+                text: column.shortname ?? '',   // <-- also guard this if it can be undefined
                 value: column.fieldname,
                 slot: 'item-' + column.fieldname,
                 weight: column.weight,
@@ -571,44 +572,28 @@
             });
         });
 
-        // Items that only display on "top level" page.
         if (toplevel.value) {
+            heads.push({text: ms('resitrequired'), value: "resitrequired", infocol: true});
 
-            // Resit required?
-            heads.push({
-                text: mstringstore.getMstring('resitrequired'),
-                value: "resitrequired",
-                infocol: true,
-            });
-
-            // Completion %age
             if (completionused.value) {
-                heads.push({
-                    text: mstringstore.getMstring('completed'),
-                    value: "completed",
-                    infocol: true,
-                });
+                heads.push({text: ms('completed'), value: "completed", infocol: true});
             }
 
-            // Total.
             heads.push({
-                text: mstringstore.getMstring('coursetotal'),
+                text: ms('coursetotal'),
                 value: "total",
                 infocol: true,
                 strategy: strategy.value,
                 excludeempty: excludeempty.value,
             });
         } else {
-
-            // Build up strategy text including conversion applied
             let headerstrategy = strategy.value;
             if (conversion.value) {
                 headerstrategy = headerstrategy + ' by ' + conversion.value;
             }
 
-            // Sub-category total
             heads.push({
-                text: mstringstore.getMstring('subcattotal'),
+                text: ms('subcattotal'),
                 atype: atype.value,
                 grademax: 100,
                 value: "total",
@@ -617,13 +602,8 @@
             });
         }
 
-        // Released grade (not shown for grand total)
         if (released.value && !toplevel.value) {
-            heads.push({
-                text: mstringstore.getMstring('released'),
-                value: 'releasegrade',
-                infocol: true,
-            });
+            heads.push({text: ms('released'), value: 'releasegrade', infocol: true});
         }
 
         return heads;
