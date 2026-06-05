@@ -5,6 +5,9 @@
     </button>
 
     <HeadlessModal :isopen="showfiltermodal" @closed="filterclose">
+        <template #title>
+            {{ mstrings.filterbyname }}
+        </template>
         <NameFilter @selected="selected"></NameFilter>
     </HeadlessModal>
 

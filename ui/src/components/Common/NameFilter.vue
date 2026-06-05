@@ -6,11 +6,6 @@
                 <InitialBar :selected="lastname" :label="mstrings.lastname" @selected="last_selected"></InitialBar>
             </div>
         </div>
-        <!--
-        <div v-if="showreset">
-            <button class="btn btn-primary btn-small" @click="reset_filter">{{ mstrings.resetfilter }}</button>
-        </div>
-        -->
     </div>
 </template>
 
