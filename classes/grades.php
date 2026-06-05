@@ -1537,6 +1537,7 @@ class grades {
         $DB->delete_records('local_gugrades_map_item', ['gradeitemid' => $gradeitemid]);
         $DB->delete_records('local_gugrades_latest', ['gradeitemid' => $gradeitemid]);
         $DB->delete_records('local_gugrades_resit', ['gradeitemid' => $gradeitemid]);
+        $DB->delete_records('local_gugrades_notes', ['gradeitemid' => $gradeitemid]);
 
         \local_gugrades\aggregation::invalidate_cache($courseid);
     }

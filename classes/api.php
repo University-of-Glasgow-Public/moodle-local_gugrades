@@ -1800,6 +1800,9 @@ class api {
         // Delete resits.
         $DB->delete_records('local_gugrades_resit', ['courseid' => $courseid]);
 
+        // Delete notes
+        $DB->delete_records('local_gugrades_notes', ['courseid' => $courseid]);
+
         // As this will be a rarely used function we will take the liberty of purging the caches.
         self::reset_all_caches();
     }
