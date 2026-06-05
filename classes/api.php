@@ -1804,7 +1804,7 @@ class api {
         self::reset_all_caches();
     }
 
-        /**
+    /**
      * Reset MyGrades data for a single assessment (grade item)
      * @param int $courseid
      * @param int $gradeitemid
@@ -1819,6 +1819,11 @@ class api {
         $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
 
         \local_gugrades\grades::delete_grade_item($courseid, $gradeitemid);
+
+        // Purge caches so stale grade data is not shown after reset (same as course reset).
+        self::reset_all_caches();
+        self::reset_bulk_data($courseid);
+
         self::recalculate($courseid, $gradecategoryid);
     }
 
