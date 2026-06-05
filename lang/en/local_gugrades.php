@@ -73,6 +73,7 @@ $string['cachedef_gradeitems'] = 'Grade item info when building aggregation tree
 $string['cachedef_progress'] = 'Cache current progress of long-running activities';
 $string['cachedef_provisionalgrade'] = 'Cache MyGrades provisional grades.';
 $string['cachedef_useraggdata'] = 'Cache MyGrades aggregated user data.';
+$string['cachedef_userpicture'] = 'Cache MyGrades user picture.';
 $string['cancel'] = 'Cancel';
 $string['cannotaggregate'] = 'Cannot aggregate';
 $string['captureaggregation'] = '\'MyGrades\' Grade capture and aggregation';
