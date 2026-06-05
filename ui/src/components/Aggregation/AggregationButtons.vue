@@ -10,6 +10,7 @@
             @released="refreshtable"
         ></ReleaseCategoryButton>
         <ExportAggregationButton v-if="props.toplevel" :categoryid="props.categoryid" :groupid="props.groupid"></ExportAggregationButton>
+        <NameFilterButton :usershidden="false" ></NameFilterButton>
     </div>
 </template>
 
@@ -18,6 +19,7 @@
     import ConversionButton from '@/components/Aggregation/ConversionButton.vue';
     import ReleaseCategoryButton from '@/components/Aggregation/ReleaseCategoryButton.vue';
     import ExportAggregationButton from '@/components/Aggregation/ExportAggregationButton.vue';
+    import NameFilterButton from '../Common/NameFilterButton.vue';
 
     const props = defineProps({
         categoryid: Number,

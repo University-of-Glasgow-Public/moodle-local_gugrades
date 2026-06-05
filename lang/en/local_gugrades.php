@@ -192,6 +192,7 @@ $string['exportfilename'] = 'Export filename (.csv)';
 $string['exportworksheet'] = 'Export worksheet';
 $string['fillns'] = 'Import as NS - No submission';
 $string['fillns0'] = 'Import as NS0 - No submission (0 grade)';
+$string['filterbyname'] = 'Filter by name';
 $string['finish'] = 'Finish';
 $string['firstname'] = 'First name';
 $string['firstnamelastname'] = 'Firstname / lastname';

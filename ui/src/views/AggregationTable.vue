@@ -34,9 +34,6 @@
 
     <div v-if="level1category && aggregationsupported" class="mt-2">
 
-        <!-- Filter on initials -->
-        <NameFilter @selected="filter_selected" ref="namefilterref"></NameFilter>
-
         <!-- Breadcrumb trail -->
         <div v-if="breadcrumb.length > 1" class="my-3 overflow-visible">
             <div class="breadcrumbs text-sm p-2 rounded-box border border-primary/50 bg-primary/20 text-primary shadow-sm tooltip-open">
@@ -63,7 +60,7 @@
         <EasyDataTable
             v-if="!loading"
             alternating
-            :key="datatablekey"
+            buttons-pagination
             :current-page="currentpage"
             sort-by="displayname"
             sort-type="asc"
@@ -228,15 +225,6 @@
                 </div>
             </template>
 
-            <!-- Override pagination -->
-            <template #pagination>
-                <TablePagination
-                    :rowsPerPage="rowsperpage"
-                    :rowsCount="users.length"
-                    :startPage="currentpage"
-                    @pagechange="page_changed"
-                ></TablePagination>
-            </template>
         </EasyDataTable>
     </div>
 </template>
@@ -253,7 +241,6 @@
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import AggregationButtons from '@/components/Aggregation/AggregationButtons.vue';
     import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
-    import DismissableAlert from '@/components/Common/DismissableAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { ArrowBigRight, ArrowBigLeft, FolderOpen } from '@lucide/vue';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning, IError } from '@/js/Interfaces';
@@ -263,6 +250,7 @@
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
     import GradeColor from '@/components/Common/GradeColor.vue';
     import NoteButton from '@/components/Common/NoteButton.vue';
+    import { useFilter } from '@/stores/filter';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -317,11 +305,11 @@
     const released = ref(false);
     const showweights = ref(false);
     const excludeempty = ref(false);
-    const firstname = ref('');
-    const lastname = ref('');
     const staffuserid = ref(0);
     const caneditgrades = ref(false);
     const completionused = ref(false);
+    const filterstore = useFilter();
+    const { firstname, lastname } = storeToRefs( filterstore );
 
     /**
      * onMounted, get write grades capability
@@ -346,10 +334,10 @@
     /**
      * Table name filter
      */
-     const table_filter = computed(() => {
+    const table_filter = computed(() => {
         const options = [];
 
-        if (firstname.value != '') {
+        if (firstname.value != 'all') {
             options.push({
                 field: 'firstinitial',
                 comparison: '=',
@@ -357,7 +345,7 @@
             });
         }
 
-        if (lastname.value != '') {
+        if (lastname.value != 'all') {
             options.push({
                 field: 'lastinitial',
                 comparison: '=',
@@ -365,7 +353,7 @@
             });
         }
 
-        return options;
+        return options.length ? options : null;
     });
 
     /**
@@ -608,26 +596,6 @@
 
         return heads;
     });
-
-    /**
-     * Firstname/lastname filter selected
-     * @param {*} first
-     * @param {*} last
-     */
-     function filter_selected(first: string, last: string) {
-        if (first == 'all') {
-            first = '';
-        }
-        if (last == 'all') {
-            last = '';
-        }
-        firstname.value = first;
-        lastname.value = last;
-
-        // Reset page
-        //currentpage.value = 1;
-        //table_update();
-    }
 
     /**
      * Update single user (when something changes)

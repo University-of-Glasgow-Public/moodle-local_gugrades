@@ -50,7 +50,7 @@
 
 
         <div v-if="itemid && gradesupported" class="mt-2">
-            <NameFilter v-if="!usershidden" @selected="filter_selected" ref="namefilterref"></NameFilter>
+            <!-- <NameFilter v-if="!usershidden" @selected="filter_selected" ref="namefilterref"></NameFilter> -->
 
             <!-- Please wait spinner -->
             <PleaseWait v-if="!loaded"></PleaseWait>
@@ -66,7 +66,7 @@
                 <!-- Note. The array 'users' contains the lines of data. One record for each user -->
                 <EasyDataTable
                     alternating
-                    :key="datatablekey"
+                    buttons-pagination
                     :current-page="currentpage"
                     sort-by="displayname"
                     sort-type="asc"
@@ -82,6 +82,7 @@
                     :rows-per-page="rowsperpage"
                     :rows-items="[25,50,100,250]"
                     :style="{ overflow: 'visible' }"
+                    ref="dataTable"
                     >
 
                     <!-- add header text and edit cog next to cell if required -->
@@ -169,14 +170,8 @@
                     </template>
 
                     <!-- Override pagination if bulk editing -->
-                    <template #pagination>
-                        <span v-if="ineditcellmode">{{ mstrings['pleasesavefirst'] }}</span>
-                        <TablePagination v-else
-                            :rowsPerPage="rowsperpage"
-                            :rowsCount="users.length"
-                            :startPage="currentpage"
-                            @pagechange="page_changed"
-                        ></TablePagination>
+                    <template v-if="ineditcellmode" #pagination>
+                        <span>{{ mstrings['pleasesavefirst'] }}</span>
                     </template>
                 </EasyDataTable>
 
@@ -193,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, watch, onMounted} from 'vue';
+    import {ref, computed, watch, onMounted, nextTick } from 'vue';
     import { storeToRefs } from 'pinia';
     import NameFilter from '@/components/Common/NameFilter.vue';
     import CaptureSelect from '@/components/Capture/CaptureSelect.vue';
@@ -214,7 +209,8 @@
     import GradeColor from '@/components/Common/GradeColor.vue';
     import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
-import NoteButton from '@/components/Common/NoteButton.vue';
+    import NoteButton from '@/components/Common/NoteButton.vue';
+    import { useFilter } from '@/stores/filter';
 
     const users = ref< ICaptureUser[] >([]);
     const userids = ref< number[] >([]);
@@ -225,6 +221,7 @@ import NoteButton from '@/components/Common/NoteButton.vue';
     const currentpage = ref(1);
     const rowsperpage = ref(25);
     const datatablekey = ref(1);
+    const filterkey = ref(0);
     const usershidden = ref(false);
     const namefilterref = ref(null);
     const itemtype = ref('');
@@ -259,8 +256,6 @@ import NoteButton from '@/components/Common/NoteButton.vue';
     const provisionalid = ref('');
     const showcsvimport = ref(true);
     const debug = ref({});
-    const firstname = ref('');
-    const lastname = ref('');
     const staffuserid = ref(0);
     const collapseclasses = ref(['collapse', 'show']);
     const caneditgrades = ref(false);
@@ -269,10 +264,9 @@ import NoteButton from '@/components/Common/NoteButton.vue';
     const { mstrings } = storeToRefs( mstringstore );
     // pagination related.
     const dataTable = ref();
-    const props = {
-        dataTable: dataTable,
-    }
     const {monochrome, updateLogo} = useLogo();
+    const filterstore = useFilter();
+    const { firstname, lastname } = storeToRefs( filterstore );
 
     /**
      * onMounted, get write grades capability
@@ -300,6 +294,9 @@ import NoteButton from '@/components/Common/NoteButton.vue';
     function page_changed(newpage: number) {
         currentpage.value = newpage;
         datatablekey.value++;
+        nextTick(() => {
+            filterkey.value++;
+        });
     }
 
     /**
@@ -309,6 +306,9 @@ import NoteButton from '@/components/Common/NoteButton.vue';
         rowsperpage.value = rows.length;
         currentpage.value = 1;
         datatablekey.value++;
+        nextTick(() => {
+            filterkey.value++;
+        });
     }
 
     /**
@@ -317,7 +317,7 @@ import NoteButton from '@/components/Common/NoteButton.vue';
     const table_filter = computed(() => {
         const options = [];
 
-        if (firstname.value != '') {
+        if (firstname.value != 'all') {
             options.push({
                 field: 'firstinitial',
                 comparison: '=',
@@ -325,7 +325,7 @@ import NoteButton from '@/components/Common/NoteButton.vue';
             });
         }
 
-        if (lastname.value != '') {
+        if (lastname.value != 'all') {
             options.push({
                 field: 'lastinitial',
                 comparison: '=',
@@ -333,7 +333,7 @@ import NoteButton from '@/components/Common/NoteButton.vue';
             });
         }
 
-        return options;
+        return options.length ? options : null;
     });
 
     /**
@@ -513,7 +513,7 @@ import NoteButton from '@/components/Common/NoteButton.vue';
         let heads = [];
         if (!usershidden.value) {
             heads.push({text: 'firstinitial', value: 'firstinitial'}),
-            heads.push({text: 'lastinitial', value: 'firstinitial'}),
+            heads.push({text: 'lastinitial', value: 'lastinitial'}),
             heads.push({text: mstrings.value['userpicture'], value: "slotuserpicture"});
             heads.push({text: mstrings.value['note'], value: "slotnote"});
             heads.push({text: mstrings.value['firstnamelastname'], value: "displayname", sortable: true})
@@ -739,26 +739,6 @@ import NoteButton from '@/components/Common/NoteButton.vue';
             window.console.error(error);
             debug.value = error;
         });
-    }
-
-    /**
-     * Firstname/lastname filter selected
-     * @param {*} first
-     * @param {*} last
-     */
-    function filter_selected(first: string, last: string) {
-        if (first == 'all') {
-            first = '';
-        }
-        if (last == 'all') {
-            last = '';
-        }
-        firstname.value = first;
-        lastname.value = last;
-
-        // Reset page
-        //currentpage.value = 1;
-        //get_page_data(itemid.value, groupid.value);
     }
 
     /**

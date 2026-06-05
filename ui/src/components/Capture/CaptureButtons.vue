@@ -9,6 +9,7 @@
         <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" @converted="emit('refreshtable')"></ConversionButton>
         <ExportCaptureButton :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :revealnames="revealnames"></ExportCaptureButton>
         <ResetAssessmentButton v-if="caneditgrades" :itemid="props.itemid" @reset="emit('refreshtable')"></ResetAssessmentButton>
+        <NameFilterButton :usershidden="props.usershidden" ></NameFilterButton>
         <InfoButton :itemid="props.itemid" size="xl"></InfoButton>
         <ReloadButton size="3" @refreshtable="refresh_clicked"></ReloadButton>
         <HelpButton class="ml-10" title="Help with capture buttons" subject="capturebuttons"/>
@@ -28,6 +29,7 @@
     import ResetAssessmentButton from '@/components/Capture/ResetAssessmentButton.vue';
     import HelpButton from '../Common/HelpButton.vue';
     import type { IEmitEditColumn } from '@/js/Interfaces';
+    import NameFilterButton from '../Common/NameFilterButton.vue';
 
     const props = defineProps({
         loaded: {
