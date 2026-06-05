@@ -1,30 +1,66 @@
 <template>
-
-    <div class="flex flex-wrap gap-1 mb-2">
-        <div class="w-24">
+    <div class="flex flex-col gap-1 mb-2">
+        <!-- Title row -->
+        <div class="font-semibold uppercase">
             {{ label }}
         </div>
-        <button
-            v-for="letter in letters"
-            :key="letter"
-            class="px-1 btn border rounded font-mono"
-            :class="{
-                'btn-primary': selected?.toLowerCase() === letter.toLowerCase(),
-                'btn-outline btn-secondary': selected?.toLowerCase() !== letter.toLowerCase()
-            }"
-            @click="letterclicked(letter)"
+
+        <!-- ALL button -->
+        <div class="flex">
+            <button
+                class="px-2 btn border rounded font-mono"
+                :class="{
+                    'btn-primary': selected?.toLowerCase() === 'all',
+                    'btn-outline btn-secondary': selected?.toLowerCase() !== 'all'
+                }"
+                @click="letterclicked('ALL')"
             >
-            {{ letter }}
-        </button>
+                ALL
+            </button>
+        </div>
+
+        <!-- Alphabet row 1: A–M -->
+        <div class="flex flex-wrap gap-1">
+            <button
+                v-for="letter in lettersFirstHalf"
+                :key="letter"
+                class="px-1 btn border rounded font-mono"
+                :class="{
+                    'btn-primary': selected?.toLowerCase() === letter.toLowerCase(),
+                    'btn-outline btn-secondary': selected?.toLowerCase() !== letter.toLowerCase()
+                }"
+                @click="letterclicked(letter)"
+            >
+                {{ letter }}
+            </button>
+        </div>
+
+        <!-- Alphabet row 2: N–Z -->
+        <div class="flex flex-wrap gap-1">
+            <button
+                v-for="letter in lettersSecondHalf"
+                :key="letter"
+                class="px-1 btn border rounded font-mono"
+                :class="{
+                    'btn-primary': selected?.toLowerCase() === letter.toLowerCase(),
+                    'btn-outline btn-secondary': selected?.toLowerCase() !== letter.toLowerCase()
+                }"
+                @click="letterclicked(letter)"
+            >
+                {{ letter }}
+            </button>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import {ref, watch } from 'vue';
+    import { ref, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
 
-    const letters = ['ALL', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const lettersFirstHalf  = alphabet.slice(0, 13);  // A–M
+    const lettersSecondHalf = alphabet.slice(13);      // N–Z
 
     const props = defineProps({
         'label': String,
@@ -35,11 +71,11 @@
 
     const activeletter = ref('all');
     const mstringstore = useMstrings();
-    const { mstrings } = storeToRefs( mstringstore );
+    const { mstrings } = storeToRefs(mstringstore);
 
     function letterclicked(letter: string) {
         if (letter) {
-            activeletter.value = letter == 'ALL' ? 'all' : letter;
+            activeletter.value = letter === 'ALL' ? 'all' : letter;
             emit('selected', activeletter.value);
         }
     }
@@ -49,5 +85,5 @@
             activeletter.value = selected;
             emit('selected', activeletter.value);
         }
-    })
+    });
 </script>

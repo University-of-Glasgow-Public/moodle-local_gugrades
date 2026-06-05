@@ -50,7 +50,6 @@
 
 
         <div v-if="itemid && gradesupported" class="mt-2">
-            <!-- <NameFilter v-if="!usershidden" @selected="filter_selected" ref="namefilterref"></NameFilter> -->
 
             <!-- Please wait spinner -->
             <PleaseWait v-if="!loaded"></PleaseWait>
