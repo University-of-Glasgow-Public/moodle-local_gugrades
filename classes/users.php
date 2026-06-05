@@ -194,12 +194,13 @@ class users {
     /**
      * Add pictures to user records
      * @param int $courseid
+     * @param int $gradeitemid
      * @param array $users
      * @return array
      */
-    public static function add_pictures_and_profiles_to_user_records(int $courseid, array $users) {
+    public static function add_pictures_and_profiles_to_user_records(int $courseid, int $gradeitemid, array $users) {
         foreach ($users as $id => $user) {
-            $users[$id] = self::add_picture_and_profile_to_user_record($courseid, $user);
+            $users[$id] = self::add_picture_and_profile_to_user_record($courseid, $gradeitemid, $user);
         }
 
         return $users;
@@ -207,11 +208,13 @@ class users {
 
     /**
      * Add picture to single user record
+     * $gradeitemid can be 0 and so an empty note is returned
      * @param int $courseid
+     * @param int $gradeitemid
      * @param object $user
      * @return object
      */
-    public static function add_picture_and_profile_to_user_record(int $courseid, object $user) {
+    public static function add_picture_and_profile_to_user_record(int $courseid, int $gradeitemid, object $user) {
         global $PAGE, $DB;
 
         $cache = \cache::make('local_gugrades', 'userpicture');
@@ -229,7 +232,12 @@ class users {
         $user->profileurl = $profile->out(false);
 
         // Also add short note
-        if ($noterecord = $DB->get_record('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $user->id])) {
+        $params = [
+            'courseid' => $courseid,
+            'gradeitemid' => $gradeitemid,
+            'userid' => $user->id,
+        ];
+        if ($gradeitemid && $noterecord = $DB->get_record('local_gugrades_notes', $params)) {
             $user->shortnote = shorten_text(html_to_text($noterecord->note), SHORTNAME_LENGTH);
         } else {
             $user->shortnote = '';

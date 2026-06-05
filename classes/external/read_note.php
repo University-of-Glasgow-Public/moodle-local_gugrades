@@ -42,6 +42,7 @@ class read_note extends external_api {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'userid' => new external_value(PARAM_INT, 'User id'),
+            'gradeitemid' => new external_value(PARAM_INT, 'Grade item id'),
         ]);
     }
 
@@ -49,15 +50,17 @@ class read_note extends external_api {
      * Execute function
      * @param int $courseid
      * @param int $userid
+     * @param int $gradeitemid
      * @return array
      */
-    public static function execute($courseid, $userid) {
+    public static function execute($courseid, $userid, $gradeitemid) {
         global $DB;
 
         // Security.
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'userid' => $userid,
+            'gradeitemid' => $gradeitemid,
         ]);
 
         // More security.
@@ -67,6 +70,7 @@ class read_note extends external_api {
         $note = \local_gugrades\api::read_note(
             $courseid,
             $userid,
+            $gradeitemid,
         );
 
         return ['note' => $note];

@@ -17,11 +17,11 @@
         </div>
     </div>
 
-    <template v-if="loaded && !treeerror && newpage">
+    <template v-if="loaded && !treeerror && newregs">
         <CategoryConfig :categoryid="categoryid" :nodes="activitytree"></CategoryConfig>
     </template>
 
-    <div v-if="loaded && !treeerror && !newpage">
+    <div v-if="loaded && !treeerror && !newregs">
         <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
             <tbody>
                 <ConfigTree
@@ -58,7 +58,7 @@
     const configuringresits = ref(false);
     const caneditgrades = ref(false);
     const engineering = ref(false);
-    const newpage = ref(false);
+    const newregs = ref(false);
     const debug = ref({});
     const treeerror = ref('');
     const mstringstore = useMstrings();
@@ -88,7 +88,7 @@
      * Get regulationextra emmited from Level1Select
      */
     function getregulation(regulation: IRegulationEmit) {
-        newpage.value = regulation.regulationshort == 'from2026';
+        newregs.value = regulation.regulationshort == 'from2026';
         engineering.value = regulation.regulationextra == 'Engineering';
     }
 

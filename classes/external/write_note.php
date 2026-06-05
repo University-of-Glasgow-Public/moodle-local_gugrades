@@ -42,6 +42,7 @@ class write_note extends external_api {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'userid' => new external_value(PARAM_INT, 'User id'),
+            'gradeitemid' => new external_value(PARAM_INT, 'Grade item id'),
             'note' => new external_value(PARAM_RAW, 'Note text'),
         ]);
     }
@@ -50,16 +51,18 @@ class write_note extends external_api {
      * Execute function
      * @param int $courseid
      * @param int $userid
+     * @param int $gradeitemid
      * @param string $note
      * @return array
      */
-    public static function execute($courseid, $userid, $note) {
+    public static function execute($courseid, $userid, $gradeitemid, $note) {
         global $DB;
 
         // Security.
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'userid' => $userid,
+            'gradeitemid' => $gradeitemid,
             'note' => $note,
         ]);
 
@@ -70,6 +73,7 @@ class write_note extends external_api {
         \local_gugrades\api::write_note(
             $courseid,
             $userid,
+            $gradeitemid,
             $note,
         );
 

@@ -141,7 +141,7 @@ class api {
         // Will be everybody for 'manual' grades or filtered list for modules.
         $users = $activity->get_users();
         $users = \local_gugrades\grades::add_grades_to_user_records($courseid, $gradeitemid, $users, $gradehidden);
-        $users = \local_gugrades\users::add_pictures_and_profiles_to_user_records($courseid, $users);
+        $users = \local_gugrades\users::add_pictures_and_profiles_to_user_records($courseid, $gradeitemid, $users);
         $users = \local_gugrades\users::add_gradehidden_to_user_records($users, $gradeitemid);
         $columns = \local_gugrades\grades::get_grade_capture_columns($courseid, $gradeitemid);
         $gradesimported = \local_gugrades\grades::is_grades_imported($courseid, $gradeitemid);
@@ -193,7 +193,7 @@ class api {
         $user = \local_gugrades\grades::add_grades_for_user($courseid, $gradeitemid, $user, $gradehidden);
 
         // Add/update picture.
-        $user = \local_gugrades\users::add_picture_and_profile_to_user_record($courseid, $user);
+        $user = \local_gugrades\users::add_picture_and_profile_to_user_record($courseid, $gradeitemid, $user);
 
         // Add/update gradehidden.
         $user = \local_gugrades\users::add_gradehidden_to_user_record($user, $gradeitemid);
@@ -2810,23 +2810,31 @@ class api {
      * Write user note
      * @param int $courseid
      * @param int $userid
+     * @param int $gradeitemid
      * @param string $note
      */
-    public static function write_note(int $courseid, int $userid, string $note) {
+    public static function write_note(int $courseid, int $userid, int $gradeitemid, string $note) {
         global $DB;
 
+        $params = [
+            'courseid' => $courseid,
+            'userid' => $userid,
+            'gradeitemid' => $gradeitemid,
+        ];
+
         if (!$note) {
-            $DB->delete_records('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $userid]);
+            $DB->delete_records('local_gugrades_notes', $params);
             return;
         }
 
-        if ($noterecord = $DB->get_record('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $userid])) {
+        if ($noterecord = $DB->get_record('local_gugrades_notes', $params)) {
             $noterecord->note = $note;
             $DB->update_record('local_gugrades_notes', $noterecord);
         } else {
             $noterecord = (object)[
                 'courseid' => $courseid,
                 'userid' => $userid,
+                'gradeitemid' => $gradeitemid,
                 'note' => $note,
             ];
             $DB->insert_record('local_gugrades_notes', $noterecord);
@@ -2837,12 +2845,19 @@ class api {
      * Read user note
      * @param int $courseid
      * @param int $userid
+     * @param int $gradeitemid
      * @return string
      */
-    public static function read_note(int $courseid, int $userid) {
+    public static function read_note(int $courseid, int $userid, int $gradeitemid) {
         global $DB;
 
-        if ($noterecord = $DB->get_record('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $userid])) {
+        $params = [
+            'courseid' => $courseid,
+            'userid' => $userid,
+            'gradeitemid' => $gradeitemid,
+        ];
+
+        if ($noterecord = $DB->get_record('local_gugrades_notes', $params)) {
             return $noterecord->note;
         } else {
             return '';

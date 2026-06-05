@@ -286,7 +286,7 @@ class aggregation {
         $user->resitrequired = \local_gugrades\grades::is_resit_required($courseid, $userid);
         $user->alteredweight = self::are_weights_altered($categoryid, $userid);
 
-        $user = \local_gugrades\users::add_picture_and_profile_to_user_record($courseid, $user);
+        $user = \local_gugrades\users::add_picture_and_profile_to_user_record($courseid, 0, $user);
 
         // Initials.
         [$user->firstinitial, $user->lastinitial] = \local_gugrades\users::get_initials($user);
@@ -343,7 +343,7 @@ class aggregation {
         }
 
         // Pictures.
-        $users = \local_gugrades\users::add_pictures_and_profiles_to_user_records($courseid, $users);
+        $users = \local_gugrades\users::add_pictures_and_profiles_to_user_records($courseid, 0, $users);
 
         return array_values($users);
     }

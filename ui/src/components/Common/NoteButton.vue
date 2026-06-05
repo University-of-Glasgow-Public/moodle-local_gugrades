@@ -27,6 +27,10 @@
             type: Number,
             required: true,
         },
+        gradeitemid: {
+            type: Number,
+            required: true,
+        },
         name: {
             type: String,
             required: true,
@@ -45,7 +49,8 @@
 
     function opennote() {
         moodleFetch('local_gugrades_read_note', {
-            userid: props.userid
+            userid: props.userid,
+            gradeitemid: props.gradeitemid,
         })
         .then((result: any) => {
             note.value = result.note;
@@ -63,6 +68,7 @@
 
         moodleFetch('local_gugrades_write_note', {
             userid: props.userid,
+            gradeitemid: props.gradeitemid,
             note: note.value,
         })
         .then(() => {

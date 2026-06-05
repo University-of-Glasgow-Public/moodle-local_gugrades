@@ -158,11 +158,6 @@
                 </a>
             </template>
 
-            <!-- notes -->
-            <template #item-slotnote="item">
-                <NoteButton :userid="item.id" :name="item.displayname" :shortnote="item.shortnote" @updated="grade_changed(item.id)"/>
-            </template>
-
             <!-- Resit required -->
             <template #item-resitrequired="item">
                 <a v-if="caneditgrades" class="cursor-pointer" @click.prevent="resit_clicked(item.id, !item.resitrequired)">
@@ -249,7 +244,6 @@
     import TablePagination from '@/components/Common/TablePagination.vue';
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
     import GradeColor from '@/components/Common/GradeColor.vue';
-    import NoteButton from '@/components/Common/NoteButton.vue';
     import { useFilter } from '@/stores/filter';
 
     interface IAggregationHeader {
@@ -708,7 +702,3 @@
         table_update();
     }
 </script>
-
-<style>
-
-</style>

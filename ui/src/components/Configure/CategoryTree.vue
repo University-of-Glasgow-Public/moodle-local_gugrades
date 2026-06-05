@@ -10,7 +10,7 @@
             {{ category.category.fullname }}
         </div>
         <div class="">
-            Tick!
+            <Switch></Switch>
         </div>
         <CategoryTree v-if="depth < 3" :nodes="category" :depth="depth + 1"></CategoryTree>
     </template>
@@ -18,6 +18,8 @@
 
 <script setup lang="ts">
     import { onMounted } from 'vue';
+    import Switch from '../Tailwind/Switch.vue';
+
     const props = defineProps({
         nodes: {
             type: Object,

@@ -236,6 +236,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $data = (object) $data;
         $data->courseid = $this->task->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
+        $data->gradeitemid = 0 - $data->gradeitemid;
 
         $DB->insert_record('local_gugrades_notes', $data);
     }
@@ -296,6 +297,13 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         foreach ($hiddens as $hidden) {
             $hidden->gradeitemid = $this->get_mappingid('grade_item', 0 - $hidden->gradeitemid);
             $DB->update_record('local_gugrades_hidden', $hidden);
+        }
+
+        // Notes.
+        $notess = $DB->get_recordset('local_gugrades_notes', ['courseid' => $this->task->get_courseid()]);
+        foreach ($notess as $note) {
+            $note->gradeitemid = $this->get_mappingid('grade_item', 0 - $note->gradeitemid);
+            $DB->update_record('local_gugrades_notes', $note);
         }
     }
 }
