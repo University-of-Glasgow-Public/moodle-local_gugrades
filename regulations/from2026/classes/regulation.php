@@ -147,7 +147,7 @@ class regulation implements \local_gugrades\IRegulation {
                 'CREDITAWARDED',
                 'AUDITONLY',
                 'INTERRUPTIONOFSTUDIES',
-                'CREDITNOTYETAWARED',
+                'CREDITNOTYETAWARDED',
                 'CREDITNOTAWARDED',
                 'GOODCAUSE_NR',
             ];
