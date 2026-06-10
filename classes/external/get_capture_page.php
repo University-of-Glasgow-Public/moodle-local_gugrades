@@ -106,6 +106,7 @@ class get_capture_page extends external_api {
                             'displaygrade' => new external_value(PARAM_TEXT, 'Grade for display'),
                             'gradetype' => new external_value(PARAM_TEXT, 'FIRST, SECOND and so on'),
                             'columnid' => new external_value(PARAM_INT, 'ID in column table'),
+                            'rawgrade' => new external_value(PARAM_FLOAT, 'Raw scale/points value', VALUE_DEFAULT, null),
                         ])
                     ),
                 ])

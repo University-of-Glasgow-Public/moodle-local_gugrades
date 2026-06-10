@@ -114,6 +114,7 @@ export interface ICaptureGrade {
     displaygrade: string;
     gradetype: string;
     columnid: number;
+    rawgrade?: number | null;
 }
 
 export interface ICaptureUser {
