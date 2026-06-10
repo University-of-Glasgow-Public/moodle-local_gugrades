@@ -49,7 +49,6 @@ class cleanup extends \core\task\scheduled_task {
         $select = 'gradetype="CATEGORY"
             AND RAWGRADE IS NULL
             AND audittimecreated < :cutoff';
-        $select = 'audittimecreated < :cutoff';
         $DB->delete_records_select('local_gugrades_grade', $select, ['cutoff' => $cutoff]);
 
         return true;

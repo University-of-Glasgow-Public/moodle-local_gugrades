@@ -36,11 +36,10 @@ class admingrades {
     /**
      * Default definitions of admin grades and where they may be used.
      * levels means....
-     * 'grandtotal' = available in 'grand total' selection
-     * 'items' = available in the small selection for all items / cats
-     * 'level2' = available in small selection ONLY for L2 and below
      * These are all the *possible* admingrades, not necessarily those
      * valid for the current regulations regime.
+     * Code and description are defaults, they can be changed in the
+     * MyGrades settings page. 
      * @return array
      */
     private static function defaults() {
