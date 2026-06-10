@@ -21,8 +21,12 @@
      */
     function gradecolorclass(grade: string): string[] {
         let colorclass: string[] = [];
-        if (grade in gradecolors) {
-            const classes = gradecolors[grade]!;
+
+        // Only look at the first two characters of the grade
+        const grade2 = grade.substring(0, 2);
+
+        if (grade2 in gradecolors) {
+            const classes = gradecolors[grade2]!;
             colorclass = ['px-2.5', 'py-0.5', 'rounded-md', 'font-semibold', 'inline-block'];
             if (props.size) {
                 colorclass.push(props.size);
