@@ -118,14 +118,10 @@
                         </div>
                     </template>
 
-                    <!-- Template for grade items -->
-                    <template v-for="column in columns" v-slot:['item-GRADE'+column.id]="item">
-                        <GradeColor :grade="item['GRADE' + column.id]"></GradeColor>
-                    </template>
-
-                    <!-- switch to input for bulk editing (if selected) -->
-                    <template v-slot:[editcolumnslot]="item">
+                    <!-- Grade display, or bulk-edit inputs when a column is selected -->
+                    <template v-for="column in columns" :key="column.id" v-slot:['item-GRADE'+column.id]="item">
                         <EditCaptureCell
+                            v-if="editcolumn === ('GRADE' + column.id)"
                             :item="item"
                             :column="editcolumn"
                             :columnid="editcolumnid"
@@ -139,10 +135,10 @@
                             :adminmenu="editadminmenu"
                             :grademax="editgrademax"
                             :cancelled="editcancelled"
-                            @gradewritten = "edit_grade_written()"
-                            @gradecancel = "edit_grade_written()"
-                             >
-                        </EditCaptureCell>
+                            @gradewritten="edit_grade_written()"
+                            @gradecancel="edit_grade_written()"
+                        />
+                        <GradeColor v-else :grade="item['GRADE' + column.id]" />
                     </template>
 
                     <!-- dropdown in the final column -->
@@ -245,7 +241,6 @@
     const revealnames = ref(false);
     const collapsed = ref(false);
     const editcolumn = ref('');
-    const editcolumnslot = ref('');
     const editusescale = ref(false);
     const editscalemenu = ref< IMenuItem[] >([]);
     const editadminmenu = ref< IMenuItem[] >([]);
@@ -349,7 +344,6 @@
         currentpage.value = 1;
         revealnames.value = false;
         editcolumn.value = '';
-        editcolumnslot.value = '';
     });
 
     /**
@@ -443,8 +437,6 @@
         // Unpack data
         const columnname = cellform.columnname;
 
-        // Note: this is the EasyDataTable slot name for the column.
-        editcolumnslot.value = 'item-' + columnname;
         editcolumn.value = columnname;
         editusescale.value = cellform.usescale;
         editscalemenu.value = cellform.scalemenu;
@@ -464,7 +456,6 @@
      */
     function edit_cell_saved() {
         editcolumn.value = '';
-        editcolumnslot.value = '';
     }
 
     /**
@@ -495,7 +486,6 @@
 
             // Duplicated for cancel
             editcolumn.value = '';
-            editcolumnslot.value = '';
 
             reload_page();
         },

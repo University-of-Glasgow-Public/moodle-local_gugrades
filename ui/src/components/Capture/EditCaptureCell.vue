@@ -88,6 +88,58 @@
     let   originaladmingrade = '';
 
     /**
+     * Strip an optional raw points suffix from a displayed scale band.
+     * e.g. "B1 (17.11111)" -> "B1"
+     */
+    function scaleDisplayBand(displayvalue: string): string {
+        return displayvalue.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    }
+
+    /**
+     * Does a scale menu label match the value shown in the table cell?
+     */
+    function scaleLabelMatches(label: string, displayvalue: string): boolean {
+        if (label == displayvalue) {
+            return true;
+        }
+
+        const band = scaleDisplayBand(displayvalue);
+        const labelband = label.split(':')[0];
+
+        return band === labelband || label.startsWith(band + ':');
+    }
+
+    /**
+     * Find the scale menu value for a displayed grade.
+     */
+    function findScaleValue(displayvalue: string, scalemenu: IMenuItem[], rawgrade?: number | null): string {
+        if (rawgrade !== undefined && rawgrade !== null) {
+            const rawvalue = String(rawgrade);
+            const byRaw = scalemenu.find((item) => String(item.value) === rawvalue);
+            if (byRaw) {
+                return rawvalue;
+            }
+        }
+
+        for (const scaleitem of scalemenu) {
+            if (scaleLabelMatches(scaleitem.label, displayvalue)) {
+                return String(scaleitem.value);
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Does the displayed value match an admin grade menu entry?
+     */
+    function adminGradeMatches(adminitem: IMenuItem, displayvalue: string): boolean {
+        return adminitem.value == displayvalue
+            || adminitem.label == displayvalue
+            || adminitem.label.startsWith(displayvalue + ' -');
+    }
+
+    /**
      * Watch out for cancel being clicked.
      * This carry on because the prop doesn't get updated when
      * unMount in progress.
@@ -106,27 +158,25 @@
      */
     onMounted(() => {
 
-        // Extract the correct current grade from the item
         const value = props.item[props.column];
+        const graderecord = props.item.grades?.find((grade) => grade.columnid === props.columnid);
+        const rawgrade = graderecord?.rawgrade;
 
-        // If it's a scale - find the value
-        if (props.usescale) {
-            props.scalemenu.forEach((scaleitem) => {
-                if (scaleitem.label == value) {
-                    grade.value = scaleitem.value;
-                }
-            });
+        let adminMatched = false;
+        props.adminmenu.forEach((adminitem) => {
+            if (adminGradeMatches(adminitem, value)) {
+                admingrade.value = adminitem.value;
+                adminMatched = true;
+            }
+        });
+
+        if (adminMatched) {
+            grade.value = '';
+        } else if (props.usescale) {
+            grade.value = findScaleValue(value, props.scalemenu, rawgrade);
         } else {
             grade.value = value;
         }
-
-        // Could is be an admingrade?
-        props.adminmenu.forEach((adminitem) => {
-            if (adminitem.value == value) {
-                admingrade.value = value;
-                grade.value = '';
-            }
-        });
 
         originalgrade = grade.value;
         originaladmingrade = admingrade.value;
