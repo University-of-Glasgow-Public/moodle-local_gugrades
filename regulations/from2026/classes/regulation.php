@@ -64,7 +64,7 @@ class regulation implements \local_gugrades\IRegulation {
             throw new \moodle_exception('Course start date has not been set');
         }
 
-        return $course->startdate > $startdate;
+        return $course->startdate >= $startdate;
     }
 
     /**
