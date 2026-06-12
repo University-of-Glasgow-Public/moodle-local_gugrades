@@ -115,7 +115,7 @@ class scheduleb extends base {
     /**
      * Convert numeric 0-22 to Schedule B
      * @param float $rawgrade
-     * @return [string, int]
+     * @return array
      */
     public static function convert(float $rawgrade) {
         if ($rawgrade < 1) {
@@ -154,7 +154,7 @@ class scheduleb extends base {
         }
 
         // It's a scale, so it can't be a decimal.
-        $grade = round($floatgrade);
+        $grade = (int) round($floatgrade);
 
         if ($this->converted) {
             $map = $this->get_map();

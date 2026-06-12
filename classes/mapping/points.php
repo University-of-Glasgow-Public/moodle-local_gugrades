@@ -72,7 +72,7 @@ class points extends base {
      * Handle imported grade
      * Create both converted grade (actual value) and display grade
      * @param float|null $floatgrade
-     * @return [float, string]
+     * @return array
      */
     public function import(float|null $floatgrade) {
 

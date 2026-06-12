@@ -63,7 +63,7 @@ class gradeitem {
 
         $this->courseid = $courseid;
         $this->gradeitemid = $gradeitemid;
-        $this->$gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
+        $this->gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
         $this->course = get_course($courseid);
     }
 

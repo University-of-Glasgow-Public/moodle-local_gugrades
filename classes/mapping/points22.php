@@ -89,7 +89,7 @@ class points22 extends schedulea {
      * Handle imported grade
      * Create both converted grade (actual value) and display grade
      * @param float|null $floatgrade
-     * @return [float, string]
+     * @return array
      */
     public function import(float|null $floatgrade) {
         global $DB;
@@ -100,7 +100,7 @@ class points22 extends schedulea {
         }
 
         // It's a scale, so it can't be a decimal.
-        $grade = round($floatgrade);
+        $grade = (int) round($floatgrade);
 
         $map = $this->get_map();
         if (!array_key_exists($grade, $map)) {
@@ -109,21 +109,5 @@ class points22 extends schedulea {
             return [$grade, $map[$grade]];
         }
 
-        if (isset($this->scaleitems[$grade])) {
-            $scaleitem = $this->scaleitems[$grade];
-        } else {
-            throw new \moodle_exception('Scale item does not exist. Scale id = ' .
-                $this->gradeitem->scaleid . ', value = ' . $grade);
-        }
-
-        // Convert to value using scalevalue.
-        if (array_key_exists($scaleitem, $this->items)) {
-            $converted = $this->items[$scaleitem];
-        } else {
-            throw new \moodle_exception('Scale item "' . $scaleitem . '" does not exist in scale id = ' .
-                $this->gradeitem->scaleid);
-        }
-
-        return [$converted, $scaleitem];
     }
 }

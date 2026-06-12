@@ -62,10 +62,10 @@ abstract class base {
      * @param int $gradecategoryid
      * @param int $groupid
      * @param array $form
-     * @return array
+     * @return string
      */
     public function get_form_data(int $courseid, int $gradecategoryid, int $groupid, array $form) {
-        return [];
+        return '';
     }
 
     /**

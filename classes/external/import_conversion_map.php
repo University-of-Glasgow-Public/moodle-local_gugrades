@@ -49,7 +49,7 @@ class import_conversion_map extends external_api {
      * Execute function
      * @param int $courseid
      * @param string $jsonmap
-     * @return int
+     * @return array
      */
     public static function execute($courseid, $jsonmap) {
         global $DB;

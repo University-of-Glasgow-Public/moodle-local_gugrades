@@ -60,6 +60,7 @@ class aggregation {
      * @param string $atype
      * @return \local_gugrades\aggregation\base
      */
+    /*
     public static function aggregation_factory(int $courseid, string $atype) {
 
         // Just base at the moment, but other variations could exist.
@@ -67,6 +68,7 @@ class aggregation {
 
         return $aggregation;
     }
+        */
 
     /**
      * Get aggregation strategy formatted for display
@@ -147,7 +149,7 @@ class aggregation {
      * @param int $courseid
      * @param int $gradecategoryid
      * @param bool $skipuserids
-     * @return [$columns, $atype, $warnings]
+     * @return array
      */
     public static function get_columns(int $courseid, int $gradecategoryid, bool $skipuserids = false) {
         global $DB;
@@ -353,6 +355,7 @@ class aggregation {
      * @param int $gradeitemid
      * @param int $userid
      */
+    /*
     private static function is_grade_hidden(int $gradeitemid, int $userid) {
         global $DB;
 
@@ -362,6 +365,7 @@ class aggregation {
 
         return false;
     }
+        */
 
     /**
      * Get cachetag for aggdata
@@ -543,7 +547,12 @@ class aggregation {
         // Get atype and aggregation rules.
         // This is why we needed items - array of array vs. array of objects.
         [$atype, $warnings] = self::get_aggregation_type($items, $gradecategoryid);
-        $aggregation = self::aggregation_factory($courseid, $atype);
+
+        // Get correct regulations object for this course.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $aggregation = $regulation->get_aggregation($courseid, $atype);
+
+        //$aggregation = self::aggregation_factory($courseid, $atype);
 
         // Has grade been converted.
         $converted = \local_gugrades\conversion::is_category_conversion_applied($courseid, $gradecategoryid);
@@ -686,7 +695,7 @@ class aggregation {
      * d. top level grades must all be scales
      * @param array $items
      * @param int $gradecategoryid
-     * @return [$atype, $warnings]
+     * @return array
      */
     public static function get_aggregation_type(array $items, $gradecategoryid) {
         global $DB;
@@ -1042,6 +1051,7 @@ class aggregation {
      * @param array $items
      * @return array
      */
+    /*
     private static function filter_available(array $items) {
         $filtered = [];
         foreach ($items as $item) {
@@ -1051,7 +1061,7 @@ class aggregation {
         }
 
         return $filtered;
-    }
+    }*/
 
     /**
      * Write aggregated category into gugrades_grades table
@@ -1136,7 +1146,7 @@ class aggregation {
      * Get overidden category (or not)
      * @param int $itemid
      * @param int $userid
-     * @return object | false
+     * @return array|boolean
      */
     protected static function get_overridden_category(int $itemid, int $userid) {
         global $DB;
@@ -1212,7 +1222,7 @@ class aggregation {
      * @param int $userid
      * @param int $level
      * @param bool $skipdroplow
-     * @return array [$total, $rawgrade, $admingrade, $displaygrade, $completion, $error, $explain, $notavailable]
+     * @return object
      */
     protected static function aggregate_user(
         int $courseid,
@@ -1458,7 +1468,6 @@ class aggregation {
      * @param int $courseid
      * @param int $gradecategoryid
      * @param array $users
-     * @return array
      */
     public static function aggregate(int $courseid, int $gradecategoryid, array $users) {
 

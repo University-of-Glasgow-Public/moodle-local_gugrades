@@ -143,7 +143,7 @@ class schedulea extends base {
      * Handle imported grade
      * Create both converted grade (actual value) and display grade
      * @param float|null $floatgrade
-     * @return [float, string]
+     * @return array
      */
     public function import(float|null $floatgrade) {
         global $DB;
@@ -154,7 +154,7 @@ class schedulea extends base {
         }
 
         // It's a scale, so it can't be a decimal.
-        $grade = round($floatgrade);
+        $grade = (int) round($floatgrade);
 
         // If converted.
         if ($this->converted || !$this->scaleitems) {

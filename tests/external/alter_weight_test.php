@@ -88,7 +88,7 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
         }
 
         // Check student mygrades API returns correct data.
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
         $this->assertEquals(25.0, $user->fields[0]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[1]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[2]['normalisedweight']);
@@ -155,7 +155,7 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
         $this->assertTrue($users[0]['alteredweight']);
 
         // Check student mygrades API returns correct data.
-        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user(
             $this->course->id,
             $summercategoryid,
             $this->student->id
@@ -196,7 +196,7 @@ final class alter_weight_test extends \local_gugrades\external\gugrades_aggregat
         $this->assertFalse($users[0]['alteredweight']);
 
         // Check student mygrades API returns correct data.
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
         $this->assertEquals(25.0, $user->fields[0]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[1]['normalisedweight']);
         $this->assertEquals(25.0, $user->fields[2]['normalisedweight']);

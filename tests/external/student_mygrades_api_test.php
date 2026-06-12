@@ -108,7 +108,7 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
         $this->assertEquals(50, $columns[2]['weight']);
 
         // Check student mygrades API returns correct data.
-        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user(
             $this->course->id,
             $this->gradecatsummative->id,
             $this->student->id

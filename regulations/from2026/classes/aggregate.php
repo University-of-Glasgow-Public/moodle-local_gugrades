@@ -628,6 +628,17 @@ class aggregate {
         return [0, '', ''];
     }
 
+
+    /**
+     * Dummy completion
+     * @param array $items
+     * @param bool $weighted
+     * @return int
+     */
+    public function completion(array $items, bool $weighted) {
+        return 0;
+    }
+
     /**
      * Round to a specific number of decimal places.
      * Spec says 5, but giving the opportunity to change.

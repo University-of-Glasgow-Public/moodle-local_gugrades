@@ -70,7 +70,7 @@ final class capture_release_grades_test extends \local_gugrades\external\gugrade
         $this->assertEquals('PROVISIONAL', $fred['grades'][1]['gradetype']);
 
         // Check student mygrades API returns correct data.
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $this->student->id);
 
         $this->assertEquals('Assignment 2', $user->fields[2]['itemname']);
         $this->assertFalse($user->fields[2]['released']);
@@ -97,7 +97,7 @@ final class capture_release_grades_test extends \local_gugrades\external\gugrade
         $this->assertEquals('PROVISIONAL', $fred['grades'][2]['gradetype']);
 
         // Check student mygrades API returns correct data.
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $this->gradecatsumm->id, $this->student->id);
 
         $this->assertEquals('Assignment 2', $user->fields[2]['itemname']);
         $this->assertTrue($user->fields[2]['released']);

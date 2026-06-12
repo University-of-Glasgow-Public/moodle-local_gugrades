@@ -113,7 +113,7 @@ class gradetype {
             $parts = explode('_', $gradetype);
             if ((count($parts) != 2) || !is_numeric($parts[1])) {
                 throw new \moodle_exception(
-                    'Invalid OTHER_ string. Gradetype = "' . $gradetype . '", gradeitemid = ' . $gradeitemid
+                    'Invalid OTHER_ string. Gradetype = "' . $gradetype
                 );
             }
             $columnid = $parts[1];

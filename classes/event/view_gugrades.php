@@ -56,7 +56,7 @@ class view_gugrades extends \core\event\base {
 
     /**
      * Get event URL
-     * @return string
+     * @return \core\url
      */
     public function get_url() {
         return new \moodle_url('/local/gugrades/ui/dist/index.php', ['id' => $this->objectid]);

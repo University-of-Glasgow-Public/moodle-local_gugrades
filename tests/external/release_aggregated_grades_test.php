@@ -147,7 +147,7 @@ final class release_aggregated_grades_test extends \local_gugrades\external\gugr
         $this->assertEquals('A2', $fred['releasegrade']);
 
         // Addition check for direct API call (used by Student MyGrades).
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
 
         $this->assertEquals('A2', $user->parent->displaygrade);
         $this->assertTrue($user->parent->released);
@@ -198,7 +198,7 @@ final class release_aggregated_grades_test extends \local_gugrades\external\gugr
         $this->assertTrue($fred['mismatch']);
 
         // Addition check for direct API call (used by Student MyGrades).
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
 
         $this->assertEquals('A2', $user->releasegrade);
         $this->assertEquals('NS', $user->displaygrade);
@@ -228,7 +228,7 @@ final class release_aggregated_grades_test extends \local_gugrades\external\gugr
         $this->assertEquals('NS', $fred['displaygrade']);
 
         // Addition check for direct API call (used by Student MyGrades).
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
 
         $this->assertEquals('NS', $user->releasegrade);
         $this->assertEquals('NS', $user->displaygrade);
@@ -255,7 +255,7 @@ final class release_aggregated_grades_test extends \local_gugrades\external\gugr
         $this->assertEquals('NS', $fred['displaygrade']);
 
         // Addition check for direct API call (used by Student MyGrades).
-        $user = \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $summercategoryid, $this->student->id);
 
         $this->assertEquals('', $user->releasegrade);
         $this->assertEquals('NS', $user->displaygrade);

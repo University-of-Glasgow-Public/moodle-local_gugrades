@@ -48,9 +48,9 @@ class api {
      */
     public static function is_unit_test() {
 
-        $istest = !empty(PHPUNIT_TEST);
+        $istest = defined('PHPUNIT_TEST') && constant('PHPUNIT_TEST');
 
-        return $istest;
+        return (bool) $istest;
     }
 
     /**
@@ -58,7 +58,7 @@ class api {
      * @param int $courseid
      * @param int $categoryid
      * @param bool $detailed
-     * @return object List of activities/subcategories in
+     * @return array List of activities/subcategories in
      */
     public static function get_activities(int $courseid, int $categoryid, bool $detailed = false) {
 
@@ -198,7 +198,7 @@ class api {
         // Add/update gradehidden.
         $user = \local_gugrades\users::add_gradehidden_to_user_record($user, $gradeitemid);
 
-        return $user;
+        return (array) $user;
     }
 
     /**
@@ -493,7 +493,7 @@ class api {
         } else if ($item->itemtype == 'manual') {
             $modname = get_string('manual', 'local_gugrades');
         } else {
-            $modname = get_string($item->itemtype);
+            $modname = get_string($item->itemtype, '');
         }
 
         // Does calculated category match real one?
@@ -625,7 +625,7 @@ class api {
 
         // Check $additional is valid.
         if (!in_array($additional, ['', 'admin', 'missing', 'update'])) {
-            throw new moodle_exception("Parameter $additional must be one of 'admin', 'missing', 'update'");
+            throw new \moodle_exception("Parameter $additional must be one of 'admin', 'missing', 'update'");
         }
 
         // Check for additional.
@@ -653,7 +653,7 @@ class api {
 
         // If fillns not selected, then write whatever we got
         // MGU-1293: including null (no grade).
-        if (empty($fillns) || (!empty($fillns) && !is_null($rawgrade))) {
+        if (empty($fillns) || !is_null($rawgrade)) {
             // Can (sometimes) come back as string, for some reason.
             if ($rawgrade) {
                 $rawgrade = floatval($rawgrade);
@@ -720,8 +720,6 @@ class api {
 
             return true;
         }
-
-        return false;
     }
 
     /**
@@ -748,45 +746,6 @@ class api {
         global $DB;
 
         throw new \moodle_exception('This function is now deprecated');
-
-        // Load *current* grades for this user.
-        if (!$grades = $DB->get_records('local_gugrades_grade', ['userid' => $userid, 'iscurrent' => 1])) {
-            return [];
-        }
-
-        // We "cache" course objects so we don't keep looking them up.
-        $courses = [];
-
-        // Iterate over grades adding additional information.
-        $newgrades = [];
-        foreach ($grades as $grade) {
-            $courseid = $grade->courseid;
-
-            // Find course or just skip if it doesn't exist (deleted?).
-            if (array_key_exists($courseid, $courses)) {
-                $course = $courses[$courseid];
-            } else {
-                if (!$course = $DB->get_record('course', ['id' => $courseid])) {
-                    continue;
-                }
-                $courses[$courseid] = $course;
-            }
-
-            // Add course data.
-            $grade->coursefullname = $course->fullname;
-            $grade->courseshortname = $course->shortname;
-
-            // Additional grade data.
-            $gradetype = $DB->get_record('local_gugrades_gradetype', ['id' => $grade->reason], '*', MUST_EXIST);
-            $grade->reasonname = $gradetype->fullname;
-
-            // Item into.
-            $grade->itemname = grades::get_item_name_from_itemid($grade->gradeitemid);
-
-            $newgrades[] = $grade;
-        }
-
-        return $newgrades;
     }
 
     /**
@@ -817,7 +776,7 @@ class api {
         foreach ($grades as $grade) {
             $grade->description = gradetype::get_description($grade->gradetype);
             $grade->time = userdate($grade->audittimecreated);
-            $grade->current = $grade->iscurrent ? get_string('yes') : get_string('no');
+            $grade->current = $grade->iscurrent ? get_string('yes', '') : get_string('no', '');
             if (array_key_exists($grade->auditby, $auditusers)) {
                 $audituser = $auditusers[$grade->auditby];
                 $grade->auditbyname = fullname($audituser);
@@ -1518,7 +1477,7 @@ class api {
      * dashboardenabled == grades released AND !$disabledashboard
      * gradesreleased == grades released
      * @param int $courseid
-     * @return [bool, bool]
+     * @return array
      */
     public static function get_dashboard_enabled(int $courseid) {
         global $DB;
@@ -1921,7 +1880,7 @@ class api {
      * @param int $courseid
      * @param int $mapid
      * @param string $schedule
-     * @return int
+     * @return array
      */
     public static function get_conversion_map(int $courseid, int $mapid, string $schedule): array {
 
@@ -2100,7 +2059,7 @@ class api {
         $user->formattedatype = \local_gugrades\aggregation::translate_atype($atype);
         $user->explain = $explain;
 
-        return $user;
+        return (array) $user;
     }
 
     /**
@@ -2246,7 +2205,7 @@ class api {
      * @param int $courseid
      * @param int $gradecategoryid
      * @param int $userid
-     * @return object
+     * @return array
      */
     public static function get_aggregation_user(int $courseid, int $gradecategoryid, int $userid) {
         global $DB;
@@ -2262,7 +2221,7 @@ class api {
         $user = \local_gugrades\aggregation::get_user($courseid, $gradecategoryid, $userid);
         $user = \local_gugrades\aggregation::add_aggregation_fields_to_user($courseid, $gradecategoryid, $user, $columns);
 
-        return $user;
+        return (array) $user;
     }
 
     /**
@@ -2271,7 +2230,7 @@ class api {
      * @param int $courseid
      * @param int $gradecategoryid
      * @param int $userid
-     * @return array | null
+     * @return array|null
      */
     public static function get_aggregation_dashboard_user(int $courseid, int $gradecategoryid, int $userid) {
 
@@ -2281,7 +2240,7 @@ class api {
         }
 
         // Get basic user field data.
-        $user = self::get_aggregation_user($courseid, $gradecategoryid, $userid);
+        $user = (object) self::get_aggregation_user($courseid, $gradecategoryid, $userid);
 
         // Run over the fields and add released status.
         foreach ($user->fields as $id => $field) {
@@ -2303,7 +2262,7 @@ class api {
         // Add the 'parent' grade item to the record.
         $user->parent = $provisional;
 
-        return $user;
+        return (array) $user;
     }
 
     /**
@@ -2393,7 +2352,7 @@ class api {
             ],
             (object)[
                 'gradetype' => 'EMAIL',
-                'description' => get_string('email'),
+                'description' => get_string('email', ''),
                 'other' => '',
             ],
             (object)[
@@ -2429,7 +2388,7 @@ class api {
      * @param int $groupid
      * @param bool $viewfullnames
      * @param array $options
-     * @return array
+     * @return string
      */
     public static function get_capture_export_data(
         int $courseid,
@@ -2456,7 +2415,7 @@ class api {
         // Get the headings.
         $columns = $page->columns;
         $headings = [];
-        $gradecolums = [];
+        $gradecolumns = [];
         if (in_array('NAME', $selected)) {
             $headings[] = get_string('name', 'local_gugrades');
         }
@@ -2464,7 +2423,7 @@ class api {
             $headings[] = get_string('idnumber', 'local_gugrades');
         }
         if (in_array('EMAIL', $selected)) {
-            $headings[] = get_string('email');
+            $headings[] = get_string('email', '');
         }
         if (in_array('COURSECODE', $selected)) {
             $headings[] = get_string('coursecode', 'local_gugrades');
@@ -2595,7 +2554,7 @@ class api {
         $columns = \local_gugrades\aggregation::get_columns($courseid, $categoryid);
 
         // Ensure aggregation data for this user is current.
-        $user = self::get_aggregation_user($courseid, $categoryid, $userid);
+        $user = (object) self::get_aggregation_user($courseid, $categoryid, $userid);
 
         // Combine required user fields and column data.
         $items = [];
@@ -2631,7 +2590,6 @@ class api {
      * @param bool $revert
      * @param string $reason
      * @param array $items
-     * @return array
      */
     public static function save_altered_weights(
         int $courseid,
@@ -2710,7 +2668,7 @@ class api {
      * @param int $uniqueid
      * @param string $progresstype
      * @param int $staffuserid
-     * @return int
+     * @return array
      */
     public static function get_progress(int $courseid, int $uniqueid, string $progresstype, int $staffuserid) {
         $progress = \local_gugrades\progress::get($courseid, $uniqueid, $progresstype, $staffuserid);
@@ -2787,8 +2745,8 @@ class api {
 
     /**
      * Get help text
-     * @param string subject
-     * @return string
+     * @param string $subject
+     * @return array
      */
     public static function get_help(string $subject) {
         global $CFG;

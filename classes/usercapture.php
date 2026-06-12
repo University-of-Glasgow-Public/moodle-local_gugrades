@@ -54,7 +54,7 @@ class usercapture {
     protected $grades;
 
     /**
-     * @var object $provisional
+     * @var object|null $provisional
      */
     protected $provisional;
 

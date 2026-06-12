@@ -155,7 +155,7 @@ abstract class base {
      * Handle imported grade
      * Create both converted grade (actual value) and display grade
      * @param float|null $floatgrade
-     * @return [float, string]
+     * @return array
      */
     public function import(float|null $floatgrade) {
         return [null, get_string('nograde', 'local_gugrades')];
@@ -179,7 +179,7 @@ abstract class base {
     /**
      * Get the band (A1, A2...) from its value
      * @param int $grade
-     * @return $string
+     * @return string
      */
     public function get_band(int $grade) {
         $map = $this->get_map();

@@ -25,7 +25,7 @@
 
 namespace local_gugrades;
 
-define('SHORTNAME_LENGTH', 30);
+define('NOTES_SHORTNAME_LENGTH', 30);
 
 /**
  * Group functions used to manipulate user-related data
@@ -35,7 +35,7 @@ class users {
      * Get course module from grade item
      * @param int $itemid Grade item ID
      * @param int $courseid
-     * @return object
+     * @return object|bool
      */
     public static function get_cm_from_grade_item(int $itemid, int $courseid) {
         global $DB;
@@ -50,7 +50,7 @@ class users {
         // Set to -1 to avoid calculation of dynamic user-depended data.
         $modinfo = get_fast_modinfo($courseid, -1);
         if (!$cm = $modinfo->instances[$item->itemmodule][$item->iteminstance]) {
-            throw new \moodle_exception('Unable to find course module for gradeitemid = ' . $gradeitemid);
+            throw new \moodle_exception('Unable to find course module for gradeitemid = ' . $itemid);
         }
         return $cm;
     }
@@ -78,7 +78,7 @@ class users {
             throw new \moodle_exception('Unable to find course module for gradeitemid = ' . $gradeitemid);
         }
 
-        return $cm->visible;
+        return (bool) $cm->visible;
     }
 
     /**
@@ -238,7 +238,7 @@ class users {
             'userid' => $user->id,
         ];
         if ($gradeitemid && $noterecord = $DB->get_record('local_gugrades_notes', $params)) {
-            $user->shortnote = shorten_text(html_to_text($noterecord->note), SHORTNAME_LENGTH);
+            $user->shortnote = shorten_text(html_to_text($noterecord->note), NOTES_SHORTNAME_LENGTH);
         } else {
             $user->shortnote = '';
         }
@@ -264,7 +264,7 @@ class users {
      * Add gradehidden to user record
      * @param object $user
      * @param int $gradeitemid
-     * @return $user
+     * @return object
      */
     public static function add_gradehidden_to_user_record(object $user, int $gradeitemid) {
         global $DB;
@@ -350,7 +350,7 @@ class users {
     /**
      * Get firstname and lastname initials
      * @param object $user
-     * @return [string, string]
+     * @return array
      */
     public static function get_initials(object $user) {
         $first = empty($user->firstname) ? '' : \core_text::substr($user->firstname, 0, 1);

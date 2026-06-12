@@ -64,7 +64,7 @@ class grades {
      * Bulk data variable for grade items
      * @var array $gradeitems
      */
-    private static $gradeitems = [];
+    //private static $gradeitems = [];
 
     /**
      * Bulk data foor grade items indexed by corresponding
@@ -87,19 +87,29 @@ class grades {
         // (presumably, data is changing).
 
         return $DB->get_record('grade_items', ['id' => $gradeitemid], '*', MUST_EXIST);
+    }
 
-        if (empty($GRADEITEMS)) {
-            $GRADEITEMS = [];
+    /**
+     * Converts a string to a number with explicit parsing.
+     * 
+     * @param string $value
+     * @return int|float
+     */
+    public static function convert_string_to_number(string $value): int|float {
+        $trimmed = trim($value);
+
+        // 1. Check if it is a valid integer
+        if (filter_var($trimmed, FILTER_VALIDATE_INT) !== false) {
+            return (int)$trimmed;
         }
 
-        if (array_key_exists($gradeitemid, $GRADEITEMS)) {
-            return $GRADEITEMS[$gradeitemid];
+        // 2. Check if it is a valid float
+        if (filter_var($trimmed, FILTER_VALIDATE_FLOAT) !== false) {
+            return (float)$trimmed;
         }
 
-        $gradeitem = $DB->get_record('grade_items', ['id' => $gradeitemid], '*', MUST_EXIST);
-        $GRADEITEMS[$gradeitemid] = $gradeitem;
-
-        return $gradeitem;
+        // 3. Fail explicitly if neither match
+        throw new \InvalidArgumentException("The provided string '$value' is not a valid number.");
     }
 
     /**
@@ -245,7 +255,7 @@ class grades {
      * Get first level (summative / formative etc) category id for given category id
      * Depth == 2 for the first level
      * @param int $gradecategoryid
-     * @return bool
+     * @return int
      */
     public static function get_level_one_parent(int $gradecategoryid) {
         global $DB;
@@ -253,7 +263,7 @@ class grades {
         $gradecategory = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
         $cats = explode('/', trim($gradecategory->path, '/'));
         if (isset($cats[1])) {
-            return $cats[1];
+            return self::convert_string_to_number($cats[1]);
         } else {
             throw new \moodle_exception('Top level category not found. Grade Category ID = ' . $gradecategoryid);
         }
@@ -539,10 +549,8 @@ class grades {
 
                 // Add odd/even for style to second level only.
                 $level = self::get_category_level($id);
-                $even = false;
                 if ($level == 2) {
-                    $gradecategories[$id]->even = $even;
-                    $even = !$even;
+                    $gradecategories[$id]->even = false;
                 } else {
                     $gradecategories[$id]->even = false;
                 }
@@ -614,7 +622,7 @@ class grades {
      * supplied gradeitemid.
      * ALSO, check that all gradestypes are valid
      * @param int $gradeitemid
-     * @return array(recursiveavailable, recursivematch, allgradesvalid)
+     * @return array
      */
     public static function recursive_import_match(int $gradeitemid) {
         global $DB;
@@ -747,7 +755,7 @@ class grades {
      * Where we have OTHER_xxx
      * @param int $courseid
      * @param string $other
-     * @return $string
+     * @return string
      */
     public static function unpack_other(int $courseid, string $other) {
         global $DB;
@@ -1010,11 +1018,13 @@ class grades {
      * @param string $reason
      * @return object
      */
+    /*
     private static function get_grade_by_reason(array $grades, string $reason) {
         $grade = array_column($grades, null, 'reasonshortname')[$reason] ?? false;
 
         return $grade->grade;
     }
+        */
 
     /**
      * Get the provisional/released grade from the
@@ -1022,7 +1032,7 @@ class grades {
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
-     * @return oject|bool
+     * @return object|null
      */
     public static function get_provisional_from_id(int $courseid, int $gradeitemid, int $userid) {
 
@@ -1068,7 +1078,7 @@ class grades {
      * @param int $gradeitemid
      * @param object $user
      * @param bool $gradehidden
-     * @return array
+     * @return object
      */
     public static function add_grades_for_user(int $courseid, int $gradeitemid, object $user, bool $gradehidden = false) {
         $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $user->id);
@@ -1437,7 +1447,7 @@ class grades {
      * e.g. if a scale, is it one we support?
      * @param int $courseid
      * @param int $gradeitemid
-     * @return boolean
+     * @return array
      */
     public static function are_all_grades_supported(int $courseid, int $gradeitemid) {
         global $DB;
@@ -1595,7 +1605,7 @@ class grades {
      * Have grades been released?
      * @param int $courseid
      * @param int $gradeitemid
-     * @return boolead
+     * @return boolean
      */
     public static function is_grades_released(int $courseid, int $gradeitemid) {
         global $DB;
@@ -1895,14 +1905,14 @@ class grades {
     /**
      * Get cm from gradeitemid
      * @param int $gradeitemid
-     * @return object
+     * @return object|null
      */
     public static function get_cm_from_gradeitemid(int $gradeitemid) {
         $item = self::get_gradeitem($gradeitemid);
 
         // This (obviously) has to be a module.
         if ($item->itemtype != 'mod') {
-            return false;
+            return null;
         }
 
         $cm = get_coursemodule_from_instance($item->itemmodule, $item->iteminstance, $item->courseid, false, MUST_EXIST);
@@ -2019,7 +2029,7 @@ class grades {
 
             if ($grade->maxgrade > $gradeitem->grademax) {
                 $erroritems[] = [
-                    'gradeitemid' => $item->gradeitemid,
+                    'gradeitemid' => $gradeitem->gradeitemid,
                     'itemname' => $gradeitem->itemname . ' (maximum grade)',
                 ];
             }
@@ -2070,9 +2080,9 @@ class grades {
         global $DB;
 
         // Look up actvity object if we need to.
-        if (!$activity) {
-            $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
-        }
+        //if (!$activity) {
+        //    $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
+        //}
 
         // Is it an aggregated category?
         if (!$released = self::get_aggregated_from_gradeitemid($gradeitemid, $userid)) {
@@ -2150,7 +2160,7 @@ class grades {
         self::$gradecategories = $DB->get_records('grade_categories', ['courseid' => $courseid]);
 
         // Grade items.
-        self::$gradeitems = $DB->get_records('grade_items', ['courseid' => $courseid]);
+        //self::$gradeitems = $DB->get_records('grade_items', ['courseid' => $courseid]);
 
         // Grade items by grade category.
          $sql = "SELECT * FROM {grade_items}

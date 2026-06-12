@@ -221,6 +221,7 @@ abstract class base {
      * @return string
      */
     public function get_itemtype() {
+        return $this->itemtype;
     }
 
     /**

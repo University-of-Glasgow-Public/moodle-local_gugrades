@@ -598,13 +598,14 @@ class conversion {
         }
     }
 
-    /** Convert a point grade according to map values
+    /** 
+     * Convert a point grade according to map values
      * Note that we only use the percentage value and that as a fraction
      * of the maxgrade recorded in the grade item.
      * @param float $rawgrade
      * @param float $maxgrade
      * @param array $mapvalues
-     * @return object
+     * @return object|null
      */
     protected static function convert_grade(float $rawgrade, float $maxgrade, array $mapvalues) {
 
@@ -643,7 +644,7 @@ class conversion {
      * @param float $rawgrade
      * @param float $maxgrade
      * @param int $mapid
-     * @return [string, int]
+     * @return array
      */
     public static function aggregation_conversion(float $rawgrade, float $maxgrade, int $mapid) {
         global $DB;

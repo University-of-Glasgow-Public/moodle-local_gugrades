@@ -53,7 +53,7 @@ class select_conversion extends external_api {
      * @param int $gradeitemid
      * @param int $gradecategoryid
      * @param int $mapid
-     * @return int
+     * @return array
      */
     public static function execute($courseid, $gradeitemid, $gradecategoryid, $mapid) {
         global $DB;

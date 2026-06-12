@@ -111,7 +111,7 @@ class custom extends base {
         ];
         $form[] = [
             'identifier' => 'completed',
-            'description' => get_string('completed'),
+            'description' => get_string('completed', ''),
             'category' => false,
         ];
         $form[] = [
@@ -288,7 +288,9 @@ class custom extends base {
 
             // If option for released grades.
             if ($options['released'] && $isreleased) {
-                $released = \local_gugrades\grades::get_released_grade($courseid, $gradeitemid, $userid);
+                if (!$released = \local_gugrades\grades::get_released_grade($courseid, $gradeitemid, $userid)) {
+                    throw new \moodle_exception('Missing released gradee. $gradeitemid = ' . $gradeitemid . 'UserID = ' . $userid);
+                }
                 if ($provisional) {
                     $csvitems[$identifier . '_released'] = $released->displaygrade;
                 } else {
@@ -428,7 +430,7 @@ class custom extends base {
      * @param int $gradecategoryid
      * @param int $groupid
      * @param array $form
-     * @return array
+     * @return string
      */
     public function get_form_data(int $courseid, int $gradecategoryid, int $groupid, array $form) {
 
@@ -487,7 +489,7 @@ class custom extends base {
                 } else if ($ident == 'email') {
                     $line[$ident] = $user->email;
                 } else if ($ident == 'resitrequired') {
-                    $line[$ident] = $user->resitrequired ? get_string('yes') : get_string('no');
+                    $line[$ident] = $user->resitrequired ? get_string('yes', '') : get_string('no', '');
                 } else if ($ident == 'completed') {
                     $line[$ident] = $user->completed;
                 } else if (str_starts_with($ident, 'ITEM_')) {
