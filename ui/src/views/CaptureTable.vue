@@ -163,10 +163,18 @@
 
                     <!-- show warning if grades do not agree -->
                     <template #item-alert="item">
-                        <div class="capture-warning">
-                            <div v-if="item.alert" class="badge badge-error mb-1 mr-1">{{ mstrings['discrepancy'] }}</div>
-                            <div v-if="item.gradebookhidden" class="badge badge-success mb-1 mr-1">{{ mstrings['hiddengradebook'] }}</div>
-                            <div v-if="item.gradehidden" class="badge badge-warning mb-1">{{ mstrings['hiddenmygrades'] }}</div>
+                        <div class="flex flex-wrap gap-1.5 items-center">
+                            <CaptureWarning v-if="item.alert" variant="discrepancy">
+                                {{ mstrings['discrepancy'] }}
+                            </CaptureWarning>
+                            
+                            <CaptureWarning v-if="item.gradebookhidden" variant="gradebook-hidden">
+                                {{ mstrings['hiddengradebook'] }}
+                            </CaptureWarning>
+                            
+                            <CaptureWarning v-if="item.gradehidden" variant="grade-hidden">
+                                {{ mstrings['hiddenmygrades'] }}
+                            </CaptureWarning>
                         </div>
                     </template>
 
@@ -212,6 +220,7 @@
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
     import NoteButton from '@/components/Common/NoteButton.vue';
     import { useFilter } from '@/stores/filter';
+    import CaptureWarning from '@/components/Capture/CaptureWarning.vue';
 
     const users = ref< ICaptureUser[] >([]);
     const userids = ref< number[] >([]);
