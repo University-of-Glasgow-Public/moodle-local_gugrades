@@ -2,18 +2,28 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <div class="text-sm">ACTIVITY</div>
-        <div class="border-solid border border-base-300 px-3 py-2 rounded-md w-120" v-if="loaded">
-            <div v-if="collapsed" @click="open_selection" class="cursor-pointer row">
-                <div v-if="selectedactivity" class="col-10">
-                    {{ mstrings.selected }}: {{ selectedactivity.itemname }}
+        <div class="text-sm font-bold mb-1 opacity-70">ACTIVITY</div>
+        
+        <div 
+            v-if="loaded"
+            class="border border-slate-300 bg-white text-neutral px-3 rounded-md w-120 shadow-md transition-all duration-200 h-10 flex flex-col justify-center"
+            :class="{ 'border-primary ring-1 ring-primary !h-auto py-3': !collapsed }"
+        >
+            <!-- Collapsed State: Fills the exact 32px height cleanly -->
+            <div v-if="collapsed" @click="open_selection" class="cursor-pointer flex items-center justify-between gap-2 select-none w-full h-full">
+                <div v-if="selectedactivity" class="text-xs truncate">
+                    <span class="opacity-60">{{ mstrings.selected }}:</span> {{ selectedactivity.itemname }}
                 </div>
-                <div class="col-2 text-right">
-                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                <div class="opacity-60 shrink-0">
+                    <i class="fa fa-chevron-down text-[10px]" aria-hidden="true"></i>
                 </div>
             </div>
-            <div v-else>
-                <b>{{ categoryname }}</b>
+            
+            <!-- Expanded State -->
+            <div v-else class="space-y-2 w-full text-xs">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-1 mb-1">
+                    <b class="text-xs font-semibold">{{ categoryname }}</b>
+                </div>
                 <ActivityTree v-if="!treeerror" :nodes="activitytree" @activityselected="activity_selected" :depth="1"></ActivityTree>
                 <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
             </div>

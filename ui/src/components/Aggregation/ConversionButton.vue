@@ -1,10 +1,9 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button @click="conversion_clicked" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <Rotate3d :size="18" />
+    <MenuButton @click="conversion_clicked" iconName="Rotate3d">
         {{ mstrings.convertgrades }}
-    </button>
+    </MenuButton>
 
     <VueModal v-model="showselectmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.conversionselect">
 
@@ -56,9 +55,9 @@
     import { useToast } from "vue-toastification";
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import MenuButton from '../Common/MenuButton.vue';
     import type { Header } from "vue3-easy-data-table";
     import type { IMap } from '@/js/Interfaces';
-    import { Rotate3d } from '@lucide/vue';
 
     const maps = ref< IMap[] >([]);
     const nomaps = ref(true);

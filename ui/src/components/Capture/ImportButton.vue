@@ -1,11 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button @click="import_button_click" :disabled="!enable" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <Download :size="18" />
+    <MenuButton @click="import_button_click" :disabled="!enable" iconName="Download">
         <span v-if="groupimport">{{ mstrings['importgradesgroup'] }}</span>
         <span v-else>{{ mstrings['importgrades'] }}</span>
-    </button>
+    </MenuButton>
 
     <VueModal v-model="showimportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['importgrades']">
 
@@ -130,11 +129,11 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import TwButton from '../Tailwind/TwButton.vue';
+    import MenuButton from '../Common/MenuButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import type { IGradetype, IFormkitOption } from '@/js/Interfaces';
-    import { Download } from '@lucide/vue';
 
     interface IFormkitOptions {
         label: string;

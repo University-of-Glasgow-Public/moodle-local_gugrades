@@ -3,7 +3,7 @@
 
     <!-- info button -->
     <div v-if="!props.text" class="tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
-        <button class="btn btn-outline mr-2 btn-sm" aria-label="Show grade item info">
+        <button class="inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed shadow-sm font-semibold text-xs gap-2 transition-all duration-150" aria-label="Show grade item info">
             <Info :size="18"></Info>
         </button>
     </div>

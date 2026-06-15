@@ -1,10 +1,9 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button :disabled="!props.show || !enable" @click="showcsvmodal = true" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <FileUp :size="18" />
-        {{ mstrings['csvimport'] }}
-    </button>
+    <MenuButton @click="showcsvmodal = true" :disabled="!props.show || !enable" iconName="BetweenVerticalStart">
+        {{ mstrings.csvimport }}
+    </MenuButton>
 
     <VueModal v-model="showcsvmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['csvimport']">
 
@@ -99,6 +98,7 @@
     import TwDropzone from '../Tailwind/TwDropzone.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
+    import MenuButton from '../Common/MenuButton.vue';
     import type { IErrorList, IGradetype } from '@/js/Interfaces';
     import { FileUp } from '@lucide/vue';
 

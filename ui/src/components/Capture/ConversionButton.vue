@@ -1,7 +1,9 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton color="primary" @click="conversion_clicked">{{ mstrings['convertgrades'] }}</TwButton>
+    <MenuButton @click="conversion_clicked" iconName="Table">
+        {{ mstrings.convertgrades }}
+    </MenuButton>
 
     <VueModal v-model="showselectmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['conversionselect']">
 
@@ -66,6 +68,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
+    import MenuButton from '../Common/MenuButton.vue';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { IMap, IGradeitem } from '@/js/Interfaces';
 

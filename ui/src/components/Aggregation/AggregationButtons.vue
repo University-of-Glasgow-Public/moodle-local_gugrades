@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12 mt-2">
+    <div class="flex gap-2 mt-2">
         <RecalculateButton v-if="caneditgrades" :categoryid="props.categoryid" :staffuserid="props.staffuserid" @recalculated="refreshtable"></RecalculateButton>
         <ConversionButton v-if="!props.toplevel && caneditgrades" :categoryid="props.categoryid" :disabled="!allowconversion" @converted="refreshtable"></ConversionButton>
         <ReleaseCategoryButton v-if="!props.toplevel && caneditgrades"

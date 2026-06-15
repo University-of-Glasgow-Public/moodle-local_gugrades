@@ -1,10 +1,9 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button @click="open_modal" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <SaveAll :size="18" />
+    <MenuButton @click="open_modal" iconName="SaveAll">
         {{ mstrings['exportcapture'] }}
-    </button>
+    </MenuButton>
 
     <VueModal v-model="showexportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['exportcapture']">
 
@@ -51,7 +50,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { ICaptureExportOptions } from '@/js/Interfaces';
-    import { SaveAll } from '@lucide/vue';
+    import MenuButton from '../Common/MenuButton.vue';
 
     const showexportmodal = ref(false);
     const debug = ref({});

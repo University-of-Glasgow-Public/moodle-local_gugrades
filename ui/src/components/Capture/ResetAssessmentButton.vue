@@ -1,15 +1,9 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button
-        v-if="hascapability"
-        :disabled="processing"
-        @click="showconfirm = true"
-        class="btn btn-outline btn-error mr-2 btn-sm"
-        >
-        <Bomb :size="18" />
+    <MenuButton  v-if="hascapability" @click="showconfirm = true" :disabled="processing" iconName="Bomb">
         {{ mstrings.resetassessment }}
-    </button>
+    </MenuButton>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetassessmentconfirm" @confirm="confirmreset"></ConfirmModal>
     <PleaseWait v-if="processing"></PleaseWait>
@@ -23,8 +17,8 @@
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
+    import MenuButton from '../Common/MenuButton.vue';
     import { useToast } from "vue-toastification";
-    import { Bomb } from '@lucide/vue';
 
     const props = defineProps<{
         itemid: number;

@@ -19,8 +19,13 @@
             </ul></p>
         </TwAlert>
         <div>
-            <div class="text-sm">CATEGORY</div>
-            <select v-if="!notsetup && !itemerror" v-model="categoryid" class="select w-80 focus:outline-none" aria-label="Select top-level grade category">
+            <div class="text-sm font-bold mb-1 opacity-70">CATEGORY</div>
+            <select 
+                v-if="!notsetup && !itemerror" 
+                v-model="categoryid" 
+                class="select select-bordered bg-white text-neutral border-slate-300 w-80 shadow-md focus:outline-none focus:border-primary" 
+                aria-label="Select top-level grade category"
+            >
                 <option disabled value="0">{{ mstrings.selectgradecategory }}</option>
                 <option v-for="category in level1categories" :key="category.id" :value="category.id" :selected="selected == category.id">{{ category.fullname }}</option>
             </select>

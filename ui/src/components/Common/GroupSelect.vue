@@ -2,8 +2,15 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div v-if="showgroupselect">
-        <div class="text-sm">GROUP</div>
-        <select class="select w-120 focus:outline-none" v-model="groupid" aria-label="Group select">
+        <!-- Matching Label to keep typography uniform -->
+        <div class="text-sm font-bold mb-1 opacity-70">GROUP</div>
+        
+        <!-- Matching visual properties: solid white, slate border, and matching drop-shadow -->
+        <select 
+            class="select select-bordered bg-white text-neutral border-slate-300 w-120 shadow-md focus:outline-none focus:border-primary" 
+            v-model="groupid" 
+            aria-label="Group select"
+        >
             <option value="0">{{ mstrings.allparticipants }}</option>
             <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
         </select>

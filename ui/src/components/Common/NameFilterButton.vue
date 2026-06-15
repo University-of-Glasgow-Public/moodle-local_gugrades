@@ -1,8 +1,7 @@
 <template>
-    <button @click="filteropen" :disabled="props.usershidden" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <Funnel :size="18" />
-        <span>{{ mstrings.filterbyname }}</span>
-    </button>
+    <MenuButton @click="filteropen" :disabled="props.usershidden" iconName="Funnel">
+        {{ mstrings.filterbyname }}
+    </MenuButton>
 
     <HeadlessModal :isopen="showfiltermodal" @closed="filterclose">
         <template #title>
@@ -15,11 +14,11 @@
 
 <script setup lang="ts">
     import { ref } from 'vue';
-    import { Funnel } from '@lucide/vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import HeadlessModal from '../Tailwind/HeadlessModal.vue';
     import NameFilter from './NameFilter.vue';
+    import MenuButton from '../Common/MenuButton.vue';
 
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );

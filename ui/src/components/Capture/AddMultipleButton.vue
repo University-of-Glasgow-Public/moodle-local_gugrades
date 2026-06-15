@@ -1,10 +1,9 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button @click="add_multiple_button_click()" :disabled="!enable" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <BetweenVerticalStart :size="18" />
+    <MenuButton @click="add_multiple_button_click()" :disabled="!enable" iconName="BetweenVerticalStart">
         {{ mstrings['addmultiple'] }}
-    </button>
+    </MenuButton>
 
     <VueModal v-model="showaddmultiplemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['addmultiple']">
         <FormKit type="form" @submit="submit_form">
@@ -50,10 +49,10 @@
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import MenuButton from '../Common/MenuButton.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { IEmitEditColumn } from '@/js/Interfaces';
-    import { BetweenVerticalStart } from '@lucide/vue';
 
     interface GradeType {
         label: string;

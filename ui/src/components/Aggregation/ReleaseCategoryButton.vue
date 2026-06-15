@@ -1,11 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button @click="showreleasemodal=true" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <Rocket :size="18" />
+    <MenuButton @click="showreleasemodal=true" iconName="Rocket">
         <span v-if="grouprelease"><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgroup }}</span>
         <span v-else><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgrade }}</span>
-    </button>
+    </MenuButton>
 
     <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.releaseaggregatedgrade">
 
@@ -60,7 +59,7 @@
     import { useLogo } from '@/js/monochromelogo';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
-    import { Rocket } from '@lucide/vue';
+    import MenuButton from '../Common/MenuButton.vue';
 
     const showreleasemodal = ref(false);
     const loading = ref(false);

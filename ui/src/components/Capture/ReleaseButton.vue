@@ -1,8 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button @click="release_button_clicked" :disabled="!enable" class="btn btn-outline btn-secondary mr-2 btn-sm">
-        <LockKeyholeOpen :size="18" />
+    <MenuButton @click="release_button_clicked" :disabled="!enable" iconName="LockKeyholeOpen">
         <span v-if="props.released">
             <span v-if="grouprelease">{{ mstrings['unreleasegradesgroup'] }}</span>
             <span v-else>{{ mstrings['unreleasegrades'] }}</span>
@@ -11,7 +10,7 @@
             <span v-if="grouprelease">{{ mstrings['releasegradesgroup'] }}</span>
             <span v-else>{{ mstrings['releasegrades'] }}</span>
         </span>
-    </button>
+    </MenuButton>
 
     <VueModal v-model="showreleasemodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['releasegrades']">
 
@@ -61,6 +60,7 @@
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import TwButton from '../Tailwind/TwButton.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
+    import MenuButton from '../Common/MenuButton.vue';
     import { useLogo } from '@/js/monochromelogo';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
