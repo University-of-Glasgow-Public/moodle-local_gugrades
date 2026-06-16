@@ -33,6 +33,12 @@ defined('MOODLE_INTERNAL') || die();
 class regulations {
 
     /**
+     * Static variable for regulation class
+     * So we don't have to keep working it out. 
+     */
+    private static ?object $regulation = null;
+
+    /**
      * Get aggregation/regulations subplugins
      *
      */
@@ -60,11 +66,19 @@ class regulations {
     public static function get_active_regulation(int $courseid): object {
         global $DB;
 
+        // Have we already worked this out?
+        // The courseid cannot change while MyGrades is active
+        if (!\local_gugrades\api::is_unit_test() && self::$regulation) {
+            return self::$regulation;
+        }
+
         $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
         $regulations = self::get_regulations();
 
         foreach ($regulations as $regulation) {
             if ($regulation->is_active($course)) {
+                self::$regulation = $regulation;
+
                 return $regulation;
             }
         }

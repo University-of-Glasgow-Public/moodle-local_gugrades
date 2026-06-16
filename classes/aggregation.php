@@ -1230,6 +1230,7 @@ class aggregation {
         int $userid,
         int $level,
         bool $skipdroplow = false,
+        bool &$nursingcondmet = false,
     ) {
 
         // Are there any altered weights at all for this course?
@@ -1270,7 +1271,8 @@ class aggregation {
                             $child,
                             $userid,
                             $level + 1,
-                            $skipdroplow
+                            $skipdroplow,
+                            $nursingcondmet,
                         );
                     $childcategorytotal = $agg->total;
                     $rawgrade = $agg->rawgrade;
@@ -1337,7 +1339,7 @@ class aggregation {
         // List of items should hold list for this gradecategory only, ready
         // to aggregate.
         [$total, $rawgrade, $admingrade, $display, $completion, $error, $explain, $notavailable] =
-            $aggregation->aggregate_user_category($courseid, $category, $items, $level, $userid);
+            $aggregation->aggregate_user_category($courseid, $category, $items, $level, $userid, $nursingcondmet);
 
         // If this is a points grade, level 2 or deeper, a grade is returned and a map exists then
         // we need to deal with this as a converted grade.

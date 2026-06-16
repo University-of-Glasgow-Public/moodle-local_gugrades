@@ -553,6 +553,10 @@ class api {
         // Check options for extra regulation information. Hard coded right now.
         if (in_array('engineering', $options)) {
             $regulationextra = 'Engineering';
+        } else if (in_array('nursingug', $options)) {
+            $regulationextra = 'Nursing UG';
+        } else if (in_array('nursingpgt', $options)) {
+            $regulationextra = 'Nursing PGT';
         } else {
             $regulationextra = '';
         }

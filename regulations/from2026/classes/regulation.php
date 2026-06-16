@@ -32,6 +32,11 @@ defined('MOODLE_INTERNAL') || die();
 class regulation implements \local_gugrades\IRegulation {
 
     /**
+     * Cached/static options array.
+     */
+    private static ?array $options = null;
+
+    /**
      * Get short name
      * @return string
      */
@@ -68,6 +73,31 @@ class regulation implements \local_gugrades\IRegulation {
     }
 
     /**
+     * Check if a course is in a course category -
+     * or in any children of that course category
+     * @param int $coursecatid
+     * @param int $parentcatid
+     * @return bool
+     */
+    protected function is_in_cat(int $coursecatid, int $parentcatid): bool {
+        global $DB;
+
+        // If it's 0 (default setting)...
+        if (!$parentcatid) {
+            return false;
+        }
+
+        // The parentcatid must exist in the coursecatid's path
+        $parentcat = $DB->get_record('course_categories', ['id' => $parentcatid], '*', MUST_EXIST);
+        $parentpath = $parentcat->path;
+
+        $coursecat = $DB->get_record('course_categories', ['id' => $coursecatid], '*', MUST_EXIST);
+        $coursepath = $coursecat->path;
+
+        return str_starts_with($coursepath, $parentpath);
+    }
+
+    /**
      * Return array of additional options. For example, modifiers
      * for particular School.
      * TODO: Need to cache this somehow!!
@@ -77,19 +107,41 @@ class regulation implements \local_gugrades\IRegulation {
     public function get_options(int $courseid) {
         global $DB;
 
+        // Options can't change while MyGrades is active.
+        if (!\local_gugrades\api::is_unit_test() && self::$options) {
+            return self::$options;
+        }
+
         $options = [];
         $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 
         // Check if Engineering.
         $engineeringcat = get_config('local_gugrades', 'engineeringcat');
-        $coursecategoryid = $course->category;
-
-        // The engineering cat setting needs to be in the category path for the category
-        // this course is in (if you see what I mean).
-        $sql = "SELECT * FROM {course_categories} WHERE path LIKE :pathsegment";
-        $pathsegment = "%/" . $engineeringcat . "%";
-        if ($DB->record_exists_sql($sql, ['pathsegment' => $pathsegment])) {
+        if (self::is_in_cat($course->category, $engineeringcat)) {
             $options[] = 'engineering';
+
+            self::$options = $options;
+            return $options;
+        }
+
+        // Check if Nursing UG
+        $nursingugcat = get_config('local_gugrades', 'nursingugcat');
+
+        if (self::is_in_cat($course->category, $nursingugcat)) {
+            $options[] = 'nursingug';
+
+            self::$options = $options;
+            return $options;
+        }
+
+        // Check if Nursing PGT
+        $nursingpgtcat = get_config('local_gugrades', 'nursingpgtcat');
+
+        if (self::is_in_cat($course->category, $nursingpgtcat)) {
+            $options[] = 'nursingpgt';
+
+            self::$options = $options;
+            return $options;
         }
 
         return $options;

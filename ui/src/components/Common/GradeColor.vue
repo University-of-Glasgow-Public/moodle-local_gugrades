@@ -22,8 +22,9 @@
     function gradecolorclass(grade: string): string[] {
         let colorclass: string[] = [];
 
-        // Only look at the first two characters of the grade
-        const grade2 = grade.substring(0, 2);
+        // Remove 'X' if it is the very first character, then take the first 2 characters
+        const cleanGrade = grade.startsWith('X') ? grade.slice(1) : grade;
+        const grade2 = cleanGrade.substring(0, 2);
 
         if (grade2 in gradecolors) {
             const classes = gradecolors[grade2]!;

@@ -54,6 +54,11 @@ class aggregate {
      */
     private string $atype;
 
+    /**
+     * @var bool $nursingx
+     */
+    private bool $nursingx;
+
 
 
 
@@ -85,6 +90,7 @@ class aggregate {
      * The category object is provided to identify aggregation settings
      * and so on
      * Note that this will be for one gradecategory for one user, only.
+     * &$conditionmet bubbles up Nursing X conditions
      * Return array has the following...
      * - parent grade value (See MGU-821)
      * - raw aggregated grade
@@ -96,9 +102,10 @@ class aggregate {
      * @param array $items
      * @param int $level
      * @param int $userid
+     * @param bool &$conditionmet
      * @return array ['rounded' grade, grade val, admingrade, grade disp, completion, error, explain, not available]
      */
-    public function aggregate_user_category(int $courseid, object $category, array $items, int $level, int $userid) {
+    public function aggregate_user_category(int $courseid, object $category, array $items, int $level, int $userid, bool &$conditionmet = false) {
 
         // Get basic data about aggregation
         // (this is also a check that it actually exists).
@@ -107,6 +114,24 @@ class aggregate {
         $aggmethod = $category->aggregation;
         $atype = $category->atype;
         $itemid = $category->itemid;
+
+        // Special rules, Engineering, Nursing.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $options = $regulation->get_options($courseid);
+        $isengineering = in_array('engineering', $options);
+        $isnursingug = in_array('nursingug', $options);
+        $isnursingpgt = in_array('nursingpgt', $options);
+
+        // If it's not nursing, it doesn't matter what this is set to.
+        // UG is D3:9, PGT is C3:12.
+        $lowestnursinggrade = $isnursingug ? 9 : 12;
+
+        // If it is nursing, check for nursing conditions.
+        if ($isnursingug || $isnursingpgt) {
+            if ($this->nursing_check($items, $lowestnursinggrade)) {
+                $conditionmet = true;
+            }
+        }
 
         // Initialise 'explain' string.
         $explain = '';
@@ -268,6 +293,12 @@ class aggregate {
                 $level
             );
 
+            // MGU-1442: Is this nursing? Do we need to apply an X?
+            if (($level == 1) && ($isnursingug || $isnursingpgt) && $conditionmet) {
+
+                $displaygrade = 'X' . $displaygrade;
+            }
+
             $explain = get_string('explain_schedule', 'local_gugrades');
 
             return [$parentgrade, $aggregatedgrade, '', $displaygrade, 0, '', $explain, false];
@@ -277,6 +308,35 @@ class aggregate {
         $explain = get_string('explain_points', 'local_gugrades');
 
         return [$aggregatedgrade, $aggregatedgrade, '', $aggregatedgrade, 0, '', $explain, false];
+    }
+
+    /**
+     * Check nursing conditions
+     * @param array $items
+     * @param int $lowestgrade
+     * @return bool
+     */
+    protected function nursing_check(array $items, int $lowestgrade): bool {
+
+        // Is there an NS (NOSUBMISSION) in the array?
+        if (in_array('NOSUBMISSION', array_column($items, 'admingrade'))) {
+            return true;
+        }
+
+        // Any valid grades < $lowestgrade?
+        foreach ($items as $item) {
+
+            // Skip items that are missing a grade or have an admingrade.
+            if ($item->grademissing || !empty($item->admingrade) || $item->iscategory) {
+                continue;
+            }
+
+            if ($item->grade < $lowestgrade) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
