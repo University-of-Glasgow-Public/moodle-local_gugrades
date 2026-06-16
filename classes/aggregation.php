@@ -500,7 +500,7 @@ class aggregation {
                 'isscale' => $column->isscale,
                 'dropped' => false,
                 'isadmin' => false,
-                'hidden' => in_array($column->gradeitemid, $hiddenids),
+                'hidden' => in_array($column->gradeitemid, $hiddenids[$user->id] ?? []),
                 'overridden' => false,
                 'available' => true,
                 'normalisedweight' => null,
