@@ -418,5 +418,30 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026060100, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026061600) {
+
+        // Define table local_gugrades_flag to be created.
+        $table = new xmldb_table('local_gugrades_flag');
+
+        // Adding fields to table local_gugrades_flag.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('gradecategoryid', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
+        $table->add_field('gradeitemid', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
+        $table->add_field('engexam', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('legacyrecit', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table local_gugrades_flag.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for local_gugrades_flag.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026061600, 'local', 'gugrades');
+    }
+
     return true;
 }

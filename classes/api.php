@@ -2238,6 +2238,11 @@ class api {
      */
     public static function get_aggregation_dashboard_user(int $courseid, int $gradecategoryid, int $userid) {
 
+        // Setup aggregation data.
+        // ...empty users array forces function to simply load the whole lot.
+        \local_gugrades\grades::build_bulk_data($courseid, []);
+        \local_gugrades\aggregation::reset_bulk_data($courseid);
+
         // Check if this user has any data?
         if (!\local_gugrades\grades::user_has_data($gradecategoryid, $userid)) {
             return null;
