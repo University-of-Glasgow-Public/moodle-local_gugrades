@@ -7,7 +7,7 @@
 
     <VueModal v-model="showaltermodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.altertitle">
 
-        <TwAlert v-if="loading">{{ mstrings.pleasewait }}</TwAlert>
+        <UAlert v-if="loading">{{ mstrings.pleasewait }}</UAlert>
 
         <div v-if="!loading" class="scrollable-content">
 
@@ -61,7 +61,7 @@
                 </tbody>
             </table>
 
-            <TwAlert v-if="!closeenough" color="warning" class="my-2">{{ mstrings.donotaddto1 }}</TwAlert>
+            <UAlert v-if="!closeenough" variant="warning" class="my-2">{{ mstrings.donotaddto1 }}</UAlert>
 
             <div class="divider"></div>
 
@@ -76,10 +76,10 @@
                 />
             </div>
 
-            <div class="mt-2">
-                <TwButton color="primary" class="mr-1" @click="save_altered_weights">{{ mstrings.save }}</TwButton>
-                <TwButton color="info" class="mr-1" @click="revert_altered_weights">{{ mstrings.revert }}</TwButton>
-                <TwButton color="warning" @click="closemodal">{{ mstrings.cancel }}</TwButton>
+            <div class="mt-2 flex gap-2">
+                <UButton variant="primary" @click="save_altered_weights">{{ mstrings.save }}</UButton>
+                <UButton vaiant="info" @click="revert_altered_weights">{{ mstrings.revert }}</UButton>
+                <UButton variant="warning" @click="closemodal">{{ mstrings.cancel }}</UButton>
             </div>
 
         </div>
@@ -93,8 +93,8 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import type { IAlterWeightItem, ISaveAlteredWeightItem } from '@/js/Interfaces';
 
     const showaltermodal = ref(false);

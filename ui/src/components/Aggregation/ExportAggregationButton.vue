@@ -42,11 +42,11 @@
                 :submit-label="mstrings.export"
             >
 
-                <TwAlert class="mb-5">{{ mstrings.selectfields }}</TwAlert>
+                <UAlert class="mb-5" variant="info">{{ mstrings.selectfields }}</UAlert>
 
-                <div class="mb-2">
-                    <TwButton color="info" class="mr-1" @click="all_selected">{{ mstrings.checkall }}</TwButton>
-                    <TwButton color="secondary"  @click="none_selected">{{ mstrings.checknone }}</TwButton>
+                <div class="mb-2 flex gap-2">
+                    <UButton variant="info" @click="all_selected">{{ mstrings.checkall }}</UButton>
+                    <UButton variant="secondary"  @click="none_selected">{{ mstrings.checknone }}</UButton>
                 </div>
 
                 <FormKit
@@ -61,12 +61,12 @@
 
         <!-- alternatively -->
         <div v-if="(step == 'selectfields') && !hasform" class="mb-5 scrollable-content">
-            <TwAlert>{{ mstrings.noselectfields }}</TwAlert>
-            <TwButton color="primary" class="mt-2" @click="fields_selected()">{{  mstrings.next }}</TwButton>"
+            <UAlert variant="warning">{{ mstrings.noselectfields }}</UAlert>
+            <UButton variant="primary" class="mt-2" @click="fields_selected()">{{  mstrings.next }}</UButton>"
         </div>
 
         <div class="flex justify-end">
-            <TwButton color="warning" @click="close_modal()">{{ mstrings.cancel }}</TwButton>
+            <UButton variant="warning" @click="close_modal()">{{ mstrings.cancel }}</UButton>
         </div>
     </VueModal>
 </template>
@@ -80,8 +80,8 @@
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import MenuButton from '../Common/MenuButton.vue';
     import type { IAggregationExportPlugin, IMenuItem, IAggregationExportForm } from '@/js/Interfaces';
 

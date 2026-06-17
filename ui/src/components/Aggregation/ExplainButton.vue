@@ -19,7 +19,7 @@
             </div>
         </template>
 
-        <TwAlert v-if="loading">{{ mstrings.pleasewait }}</TwAlert>
+        <UAlert v-if="loading">{{ mstrings.pleasewait }}</UAlert>
 
         <div v-if="!loading" class="scrollable-content">
 
@@ -114,7 +114,7 @@
             </div>
 
             <div class="flex justify-end">
-                <TwButton color="warning" @click="closemodal" class="mt-8 font-semibold">{{ mstrings.close }}</TwButton>
+                <UButton variant="warning" @click="closemodal" class="mt-8 font-semibold">{{ mstrings.close }}</UButton>
             </div>
         </div>
     </VueModal>
@@ -127,8 +127,8 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import YesNo from '@/components/YesNo.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import { CircleAlert, X } from '@lucide/vue';
     import type { IUser } from '@/js/Interfaces';
 import GradeColor from '../Common/GradeColor.vue';

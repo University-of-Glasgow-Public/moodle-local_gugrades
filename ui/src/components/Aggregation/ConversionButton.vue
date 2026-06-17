@@ -18,7 +18,7 @@
 
             <!--  If no map is currently selected, show the selection dialogue -->
             <div v-if="!selection">
-                <TwAlert v-if="nomaps && loaded" class="mb-4" color="warning">{{ mstrings.nomaps }}</TwAlert>
+                <Ulert v-if="nomaps && loaded" class="mb-4" variant="warning">{{ mstrings.nomaps }}</Ulert>
 
                 <EasyDataTable class="mb-2" v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true">
                     <template #item-select="item">
@@ -26,18 +26,18 @@
                     </template>
                 </EasyDataTable>
 
-                <div>
-                    <TwButton color="primary" class="mr-1" @click="save_clicked" :disabled="mapid == 0">{{ mstrings.save }}</TwButton>
-                    <TwButton color="warning" @click="showselectmodal = false">{{  mstrings.cancel }}</TwButton>
+                <div class="flex gap-2">
+                    <UButton variant="primary" @click="save_clicked" :disabled="mapid == 0">{{ mstrings.save }}</UButton>
+                    <UButton variant="warning" @click="showselectmodal = false">{{  mstrings.cancel }}</UButton>
                 </div>
             </div>
 
             <!-- if a map is selected then show warning message and option to remove -->
             <div v-if="selection">
-                <TwAlert color="warning">{{ mstrings.conversionremovewarning }}</TwAlert>
-                <div class="mt-1 mb-4">
-                    <TwButton color="primary" class="mr-1" @click="remove_clicked">{{ mstrings.remove }}</TwButton>
-                    <TwButton color="warning" @click="showselectmodal = false">{{  mstrings.cancel }}</TwButton>
+                <UAlert variant="warning">{{ mstrings.conversionremovewarning }}</UAlert>
+                <div class="mt-1 mb-4 flex gap-2">
+                    <UButton variant="primary" @click="remove_clicked">{{ mstrings.remove }}</UButton>
+                    <UButton variant="warning" @click="showselectmodal = false">{{  mstrings.cancel }}</UButton>
                 </div>
             </div>
 
@@ -53,8 +53,8 @@
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useToast } from "vue-toastification";
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UAlert from '../Common/UAlert.vue';
+    import UButton from '../Common/UButton.vue';
     import MenuButton from '../Common/MenuButton.vue';
     import type { Header } from "vue3-easy-data-table";
     import type { IMap } from '@/js/Interfaces';

@@ -11,10 +11,12 @@
         </div>
 
         <div v-else>
-            <TwAlert class="mb-5">{{ mstrings.recalculatehelp }}</TwAlert>
+            <UAlert class="mb-5" variant="info">{{ mstrings.recalculatehelp }}</UAlert>
 
-            <TwButton color="primary" class="mr-1"  @click="do_recalculate()">{{  mstrings.recalculate }}</TwButton>
-            <TwButton color="warning" @click="showrecalculatemodal = false">{{  mstrings.cancel }}</TwButton>
+            <div class="flex gap-2">
+                <UButton variant="primary" @click="do_recalculate()">{{  mstrings.recalculate }}</UButton>
+                <UButton variant="warning" @click="showrecalculatemodal = false">{{  mstrings.cancel }}</UButton>
+            </div>
         </div>
     </VueModal>
 </template>
@@ -27,8 +29,8 @@
     import { useToast } from "vue-toastification";
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import MenuButton from '../Common/MenuButton.vue';
 
     const showrecalculatemodal = ref(false);
