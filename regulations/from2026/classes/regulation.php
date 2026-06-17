@@ -182,10 +182,16 @@ class regulation implements \local_gugrades\IRegulation {
      * NOTE: Level == 0, means 'grand'/final total
      * List of admincode 'names' is returned for level;
      * translation is done in admingrades class.
+     * @param int $courseid
      * @param int $level
      * @return array
      */
-    public function get_admingrades(int $level): array {
+    public function get_admingrades(int $courseid, int $level): array {
+
+        // Nursing does NOT have GOODCAUSE_NR (ECC).
+        $options = $this->get_options($courseid);
+        $isnursing = in_array('nursingug', $options) || in_array('nursingpgt', $options);
+
         if ($level == 0) {
             return [
                 'GOODCAUSE_FO',
@@ -204,21 +210,39 @@ class regulation implements \local_gugrades\IRegulation {
                 'GOODCAUSE_NR',
             ];
         } else if ($level == 1) {
-            return [
-                'GOODCAUSE_FO',
-                'GOODCAUSE_NR',
-                'NOSUBMISSION',
-                'DEFERRED',
-                'INTERRUPTIONOFSTUDIES',
-            ];
+            if ($isnursing) {
+                return [
+                    'GOODCAUSE_FO',
+                    'NOSUBMISSION',
+                    'DEFERRED',
+                    'INTERRUPTIONOFSTUDIES',
+                ];
+            } else {
+                return [
+                    'GOODCAUSE_FO',
+                    'GOODCAUSE_NR',
+                    'NOSUBMISSION',
+                    'DEFERRED',
+                    'INTERRUPTIONOFSTUDIES',
+                ];
+            }
         } else {
-            return [
-                'GOODCAUSE_FO',
-                'GOODCAUSE_NR',
-                'NOSUBMISSION',
-                'DEFERRED',
-                'INTERRUPTIONOFSTUDIES',
-            ];
+            if ($isnursing) {
+                return [
+                    'GOODCAUSE_FO',
+                    'NOSUBMISSION',
+                    'DEFERRED',
+                    'INTERRUPTIONOFSTUDIES',
+                ];
+            } else {
+                return [
+                    'GOODCAUSE_FO',
+                    'GOODCAUSE_NR',
+                    'NOSUBMISSION',
+                    'DEFERRED',
+                    'INTERRUPTIONOFSTUDIES',
+                ];
+            }
         }
     }
 

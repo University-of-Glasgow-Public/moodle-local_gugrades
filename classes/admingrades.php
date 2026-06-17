@@ -300,7 +300,7 @@ class admingrades {
 
         $defaults = self::defaults();
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
-        $codes = $regulation->get_admingrades($grandtotal ? 0 : $level);
+        $codes = $regulation->get_admingrades($courseid, $grandtotal ? 0 : $level);
 
         $admingrades = [];
         foreach ($codes as $code) {
@@ -373,9 +373,9 @@ class admingrades {
 
         // Get ALL valid admingrades for regulations.
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
-        $admingrades = $regulation->get_admingrades(0);
-        $admingrades = array_merge($admingrades, $regulation->get_admingrades(1));
-        $admingrades = array_unique(array_merge($admingrades, $regulation->get_admingrades(2)));
+        $admingrades = $regulation->get_admingrades($courseid, 0);
+        $admingrades = array_merge($admingrades, $regulation->get_admingrades($courseid, 1));
+        $admingrades = array_unique(array_merge($admingrades, $regulation->get_admingrades($courseid, 2)));
 
         return !\local_gugrades\grades::any_invalid_admingrades($courseid, $admingrades);
     }

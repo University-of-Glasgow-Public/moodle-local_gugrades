@@ -102,10 +102,11 @@ class regulation implements \local_gugrades\IRegulation {
      * NOTE: Level == 0, means 'grand'/final total
      * List of admincode 'names' is returned for level;
      * translation is done in admingrades class.
+     * @param int $courseid
      * @param int $level
      * @return array
      */
-    public function get_admingrades(int $level): array {
+    public function get_admingrades(int $courseid, int $level): array {
         if ($level == 0) {
             return [
                 'GOODCAUSE_FO',
