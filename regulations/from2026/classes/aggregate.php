@@ -149,6 +149,21 @@ class aggregate {
         // Used to drop unavailable.
         $items = $this->availability($items, $userid);
 
+        // MGU-1446. If only one grade then that's the aggregated result (whatever it is)
+        if (count($items) == 1) {
+            $explain = get_string('explain_onegrade', 'local_gugrades');
+            $item = $items[0];
+
+            // Just let it drop through if grademissing
+            if (!$item->grademissing) {
+                if ($item->admingrade) {
+                    return [0, 0, $item->admingrade, $item->displaygrade, 0, '', $explain, false];
+                } else {
+                    return [$item->grade, $item->grade, '', $item->displaygrade, 0, '', $explain, false];
+                }
+            }
+        }
+
         // MGU-1349: If there are now no 'available' items left, the
         // aggregated category is 'not available'.
         if (count($items) == 0) {

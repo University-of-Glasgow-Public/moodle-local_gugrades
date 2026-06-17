@@ -6,10 +6,10 @@
             <TabList class="flex justify-start space-x-1 bg-base-100 p-1 border border-base-300 rounded-b-md w-full shadow-sm focus:outline-none">
                 <Tab v-for="tab in tabs" v-slot="{ selected }" as="template">
                     <a
-                        class="tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none"
+                        class="tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center"
                         :class="{
-                            'link-primary border-b-2 border-primary': selected,
-                            'text-base-content/80 hover:bg-base-100 hover:text-base-content': !selected,
+                            'text-university-blue border-b-2 border-university-blue': selected,
+                            'text-brand-dark-purple/80 hover:bg-brand-light-purple/10 hover:text-brand-dark-purple': !selected,
                         }"
                     >
                         <component :is="tab.icon" :size="16" class="mr-1" /> {{ tab.label }}

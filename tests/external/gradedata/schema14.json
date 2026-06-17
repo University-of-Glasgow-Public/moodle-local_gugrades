@@ -1,0 +1,35 @@
+[
+
+    {
+        "name": "Summative",
+        "category": true,
+        "weight": 1.0,
+        "children": [
+            {
+                "name": "Item 1",
+                "category": false,
+                "type": "schedulea",
+                "weight": 0.5
+            },
+            {
+                "name": "Item 2",
+                "category": false,
+                "type": "schedulea",
+                "weight": 0.5
+            },
+            {
+                "name": "Summer exam",
+                "category": true,
+                "weight": 0.5,
+                "children": [
+                    {
+                        "name": "Question 1",
+                        "category": false,
+                        "type": "schedulea"
+                    }
+                ]
+            }
+
+        ]
+    }
+]
