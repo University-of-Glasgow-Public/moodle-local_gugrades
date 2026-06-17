@@ -1,3 +1,31 @@
+
+<template>
+  <div v-if="visible" :class="classes" role="alert">
+    <!--
+    <slot name="icon">
+      <span :class="['mt-0.5 font-bold leading-none', ICON_COLOR[variant]]" aria-hidden="true">
+        {{ ICON_GLYPH[variant] }}
+      </span>
+    </slot>
+    -->
+
+    <div class="flex-1">
+      <p v-if="title" class="mb-0.5 font-semibold">{{ title }}</p>
+      <slot />
+    </div>
+
+    <button
+      v-if="dismissible"
+      type="button"
+      class="shrink-0 opacity-60 transition hover:opacity-100"
+      aria-label="Dismiss"
+      @click="dismiss"
+    >
+      ✕
+    </button>
+  </div>
+</template>
+
 <script setup lang="ts">
 /**
  * UAlert — drop-in replacement for DaisyUI's `alert` usage pattern,
@@ -65,27 +93,4 @@ const classes = computed<string[]>(() => [
 ])
 </script>
 
-<template>
-  <div v-if="visible" :class="classes" role="alert">
-    <slot name="icon">
-      <span :class="['mt-0.5 font-bold leading-none', ICON_COLOR[variant]]" aria-hidden="true">
-        {{ ICON_GLYPH[variant] }}
-      </span>
-    </slot>
 
-    <div class="flex-1">
-      <p v-if="title" class="mb-0.5 font-semibold">{{ title }}</p>
-      <slot />
-    </div>
-
-    <button
-      v-if="dismissible"
-      type="button"
-      class="shrink-0 opacity-60 transition hover:opacity-100"
-      aria-label="Dismiss"
-      @click="dismiss"
-    >
-      ✕
-    </button>
-  </div>
-</template>

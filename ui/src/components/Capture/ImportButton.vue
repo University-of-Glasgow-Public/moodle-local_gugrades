@@ -21,28 +21,26 @@
             <div class="divider"></div>
 
             <div class="mt-2 pt-2">
-                <TwButton v-if="dryruncount > 0" color="primary" @click="importgrades()">{{ mstrings['yesimport'] }}</TwButton>
-                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
+                <UButton v-if="dryruncount > 0" variant="primary" @click="importgrades()">{{ mstrings.yesimport }}</UButton>
+                <UButton variant="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</UButton>
             </div>
         </div>
 
         <div v-if="!loading && !showdryrun">
 
             <!-- already imported warning-->
-            <div class="alert alert-soft alert-vertical sm:alert-horizontal mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info h-6 w-6 shrink-0">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+            <!--<div class="alert alert-soft alert-vertical sm:alert-horizontal mb-4">-->
+            <UAlert variant="neutral" class="mb-4">
                 <div v-if="is_importgrades">
-                    {{ mstrings['gradesimported'] }}
-                    <p v-if="groupimport"><b>{{ mstrings['importinfogroup'] }}</b></p>
+                    {{ mstrings.gradesimported }}
+                    <p v-if="groupimport"><b>{{ mstrings.importinfogroup }}</b></p>
                 </div>
                 <div v-else>
                     {{ mstrings['importinfo'] }}
                     <p v-if="groupimport"><b>{{ mstrings['importinfogroup'] }}</b></p>
                 </div>
-                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
-            </div>
+                <UButton variant="warning" @click="showimportmodal = false" class="mt-2">{{ mstrings.cancel }}</UButton>
+            </UAlert>
 
             <FormKit type="form" :actions="false">
 
@@ -115,9 +113,9 @@
 
             <div class="divider"></div>
 
-            <div class="mt-2 pt-2">
-                <TwButton color="primary" @click="dryrungrades()">{{ mstrings['yesimport'] }}</TwButton>
-                <TwButton color="warning" @click="showimportmodal = false">{{ mstrings['cancel'] }}</TwButton>
+            <div class="mt-2 pt-2 flex gap-2">
+                <UButton variant="primary" @click="dryrungrades()">{{ mstrings.yesimport }}</UButton>
+                <UButton variant="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</UButton>
             </div>
         </div>
     </VueModal>
@@ -128,7 +126,8 @@
     import { storeToRefs } from 'pinia';
     import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import MenuButton from '../Common/MenuButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';

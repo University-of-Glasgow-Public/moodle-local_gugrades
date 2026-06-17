@@ -2,12 +2,12 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <MenuButton @click="open_modal" iconName="SaveAll">
-        {{ mstrings['exportcapture'] }}
+        {{ mstrings.exportcapture }}
     </MenuButton>
 
-    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['exportcapture']">
+    <VueModal v-model="showexportmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.exportcapture">
 
-        <TwAlert color="info">{{  mstrings['exportcapturehelp'] }}</TwAlert>
+        <UAlert variant="info">{{  mstrings.exportcapturehelp }}</UAlert>
 
         <PleaseWait v-if="pleasewait"></PleaseWait>
 
@@ -18,10 +18,10 @@
                 :submit-label="mstrings['export']"
                 @submit="submit_export_form"
             >
-                <TwButton @click.prevent="clickallnone">
+                <UButton variant="accent" @click.prevent="clickallnone">
                     <span v-if="allnone">Select none</span>
                     <span v-else>Select all</span>
-                </TwButton>
+                </UButton>
                 <div class="mb-1">&nbsp;</div>
                 <FormKit
                     v-for="option in options"
@@ -33,7 +33,7 @@
         </div>
 
         <div class="flex justify-end">
-            <TwButton color="warning" @click="close_modal">{{ mstrings['cancel'] }}</TwButton>
+            <UButton variant="warning" @click="close_modal">{{ mstrings.cancel }}</UButton>
         </div>
     </VueModal>
 </template>
@@ -42,8 +42,8 @@
     import { ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import { useToast } from "vue-toastification";
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';

@@ -20,33 +20,33 @@
 
         <!-- Show if NOT already released -->
         <div v-if="!props.released">
-            <TwAlert v-if="!props.released">
-                {{ mstrings['releaseconfirm'] }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['releaseconfirmgroup'] }}</b></p>
-            </TwAlert>
+            <UAlert v-if="!props.released" variant="info">
+                {{ mstrings.releaseconfirm }}
+                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+            </UAlert>
 
-            <TwAlert v-if="props.released">
-                {{ mstrings['releaseconfirmstern'] }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['releaseconfirmgroup'] }}</b></p>
-            </TwAlert>
+            <UAlert v-if="props.released" variant="info">
+                {{ mstrings.releaseconfirmstern }}
+                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
+            </UAlert>
 
-            <div class="mt-5 flex justify-start">
-                <TwButton color="primary" @click="release_grades">{{ mstrings['yesrelease'] }}</TwButton>
-                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings['cancel'] }}</TwButton>
+            <div class="mt-5 flex gap-2 justify-start">
+                <UButton variant="primary" @click="release_grades">{{ mstrings.yesrelease }}</UButton>
+                <UButton variant="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</UButton>
             </div>
         </div>
 
         <!-- Show if already released -->
         <div v-if="props.released">
-            <h4>Revert release of grades</h4>
-            <TwAlert>
-                {{ mstrings['removerelease'] }}
-                <p v-if="grouprelease" class="mt-1"><b>{{ mstrings['removereleasegroup'] }}</b></p>
-            </TwAlert>
+            <h4 class="font-bold mb-2">Revert release of grades</h4>
+            <UAlert variant="info">
+                {{ mstrings.removerelease }}
+                <p v-if="grouprelease" class="mt-2"><b>{{ mstrings.removereleasegroup }}</b></p>
+            </UAlert>
 
-            <div class="mt-5 flex justify-start">
-                <TwButton color="primary" @click="revert_release">{{ mstrings['yesunrelease'] }}</TwButton>
-                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings['cancel'] }}</TwButton>
+            <div class="mt-5 flex gap-2 justify-start">
+                <UButton variant="primary" @click="revert_release">{{ mstrings.yesunrelease }}</UButton>
+                <UButton variant="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</UButton>
             </div>
         </div>
     </VueModal>
@@ -58,13 +58,12 @@
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
     import MenuButton from '../Common/MenuButton.vue';
     import { useLogo } from '@/js/monochromelogo';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import { LockKeyholeOpen } from '@lucide/vue';
+    import UAlert from '../Common/UAlert.vue';
+    import UButton from '../Common/UButton.vue';
 
     const showreleasemodal = ref(false);
     const loading = ref(false);

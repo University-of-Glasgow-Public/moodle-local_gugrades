@@ -10,9 +10,9 @@
         <PleaseWait v-if="waiting" progresstype="csvimport" :staffuserid="props.staffuserid"></PleaseWait>
 
         <!-- Doesn't appear to be a CSV -->
-        <TwAlert v-if="incorrectfiletype" color="danger">
-            {{ mstrings['incorrectfiletype'] }}
-        </TwAlert>
+        <UAlert v-if="incorrectfiletype" variant="error">
+            {{ mstrings.incorrectfiletype }}
+        </UAlert>
 
         <div v-if="!incorrectfiletype">
 
@@ -20,7 +20,7 @@
             <div v-if="pagestate == 'showuploadpage'">
                 <p><b>{{  mstrings['csvdownloadhelp'] }}</b></p>
 
-                <TwButton color="primary" @click="csv_download()">{{  mstrings['csvdownload'] }}</TwButton>
+                <UButton variant="primary" @click="csv_download()" class="mt-2">{{  mstrings.csvdownload }}</UButton>
 
                 <div class="divider"></div>
 
@@ -29,7 +29,7 @@
 
                 <TwDropzone :mimetypes="['text/csv']" accept="text/csv" @onchange="uploadfilechange">CSV files only</TwDropzone>
 
-                <TwButton :disabled="file == null" color="primary" @click="process_selected">{{ mstrings['next'] }}</TwButton>
+                <UButton :disabled="file == null" variant="primary" @click="process_selected">{{ mstrings.next }}</UButton>
             </div>
 
             <!-- Test-run / confirm page -->
@@ -81,7 +81,7 @@
         </div> <!-- incorrectfiletype -->
 
         <div class="flex justify-end">
-            <TwButton color="warning" @click="close_modal()">{{ mstrings['cancel'] }}</TwButton>
+            <UButton variant="warning" @click="close_modal()">{{ mstrings.cancel }}</UButton>
         </div>
     </VueModal>
 </template>
@@ -93,8 +93,8 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { saveAs } from 'file-saver';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import TwDropzone from '../Tailwind/TwDropzone.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
