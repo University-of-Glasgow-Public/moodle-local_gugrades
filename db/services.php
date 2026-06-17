@@ -90,6 +90,7 @@ $services = [
             'local_gugrades_get_help',
             'local_gugrades_write_note',
             'local_gugrades_read_note',
+            'local_gugrades_get_course_info',
         ],
         'requiredcapability' => 'local/gugrades:view',
         'restrictedusers' => 1,
@@ -476,6 +477,12 @@ $functions = [
     'local_gugrades_read_note' => [
         'classname' => 'local_gugrades\external\read_note',
         'description' => 'Read a student note from database',
+        'type' => 'read',
+        'ajax' => true,
+    ],
+    'local_gugrades_get_course_info' => [
+        'classname' => 'local_gugrades\external\get_course_info',
+        'description' => 'Get the course info to create back to course link',
         'type' => 'read',
         'ajax' => true,
     ],

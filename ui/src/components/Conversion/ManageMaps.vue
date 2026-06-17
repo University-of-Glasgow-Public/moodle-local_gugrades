@@ -8,7 +8,7 @@
             <UAlert v-if="!maps.length" variant="warning" class="mt-5">{{ mstrings.noconversionmaps }}</UAlert>
 
             <!-- New TanStack Table -->
-             <UTable :data="maps" :columns="columns" class="mt-5"></UTable>
+            <UTable :data="maps" :columns="columns" class="mt-5"></UTable>
 
             <div v-if="caneditgrades" class="mt-4 flex gap-2">
                 <UButton variant="primary" @click="add_map">{{ mstrings.addconversionmap }}</UButton>

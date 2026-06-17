@@ -1,42 +1,60 @@
 <template>
-    <div class="navbar bg-base-100 border-x border-t border-base-300 rounded-t-md flex justify-between mt-4 px-6">
-        <div>
-            <a :href="courseurl" class="text-sm" ><MoveLeft :size="18" class="inline" /> Back to course</a>
+    <div class="w-full mt-4 grid grid-cols-3 items-center justify-between border-x border-t border-brand-light-purple/30 bg-white rounded-t-xl px-6 py-3 text-brand-dark-purple shadow-sm">
+        
+        <div class="flex items-start gap-3 max-w-xs md:max-w-sm">
+            <a :href="url" class="text-university-blue hover:text-brand-dark-blue transition-colors pt-0.5 shrink-0" aria-label="Go back">
+                <MoveLeft :size="18" />
+            </a>
+
+            <div class="flex flex-col min-w-0 space-y-1">
+                <a :href="url" class="text-sm font-semibold text-university-blue hover:underline truncate block" :title="fullname">
+                    Back to {{ fullname }}
+                </a>
+                
+                <p class="text-xs text-brand-dark-purple/60 font-medium">
+                    Start date: <span class="font-mono text-brand-dark-purple/80">{{ startdate }}</span>
+                </p>
+                
+                <!-- 2. SPECIAL CATEGORY: Highlighted cleanly in your Dark Pink brand color -->
+                <div class="pt-0.5">
+                    <span class="inline-block text-[11px] font-bold tracking-wider uppercase bg-brand-dark-pink/10 text-brand-dark-pink px-2 py-0.5 rounded border border-brand-dark-pink/20 shadow-inner">
+                        {{ specialcategory }}
+                    </span>
+                </div>
+            </div>
         </div>
-        <GreyLogo />
-        <RegulationsBadge />
+
+        <div class="flex justify-center shrink-0">
+            <GreyLogo />
+        </div>
+
+        <!-- This empty block ensures the layout math centers the middle logo perfectly -->
+        <div class="hidden md:block"></div>
+
     </div>
 </template>
 
 <script setup lang="ts">
-    import { computed } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
+    import { moodleFetch } from '@/js/moodlefetch.ts';
     import { MoveLeft } from '@lucide/vue';
     import GreyLogo from './Common/GreyLogo.vue';
-    import ThemeSelect from './Common/ThemeSelect.vue';
-    import RegulationsBadge from './RegulationsBadge.vue';
 
-    /**
-     * Work out link back to course page
-     *
-     */
-    const courseurl = computed(() => {
+    const fullname = ref('');
+    const url = ref('');
+    const startdate = ref('');
+    const specialcategory = ref('');
 
-        // Extract the base URL
-        const currentUrl = window.location.href;
-        const baseUrl = currentUrl.split('/local/gugrades/ui/dist')[0];
-
-        // Extract the courseid from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseId = urlParams.get('courseid');
-
-        // Create the link to the course view
-        if (courseId) {
-
-          return `${baseUrl}/course/view.php?id=${courseId}`;
-        } else {
-          console.error('No courseid parameter found in the URL.');
-
-          return '';
-        }
-    });
+    onMounted(() => {
+        moodleFetch('local_gugrades_get_course_info', {})
+        .then((result: any) => {
+            fullname.value = result.fullname;
+            url.value = result.url;
+            startdate.value = result.startdate;
+            specialcategory.value = result.specialcategory;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    })
 </script>

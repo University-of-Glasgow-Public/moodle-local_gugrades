@@ -11,7 +11,6 @@
         <!-- Main Form Section -->
         <div v-if="!showreleaseddialogue" class="p-6 text-brand-dark-purple">
             
-            <!-- EXCITING SUMMARY CARD: Breaks the whiteness using your brand palette -->
             <div class="mb-6 p-4 rounded-lg bg-brand-light-purple/10 border border-brand-light-purple/30 shadow-inner">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     

@@ -2833,4 +2833,42 @@ class api {
             return '';
         }
     }
+
+    /**
+     * Get course info
+     * @param int $courseid
+     * @return array
+     */
+    public static function get_course_info(int $courseid) {
+        global $DB;
+
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+        $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
+
+    
+        // Regulation.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $options = $regulation->get_options($courseid);
+
+        // Check options for extra regulation information. Hard coded right now.
+        if (in_array('engineering', $options)) {
+            $regulationextra = 'Engineering';
+        } else if (in_array('nursingug', $options)) {
+            $regulationextra = 'Nursing UG';
+        } else if (in_array('nursingpgt', $options)) {
+            $regulationextra = 'Nursing PGT';
+        } else {
+            $regulationextra = '';
+        }
+
+        return [
+            'id' => $courseid,
+            'fullname' => $course->fullname,
+            'shortname' => $course->shortname,
+            'url' => $url->out(),
+            'startdate' => userdate($course->startdate),
+            'enddate' => userdate($course->enddate),
+            'specialcategory' => $regulationextra,
+        ];
+    }
 }
