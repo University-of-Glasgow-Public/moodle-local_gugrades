@@ -619,16 +619,18 @@ class conversion {
             return end($values);
         }
 
-        // Convert to integer percent.
-        $percentgrade = (int) floor((100 * $rawgrade / $maxgrade) * $scale);
+        // Convert to scaled integer percent.
+        // Use rounding (not floor) to avoid float representation drift at exact boundaries
+        // e.g. 92% being represented as 91.999999999 and falling into the prior band.
+        $percentgrade = (int) round((100 * $rawgrade / $maxgrade) * $scale, 0, PHP_ROUND_HALF_UP);
 
         for ($i = 0; $i < count($values); $i++) {
-            $lower = (int) floor($values[$i]->percentage * $scale);
+            $lower = (int) round(((float) $values[$i]->percentage) * $scale, 0, PHP_ROUND_HALF_UP);
 
             if ($i == count($values) - 1) {
                 $upper = 100 * $scale;
             } else {
-                $upper = (int) floor($values[$i + 1]->percentage * $scale);
+                $upper = (int) round(((float) $values[$i + 1]->percentage) * $scale, 0, PHP_ROUND_HALF_UP);
             }
 
             if ($percentgrade >= $lower && $percentgrade < $upper) {
