@@ -150,7 +150,7 @@ class aggregate {
         $items = $this->availability($items, $userid);
 
         // MGU-1446. If only one grade then that's the aggregated result (whatever it is)
-        if (count($items) == 1) {
+        if (($level > 1) && (count($items) == 1)) {
             $explain = get_string('explain_onegrade', 'local_gugrades');
             $item = $items[0];
 
