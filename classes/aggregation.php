@@ -801,9 +801,9 @@ class aggregation {
      */
     public static function translate_atype(string $atype) {
         if ($atype == \local_gugrades\GRADETYPE_SCHEDULEA) {
-            return 'Schedule A';
+            return 'GGS1';
         } else if ($atype == \local_gugrades\GRADETYPE_SCHEDULEB) {
-            return 'Schedule B';
+            return 'GGS2';
         } else if ($atype == \local_gugrades\GRADETYPE_POINTS) {
             return get_string('points', 'local_gugrades');
         } else if ($atype == \local_gugrades\GRADETYPE_ERROR) {

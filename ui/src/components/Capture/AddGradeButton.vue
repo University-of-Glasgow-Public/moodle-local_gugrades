@@ -1,31 +1,81 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a class="dropdown-item" href="#" @click="add_grade()">
+    <a class="dropdown-item block px-4 py-2 text-sm text-brand-dark-purple hover:bg-brand-light-purple/20 transition-colors" href="#" @click="add_grade()">
         {{ buttontitle }}
     </a>
 
-    <VueModal v-model="showaddgrademodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="buttontitle">
+    <!-- Upgraded modal classes for better shadows and borders -->
+    <VueModal v-model="showaddgrademodal" :enableClose="false" modalClass="rounded-xl max-w-3xl border border-brand-light-purple/30 bg-white shadow-xl" :title="buttontitle">
 
-        <!-- Can either show add grade form or re-release dialogue -->
-        <div v-if="!showreleaseddialogue">
-            <ul class="list-none">
-                <li v-if="props.categoryid"><b>{{ mstrings.category }}:</b> {{ itemname }}</li>
-                <li v-else><b>{{ mstrings.itemname }}:</b> {{ itemname }}</li>
-                <li><b>{{ mstrings.username }}:</b> {{ name }}</li>
-                <li><b>{{ mstrings.idnumber }}:</b> {{ idnumber }}</li>
-                <li>{{ reason }}</li>
-                <li v-if="overridden"><b>{{ mstrings.categoryoverridden }}</b></li>
-                <li v-if="props.released"><b>{{ mstrings.releasedgrade }}</b></li>
-            </ul>
+        <!-- Main Form Section -->
+        <div v-if="!showreleaseddialogue" class="p-6 text-brand-dark-purple">
+            
+            <!-- EXCITING SUMMARY CARD: Breaks the whiteness using your brand palette -->
+            <div class="mb-6 p-4 rounded-lg bg-brand-light-purple/10 border border-brand-light-purple/30 shadow-inner">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    
+                    <!-- Left Column: Primary Context Details -->
+                    <div class="space-y-2">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60">
+                                {{ props.categoryid ? mstrings.category : mstrings.itemname }}
+                            </span>
+                            <span class="font-bold text-base text-university-blue">
+                                {{ itemname }}
+                            </span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60">
+                                {{ mstrings.username }}
+                            </span>
+                            <span class="font-medium text-brand-dark-purple">
+                                {{ name }}
+                            </span>
+                        </div>
+                    </div>
 
-            <!-- message if not available -->
-            <TwAlert v-if="!available">{{ mstrings.overridenotavailable }}</TwAlert>
+                    <!-- Right Column: Identifiers & Dynamic Branded Badges -->
+                    <div class="space-y-2 flex flex-col md:items-end justify-between">
+                        <div class="flex flex-col md:items-end">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60">
+                                {{ mstrings.idnumber }}
+                            </span>
+                            <code class="font-mono text-xs bg-university-blue/10 px-2 py-0.5 rounded text-university-blue font-bold">
+                                {{ idnumber }}
+                            </code>
+                        </div>
 
-            <!-- message if error -->
-            <TwAlert v-if="error">{{ mstrings.overrideerror}}</TwAlert>
+                        <!-- Pill badges using your exact light palette settings -->
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            <span v-if="overridden" class="inline-block text-xs font-bold bg-brand-light-yellow text-brand-dark-purple px-2 py-0.5 rounded-md shadow-sm border border-brand-light-yellow/80">
+                                ⚠ {{ mstrings.categoryoverridden }}
+                            </span>
+                            <span v-if="props.released" class="inline-block text-xs font-bold bg-brand-light-green text-brand-dark-purple px-2 py-0.5 rounded-md shadow-sm border border-brand-light-green/80">
+                                ✓ {{ mstrings.releasedgrade }}
+                            </span>
+                        </div>
+                    </div>
 
-            <FormKit v-if="!overridden && available && !error" class="border rounded" type="form"  @submit="submit_form">
+                </div>
+
+                <!-- Sub-text label string if present -->
+                <div v-if="reason" class="mt-3 pt-3 border-t border-brand-light-purple/20 text-xs italic text-brand-dark-purple/70">
+                    {{ reason }}
+                </div>
+            </div>
+
+            <!-- Message Alerts Windows Layout Adjustments -->
+            <UAlert v-if="!available" class="mb-4 bg-brand-light-yellow/10 border border-brand-light-yellow/50 rounded-lg p-3 text-brand-dark-purple">
+                {{ mstrings.overridenotavailable }}
+            </UAlert>
+
+            <UAlert variant="error" v-if="error" class="mb-4 bg-brand-dark-red/10 border border-brand-dark-red/50 rounded-lg p-3 text-brand-dark-red">
+                {{ mstrings.overrideerror }}
+            </UAlert>
+
+            <!-- FORM WRAPPER: Enhanced padding and clean borders -->
+            <FormKit v-if="!overridden && available && !error" class="bg-white p-5 border border-brand-light-purple/30 rounded-xl shadow-sm" type="form" @submit="submit_form">
                 <FormKit
                     v-if="!iscategory"
                     type="select"
@@ -35,14 +85,12 @@
                     v-model="reason"
                     :options="gradetypes"
                     :placeholder="mstrings.selectareason"
-                    :validation-messages="{
-                        required: 'This field is required.',
-                    }"
+                    :validation-messages="{ required: 'This field is required.' }"
                     validation="required"
                     validation-visibility="live"
                 />
                 <FormKit
-                    v-if = 'reason == "OTHER"'
+                    v-if='reason == "OTHER"'
                     :label="mstrings.pleasespecify"
                     type="text"
                     outer-class="mb-3"
@@ -50,9 +98,7 @@
                     name="other"
                     v-model="other"
                     validation="required"
-                    :validation-messages="{
-                        required: 'This field is required.',
-                    }"
+                    :validation-messages="{ required: 'This field is required.' }"
                 />
                 <FormKit
                     type="select"
@@ -96,28 +142,39 @@
                 />
             </FormKit>
 
-            <div v-if="overridden" class="my-3">
-                <TwAlert class="mb-3">{{ mstrings.categoryremoveoverride }}</TwAlert>
-                <TwButton color="primary" @click="removeoverride">{{ mstrings.remove }}</TwButton>
+            <!-- Action panel for overridden states -->
+            <div v-if="overridden" class="my-4 p-4 bg-brand-light-purple/10 border border-brand-light-purple/30 rounded-lg">
+                <UAlert variant="info" class="mb-3 bg-white p-2 border border-brand-light-purple/20 text-brand-dark-purple rounded">{{ mstrings.categoryremoveoverride }}</UAlert>
+                <UButton variant="primary" class="bg-brand-dark-purple hover:bg-brand-dark-purple/90 text-white font-medium px-4 py-2 rounded-lg shadow-sm" @click="removeoverride">
+                    {{ mstrings.remove }}
+                </UButton>
             </div>
 
-            <div class="flex justify-end mt-8">
-                <TwButton color="warning" @click="closemodal">{{ mstrings.cancel }}</TwButton>
+            <!-- Main modal actions alignment footer -->
+            <div class="flex justify-end mt-6 pt-4 border-t border-brand-light-purple/20">
+                <UButton variant="warning" class="bg-brand-dark-red hover:bg-brand-dark-red/90 text-white font-medium px-4 py-2 rounded-lg shadow-sm" @click="closemodal">
+                    {{ mstrings.cancel }}
+                </UButton>
             </div>
         </div>
 
-        <!-- re-release after add dialogue -->
-        <div v-if="showreleaseddialogue">
-            <div class="alert alert-warning">
+        <!-- Re-release Interception Layer Window -->
+        <div v-if="showreleaseddialogue" class="p-6 text-brand-dark-purple">
+            <UAlert variant="warning" class="bg-brand-light-yellow/20 border-l-4 border-brand-light-yellow rounded-r-lg p-3 text-brand-dark-purple font-medium mb-4">
                 {{ mstrings.releasefromadd }}
-            </div>
-            <div class="mt-2">
-                <button class="btn btn-success" type="button" @click="release_grade">{{  mstrings.yes }}</button>
-                <button class="btn btn-warning ml-1" type="button" @click="closemodal">{{  mstrings.no }}</button>
+            </UAlert>
+            <div class="mt-4 flex gap-2 justify-end">
+                <UButton variant="success" class="bg-brand-dark-green hover:bg-brand-dark-green/90 text-white font-medium px-4 py-2 rounded-lg shadow-sm" @click="release_grade">
+                    {{ mstrings.yes }}
+                </UButton>
+                <UButton variant="warning" type="button" class="border border-brand-dark-red text-brand-dark-red hover:bg-brand-dark-red/5 px-4 py-2 rounded-lg" @click="closemodal">
+                    {{ mstrings.no }}
+                </UButton>
             </div>
         </div>
     </VueModal>
 </template>
+
 
 <script setup lang="ts">
     import {ref, computed} from 'vue';
@@ -128,6 +185,8 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwAlert from '../Tailwind/TwAlert.vue';
     import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import type { IGradetype } from '@/js/Interfaces';
 
     interface IAdminMenu {

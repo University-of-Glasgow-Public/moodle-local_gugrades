@@ -214,8 +214,8 @@
     const scaletype = ref('schedulea');
     const entrytype = ref('percentage');
     const scaletypeoptions = [
-        {value: 'schedulea', label: 'Schedule A'},
-        {value: 'scheduleb', label: 'Schedule B'},
+        {value: 'schedulea', label: 'GGS1'},
+        {value: 'scheduleb', label: 'GGS2'},
     ];
     const entrytypeoptions = [
         {value: 'percentage', label: 'Percentage'},

@@ -21,6 +21,7 @@
     "@kouts/vue-modal": "^5.0.3",
     "@lucide/vue": "^1.14.0",
     "@tailwindcss/vite": "^4.2.4",
+    "@tanstack/vue-table": "^8.21.3",
     "@tiptap/pm": "^3.24.0",
     "@tiptap/starter-kit": "^3.24.0",
     "@tiptap/vue-3": "^3.24.0",

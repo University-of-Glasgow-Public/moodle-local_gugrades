@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="serverdebug"></DebugDisplay>
 
-    <div class="bg-base-100 border rounded-md mt-2 border-gray-300 shadow-sm">
+    <div class="bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm">
 
         <div class="p-2">
             <div class="flex gap-2 justify-start mb-4">
@@ -30,25 +30,40 @@
     </div>
 
     <!-- Aggregation is not possible -->
-     <TwAlert v-if="!aggregationsupported" color="error" class="my-5">{{  mstrings.aggregationnotsupported }}</TwAlert>
+     <UAlert v-if="!aggregationsupported" variant="error" class="my-5">{{  mstrings.aggregationnotsupported }}</UAlert>
 
     <div v-if="level1category && aggregationsupported" class="mt-2">
 
         <!-- Breadcrumb trail -->
         <div v-if="breadcrumb.length > 1" class="my-3 overflow-visible">
-            <div class="breadcrumbs text-sm p-2 rounded-box border border-primary/50 bg-primary/20 text-primary shadow-sm tooltip-open">
-                <ul>
-                    <li><FolderOpen :size="18" /></li>
-                    <li v-for="(item, index) in breadcrumb" :key="item.id">
-                        <a
-                            href="#"
-                            @click.prevent="expand_clicked(item.id)"
-                            class="tooltip tooltip-right hover:text-primary"
-                            :data-tip="item.fullname"
-                            :class="{ 'font-bold': index == breadcrumb.length - 1}"
-                        >
-                        {{ item.shortname }}
-                        </a>
+            <div class="text-sm p-2 rounded-lg border border-university-blue/40 bg-university-blue/10 text-university-blue shadow-sm">
+                <ul class="flex flex-wrap items-center gap-2">
+                    
+                    <li class="flex items-center text-university-blue/70">
+                        <FolderOpen :size="18" />
+                    </li>
+
+                    <li 
+                        v-for="(item, index) in breadcrumb" 
+                        :key="item.id"
+                        class="flex items-center gap-2"
+                    >
+                        <span v-if="index > 0" class="text-university-blue/40 select-none">/</span>
+
+                        <UTooltip :text="item.fullname">
+                            <a
+                                href="#"
+                                @click.prevent="expand_clicked(item.id)"
+                                class="hover:underline transition-colors block py-0.5"
+                                :class="{ 
+                                    'font-bold text-university-blue': index === breadcrumb.length - 1,
+                                    'text-university-blue/80 hover:text-university-blue': index !== breadcrumb.length - 1
+                                }"
+                            >
+                                {{ item.shortname }}
+                            </a>
+                        </UTooltip>
+
                     </li>
                 </ul>
             </div>
@@ -78,13 +93,13 @@
             <!-- additional information in header cells -->
             <template #header="header">
                 <div v-if="header.value == 'back'">
-                    <button class="btn" @click="expand_clicked(backid)">
+                    <UButton @click="expand_clicked(backid)">
                         <ArrowBigLeft :size="18" /> Back
-                    </button>
+                    </UButton>
                 </div>
                 <div v-else class="aggregation-header flex gap-x-2">
                     <div>
-                        <div class="tooltip tooltip-success" :data-tip="header.fullname">
+                        <UTooltip :text="header.fullname">
 
                             <div>
                                 <!-- column title -->
@@ -94,7 +109,7 @@
                             <div v-if="!header.infocol && showweights">{{ header.weight }}%</div>
                             <div v-if="header.gradetype">{{ header.gradetype }} <span v-if="!header.isscale">({{ header.grademax }})</span></div>
                             <div v-if="header.resititem" class="badge badge-success">{{ mstrings.reassessment}}</div>
-                        </div>
+                        </UTooltip>
                         <div class="py-1" v-if="header.strategy">
                             <i>{{ header.strategy }}</i>
                         </div>
@@ -104,9 +119,9 @@
                     </div>
                 </div>
                 <div v-if="header.categoryid">
-                    <button class="btn btn-sm btn-soft ml-2" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
+                    <UButton class="ml-2" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
                         <ArrowBigRight :size="18" :stroke-width="1" />
-                    </button>
+                    </UButton>
                 </div>
             </template>
 
@@ -230,7 +245,6 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
-    import NameFilter from '@/components/Common/NameFilter.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue';
     import InfoButton from '@/components/Common/InfoButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
@@ -240,11 +254,12 @@
     import { ArrowBigRight, ArrowBigLeft, FolderOpen } from '@lucide/vue';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning, IError } from '@/js/Interfaces';
     import type { Header, Item } from "vue3-easy-data-table";
-    import TwAlert from '@/components/Tailwind/TwAlert.vue';
-    import TablePagination from '@/components/Common/TablePagination.vue';
+    import UAlert from '@/components/Common/UAlert.vue';
+    import UTooltip from '@/components/Common/UTooltip.vue';
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
     import GradeColor from '@/components/Common/GradeColor.vue';
     import { useFilter } from '@/stores/filter';
+    import UButton from '@/components/Common/UButton.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;

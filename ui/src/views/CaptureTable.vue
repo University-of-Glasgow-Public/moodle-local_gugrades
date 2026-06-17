@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <div class="border rounded-md mt-6 bg-base-100 border-gray-300 shadow-sm">
+        <div class="bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm">
 
             <div id="captureselect" class="p-2 overflow-hidden transition-all duration-300"
                 :class="collapsed ? 'max-h-0 opacity-0' : 'max-h-screen opacity-100'">
@@ -57,9 +57,9 @@
             <div v-if="showtable && loaded">
 
                 <!-- button for saving cell edits -->
-                <div class="pb-1 flex justify-end" v-if="ineditcellmode">
-                    <TwButton color="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</TwButton>
-                    <TwButton color="primary" @click="edit_cell_saved">{{ mstrings.save }}</TwButton>
+                <div class="pb-1 flex justify-end gap-2" v-if="ineditcellmode">
+                    <UButton variant="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</UButton>
+                    <UButton variant="primary" @click="edit_cell_saved">{{ mstrings.save }}</UButton>
                 </div>
 
                 <!-- Note. The array 'users' contains the lines of data. One record for each user -->
@@ -111,10 +111,29 @@
 
                     <!-- Latest grade column -->
                     <template v-slot:[provisionalslot]="item">
-                        <div v-if="item[provisionalid]">
-                            <span v-if="item.gradehidden && !item.gradebookhidden" class="border-2 border-yellow-500 border-rounded-md p-1">{{ item[provisionalid] }}</span>
-                            <span v-if="item.gradebookhidden" class="border-2 border-green-500 border-rounded-md p-1">{{ item[provisionalid] }}</span>
-                            <span v-if="!item.gradebookhidden && !item.gradehidden">{{ item[provisionalid] }}</span>
+                        <div v-if="item[provisionalid]" class="text-sm font-medium">
+                            
+                            <span 
+                                v-if="item.gradehidden && !item.gradebookhidden" 
+                                class="inline-block border-2 border-brand-light-yellow rounded-md px-2 py-0.5 bg-brand-light-yellow/10 text-brand-dark-purple"
+                            >
+                                {{ item[provisionalid] }}
+                            </span>
+
+                            <span 
+                                v-if="item.gradebookhidden" 
+                                class="inline-block border-2 border-brand-light-green rounded-md px-2 py-0.5 bg-brand-light-green/10 text-brand-dark-purple"
+                            >
+                                {{ item[provisionalid] }}
+                            </span>
+
+                            <span 
+                                v-if="!item.gradebookhidden && !item.gradehidden"
+                                class="text-brand-dark-purple"
+                            >
+                                {{ item[provisionalid] }}
+                            </span>
+
                         </div>
                     </template>
 
@@ -185,9 +204,9 @@
                 </EasyDataTable>
 
                 <!-- button for saving cell edits -->
-                <div class="pb-1 mt-2 flex justify-end" v-if="ineditcellmode">
-                    <TwButton color="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</TwButton>
-                    <TwButton color="primary" @click="edit_cell_saved">{{ mstrings.save }}</TwButton>
+                <div class="pb-1 mt-2 flex gap-2 justify-end" v-if="ineditcellmode">
+                    <UButton variant="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</UButton>
+                    <UButton variant="primary" @click="edit_cell_saved">{{ mstrings.save }}</UButton>
                 </div>
             </div>
 
@@ -213,8 +232,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { Header, Item } from "vue3-easy-data-table";
-    import TablePagination from '@/components/Common/TablePagination.vue';
-    import TwButton from '@/components/Tailwind/TwButton.vue';
+    import UButton from '@/components/Common/UButton.vue';
     import GradeColor from '@/components/Common/GradeColor.vue';
     import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
@@ -761,65 +779,3 @@
     });
 
 </script>
-
-<style>
-/*
-    .hidden-row td {
-        background-color: #ffff66  !important;
-        overflow: visible;
-    }
-
-    .gradebookhidden-row td {
-        background-color: #fabbec!important;
-        overflow: visible;
-    }
-
-    .non-hidden-row td {
-        overflow: visible;
-    }
-
-    .capture-table {
-        --easy-table-header-font-size: 14px;
-        --easy-table-header-height: 50px;
-        --easy-table-header-font-color: #f5f5f5;
-        --easy-table-header-background-color: #005c8a;
-
-        --easy-table-header-item-padding: 10px 15px;
-    }
-
-    .border-lg {
-        border-width: thick !important;
-    }
-
-    .capture-warning {
-        font-size: 125%;
-    }
-
-    .buttons-pagination .item.button.active {
-        color: black !important;
-    }
-
-    .vue3-easy-data-table__main {
-        overflow: visible !important;
-    }
-
-
-    .capture-table {
-        --easy-table-header-background-color: var(--color-primary);
-        --easy-table-header-font-color: var(--color-primary-content);
-
-        --easy-table-body-row-background-color: var(--color-base-100);
-        --easy-table-body-row-font-color: var(--color-base-content);
-
-        --easy-table-body-even-row-background-color: var(--color-base-300);
-        --easy-table-body-even-row-font-color: var(--color-base-content);
-
-        --easy-table-footer-background-color: var(--color-primary);
-        --easy-table-footer-font-color: var(--color-primary-content);
-    }
-
-    .vue3-easy-data-table__main {
-        overflow: visible !important;
-    }
-        */
-</style>

@@ -5,31 +5,14 @@
 
         <!-- show available maps -->
         <div v-if="!editmap && loaded">
-            <TwAlert v-if="!maps.length" color="warning" class="mt-5">{{ mstrings.noconversionmaps }}</TwAlert>
+            <UAlert v-if="!maps.length" variant="warning" class="mt-5">{{ mstrings.noconversionmaps }}</UAlert>
 
-            <EasyDataTable
-                class="mt-5"
-                v-if="loaded && maps.length"
-                :headers="headers"
-                :items="maps"
-            >
-                <template #item-inuse="map">
-                    <span v-if="map.inuse">{{ mstrings.yes }}</span>
-                    <span v-else>{{ mstrings.no }}</span>
-                </template>
-                <template #item-actions="map">
-                    <div class="py-1" role="group" aria-label="Actions">
-                        <button v-if="caneditgrades" class="btn btn-sm mr-1" @click="edit_clicked(map.id)">{{ mstrings.edit }}</button>
-                        <button v-if="!caneditgrades" class="btn btn-sm mr-1" @click="edit_clicked(map.id)">{{ mstrings.view }}</button>
-                        <button v-if="caneditgrades" class="btn btn-sm btn-error mr-1" :class="{ disabled: map.inuse }" :disabled="map.inuse" @click="delete_clicked(map.id)">{{ mstrings.delete }}</button>
-                        <button class="btn btn-sm btn-success mr-1" @click="export_clicked(map.id)">{{ mstrings.export }}</button>
-                    </div>
-                </template>
-            </EasyDataTable>
+            <!-- New TanStack Table -->
+             <UTable :data="maps" :columns="columns" class="mt-5"></UTable>
 
-            <div v-if="caneditgrades" class="mt-4">
-                <TwButton color="primary" @click="add_map" class="mr-1">{{ mstrings.addconversionmap }}</TwButton>
-                <TwButton color="success" @click="import_clicked">{{ mstrings.importconversionmap }}</TwButton>
+            <div v-if="caneditgrades" class="mt-4 flex gap-2">
+                <UButton variant="primary" @click="add_map">{{ mstrings.addconversionmap }}</UButton>
+                <UButton variant="success" @click="import_clicked">{{ mstrings.importconversionmap }}</UButton>
             </div>
         </div>
 
@@ -47,13 +30,15 @@
 
         <TwDropzone :mimetypes="['text/json']" accept="text/json" @onchange="uploadfilechange"></TwDropzone>
 
-        <TwButton color="info" class="mr-1" @click="process_import">{{ mstrings.import }}</TwButton>
-        <TwButton color="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</TwButton>
+        <div class="flex gap-2">
+            <UButton variant="info" @click="process_import">{{ mstrings.import }}</UButton>
+            <UButton variant="warning" @click="showimportmodal = false">{{ mstrings.cancel }}</UButton>
+        </div>
     </VueModal>
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted} from 'vue';
+    import { ref, onMounted, h } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -63,10 +48,14 @@
     import { saveAs } from 'file-saver';
     import { useFileDialog } from '@vueuse/core';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
     import TwDropzone from '../Tailwind/TwDropzone.vue';
     import type { Header } from "vue3-easy-data-table";
+    import UTable from '../Common/UTable.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
+    import ConversionActionButtons from './ConversionActionButtons.vue';
+    import { createColumnHelper } from '@tanstack/vue-table';
+    import type { IMap } from '@/js/Interfaces.ts';
 
     const maps = ref([]);
     const editmap = ref(false);
@@ -82,6 +71,61 @@
     const headers = ref< Header[] >([]);
     const caneditgrades = ref(false);
     const file = ref<File | null>(null);
+
+    const columnHelper = createColumnHelper< IMap >();
+
+    const columns = [
+        columnHelper.accessor('name', { 
+            header: mstringstore.getMstring('name'), 
+        }),
+
+        columnHelper.accessor('scale', {
+            header: mstringstore.getMstring('scalehead'),
+            cell: (info) => {
+                const scale = info.getValue();
+                if (scale == 'schedulea') {
+                    return 'GGS1';
+                } else {
+                    return 'GGS2';
+                }
+            }
+        }),
+
+        columnHelper.accessor('maxgrade', {
+            header: mstringstore.getMstring('maxgrade'),
+        }),
+
+        columnHelper.accessor('createdby', {
+            header: mstringstore.getMstring('createdby'),
+        }),
+
+        columnHelper.accessor('createdat', {
+            header: mstringstore.getMstring('createdat'),
+        }),
+
+        columnHelper.accessor('inuse', {
+            header: mstringstore.getMstring('inuse'),
+            cell: (info) => {
+                const inuse = info.getValue();
+                return inuse ? 'Yes' : 'No';
+            }
+        }),
+
+        columnHelper.display({
+            id: 'actions',
+            cell: ({ row }) => {
+                const currentMap = row.original // This will now work perfectly!
+                return h(ConversionActionButtons, {
+                    id: currentMap.id,
+                    caneditgrades: caneditgrades.value,
+                    inuse: currentMap.inuse,
+                    onEdit: (id: number) => edit_clicked(id),
+                    onDelete: (id: number) => delete_clicked(id),
+                    onExport: (id: number) => export_clicked(id),
+                });
+            }
+        }),
+    ];
 
     /**
      * Uploaded file has changed

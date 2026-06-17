@@ -317,3 +317,16 @@ export interface IError {
     help: string;
     level: string;
 }
+
+/**
+ * Conversion map
+ */
+export interface Map {
+    id: number;
+    name: string;
+    inuse: boolean;
+    maxgrade: number;
+    scale: string;
+    createdby: string;
+    createdat: string;
+}

@@ -13,36 +13,36 @@
         <!-- Displayed if not released -->
         <div v-if="!props.released">
             <h4>{{ mstrings.releaseaggregatedgrade }}</h4>
-            <TwAlert v-if="!props.released" color="warning" class="mt-2">
+            <UAlert v-if="!props.released" variant="warning" class="mt-2">
                 <div>
                     {{ mstrings.releaseaggregatedconfirm }}
                     <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
                 </div>
-            </TwAlert>
-            <TwAlert v-if="props.released" color="error" class="mt-2">
+            </UAlert>
+            <UAlert v-if="props.released" variant="error" class="mt-2">
                 <div>
                     {{ mstrings.releaseaggregatedconfirmstern }}
                     <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.releaseconfirmgroup }}</b></p>
                 </div>
-            </TwAlert>
-            <div class="mt-4">
-                <TwButton color="primary" @click="release_grades()">{{ mstrings.yesrelease }}</TwButton>
-                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
+            </UAlert>
+            <div class="mt-4 flex gap-2">
+                <UButton variant="primary" @click="release_grades()">{{ mstrings.yesrelease }}</UButton>
+                <UButton variant="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</UButton>
             </div>
         </div>
 
         <!-- display if already released -->
         <div v-if="props.released" class="mt-4">
             <h4>Revert release of grades</h4>
-            <TwAlert color="error" class="mt-2">
+            <UAlert variant="error" class="mt-2">
                 <div>
                     {{ mstrings.removerelease }}
                     <p v-if="grouprelease" class="mt-1"><b>{{ mstrings.removereleasegroup }}</b></p>
                 </div>
-            </TwAlert>
-            <div class="mt-4">
-                <TwButton class="error" @click="revert_release()">{{ mstrings.yesunrelease }}</TwButton>
-                <TwButton color="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</TwButton>
+            </UAlert>
+            <div class="mt-4 flex gap-2">
+                <UButton variant="error" @click="revert_release()">{{ mstrings.yesunrelease }}</UButton>
+                <UButton variant="warning" @click="showreleasemodal = false">{{ mstrings.cancel }}</UButton>
             </div>
         </div>
     </VueModal>
@@ -57,8 +57,8 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useLogo } from '@/js/monochromelogo';
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import MenuButton from '../Common/MenuButton.vue';
 
     const showreleasemodal = ref(false);
