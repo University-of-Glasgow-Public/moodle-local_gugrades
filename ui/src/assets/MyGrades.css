@@ -1,79 +1,178 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+:root {
+  /* Primary Identity */
+  --color-university-blue: #011451; /* Primary identifier */
+
+  /* Secondary Dark Palette */
+  --color-brand-dark-purple: #4C2683;
+  --color-brand-dark-pink: #A60367;
+  --color-brand-dark-green: #405D18;
+  --color-brand-dark-blue: #005398;
+  --color-brand-dark-red: #7D2239;
+
+  /* Secondary Light Palette */
+  --color-brand-light-purple: #A5A1CE;
+  --color-brand-light-pink: #E98BAF;
+  --color-brand-light-green: #81C071;
+  --color-brand-light-blue: #4DBBC6;
+  --color-brand-light-yellow: #F2D25C;
+}
+
 @theme {
   --font-sans: 'Inter', sans-serif;
+
+  --color-university-blue: var(--color-university-blue);
+
+  --color-brand-dark-purple: var(--color-brand-dark-purple);
+  --color-brand-dark-pink: var(--color-brand-dark-pink);
+  --color-brand-dark-green: var(--color-brand-dark-green);
+  --color-brand-dark-blue: var(--color-brand-dark-blue);
+  --color-brand-dark-red: var(--color-brand-dark-red);
+
+  --color-brand-light-purple: var(--color-brand-light-purple);
+  --color-brand-light-pink: var(--color-brand-light-pink);
+  --color-brand-light-green: var(--color-brand-light-green);
+  --color-brand-light-blue: var(--color-brand-light-blue);
+  --color-brand-light-yellow: var(--color-brand-light-yellow);
 }
 
-@plugin "daisyui/theme" {
-  name: "uofg";
-  default: true; /* set as default */
-  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
-  color-scheme: light; /* color of browser-provided UI */
+/* ============================================================
+   uofg-table
+   Apply via: <EasyDataTable table-class-name="uofg-table" theme-color="#011451" />
 
-  --color-base-100: oklch(98% 0.02 240);
-  --color-base-200: oklch(95% 0.03 240);
-  --color-base-300: oklch(92% 0.04 240);
-  --color-base-content: oklch(20% 0.05 240);
-  --color-primary: oklch(0.23 0.114 263.415);
-  --color-primary-content: oklch(98% 0.01 240);
-  --color-secondary: oklch(0.374 0.147 297.483);
-  --color-secondary-content: oklch(98% 0.01 200);
-  --color-accent: oklch(0.477 0.196 352.492);
-  --color-accent-content: oklch(98% 0.01 160);
-  --color-neutral: oklch(50% 0.05 240);
-  --color-neutral-content: oklch(98% 0.01 240);
-  --color-info: oklch(0.44 0.132 252.027);
-  --color-info-content: oklch(98% 0.01 220);
-  --color-success: oklch(0.44 0.101 129.584);
-  --color-success-content: oklch(98% 0.01 140);
-  --color-warning: oklch(0.869 0.14 94.094);
-  --color-warning-content: oklch(20% 0.05 80);
-  --color-error: oklch(0.403 0.125 9.851);
-  --color-error-content: oklch(98% 0.01 30);
+   The neutrals below (border, even-row tint, hover tint, muted text)
+   are mixed FROM --color-university-blue rather than a generic Tailwind
+   gray, so the table reads as part of the same brand system as the rest
+   of the app, even though the contrast stays subtle and corporate.
+   ============================================================ */
+.uofg-table {
+  /* Branded neutrals, derived from the primary blue */
+  --uofg-border: color-mix(in srgb, var(--color-university-blue) 22%, white);
+  --uofg-tint-low: color-mix(in srgb, var(--color-university-blue) 6%, white);
+  --uofg-tint-high: color-mix(in srgb, var(--color-university-blue) 12%, white);
+  --uofg-muted-text: color-mix(in srgb, var(--color-university-blue) 45%, #475569);
 
-  /* border radius */
-  --radius-selector: 1rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
+  /* Grid lines */
+  --easy-table-border: 1px solid var(--uofg-border);
+  --easy-table-row-border: 1px solid var(--uofg-border);
 
-  /* base sizes */
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
+  /* 1. HEADER: strong, authoritative anchor */
+  --easy-table-header-background-color: var(--color-university-blue);
+  --easy-table-header-font-color: #FFFFFF;
+  --easy-table-header-font-size: 12.5px;
+  --easy-table-header-height: 48px;
+  --easy-table-header-item-padding: 0 18px;
 
-  /* border size */
-  --border: 1px;
+  /* 2. ODD ROWS: clean white, sharp legibility */
+  --easy-table-body-row-background-color: #FFFFFF;
+  --easy-table-body-row-font-color: #1E293B;
+  --easy-table-body-row-font-size: 14px;
+  --easy-table-body-row-height: 50px;
+  --easy-table-body-item-padding: 0 18px;
 
-  /* effects */
-  --depth: 1;
-  --noise: 0;
+  /* 3. EVEN ROWS: a soft tint of the brand blue, not generic gray */
+  --easy-table-body-even-row-background-color: var(--uofg-tint-low);
+  --easy-table-body-even-row-font-color: #1E293B;
+
+  /* 4. HOVER: soft interactive highlight, text tints to brand blue */
+  --easy-table-body-row-hover-background-color: var(--uofg-tint-high);
+  --easy-table-body-row-hover-font-color: var(--color-university-blue);
+
+  /* 5. FOOTER: muted frame matching the even-row tint for continuity */
+  --easy-table-footer-background-color: var(--uofg-tint-low);
+  --easy-table-footer-font-color: var(--uofg-muted-text);
+  --easy-table-footer-font-size: 12.5px;
+  --easy-table-footer-height: 48px;
+  --easy-table-footer-padding: 0 18px;
+
+  /* Empty state, e.g. no search results */
+  --easy-table-message-font-color: var(--uofg-muted-text);
+  --easy-table-message-font-size: 14px;
+  --easy-table-message-padding: 40px;
+
+  /* Loading mask */
+  --easy-table-loading-mask-background-color: rgba(255, 255, 255, 0.85);
+  --easy-table-loading-mask-opacity: 0.6;
+
+  /* Scrollbar: ghost track, brand-tinted thumb */
+  --easy-table-scrollbar-track-color: transparent;
+  --easy-table-scrollbar-color: transparent;
+  --easy-table-scrollbar-thumb-color: color-mix(in srgb, var(--color-brand-light-blue) 55%, white);
+  --easy-table-scrollbar-corner-color: transparent;
+
+  /* Only used if you add the buttons-pagination prop */
+  --easy-table-buttons-pagination-border: 1px solid var(--uofg-border);
 }
 
-/* See, https://github.com/saadeghi/daisyui/issues/4503 */
-@plugin "daisyui" {
-    themes: "*", "uofg";
+/* ----------------------------------------------------------------
+   Structural chrome: radius + elevation.
+
+   Deliberately NOT using overflow:hidden + border-radius on <table>
+   itself. The Actions column's "⋮" menu opens a dropdown that's a
+   descendant of the table; clipping the table would clip that menu
+   on the last few rows. Instead, the outer wrapper div gets the
+   border/shadow (no clipping needed for box-shadow), and only the
+   actual corner cells get rounded.
+
+   The !important flags below are intentional and narrowly scoped:
+   the component's own Vue SFC styles compile with a `[data-v-xxxx]`
+   attribute on every selector, which often out-specifies a plain
+   class override. This is a standard, contained way to win that
+   fight without reaching for !important anywhere else in the app.
+   ------------------------------------------------------------------ */
+.uofg-table {
+  display: block;
+  border: var(--easy-table-border);
+  border-radius: 10px;
+  box-shadow:
+    0 2px 4px rgba(1, 20, 81, 0.08),
+    0 12px 28px rgba(1, 20, 81, 0.12);
 }
 
-.vue3-easy-data-table {
-    background-color: var(--color-base-200) !important;
-    --easy-table-header-background-color: var(--color-base-300);
-    --easy-table-header-font-color: var(--color-primary);
-
-    --easy-table-body-row-background-color: var(--color-base-100);
-    --easy-table-body-row-font-color: var(--color-base-content);
-
-    --easy-table-body-even-row-background-color: var(--color-base-200);
-    --easy-table-body-even-row-font-color: var(--color-base-content);
-
-    --easy-table-footer-background-color: var(--color-base-300);
-    --easy-table-footer-font-color: var(--color-primary-content);
+/* The library defaults this wrapper to overflow-x: auto for horizontal
+   scrolling on narrow tables. visible keeps the Actions menu's dropdown
+   from being clipped when it opens near the table's edge. */
+.uofg-table .vue3-easy-data-table__main {
+  overflow: visible;
 }
 
-.vue3-easy-data-table__main {
-    overflow: visible !important;
+.uofg-table table thead th:first-child {
+  border-top-left-radius: 10px !important;
 }
 
-.vue3-easy-data-table table {
-    @apply border rounded-md shadow-sm;
-    border-color: var(--color-base-300);
+.uofg-table table thead th:last-child {
+  border-top-right-radius: 10px !important;
+}
+
+.uofg-table .vue3-easy-data-table__footer {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Confident, corporate header type: wide tracking, small caps-style sizing */
+.uofg-table table thead th {
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+/* A one-pixel accent line under the header in the secondary dark blue,
+   so the header nods to the wider brand palette without shouting */
+.uofg-table table thead th {
+  border-bottom: 2px solid var(--color-brand-dark-blue) !important;
+}
+
+/* Numeric columns line up on their decimal/units rather than jittering */
+.uofg-table table td,
+.uofg-table table th {
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Visible keyboard focus for sortable headers and rows */
+.uofg-table table th:focus-visible,
+.uofg-table table tr:focus-visible {
+  outline: 2px solid var(--color-brand-dark-blue);
+  outline-offset: -2px;
 }

@@ -64,7 +64,7 @@
             :current-page="currentpage"
             sort-by="displayname"
             sort-type="asc"
-            table-class-name="aggregation-table"
+            table-class-name="uofg-table"
             header-text-direction="center"
             :body-item-class-name="table_item_class"
             :header-item-class-name="header_item_class"

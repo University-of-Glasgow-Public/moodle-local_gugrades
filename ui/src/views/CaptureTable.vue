@@ -69,7 +69,7 @@
                     :current-page="currentpage"
                     sort-by="displayname"
                     sort-type="asc"
-                    table-class-name="capture-table"
+                    table-class-name="uofg-table"
                     :items="users"
                     :headers="headers"
                     header-text-direction="center"

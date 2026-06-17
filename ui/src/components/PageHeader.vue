@@ -5,7 +5,6 @@
         </div>
         <GreyLogo />
         <RegulationsBadge />
-        <ThemeSelect />
     </div>
 </template>
 
