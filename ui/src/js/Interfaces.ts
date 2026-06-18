@@ -36,6 +36,28 @@ export interface IGradeitem {
 }
 
 /**
+ * See get_history
+ */
+export interface IHistory {
+    id: number;
+    courseid: number;
+    gradeitemid: number;
+    userid: number;
+    displaygrade: string;
+    weightedgrade: number;
+    gradetype: string;
+    description: string;
+    other: string;
+    iscurrent: boolean;
+    current: string;
+    auditby: number;
+    auditbyname: string;
+    audittimecreated: number;
+    time: string;
+    auditcomment: string;
+}
+
+/**
  * Set get_capture_export_options
  */
 export interface ICaptureExportOptions {

@@ -83,7 +83,7 @@ class get_history extends external_api {
                 'gradeitemid' => new external_value(PARAM_INT, 'Grade item ID'),
                 'userid' => new external_value(PARAM_INT, 'User ID'),
                 'displaygrade' => new external_value(PARAM_TEXT, 'Display grade value'),
-                'weightedgrade' => new external_value(PARAM_NUMBER, 'Weighted grade'),
+                'weightedgrade' => new external_value(PARAM_FLOAT, 'Weighted grade'),
                 'gradetype' => new external_value(PARAM_TEXT, 'Gradetype short name'),
                 'description' => new external_value(PARAM_TEXT, 'Gradetype description'),
                 'other' => new external_value(PARAM_TEXT, 'if reason = other'),

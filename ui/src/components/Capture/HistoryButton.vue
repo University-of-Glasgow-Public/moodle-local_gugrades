@@ -10,32 +10,30 @@
             </ul>
         </div>
 
-        <TwAlert v-if="grades.length == 0">{{ mstrings.nohistory }}</TwAlert>
+        <UAlert v-if="grades.length == 0">{{ mstrings.nohistory }}</UAlert>
 
-        <EasyDataTable v-else :headers="headers" :items="grades">
 
-            <template #item-displaygrade="item">
-                <GradeColor :grade="item.displaygrade"></GradeColor>
-            </template>
-
-        </EasyDataTable>
+        <UTable :data="grades" :columns="columns" :dense="true" class="mt-3"></UTable>
 
         <div class="flex justify-end mt-5">
-            <TwButton color="warning" @click="closemodal">{{ mstrings.close }}</TwButton>
+            <UButton variant="warning" @click="closemodal">{{ mstrings.close }}</UButton>
         </div>
     </VueModal>
 </template>
 
 <script setup lang="ts">
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, h } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import TwButton from '../Tailwind/TwButton.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
+    import UTable from '../Common/UTable.vue';
+    import { createColumnHelper } from '@tanstack/vue-table';
     import GradeColor from '../Common/GradeColor.vue';
+    import type { IHistory } from '@/js/Interfaces.ts';
 
     interface IHeader {
         text: string;
@@ -58,6 +56,39 @@
         itemname: String,
         close: Function,
     });
+
+    const columnHelper = createColumnHelper< IHistory >();
+    const columns = [
+        columnHelper.accessor('time', {
+            header: mstringstore.getMstring('time'),
+        }),
+
+        columnHelper.accessor('auditbyname', {
+            header: mstringstore.getMstring('by'),
+        }),
+
+        columnHelper.accessor('displaygrade', {
+            header: mstringstore.getMstring('grade'),
+            cell: (info) => {
+                const grade = info.getValue();
+                return h(GradeColor, {
+                    grade: grade,
+                });
+            }
+        }),
+
+        columnHelper.accessor('description', {
+            header: mstringstore.getMstring('gradetype'),
+        }),
+
+        columnHelper.accessor('current', {
+            header: mstringstore.getMstring('current'),
+        }),
+
+        columnHelper.accessor('auditcomment', {
+            header:  mstringstore.getMstring('comment'),
+        }),
+    ];
 
     /**
      * Close modal and whatever called it
@@ -91,18 +122,4 @@
 
         showhistorymodal.value = true;
     }
-
-    /**
-     * Setup the table.
-     */
-    onMounted(() => {
-        headers.value = [
-               {text: mstringstore.getMstring('time'), value: 'time'},
-               {text: mstringstore.getMstring('by'), value: 'auditbyname'},
-               {text: mstringstore.getMstring('grade'), value: 'displaygrade'},
-               {text: mstringstore.getMstring('gradetype'), value: 'description'},
-               {text: mstringstore.getMstring('current'), value: 'current'},
-               {text: mstringstore.getMstring('comment'), value: 'auditcomment'},
-            ];
-    });
 </script>
