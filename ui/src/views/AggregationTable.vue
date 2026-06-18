@@ -679,7 +679,6 @@
             }
         )
         .then((result: any) => {
-            console.log(result);
             aggregationsupported.value = result.aggregationsupported;
             users.value = result.users;
             warnings.value = result.warnings;
