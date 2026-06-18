@@ -9,6 +9,7 @@
         <select 
             class="select select-bordered bg-white text-neutral border-slate-300 w-120 shadow-md focus:outline-none focus:border-primary" 
             v-model="groupid" 
+            @change="handleUserSelection"
             aria-label="Group select"
         >
             <option value="0">{{ mstrings.allparticipants }}</option>
@@ -55,9 +56,15 @@
     }
 
     // Handle change of selection in dropdown.
+    /*
     watch(groupid, () => {
         emit('groupselected', groupid.value);
     })
+    */
+
+    function handleUserSelection() {
+        emit('groupselected', groupid.value);
+    }
 
     onMounted(() => {
         get_groups();

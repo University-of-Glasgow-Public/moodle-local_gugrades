@@ -68,7 +68,7 @@ class scheduleb extends base {
      * @return string
      */
     public function name() {
-        return 'Schedule B';
+        return 'GGS2';
     }
 
     /**

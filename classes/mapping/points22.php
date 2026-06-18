@@ -52,7 +52,7 @@ class points22 extends schedulea {
      * @return string
      */
     public function name() {
-        return 'Schedule A (22)';
+        return 'GGS1 (22)';
     }
 
     /**

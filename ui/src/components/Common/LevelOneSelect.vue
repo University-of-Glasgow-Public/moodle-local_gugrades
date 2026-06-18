@@ -23,6 +23,7 @@
             <select 
                 v-if="!notsetup && !itemerror" 
                 v-model="categoryid" 
+                @change="handleUserSelection"
                 class="select select-bordered bg-white text-neutral border-slate-300 w-80 shadow-md focus:outline-none focus:border-primary" 
                 aria-label="Select top-level grade category"
             >
@@ -107,10 +108,17 @@
         })
     }
 
+    /**
     watch(categoryid, () => {
         level1store.categoryid = categoryid.value;
         emit('levelchange', categoryid.value);
     })
+    */
+
+    function handleUserSelection() {
+        level1store.categoryid = categoryid.value;
+        emit('levelchange', categoryid.value);
+    }
 
     onMounted(() => {
         itemerror.value = false;

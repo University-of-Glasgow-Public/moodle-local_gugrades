@@ -23,7 +23,7 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const datemismatch = ref(false);
-    const admingradesinvalid = ref(true);
+    const admingradesinvalid = ref(false);
     const continueurl = ref('');
     const debug = ref({});
 

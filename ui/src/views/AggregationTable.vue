@@ -100,7 +100,6 @@
                 <div v-else class="aggregation-header flex gap-x-2">
                     <div>
                         <UTooltip :text="header.fullname">
-
                             <div>
                                 <!-- column title -->
                                 <InfoButton v-if="header.gradeitemid" :itemid="header.gradeitemid" :text="header.text" size="lg" color="text-warning"></InfoButton>
@@ -240,7 +239,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, onMounted} from 'vue';
+    import {ref, computed, onMounted, nextTick } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -318,6 +317,7 @@
     const caneditgrades = ref(false);
     const completionused = ref(false);
     const filterstore = useFilter();
+    const issetupcomplete = ref(false);
     const { firstname, lastname } = storeToRefs( filterstore );
 
     /**
@@ -400,9 +400,12 @@
      * @param {*} level
      */
     function levelOneChange(level: number) {
+
         level1category.value = level;
         categoryid.value = level1category.value;
         if (categoryid.value) {
+
+            // Don't fire update during initial setup
             table_update();
         }
     }
@@ -411,7 +414,11 @@
      * Capture change to group
      */
      function groupselected(gid: number) {
-        groupid.value = Number(gid);
+        const newgid = Number(gid);
+        if (newgid === groupid.value) return;
+        groupid.value = newgid;
+
+        // Don't fire during initial setup.
         table_update();
     }
 
@@ -512,9 +519,9 @@
      */
     function get_formattedatype() {
         if (atype.value == 'A') {
-            return 'Schedule A';
+            return 'GGS1';
         } else if (atype.value == 'B') {
-            return 'Schedule B';
+            return 'GGS2';
         } else if (atype.value == 'P') {
             return mstringstore.getMstring('points') + ' 100';
         } else if (atype.value == 'C') {
@@ -650,6 +657,10 @@
      */
     function table_update() {
 
+        // This is to prevent other things firing update during page load.
+        //nextTick();
+        issetupcomplete.value = true;
+
         // If we happen to end up here with no categoryid then just bail out.
         if (!Number.isInteger(categoryid.value)) {
             return;
@@ -668,6 +679,7 @@
             }
         )
         .then((result: any) => {
+            console.log(result);
             aggregationsupported.value = result.aggregationsupported;
             users.value = result.users;
             warnings.value = result.warnings;
