@@ -218,7 +218,6 @@
 <script setup lang="ts">
     import {ref, computed, watch, onMounted, nextTick } from 'vue';
     import { storeToRefs } from 'pinia';
-    import NameFilter from '@/components/Common/NameFilter.vue';
     import CaptureSelect from '@/components/Capture/CaptureSelect.vue';
     import CaptureMenu from '@/components/Capture/CaptureMenu.vue';
     import { useToast } from "vue-toastification";

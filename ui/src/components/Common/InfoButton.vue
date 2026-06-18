@@ -2,11 +2,11 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <!-- info button -->
-    <div v-if="!props.text" class="tooltip"  @click="info_clicked" :data-tip="mstrings['gradeiteminfo']">
+    <UTooltip v-if="!props.text" @click="info_clicked" :text="mstrings['gradeiteminfo']">
         <button class="inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed shadow-sm font-semibold text-xs gap-2 transition-all duration-150" aria-label="Show grade item info">
             <Info :size="18"></Info>
         </button>
-    </div>
+    </UTooltip>
 
     <!-- info link -->
     <a v-if="props.text" class="text-white underline cursor-pointer" @click="info_clicked">{{ props.text }}</a>
@@ -56,6 +56,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { Info, MessageCircleWarning } from '@lucide/vue';
     import HeadlessModal from '../Tailwind/HeadlessModal.vue';
+    import UTooltip from './UTooltip.vue';
 
     const showinfomodal = ref(false);
     const itemname = ref('');

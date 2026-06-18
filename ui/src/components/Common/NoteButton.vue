@@ -1,9 +1,9 @@
 <template>
-    <div v-if="props.shortnote" class="tooltip" :data-tip="props.shortnote">
-        <button class="btn btn-warning btn-xs" @click.stop.prevent="opennote"><NotepadText :size="12" /> Note</button>
-    </div>
+    <UTooltip v-if="props.shortnote" :text="props.shortnote">
+        <UButton variant="warning" size="xs" @click.stop.prevent="opennote"><NotepadText :size="12" /> Note</UButton>
+    </UTooltip>
     <div v-else>
-        <button class="btn btn-xs btn-dash" @click.stop.prevent="opennote"><Plus :size="12" /> Note</button>
+        <UButton appearance="outline" size="xs" @click.stop.prevent="opennote"><Plus :size="12" /> Note</UButton>
     </div>
 
     <HeadlessModal :isopen="noteopen" @closed="closenote">
@@ -20,6 +20,8 @@
     import { ref } from 'vue';
     import { Plus, NotepadText } from '@lucide/vue';
     import HeadlessModal from '../Tailwind/HeadlessModal.vue';
+    import UButton from './UButton.vue';
+    import UTooltip from './UTooltip.vue';
     import { moodleFetch } from '@/js/moodlefetch';
 
     const props = defineProps({

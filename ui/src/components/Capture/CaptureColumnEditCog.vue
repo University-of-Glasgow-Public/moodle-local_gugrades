@@ -1,18 +1,18 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a class="ml-1 tooltip cursor-pointer" aria-label="Bulk edit" data-tip="Bulk edit" @click.prevent="cog_clicked">
-        <Settings class="text-warning"></Settings>
-    </a>
-    <a
+    <UTooltip class="ml-1" aria-label="Bulk edit" text="Bulk edit" @click.prevent="cog_clicked">
+        <Settings class="text-brand-light-yellow"></Settings>
+    </UTooltip>
+    <UTooltip
         v-if="candelete"
-        class="ml-1 tooltip cursor-pointer"
+        class="ml-1"
         aria-label="Delete column"
-        :data-tip="mstringstore.getMstring('deletecolumn')"
+        :text="mstringstore.getMstring('deletecolumn')"
         @click.prevent="delete_clicked"
     >
-        <Trash2 class="text-error"></Trash2>
-    </a>
+        <Trash2 class="text-brand-dark-pink"></Trash2>
+    </UTooltip>
     <ConfirmModal
         :show="showconfirm"
         :message="mstringstore.getMstring('deletecolumnconfirm')"
@@ -31,6 +31,7 @@
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import { useToast } from "vue-toastification";
     import { Settings, Trash2 } from '@lucide/vue';
+    import UTooltip from '../Common/UTooltip.vue';
 
     const props = defineProps({
         itemid: {

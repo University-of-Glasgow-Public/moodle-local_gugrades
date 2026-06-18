@@ -1,7 +1,7 @@
 <template>
-    <div class="tooltip" :data-tip="title" v-bind="$attrs">
-        <button class="btn btn-primary btn-circle btn-outline btn-sm" @click.prevent="click_help"><CircleQuestionMark :size="18"></CircleQuestionMark></button>
-    </div>
+    <UTooltip :text="title" v-bind="$attrs">
+        <UButton variant="info" size="sm" shape="circle" appearance="outline" @click.prevent="click_help"><CircleQuestionMark :size="18"></CircleQuestionMark></UButton>
+    </UTooltip>
 
 <!-- HeadlessUI Dialog -->
   <TransitionRoot appear :show="isOpen" as="template">
@@ -93,6 +93,8 @@
     } from '@headlessui/vue';
     import { CircleQuestionMark, MoveLeft } from '@lucide/vue';
     import { moodleFetch } from '@/js/moodlefetch';
+    import UButton from './UButton.vue';
+    import UTooltip from './UTooltip.vue';
 
     const props = defineProps<{
         title: string,
