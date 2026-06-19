@@ -118,7 +118,7 @@
                     </div>
                 </div>
                 <div v-if="header.categoryid">
-                    <UButton class="ml-2" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
+                    <UButton class="ml-2" size="sm" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
                         <ArrowBigRight :size="18" :stroke-width="1" />
                     </UButton>
                 </div>
