@@ -1079,7 +1079,7 @@ class aggregation {
             $grade = null;
             $rawgrade = null;
             if (!$category->error) {
-                throw new \moodle_exception('No error text when grade=null');
+                throw new \moodle_exception('No error text when grade=null, userid = ' . $userid . ' itemid = ' . $category->itemid);
             }
             $iserror = true;
             $displaygrade = $category->error;

@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="border rounded-md mt-4 bg-base-100 border-gray-300 shadow-sm p-4">
+    <div class="bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm">
         <div class="mt-5">
             <LevelOneSelect  @levelchange="levelOneChange" @regulation="getregulation"></LevelOneSelect>
         </div>
