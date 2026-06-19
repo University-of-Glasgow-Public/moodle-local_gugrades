@@ -67,7 +67,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
         $this->assertEquals('Assignment 2', $item['itemname']);
         $this->assertTrue($item['isscale']);
         $this->assertEquals(23, $item['grademax']);
-        $this->assertEquals('Schedule A', $item['scalename']);
+        $this->assertEquals('GGS1', $item['scalename']);
 
         // Manual item.
         $item = get_grade_item::execute($this->course->id, $this->gradeitemsecond1);
