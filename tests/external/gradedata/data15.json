@@ -1,0 +1,18 @@
+[
+    {
+        "item": "Points Item 1",
+        "grade": 4
+    },
+    {
+        "item": "Points Item 2",
+        "grade": 17
+    },
+    {
+        "item": "SchedA Item 1",
+        "grade": "A5:18"
+    },
+    {
+        "item": "SchedA Item 2",
+        "grade": "D1:11"
+    }
+]

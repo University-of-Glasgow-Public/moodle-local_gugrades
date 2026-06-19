@@ -1,0 +1,44 @@
+[
+
+    {
+        "name": "Summative",
+        "category": true,
+        "weight": 1.0,
+        "aggregation": "weighted_mean",
+        "children": [
+            {
+                "name": "Mixed activities category",
+                "category": true,
+                "weight": 1.0,
+                "children": [
+                    {
+                        "name": "Points Item 1",
+                        "category": false,
+                        "type": "points",
+                        "weight": 0.25,
+                        "grademax": 22
+                    },
+                    {
+                        "name": "Points Item 2",
+                        "category": false,
+                        "type": "points",
+                        "weight": 0.25,
+                        "grademax": 22
+                    },
+                    {
+                        "name": "SchedA Item 1",
+                        "category": false,
+                        "type": "schedulea",
+                        "weight": 0.25
+                    },
+                    {
+                        "name": "SchedA Item 2",
+                        "category": false,
+                        "type": "schedulea",
+                        "weight": 0.25
+                    }
+                ]
+            }
+        ]
+    }
+]

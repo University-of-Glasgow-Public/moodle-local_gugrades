@@ -1210,7 +1210,9 @@ class grades {
 
         $gradetype = $gradeitem->gradetype;
         if ($gradetype == GRADE_TYPE_VALUE) {
-            if ($gradeitem->grademax == 22) {
+            // MGU-1447 Check if we're using "old regulations" here, if so, continue to use points22 mapping.
+            $regulation = \local_gugrades\regulations::get_active_regulation($gradeitem->courseid);
+            if (($gradeitem->grademax == 22) && ($regulation->shortname() == 'original')) {
                 return ['scale22', $gradeitem];
             } else {
                 return ['value', $gradeitem];
@@ -1433,7 +1435,9 @@ class grades {
         } else {
             // It's points. BUT... *special case*
             // Grading out of 0 to 22 is a proxy for Schedule A.
-            if (($gradeitem->grademin == 0) && ($gradeitem->grademax == 22)) {
+            // MGU-1447 Check if we're using "old regulations" here, if so, continue to use points22 mapping.
+            $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+            if (($gradeitem->grademin == 0) && ($gradeitem->grademax == 22) && ($regulation->shortname() == 'original')) {
                 return new \local_gugrades\mapping\points22($courseid, $gradeitemid, false);
             }
 
@@ -1594,7 +1598,9 @@ class grades {
         $gradetype = $gradeitem->gradetype;
 
         // Ropey check for exact 22.
-        if ($gradeitem->grademax == 22) {
+        // MGU-1447 Check if we're using "old regulations" here, if so, continue to use points22 mapping.
+        $regulation = \local_gugrades\regulations::get_active_regulation($gradeitem->courseid);
+        if (($gradeitem->grademax == 22) && ($regulation->shortname() == 'original')) {
             return false;
         }
 
