@@ -3,61 +3,54 @@
     <!-- Main Scrollable Table Containment Frame -->
     <div class="w-full overflow-x-auto rounded-lg border border-brand-light-purple/30 bg-white shadow-md">
       
-      <!-- GRID CONTAINER: Replaces <table> with a clean, flexible block structure -->
-      <div class="w-full min-w-max text-sm text-left">
+      <!-- NATIVE TABLE: Restored proper semantics for bulletproof auto-alignment -->
+      <table class="w-full text-left border-collapse text-sm">
         
-        <!-- HEADER ROW GROUP: Replaces <thead> -->
-        <div class="w-full bg-university-blue text-white uppercase text-xs tracking-wider font-semibold flex">
-          <div v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id" class="w-full flex">
-            
-            <!-- Individual Header Cells -->
-            <div 
+        <!-- HEADER ROW GROUP -->
+        <thead class="bg-university-blue text-white uppercase text-xs tracking-wider">
+          <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+            <th 
               v-for="header in headerGroup.headers" 
               :key="header.id" 
-              class="flex-1 transition-all duration-150"
+              class="font-semibold transition-all duration-150"
               :class="dense ? 'px-3 py-1.5 text-xs' : 'px-6 py-2.5'"
             >
               <FlexRender 
                 :render="header.column.columnDef.header" 
                 :props="header.getContext()" 
               />
-            </div>
+            </th>
+          </tr>
+        </thead>
 
-          </div>
-        </div>
-
-        <!-- BODY ROWS GROUP: Replaces <tbody> -->
-        <div class="w-full divide-y divide-brand-light-purple/20 text-brand-dark-purple flex flex-col">
-          
-          <!-- 
-            THE DEFINITIVE FIX: Replaces <tr> with an absolute Block Div.
-            - 'odd:bg-brand-light-purple/5' handles zebra striping natively on the block.
-            - 'hover:bg-brand-light-purple/15' handles row hovers safely.
-          -->
-          <div 
+        <!-- BODY ROWS GROUP -->
+        <tbody class="divide-y divide-brand-light-purple/20 text-brand-dark-purple">
+          <tr 
             v-for="row in table.getRowModel().rows" 
             :key="row.id"
-            class="w-full flex items-center bg-white odd:bg-brand-light-purple/5 hover:bg-brand-light-purple/15 hover:text-university-blue transition-all duration-150 ease-in-out"
+            class="transition-colors duration-150 ease-in-out hover:text-university-blue"
           >
-            
-            <!-- Individual Body Data Cells (Replaces <td>) -->
-            <div 
+            <!-- 
+              INDIVIDUAL BODY CELLS:
+              - Restored native <td> element.
+              - Changed whitespace rules to 'whitespace-normal break-words' to wrap dates neatly.
+              - Standardized condensed row height padding limits to 'py-2'.
+            -->
+            <td 
               v-for="cell in row.getVisibleCells()" 
               :key="cell.id" 
-              class="flex-1 whitespace-normal transition-all duration-150"
+              class="whitespace-normal break-words transition-all duration-150"
               :class="dense ? 'px-3 py-1 text-xs' : 'px-6 py-2'"
             >
               <FlexRender 
                 :render="cell.column.columnDef.cell" 
                 :props="cell.getContext()" 
               />
-            </div>
+            </td>
+          </tr>
+        </tbody>
 
-          </div>
-
-        </div>
-
-      </div>
+      </table>
     </div>
 
     <!-- Branded Pagination Controls Footer -->
@@ -133,8 +126,6 @@
     </div>
   </div>
 </template>
-
-
 
 
 <script setup lang="ts" generic="TData">
