@@ -151,14 +151,15 @@ class aggregate {
 
         // MGU-1446. If only one grade then that's the aggregated result (whatever it is)
         if (($level > 1) && (count($items) == 1)) {
-            $explain = get_string('explain_onegrade', 'local_gugrades');
-            $item = $items[0];
+            $item = reset($items);
 
             // Just let it drop through if grademissing
             if (!$item->grademissing) {
                 if ($item->admingrade) {
+                    $explain = get_string('explain_onegrade_admin', 'local_gugrades');
                     return [0, 0, $item->admingrade, $item->displaygrade, 0, '', $explain, false];
                 } else {
+                    $explain = get_string('explain_onegrade', 'local_gugrades');
                     return [$item->grade, $item->grade, '', $item->displaygrade, 0, '', $explain, false];
                 }
             }

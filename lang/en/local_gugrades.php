@@ -178,6 +178,7 @@ $string['explain_mixmvns'] = 'If there is a mix of GOODCAUSE_FO and NOSUBMISSION
 $string['explain_noitems'] = 'If there are no items left to aggregate after initial processing, result is error';
 $string['explain_notavailable'] = 'All items in the Grade Category are not available';
 $string['explain_onegrade'] = 'Only one available grade in the category. Aggregated grade is the same as the single grade.';
+$string['explain_onegrade_admin'] = 'Only one available admin grade in the category. Aggregated grade is the same as the single admin grade.';
 $string['explain_overridden'] = 'Aggregated grade has been overridden';
 $string['explain_points'] = 'Grades are aggregated in points';
 $string['explain_resitadmingrade'] = 'In a reassessment category with at least one admin grade, the result is the reassessment grade (or admin grade)';
