@@ -44,7 +44,7 @@
             <div 
               v-for="cell in row.getVisibleCells()" 
               :key="cell.id" 
-              class="flex-1 whitespace-nowrap transition-all duration-150"
+              class="flex-1 whitespace-normal transition-all duration-150"
               :class="dense ? 'px-3 py-1 text-xs' : 'px-6 py-2'"
             >
               <FlexRender 
