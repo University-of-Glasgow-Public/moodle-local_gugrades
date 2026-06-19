@@ -1,0 +1,9 @@
+# Block production folders
+dist/
+build/
+public/build/
+
+# Block minified assets explicitly just in case
+*.min.js
+*.min.css
+*.phar

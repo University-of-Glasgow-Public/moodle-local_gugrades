@@ -36,6 +36,13 @@
   --color-brand-light-green: var(--color-brand-light-green);
   --color-brand-light-blue: var(--color-brand-light-blue);
   --color-brand-light-yellow: var(--color-brand-light-yellow);
+
+  /* 
+    COMPILER FIX: Define pre-computed translucent variants directly in your theme!
+    This mixes 5% and 15% of your light purple color with absolute transparency.
+  */
+  --color-brand-table-stripe: color-mix(in srgb, var(--color-brand-light-purple) 5%, transparent);
+  --color-brand-table-hover: color-mix(in srgb, var(--color-brand-light-purple) 15%, transparent);
 }
 
 /* ============================================================

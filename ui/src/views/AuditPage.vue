@@ -2,35 +2,52 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div class="my-5">
-        <EasyDataTable
-            alternating
-            :headers="headers"
-            :items="items"
-            table-class-name="audit-table"
-        >
-        </EasyDataTable>
+        <UTable :data="items" :columns="columns" class="mt-3"></UTable>
     </div>
-    <TwButton class="mt-2" color="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</TwButton>
+    <UButton class="mt-2" variant="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</UButton>
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted } from 'vue';
+    import { ref, onMounted } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import { saveAs } from 'file-saver';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import type { IAuditItem } from '@/js/Interfaces';
-    import type { Header } from "vue3-easy-data-table";
-    import TwButton from '@/components/Tailwind/TwButton.vue';
-    import TablePagination from '@/components/Common/TablePagination.vue';
+    import UTable from '@/components/Common/UTable.vue';
+    import UButton from '@/components/Common/UButton.vue';
+    import { createColumnHelper } from '@tanstack/vue-table';
 
     const items = ref< IAuditItem[] >([]);
-    const headers = ref< Header[] >([]);
     const debug = ref({});
     const loaded = ref(false);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
+
+
+    const columnHelper = createColumnHelper< IAuditItem >();
+    const columns = [
+        columnHelper.accessor('time', {
+            header: mstringstore.getMstring('time'),
+        }),
+
+        columnHelper.accessor('gradeitem', {
+            header: mstringstore.getMstring('gradeitem'),
+        }),
+
+        columnHelper.accessor('username', {
+            header: mstringstore.getMstring('by'),
+        }),
+
+        columnHelper.accessor('relatedusername', {
+            header: mstringstore.getMstring('relateduser'),
+        }),
+
+        columnHelper.accessor('message', {
+            header: mstringstore.getMstring('message'),
+        }),
+    ];
 
     /**
      * Download button clicked
@@ -57,14 +74,6 @@
     }
 
     onMounted(() => {
-        headers.value = [
-               {text: mstringstore.getMstring('time'), value: 'time'},
-               {text: mstringstore.getMstring('gradeitem'), value: 'gradeitem'},
-               {text: mstringstore.getMstring('by'), value: 'username'},
-               {text: mstringstore.getMstring('relateduser'), value: 'relatedusername'},
-               {text: mstringstore.getMstring('message'), value: 'message'},
-            ];
-
         moodleFetch(
             'local_gugrades_get_audit',
             {}
@@ -80,16 +89,3 @@
         })
     });
 </script>
-
-<style>
-    .audit-table {
-        --easy-table-header-background-color: var(--color-primary);
-        --easy-table-header-font-color: var(--color-primary-content);
-
-        --easy-table-body-row-background-color: var(--color-base-100);
-        --easy-table-body-row-font-color: var(--color-base-content);
-
-        --easy-table-body-even-row-background-color: var(--color-base-300);
-        --easy-table-body-even-row-font-color: var(--color-base-content);
-    }
-</style>
