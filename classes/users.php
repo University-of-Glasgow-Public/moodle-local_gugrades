@@ -361,4 +361,75 @@ class users {
 
         return [$first, $last];
     }
+
+    /**
+     * Get a user profile field
+     * @param int $userid
+     * @param string $fieldname
+     * @return string
+     */
+    protected static function get_profile_field(int $userid, string $fieldname): string {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+
+        // Fetch all custom profile fields for the student
+        $profilefields = profile_user_record($userid);
+
+        $value = $profilefields->$fieldname ?? '';
+
+        return $value;
+    }
+
+    /**
+     * Determine if user is UG, PG or neither
+     * Returns 'Postgraduate Taught', 'Lifelong Learning, 'Undergraduate', 'Postgraduate Research',
+     * 'External'. Or 'Unknown' if no record found
+     * If no data for a user, we call enrol_gudatabase in an attempt to do something
+     * about it. However, as we don't want to keep hammering the external enrolment database
+     * we'll have a cache for this information. 
+     * @param int $userid
+     * @return string
+     */
+    public static function get_ugpg(int $userid): string {
+        global $DB, $CFG;
+
+        $cache = \cache::make('local_gugrades', 'ugpg');
+        if ($ugpg = $cache->get($userid)) {
+            return $ugpg;
+        }
+
+        // If not in cache, is it in the 'ugpg' profile field?
+        if ($ugpg = self::get_profile_field($userid, 'ugpg')) {
+            $cache->set($userid, $ugpg);
+
+            return $ugpg;
+        }
+
+        // If that fails, we prompt local_gugrades to load the data from enrolment database
+        // NOTE: Checks that custom profile fields for program data have been added to
+        // api::background_setup(), so it's reasonably certain the ugpg field exists.
+        $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+        require_once("$CFG->dirroot/enrol/gudatabase/lib.php");
+        $plugin = new \enrol_gudatabase_plugin();
+
+        // If it's not configured, then we can only return Unknown
+        if (!$plugin->is_configured()) {
+            $cache->set($userid, 'Unknown');
+            return 'Unknown';
+        }
+        $plugin->external_programdata($user);
+
+        // Now try again to see if data has appeared in profile field.
+        if ($ugpg = self::get_profile_field($userid, 'ugpg')) {
+            $cache->set($userid, $ugpg);
+
+            return $ugpg;
+        }
+
+        // Failed. Not a student at all or missing record.
+        $cache->set($userid, 'Unknown');
+
+        return 'Unknown';
+    }
 }

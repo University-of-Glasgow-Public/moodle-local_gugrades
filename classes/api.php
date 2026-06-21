@@ -1723,7 +1723,7 @@ class api {
      * Reset all caches
      */
     public static function reset_all_caches() {
-        $caches = ['gradeitems', 'availableusers', 'useraggdata', 'progress', 'provisionalgrade'];
+        $caches = ['gradeitems', 'useraggdata', 'progress', 'userpicture', 'ugpg'];
         foreach ($caches as $cache) {
             $cache = \cache::make('local_gugrades', $cache);
             $cache->purge();
@@ -2739,6 +2739,10 @@ class api {
      * @param int $courseid
      */
     public static function background_setup(int $courseid) {
+
+        // Make sure custom user fields exist
+        // We need these for UG/PG tests
+        \report_guid\lib::check_create_userprofile();
 
         // First step is to recalculate 'summative' categories.
         $categories = \local_gugrades\grades::get_firstlevel($courseid);

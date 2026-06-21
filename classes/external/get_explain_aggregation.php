@@ -91,6 +91,7 @@ class get_explain_aggregation extends external_api {
             'pictureurl' => new external_value(PARAM_URL, 'URL of user avatar'),
             'profileurl' => new external_value(PARAM_URL, 'Like to user profile page'),
             'idnumber' => new external_value(PARAM_TEXT, 'User ID number'),
+            'ugpg' => new external_value(PARAM_ALPHA, 'Undergraduate / Postgraduate status.'),
             'resitrequired' => new external_value(PARAM_BOOL, 'Is resit required?'),
             'completed' => new external_value(PARAM_FLOAT, '%age of course completed'),
             'displaygrade' => new external_value(PARAM_TEXT, 'Content for total column'),

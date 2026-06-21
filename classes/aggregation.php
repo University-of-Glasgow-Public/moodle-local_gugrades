@@ -287,6 +287,7 @@ class aggregation {
         $user->displayname = fullname($user);
         $user->resitrequired = \local_gugrades\grades::is_resit_required($courseid, $userid);
         $user->alteredweight = self::are_weights_altered($categoryid, $userid);
+        $user->ugpg = \local_gugrades\users::get_ugpg($userid);
 
         $user = \local_gugrades\users::add_picture_and_profile_to_user_record($courseid, 0, $user);
 

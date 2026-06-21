@@ -24,98 +24,133 @@
         <div v-if="!loading" class="scrollable-content">
 
             <!-- user stuffs -->
-            <div class="flex justify-start gap-4 items-start mb-8 pb-2 border-b border-base-300">
-                <div class="avatar">
-                    <div class="ring-base-300 ring-offset-base-100 w-12 rounded-full ring-2 ring-offset-2">
-                        <a :href="user!.profileurl" target="_profile">
-                            <img :src="user!.pictureurl" :alt="user!.displayname" class="userpicture defaultuserpic" width="35" height="35"/>
-                        </a>
-                    </div>
+            <div class="flex items-center gap-5 pb-5 mb-8 border-b border-brand-light-purple/30">
+                <!-- User Avatar Section -->
+                <div class="relative shrink-0">
+                    <a :href="user!.profileurl" 
+                    target="_profile" 
+                    class="block w-14 h-14 rounded-full ring-2 ring-university-blue ring-offset-2 ring-offset-white overflow-hidden transition-transform duration-200 hover:scale-105">
+                        <img :src="user!.pictureurl" 
+                            :alt="user!.displayname" 
+                            class="w-full h-full object-cover" 
+                            width="56" 
+                            height="56"/>
+                    </a>
                 </div>
-                <div>
-                    <div class="text-lg font-bold">{{ user!.displayname }}</div>
-                    <div>{{ mstrings.idnumber }} {{ user!.idnumber }}</div>
+
+                <!-- User Information Section -->
+                <div class="flex flex-col gap-1 min-w-0">
+                    <h2 class="text-xl font-bold tracking-tight text-brand-dark-purple truncate">
+                        {{ user!.displayname }}
+                    </h2>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 font-sans">
+                        <span class="font-medium">
+                            {{ mstrings.idnumber }}: <span class="font-mono text-slate-800">{{ user!.idnumber }}</span>
+                        </span>
+                        <span class="hidden sm:inline text-slate-300">•</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-light-blue text-brand-dark-blue">
+                            {{ user!.ugpg }}
+                        </span>
+                    </div>
                 </div>
             </div>
 
             <!-- grade, completed, type -->
-            <div class="flex gap-4 border-b border-base-300 pb-3">
+            <div class="flex gap-4 border-b border-brand-light-purple/30 pb-3 text-slate-600">
                 <div class="flex-1 text-left">
-                    <div class="uppercase">{{ mstrings.aggregatedgrade }}</div>
-                    <div class="text-info"><GradeColor :grade="user!.displaygrade"/></div>
+                    <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.aggregatedgrade }}</div>
+                    <!-- Replaced text-info with your custom brand accent -->
+                    <div class="text-university-blue font-semibold"><GradeColor :grade="user!.displaygrade"/></div>
                 </div>
-                <div class="flex-1 pl-4 border-l border-base-300">
-                    <div class="uppercase">{{ mstrings.completed }}</div>
-                    <div class="font-bold">{{ user!.completed }}%</div>
+                <div class="flex-1 pl-4 border-l border-brand-light-purple/30">
+                    <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.completed }}</div>
+                    <div class="font-bold text-slate-900">{{ user!.completed }}%</div>
                 </div>
-                <div class="flex-1 pl-4 border-l border-base-300">
-                    <div class="uppercase">{{ mstrings.gradetype }}</div>
-                    <div class="font-bold">{{ user!.formattedatype }}</div>
+                <div class="flex-1 pl-4 border-l border-brand-light-purple/30">
+                    <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.gradetype }}</div>
+                    <div class="font-bold text-slate-900">{{ user!.formattedatype }}</div>
                 </div>
             </div>
 
             <!-- configuration -->
-            <div class="uppercase my-2">{{ mstrings.configuration }}</div>
-            <div class="grid grid-cols-2 gap-4 border-b border-base-300 pb-1.5 text-sm">
-                <div class="">
-                    <div>{{ mstrings.strategy }}</div>
-                    <div class="font-bold">{{ user!.strategy }}</div>
+            <div class="uppercase text-xs font-bold tracking-wider text-brand-dark-purple mt-4 mb-2">{{ mstrings.configuration }}</div>
+            <div class="grid grid-cols-2 gap-4 border-b border-brand-light-purple/30 pb-4 text-sm text-slate-600">
+                <div>
+                    <div class="text-xs text-slate-500 mb-0.5">{{ mstrings.strategy }}</div>
+                    <div class="font-bold text-slate-900">{{ user!.strategy }}</div>
                 </div>
-                <div class="">
-                    <div>{{ mstrings.gradecategory }}</div>
-                    <div class="font-bold">{{ user!.itemname }}</div>
+                <div>
+                    <div class="text-xs text-slate-500 mb-0.5">{{ mstrings.gradecategory }}</div>
+                    <div class="font-bold text-slate-900">{{ user!.itemname }}</div>
                 </div>
-                <div class="">
-                    <div>{{ mstrings.overridden }}</div>
-                    <div class="font-bold"><YesNo :yes="user!.overridden"></YesNo></div>
+                <div>
+                    <div class="text-xs text-slate-500 mb-0.5">{{ mstrings.overridden }}</div>
+                    <div class="font-bold text-slate-900"><YesNo :yes="user!.overridden"></YesNo></div>
                 </div>
-                <div class="">
-                    <div>{{ mstrings.scale }}</div>
-                    <div class="font-bold">{{ user!.formattedatype }}</div>
+                <div>
+                    <div class="text-xs text-slate-500 mb-0.5">{{ mstrings.scale }}</div>
+                    <div class="font-bold text-slate-900">{{ user!.formattedatype }}</div>
                 </div>
             </div>
 
             <!-- Grades -->
-            <div class="mb-6 border-b border-base-300 pb-6">
-                <div class="uppercase my-2">{{ mstrings.grades }}</div>
-                <div v-for="field in user!.fields" class="bg-warning/20 text-warning-content rounded-md shadow-md mb-2 px-3 py-1">
-                    <div class="border-warning border-b pb-1">
-                        <div class="flex justify-between pb-1">
-                            <div class="font-semibold">{{ field.fullname }}</div>
-                            <div class="font-semibold"><GradeColor :grade="field.display" size="text-lg"/></div>
+            <div class="mb-6 border-b border-brand-light-purple/30 pb-6">
+                <div class="uppercase text-xs font-bold tracking-wider text-brand-dark-purple mt-4 mb-3">{{ mstrings.grades }}</div>
+                
+                <!-- Replaced bg-warning/20 and text-warning-content with your light/dark yellow theme -->
+                <div v-for="field in user!.fields" class="bg-brand-light-yellow/50 text-slate-800 rounded-lg border border-brand-light-yellow/50 shadow-sm mb-3 px-4 py-2.5">
+                    <div class="border-brand-light-yellow/40 border-b pb-2">
+                        <div class="flex justify-between items-center pb-1.5">
+                            <div class="font-semibold text-brand-dark-purple">{{ field.fullname }}</div>
+                            <div class="font-bold"><GradeColor :grade="field.display" size="text-lg"/></div>
                         </div>
-                        <div class="flex justify-start space-x-1">
-                            <div v-if="!field.available" class="badge badge-error">{{ mstrings.notavailable }}</div>
-                            <div v-if="field.dropped" class="badge badge-error">{{ mstrings.dropped }}</div>
-                            <div v-if="field.hidden" class="badge badge-error">{{ mstrings.hidden }}</div>
-                            <div v-if="field.overridden" class="badge badge-error">{{ mstrings.overridden }}</div>
+                        
+                        <!-- Replaced badge-error with your brand red colors -->
+                        <div class="flex flex-wrap gap-1.5 pt-0.5">
+                            <div v-if="!field.available" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.notavailable }}</div>
+                            <div v-if="field.dropped" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.dropped }}</div>
+                            <div v-if="field.hidden" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.hidden }}</div>
+                            <div v-if="field.overridden" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.overridden }}</div>
                         </div>
                     </div>
-                    <div class="flex justify-start space-x-2 pt-1">
-                        <div v-if="user!.showweights">
-                            <div class="text-sm">{{ mstrings.weight }}</div>
-                            <div>{{ field.weight }}&percnt;</div>
+                    
+                    <div class="flex flex-wrap gap-x-6 gap-y-1 pt-2 text-sm text-slate-600">
+                        <div v-if="user!.showweights" class="flex gap-1.5">
+                            <span class="text-slate-500">{{ mstrings.weight }}:</span>
+                            <span class="font-semibold text-slate-800">{{ field.weight }}&percnt;</span>
                         </div>
-                        <div v-if="user!.showweights && field.normalisedweight">
-                            <div class="text-sm">{{mstrings.normalisedweight }}</div>
-                            <div>{{ field.normalisedweight }}&percnt;</div>
+                        <div v-if="user!.showweights && field.normalisedweight" class="flex gap-1.5">
+                            <span class="text-slate-500">{{mstrings.normalisedweight }}:</span>
+                            <span class="font-semibold text-slate-800">{{ field.normalisedweight }}&percnt;</span>
                         </div>
-                        <div v-if="user!.showweights && field.alteredweight">
-                            <div class="text-sm">{{mstrings.alteredweight }}</div>
-                            <div>{{ field.alteredweight }}&percnt;</div>
+                        <div v-if="user!.showweights && field.alteredweight" class="flex gap-1.5">
+                            <span class="text-slate-500">{{mstrings.alteredweight }}:</span>
+                            <span class="font-semibold text-slate-800">{{ field.alteredweight }}&percnt;</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- explanation -->
-            <div class="alert alert-warning bg-warning/50">
+            <!-- Assuming UAlert is a Nuxt UI / custom component, overridden variant/class attributes to use your warning colors -->
+            <UAlert 
+                :ui="{ wrapper: 'bg-brand-light-yellow border-l-4 border-brand-light-yellow text-slate-800 p-4 rounded-r-lg shadow-sm' }"
+                title="Explanation"
+            >
                 {{ user!.explain }}
-            </div>
+            </UAlert>
 
             <div class="flex justify-end">
-                <UButton variant="warning" @click="closemodal" class="mt-8 font-semibold">{{ mstrings.close }}</UButton>
+                <!-- Updated the custom button class styles to use your primary university-blue color instead of warning -->
+                <button 
+                    type="button"
+                    @click="closemodal" 
+                    class="mt-8 px-5 py-2 rounded-lg font-semibold text-sm text-white bg-university-blue hover:bg-university-blue/90 shadow transition-colors focus:outline-none focus:ring-2 focus:ring-university-blue focus:ring-offset-2"
+                >
+                    {{ mstrings.close }}
+                </button>
             </div>
+
         </div>
     </VueModal>
 </template>
@@ -131,7 +166,7 @@
     import UAlert from '../Common/UAlert.vue';
     import { CircleAlert, X } from '@lucide/vue';
     import type { IUser } from '@/js/Interfaces';
-import GradeColor from '../Common/GradeColor.vue';
+    import GradeColor from '../Common/GradeColor.vue';
 
     const showexplainmodal = ref(false);
     const debug = ref({});
@@ -173,8 +208,6 @@ import GradeColor from '../Common/GradeColor.vue';
         )
         .then((result: any) => {
             user.value = result;
-            console.log(result);
-
             loading.value = false;
         })
         .catch((error) => {
