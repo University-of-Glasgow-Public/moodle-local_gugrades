@@ -17,10 +17,12 @@
         </div>
     </div>
 
+    <!-- NEW regulations -->
     <template v-if="loaded && !treeerror && newregs">
-        <CategoryConfig :categoryid="categoryid" :nodes="activitytree"></CategoryConfig>
+        <CategoryConfig :categoryid="categoryid" :nodes="activitytree" :engineering="engineering"></CategoryConfig>
     </template>
 
+    <!-- OLD regulations -->
     <div v-if="loaded && !treeerror && !newregs">
         <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
             <tbody>
@@ -49,9 +51,10 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import CategoryConfig from '@/components/Configure/CategoryConfig.vue';
+    import type { ICategoryCategory } from '@/js/Interfaces.js';
 
     const categoryid = ref(0);
-    const activitytree = ref();
+    const activitytree = ref<ICategoryCategory>();
     const categoryname = ref('');
     const loaded = ref(false);
     const showresitoption = ref(false);
@@ -63,6 +66,7 @@
     const treeerror = ref('');
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
+
 
     /**
      * onMounted, get write grades capability
@@ -149,6 +153,7 @@
         }
         if (treestore.trees[catid]) {
             const tree = JSON.parse(treestore.trees[catid]);
+            console.log(tree);
             if (!treeerror.value) {
                 activitytree.value = tree;
                 categoryname.value = tree.category.fullname;

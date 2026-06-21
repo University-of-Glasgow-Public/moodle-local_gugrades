@@ -110,13 +110,13 @@ class users {
 
     /**
      * Get users who can "be graded". Usually students.
-     * @param \context $context
+     * @param \core\context\course|false $context
      * @param string $firstname (first letter of first name)
      * @param string $lastname (first letter of last name)
      * @param int $groupid (0 means ignore groups)
      * @return array
      */
-    public static function get_gradeable_users(\context $context, $firstname = '', $lastname = '', $groupid = 0) {
+    public static function get_gradeable_users(\core\context\course|false $context, $firstname = '', $lastname = '', $groupid = 0) {
         $fields = 'u.id, u.username, u.idnumber, u.firstname, u.lastname, u.email,
             u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, u.picture, u.imagealt';
         $users = get_enrolled_users($context, 'moodle/grade:view', $groupid, $fields);

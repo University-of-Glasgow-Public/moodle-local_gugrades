@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a class="dropdown-item block px-4 py-2 text-sm text-brand-dark-purple hover:bg-brand-light-purple/20 transition-colors" href="#" @click="add_grade()">
+    <a  @click.prefent="add_grade()">
         {{ buttontitle }}
     </a>
 

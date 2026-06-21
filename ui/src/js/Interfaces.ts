@@ -352,3 +352,38 @@ export interface Map {
     createdby: string;
     createdat: string;
 }
+
+/**
+ * Recursive category grade/item structure structure
+ */
+
+/**
+ * Individual grade item within Items array (Items[])
+ */
+export interface ICategoryGradeItem {
+    id: number;
+    categoryid: number;
+    icon: string;
+    itemmodule: string;
+    itemname: string;
+    [key: string]: any; // Ignore all the other fields.
+}
+
+/**
+ * The record containing information about current category (Category)
+ */
+export interface ICategoryDetail {
+    id: number;
+    fullname: string;
+    [key: string]: any; // Ignore all the other fields.
+}
+
+/**
+ * Recursive grade categories (Categories)
+ */
+export interface ICategoryCategory {
+    categories: ICategoryCategory[];
+    category: ICategoryDetail;
+    items: ICategoryGradeItem[];
+    [key: string]: any; // Ignore all the other fields.
+}
