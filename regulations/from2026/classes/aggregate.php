@@ -415,6 +415,11 @@ class aggregate {
         // Split into exam and course grades. 
         [$examitems, $courseitems] = $this->eng_split_items($courseid, $items);
 
+        // If there are no exams then the rule does not apply.
+        if (count($examitems) == 0) {
+            return $aggregatedgrade;
+        }
+
         // Get weights
         $examweight = array_sum(array_column($examitems, 'weight'));
         $courseweight = array_sum(array_column($courseitems, 'weight'));
