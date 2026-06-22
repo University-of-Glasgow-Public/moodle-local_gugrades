@@ -8,7 +8,7 @@
 
         <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
 
-        <div v-if="(showresitoption || engineering) && caneditgrades" class="my-2">
+        <div v-if="(showresitoption || engineering) && caneditgrades &&!newregs" class="my-2">
             <button v-if="!configuringresits" type="button" class="btn btn-accent btn-outline" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
             <div v-else>
                 <div class="alert alert-primary mb-2" v-html="mstrings['resit_help']"></div>
