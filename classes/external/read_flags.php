@@ -63,7 +63,7 @@ class read_flags extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        $flags = \local_gugrades\api::read_flags($courseid, $flags);
+        $flags = \local_gugrades\api::read_flags($courseid);
 
         return ['flags' => $flags];
     }

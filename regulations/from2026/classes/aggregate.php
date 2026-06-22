@@ -223,7 +223,6 @@ class aggregate {
                         $displaygrade = $this->format_displaygrade(
                             $convertedgrade,
                             $rawgrade,
-                            $convertedgradevalue,
                             0,
                             $level
                         );
@@ -294,6 +293,17 @@ class aggregate {
         // Now call the appropriate aggregation function to do the sums.
         $aggregatedgrade = call_user_func([$this, $aggfunction], $items);
 
+        // Flag modifying explanation if Engineering cap applied.
+        $isengineeringcap = false;
+
+        // Is this ENGINEERING? Apply Engineering rules if this is Level 1
+        // NOTE: Only works if aggregation strategy is weighted mean
+        if ($isengineering && ($level == 1) && ($aggmethod = \GRADE_AGGREGATE_WEIGHTED_MEAN)) {
+            $oldaggregatedgrade = $aggregatedgrade;
+            $aggregatedgrade = $this->engineering_cap($courseid, $aggregatedgrade, $items);
+            $isengineeringcap = $oldaggregatedgrade <> $aggregatedgrade;
+        }
+
         // If this is a scale convert the numeric grade to the appropriate.
         if (($atype == \local_gugrades\GRADETYPE_SCHEDULEA) || ($atype == \local_gugrades\GRADETYPE_SCHEDULEB)) {
             [$convertedgrade, $convertedgradevalue] = $this->convert($aggregatedgrade, $atype);
@@ -316,6 +326,11 @@ class aggregate {
             }
 
             $explain = get_string('explain_schedule', 'local_gugrades');
+
+            // TODO - can probably improve on this.
+            if ($isengineeringcap) {
+                $explain .= " (Capped by Engineering rules)";
+            }
 
             return [$parentgrade, $aggregatedgrade, '', $displaygrade, 0, '', $explain, false];
         }
@@ -353,6 +368,78 @@ class aggregate {
         }
 
         return false;
+    }
+
+    /**
+     * Split list of items into exams and coursework
+     * @param int $courseid
+     * @param array $items
+     * @return array
+     */
+    protected function eng_split_items(int $courseid, array $items) {
+        global $DB;
+
+        // Get the grade category IDs that represent exams.
+        $flags = $DB->get_records('local_gugrades_flag', ['courseid' => $courseid]);
+        $examids = [];
+        foreach ($flags as $flag) {
+            if ($flag->engexam && $flag->gradecategoryid) {
+                $examids[] = $flag->gradecategoryid;
+            }
+        }
+
+        $examitems = [];
+        $courseitems = [];
+
+        // Run through items, split into correct camp.
+        foreach ($items as $item) {
+            if ($item->iscategory && in_array($item->categoryid, $examids)) {
+                $examitems[] = $item;
+            } else {
+                $courseitems[] = $item;
+            }
+        }
+
+        return [$examitems, $courseitems];
+    }
+
+    /**
+     * Engineering cap
+     * @param int $courseid
+     * @param float $aggregatedgrade
+     * @param array $items
+     * @return float
+     */
+    public function engineering_cap(int $courseid, float $aggregatedgrade, array $items) {
+
+        // Split into exam and course grades. 
+        [$examitems, $courseitems] = $this->eng_split_items($courseid, $items);
+
+        // Get weights
+        $examweight = array_sum(array_column($examitems, 'weight'));
+        $courseweight = array_sum(array_column($courseitems, 'weight'));
+        $totalweight = $examweight + $courseweight;
+
+        // Normalise total weights.
+        $examweight = 100 * $examweight / $totalweight;
+        $courseweight = 100 * $courseweight / $totalweight; 
+
+        // Get "aggregated" grades.
+        // It HAS to be weigghted mean - we wouldn't be here otherwise. 
+        $examgrade = $this->strategy_weighted_mean($examitems);
+        $coursegrade = $this->strategy_weighted_mean($courseitems);
+
+        // MGU-1439
+        // If either exam or course id weighted >30% AND grade is below E3 (6.0)
+        // output grade is capped at a max of E1 (8.0)
+        if (($examweight > 30) && ($examgrade < 6.0)) {
+            $aggregatedgrade = $aggregatedgrade > 8.0 ? 8.0 : $aggregatedgrade;
+        }
+        if (($courseweight > 30) && ($coursegrade < 6.0)) {
+            $aggregatedgrade = $aggregatedgrade > 8.0 ? 8.0 : $aggregatedgrade;
+        }
+
+        return $aggregatedgrade;
     }
 
     /**

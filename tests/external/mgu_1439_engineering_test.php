@@ -48,6 +48,9 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
 
         parent::setUp();
 
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
         // Create new category for engineering.
         $category = $this->getDataGenerator()->create_category([
             'name' => 'Engineering',
@@ -61,6 +64,67 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
         $course->category = $category->id;
         $course->startdate = strtotime('2027-01-01');
         $DB->update_record('course', $course);
+
+        // Install test schema.
+        $this->gradeitemids = $this->load_schema('schema9');
+
+        // Get the categories. 
+        $summativeid = $this->get_grade_category('Summative');
+        $category1id = $this->get_grade_category('Category 1');
+        $category2id = $this->get_grade_category('Category 2');
+
+        // Set category 1 as the exam.
+        $flags = [
+            [
+                'gradecategoryid' => $category1id,
+                'gradeitemid' => 0,
+                'engexam' => true,
+                'resit' => false,
+            ]
+        ];
+        $nothing = write_flags::execute($this->course->id, $flags);
+        $nothing = external_api::clean_returnvalue(
+            write_flags::execute_returns(),
+            $nothing,
+        );
+
+        // Check we can read them back
+        $readflags = read_flags::execute($this->course->id);
+        $readflags = external_api::clean_returnvalue(
+            read_flags::execute_returns(),
+            $readflags,
+        );
+
+        $this->assertTrue($readflags['flags'][0]['engexam']);
+        $this->assertFalse($readflags['flags'][0]['resit']);
+
+        // Load test data.
+        $userlist = [
+            $this->student->id,
+        ];
+        $this->load_data('data9a', $this->student->id);
+        foreach ($this->gradeitemids as $gradeitemid) {
+            $this->import_grades($this->course->id, $gradeitemid, $userlist);
+        }
+
+        // Get aggregation page for above.
+        $page = get_aggregation_page::execute($this->course->id, $summativeid, '', '', 0, false);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('E1 (8)', $fred['displaygrade']);
+
+        // Explain current page.
+        $explain = get_explain_aggregation::execute($this->course->id, $summativeid, $this->student->id);
+        $explain = external_api::clean_returnvalue(
+            get_explain_aggregation::execute_returns(),
+            $explain
+        );
+
+        $this->assertEquals('Grades are aggregated according to GGS1 or GGS2 (Capped by Engineering rules)', $explain['explain']);
     }
 
     /**
