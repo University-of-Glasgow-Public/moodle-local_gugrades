@@ -443,5 +443,18 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026061600, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026062200) {
+
+        // Rename field legacyrecit on table local_gugrades_flag to resit.
+        $table = new xmldb_table('local_gugrades_flag');
+        $field = new xmldb_field('legacyrecit', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'engexam');
+
+        // Launch rename field resit.
+        $dbman->rename_field($table, $field, 'resit');
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026062200, 'local', 'gugrades');
+    }
+
     return true;
 }

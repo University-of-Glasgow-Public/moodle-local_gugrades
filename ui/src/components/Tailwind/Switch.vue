@@ -33,14 +33,15 @@
 </template>
 
 <script setup lang="ts">
-    import { watch } from 'vue';
+    import { watch, ref, onMounted } from 'vue';
     import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 
     const props = withDefaults(
         defineProps<{
-            disabled?: boolean
-            label?: string
-            size?: 'sm' | 'md' | 'lg'
+            active?: boolean;
+            disabled?: boolean;
+            label?: string;
+            size?: 'sm' | 'md' | 'lg';
         }>(),
         {
             disabled: false,
@@ -49,11 +50,19 @@
     );
 
     // One line defines the prop, the internal ref, and the parent update sync emit
-    const model = defineModel<boolean>({ default: false });
+    //const model = defineModel<boolean>({ default: false });
+    const model = ref(false);
 
     const emit = defineEmits<{
         change: [value: 'on' | 'off']
     }>();
+
+    watch(
+        () => props.active,
+        (newVal) => {
+            model.value = newVal;
+        }
+    );
 
     // Use a simple watch to fire your legacy backend 'on'/'off' change event
     watch(model, (val) => {

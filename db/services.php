@@ -91,6 +91,8 @@ $services = [
             'local_gugrades_write_note',
             'local_gugrades_read_note',
             'local_gugrades_get_course_info',
+            'local_gugrades_write_flags',
+            'local_gugrades_read_flags',
         ],
         'requiredcapability' => 'local/gugrades:view',
         'restrictedusers' => 1,
@@ -483,6 +485,18 @@ $functions = [
     'local_gugrades_get_course_info' => [
         'classname' => 'local_gugrades\external\get_course_info',
         'description' => 'Get the course info to create back to course link',
+        'type' => 'read',
+        'ajax' => true,
+    ],
+    'local_gugrades_write_flags' => [
+        'classname' => 'local_gugrades\external\write_flags',
+        'description' => 'Write the reassessment/exams flags to the database',
+        'type' => 'write',
+        'ajax' => true,
+    ],
+    'local_gugrades_read_flags' => [
+        'classname' => 'local_gugrades\external\read_flags',
+        'description' => 'Read the reassessment/exams flags from the database',
         'type' => 'read',
         'ajax' => true,
     ],

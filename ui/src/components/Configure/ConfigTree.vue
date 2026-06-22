@@ -141,7 +141,7 @@
             }
         )
         .catch((error) => {
-            window.console.log(error);
+            console.error(error);
             emit('saverror', error);
         });
     }

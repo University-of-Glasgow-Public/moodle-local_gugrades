@@ -83,7 +83,7 @@
             caneditgrades.value = result.hascapability;
         })
         .catch((error) => {
-            window.console.log(error);
+            console.error(error);
             debug.value = error;
         });
     });
@@ -153,7 +153,6 @@
         }
         if (treestore.trees[catid]) {
             const tree = JSON.parse(treestore.trees[catid]);
-            console.log(tree);
             if (!treeerror.value) {
                 activitytree.value = tree;
                 categoryname.value = tree.category.fullname;

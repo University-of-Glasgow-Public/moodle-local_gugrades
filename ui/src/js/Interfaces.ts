@@ -387,3 +387,15 @@ export interface ICategoryCategory {
     items: ICategoryGradeItem[];
     [key: string]: any; // Ignore all the other fields.
 }
+
+/**
+ * Reassessment / Engineering flags
+ */
+export interface IFlag {
+    id?: number;
+    courseid: number;
+    gradecategoryid: number;
+    gradeitemid: number;
+    engexam: boolean;
+    resit: boolean;
+}

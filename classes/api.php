@@ -2875,4 +2875,50 @@ class api {
             'specialcategory' => $regulationextra,
         ];
     }
+
+    /**
+     * Write flags
+     * @param int $courseid
+     * @param array $flags
+     * 
+     */
+    public static function write_flags(int $courseid, array $flags) {
+        global $DB;
+
+        // Easiest to delete all the flags for course and write them back again
+        $DB->delete_records('local_gugrades_flag', ['courseid' => $courseid]);
+
+        // Track a category to hang recalculate on.
+        $gradecategoryid = 0;
+
+        foreach ($flags as $flag) {
+            $flagdata = (object) [
+                'courseid' => $courseid,
+                'gradecategoryid' => $flag['gradecategoryid'],
+                'gradeitemid' => $flag['gradeitemid'],
+                'engexam' => $flag['engexam'],
+                'resit' => $flag['resit'],
+            ];
+            $gradecategoryid = $flag['gradecategoryid'];
+            $DB->insert_record('local_gugrades_flag', $flagdata);
+        }
+
+        if ($gradecategoryid) {
+            self::recalculate($courseid, $gradecategoryid);
+        }
+    }
+
+    /**
+     * Read flags
+     * @param int $courseid
+     * @return array
+     * 
+     */
+    public static function read_flags(int $courseid) {
+        global $DB;
+
+        $flags = $DB->get_records('local_gugrades_flag', ['courseid' => $courseid]);
+
+        return $flags;
+    }
 }

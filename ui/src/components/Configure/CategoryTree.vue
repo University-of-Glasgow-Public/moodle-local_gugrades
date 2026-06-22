@@ -28,7 +28,7 @@
                 <!-- COLUMN 2: Reassessment Toggle Switch -->
                 <!-- Occupies its fixed track comfortably with left alignment -->
                 <div class="w-52 shrink-0 flex items-center justify-start pr-2">
-                    <Switch label="Reassessment?"/>
+                    <Switch :label="mstrings.reassessment + '?'"/>
                 </div>
 
                 <!-- COLUMN 3: Optional Engineering Toggle Switch -->
@@ -37,7 +37,12 @@
                   when the parent component turns engineering support off.
                 -->
                 <div v-if="props.engineering" class="w-52 shrink-0 flex items-center justify-start pr-2">
-                    <Switch v-if="props.depth === 1" @change="eng_change($event, category.category.id)" label="Exam?"/>
+                    <Switch
+                        v-if="props.depth === 1" 
+                        @change="eng_change($event, category.category.id)" 
+                        :label="mstrings.exam + '?'"
+                        :active="engineeringcats.some(id => id == category.category.id)"
+                    />
                 </div>
 
             </div>
@@ -55,9 +60,12 @@
 
 
 <script setup lang="ts">
-    import { onMounted } from 'vue';
+    import { onMounted, ref } from 'vue';
     import Switch from '../Tailwind/Switch.vue';
-    import type { ICategoryCategory } from '@/js/Interfaces.ts';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import type { ICategoryCategory, IFlag } from '@/js/Interfaces.ts';
 
     interface IProps {
         nodes: ICategoryCategory;
@@ -67,14 +75,57 @@
 
     const props = defineProps< IProps >();
 
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
+    const engineeringcats = ref< number[] >([]);
+
     /**
      * Engineering switch has been changed
      */
     function eng_change(state: boolean|string, categoryid: number) {
-        console.log(state);
-        console.log(categoryid);
+
+        // Destructive update...
+        engineeringcats.value = engineeringcats.value.filter(id => id !== categoryid);
+
+        // If it was 'on' then back it goes.
+        if (state == 'on') {
+            engineeringcats.value.push(categoryid);
+        }
+
+        // Load into flags array
+        const flags = engineeringcats.value.map((id) => ({
+            gradecategoryid: id,
+            gradeitemid: 0,
+            engexam: true,
+            resit: false,
+        }));
+
+        // Push results to Moodle
+        moodleFetch('local_gugrades_write_flags', {
+            flags: flags,
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     }
 
     onMounted(() => {
+        moodleFetch('local_gugrades_read_flags', {})
+        .then((result: any) => {
+            if (result && result.flags) {
+                // FIXED FOR REACTIVITY: 
+                // We map the values into a clean, fresh JavaScript array first,
+                // filtering out any empty or invalid entries on the fly.
+                const activeIds = result.flags
+                    .filter((flag: IFlag) => flag.gradecategoryid)
+                    .map((flag: IFlag) => flag.gradecategoryid);
+
+                // Overwriting the whole value at once guarantees Vue triggers a full re-render!
+                engineeringcats.value = activeIds;
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     });
 </script>
