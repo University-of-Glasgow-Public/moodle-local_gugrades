@@ -2,7 +2,7 @@
     <!-- Use a simple top-level container div to hold your rows sequentially -->
     <div class="flex flex-col w-full">
 
-        <UAlert v-if="hasNoCategories">{{ mstrings.nocategories }}</UAlert>
+        <UAlert variant="error" v-if="hasNoCategories">No categories available to select.</UAlert>
 
         <template v-for="category in props.nodes.categories" :key="category.category.id">
             
