@@ -18,7 +18,7 @@
     </div>
 
     <!-- NEW regulations -->
-    <template v-if="loaded && !treeerror && newregs">
+    <template v-if="loaded && !treeerror && newregs &&activitytree">
         <CategoryConfig :categoryid="categoryid" :nodes="activitytree" :engineering="engineering"></CategoryConfig>
     </template>
 
@@ -27,6 +27,7 @@
         <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
             <tbody>
                 <ConfigTree
+                    v-if="activitytree"
                     :nodes="activitytree"
                     :depth="1"
                     :resitconfig="configuringresits"
