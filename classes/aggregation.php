@@ -163,12 +163,10 @@ class aggregation {
         // Get list of grade categories.
         $sql = "SELECT * FROM {grade_categories}
             WHERE courseid = :courseid
-            AND parent = :parent
-            AND hidden = :hidden";
+            AND parent = :parent";
         $rawcats = $DB->get_records_sql($sql, [
             'courseid' => $courseid,
             'parent' => $gradecategoryid,
-            'hidden' => 0,
         ]);
 
         // Run over above and fetch enhanced category information from (hopefully) cache.
