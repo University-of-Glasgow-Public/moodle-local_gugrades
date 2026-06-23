@@ -44,7 +44,7 @@ Feature: Testing import_grades_mygrades in local_gugrades
   Scenario: Import Grades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "MyGrades (Beta)" in current page administration
+    And I navigate to "MyGrades" in current page administration
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"

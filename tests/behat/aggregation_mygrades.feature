@@ -61,58 +61,70 @@ Feature: Testing aggregation_mygrades in local_gugrades
   Scenario: Importing Grades and checking aggregation
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "MyGrades (Beta)" in current page administration
+    And I navigate to "MyGrades" in current page administration
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     Then I should see "B1"
-    And I click on "Course grade aggregation"
+    And I wait 3 seconds
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "B1"
     And I should see "33.333%"
     And I should see "Grades missing" in the total cell
-    And I click on "Assessment grade capture" "button"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element"
     And I click on "Test assignment 2" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     Then I should see "C1"
-    And I click on "Course grade aggregation" "button"
+    And I wait 3 seconds
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "C1"
     And I should see "66.667%"
     And I should see "Grades missing" in the total cell
-    And I click on "Assessment grade capture" "button"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element"
     And I click on "Test assignment 3" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     Then I should see "B3"
-    And I click on "Course grade aggregation" "button"
+    And I wait 3 seconds
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "B3"
     And I should see "100%"
     Then I should see "B3 (15.33333)" in the total cell
   Scenario: IS Overrides Total
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "MyGrades (Beta)" in current page administration
+    And I navigate to "MyGrades" in current page administration
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     Then I should see "B1"
-    And I click on "Course grade aggregation"
+    And I wait 3 seconds
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "B1"
     And I should see "33.333%"
     And I should see "Grades missing" in the total cell
-    And I click on "Assessment grade capture" "button"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element"
     And I click on "Test assignment 2" "link" in the "captureselect" "region"
-    And I click on "Action" "button"
-    And I click on "Add grade" "link"
+    And I click on "Open menu" "button"
+    And I click on "//a[contains(., 'Add grade')]" "xpath_element"
     And I wait 3 seconds
     And I set the following fields to these values:
         | Reason for additional grade | 2nd grade                    |
         | Admin grade                 | IS - Interruption of Studies |
     And I wait 3 seconds
     And I click on "Submit" "button" in the ".vm-content" "css_element"
-    And I click on "Course grade aggregation" "button"
-    Then I should see "IS" in the total cell
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
+    Then I should see "B1"
+    And I should see "IS" in the total cell
