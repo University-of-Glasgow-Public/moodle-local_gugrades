@@ -2,12 +2,12 @@
 
 <template>
   <!-- 1. SAFETY CHECK: If text is missing or empty, render a plain container with no hover logic -->
-  <div v-if="!text || text.trim() === ''">
+  <div v-if="!text || text.trim() === ''" v-bind="$attrs">
     <slot />
   </div>
 
   <!-- 2. BRANDED SPEECH BUBBLE TOOLTIP -->
-  <div v-else class="group relative inline-block cursor-help border-b border-dashed border-brand-light-purple/60">
+  <div v-else class="group relative inline-block cursor-help border-b border-dashed border-brand-light-purple/60" v-bind="$attrs">
     
     <!-- This is your wrapped header content -->
     <slot />

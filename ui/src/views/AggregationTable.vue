@@ -133,7 +133,7 @@
                     <!-- strikethrough if data is dropped -->
                     <!-- bold if admin -->
                     <!-- there HAS to be an easier way -->
-                    <span :class="itemclasses(item[header.value])">
+                    <UTooltip :class="itemclasses(item[header.value])" :text="itemtooltip(item[header.value])">
                         <s v-if="item[header.value].dropped">
                             <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
                             <GradeColor v-else :grade="item[header.value].data"></GradeColor>
@@ -144,7 +144,7 @@
                             <GradeColor v-else :grade="item[header.value].data"></GradeColor>
                             <!-- <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span> -->
                         </span>
-                    </span>
+                    </UTooltip>
 
                     <!-- add/override grade -->
                     <OverrideGrade
@@ -387,12 +387,25 @@
      */
     function itemclasses(item: IUserField) {
         if (item.overridden) {
-            return ['border', 'border-danger', 'rounded', 'p-1']
+            return ['border-2', 'border-solid', 'border-brand-dark-red', 'rounded-lg', 'p-1.5'];
         }
         if (item.hidden) {
-            return ['border', 'border-warning', 'rounded', 'p-1']
+            return ['border-2', 'border-solid', 'border-brand-light-yellow', 'rounded-lg', 'p-1.5'];
         }
         return [];
+    }
+
+    /**
+     * Get tooltip text for bordered items
+     */
+    function itemtooltip(item: IUserField) {
+        if (item.overridden) {
+            return mstringstore.getMstring('tooltipoverridden');
+        }
+        if (item.hidden) {
+            return mstringstore.getMstring('tooltiphidden');
+        }
+        return '';
     }
 
     /**
