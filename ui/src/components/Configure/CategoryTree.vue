@@ -84,26 +84,27 @@
     const engineeringcats = ref< number[] >([]);
 
     /**
-     * Engineering switch has been changed
+     * Switch clicked.
+     * @param state 
+     * @param categoryid 
      */
-    function eng_change(state: boolean|string, categoryid: number) {
+    function eng_change(state: boolean | string, categoryid: number) {
 
-        // Destructive update...
-        engineeringcats.value = engineeringcats.value.filter(id => id !== categoryid);
+        engineeringcats.value = engineeringcats.value.filter(id => id != categoryid);
 
-        // If it was 'on' then back it goes.
-        if (state == 'on') {
-            engineeringcats.value.push(categoryid);
+        if (state === 'on' || state === true) {
+            // Enforce pure integer values inside your tracking arrays
+            engineeringcats.value.push(Number(categoryid));
         }
 
-        // Load into flags array
+        // Load into flags array (Duplicates are now permanently structurally impossible)
         const flags = engineeringcats.value.map((id) => ({
             gradecategoryid: id,
             gradeitemid: 0,
             engexam: true,
             resit: false,
         }));
-
+        
         // Push results to Moodle
         moodleFetch('local_gugrades_write_flags', {
             flags: flags,
