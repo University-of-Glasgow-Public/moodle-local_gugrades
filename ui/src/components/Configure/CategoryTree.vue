@@ -1,6 +1,9 @@
 <template>
     <!-- Use a simple top-level container div to hold your rows sequentially -->
     <div class="flex flex-col w-full">
+
+        <UAlert v-if="hasNoCategories">{{ mstrings.nocategories }}</UAlert>
+
         <template v-for="category in props.nodes.categories" :key="category.category.id">
             
             <!-- 
@@ -60,12 +63,13 @@
 
 
 <script setup lang="ts">
-    import { onMounted, ref } from 'vue';
+    import { onMounted, ref, computed } from 'vue';
     import Switch from '../Tailwind/Switch.vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { ICategoryCategory, IFlag } from '@/js/Interfaces.ts';
+    import UAlert from '../Common/UAlert.vue';
 
     interface IProps {
         nodes: ICategoryCategory;
@@ -108,6 +112,10 @@
             console.error(error);
         });
     }
+
+    const hasNoCategories = computed(() => {
+        return !props.nodes.categories || props.nodes.categories.length === 0;
+    });
 
     onMounted(() => {
         moodleFetch('local_gugrades_read_flags', {})

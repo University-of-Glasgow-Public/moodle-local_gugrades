@@ -315,6 +315,7 @@ $string['name'] = 'Name';
 $string['next'] = 'Next...';
 $string['no'] = 'No';
 $string['noaudit'] = 'No audit logs for this course';
+$string['nocategories'] = 'No categories available to select.';
 $string['noconversionmaps'] = 'No conversion maps have been defined. Click \'Add map\' to create one.';
 $string['nodata'] = 'No data';
 $string['nograde'] = 'No grade';
