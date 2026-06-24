@@ -1700,6 +1700,10 @@ class grades {
     public static function grade_item_updated(int $courseid, int $gradeitemid) {
         global $DB;
 
+        // I'm disabling this as MyGrades recalculates anyway when it is 
+        // launched.
+        return;
+
         // If there are no grades then there's little point.
         if (!self::any_grades($gradeitemid)) {
             return;
