@@ -77,8 +77,7 @@
                     <div  class="flex" v-for="item in leftItems" :key="item.band">
                         <div class="pt-2">
                             <h3 class="w-24 flex items-center">
-                                <span :class="item.colorclass"><Circle :size="14" class="lucideFill inline" /></span>
-                                {{  item.band  }}
+                                <GradeColor :grade="item.band" class="w-10 text-center">{{  item.band  }}</GradeColor>
                             </h3>
                         </div>
                         <div class="w-60 mr-5">
@@ -127,8 +126,7 @@
                     <div class="flex" v-for="item in rightItems" :key="item.band">
                         <div class="pt-2">
                             <h3 class="w-24">
-                                <span :class="item.colorclass"><Circle :size="14" class="lucideFill inline" /></span>
-                                {{  item.band  }}
+                                <GradeColor :grade="item.band" class="w-10 text-center">{{  item.band  }}</GradeColor>
                             </h3>
                         </div>
                         <div class="w-60 mr-5">
@@ -194,6 +192,7 @@
     import { gradecolors } from '@/js/GradeColors';
     import { Circle } from '@lucide/vue';
     import HelpButton from '../Common/HelpButton.vue';
+import GradeColor from '../Common/GradeColor.vue';
 
     interface IBandItem {
         band: string;

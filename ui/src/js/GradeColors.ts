@@ -34,43 +34,53 @@ export const old_gradecolors: { [key: string]: { bg: string; text: string; dot: 
 
 export const gradecolors: { [key: string]: { bg: string; text: string; dot: string } } =
 {
-  "A1": { "bg": "bg-emerald-200",      "text": "text-emerald-950 font-bold", "dot": "bg-emerald-600" },
-  "A2": { "bg": "bg-emerald-200/80",   "text": "text-emerald-900",           "dot": "bg-emerald-500" },
-  "A3": { "bg": "bg-emerald-100",      "text": "text-emerald-900",           "dot": "bg-emerald-500" },
-  "A4": { "bg": "bg-emerald-100/70",   "text": "text-emerald-800",           "dot": "bg-emerald-400" },
-  "A5": { "bg": "bg-emerald-100/40",   "text": "text-emerald-800",           "dot": "bg-emerald-400" },
+  // A Tier: Green (Using brand green tokens)
+  "A1": { "bg": "bg-brand-light-green",     "text": "text-brand-dark-green font-bold", "dot": "bg-brand-dark-green" },
+  "A2": { "bg": "bg-brand-light-green/80",  "text": "text-brand-dark-green",           "dot": "bg-brand-dark-green/80" },
+  "A3": { "bg": "bg-brand-light-green/60",  "text": "text-brand-dark-green",           "dot": "bg-brand-dark-green/80" },
+  "A4": { "bg": "bg-brand-light-green/40",  "text": "text-brand-dark-green/90",        "dot": "bg-brand-dark-green/60" },
+  "A5": { "bg": "bg-brand-light-green/20",  "text": "text-brand-dark-green/80",        "dot": "bg-brand-dark-green/40" },
 
-  "B1": { "bg": "bg-cyan-200",         "text": "text-cyan-950 font-bold",    "dot": "bg-cyan-600"    },
-  "B2": { "bg": "bg-cyan-100",         "text": "text-cyan-900",              "dot": "bg-cyan-500"    },
-  "B3": { "bg": "bg-cyan-100/60",      "text": "text-cyan-800",              "dot": "bg-cyan-400"    },
+  // B Tier: Light Blue (Using brand light blue tokens)
+  "B1": { "bg": "bg-brand-light-blue",      "text": "text-brand-dark-blue font-bold",  "dot": "bg-brand-dark-blue" },
+  "B2": { "bg": "bg-brand-light-blue/60",   "text": "text-brand-dark-blue",            "dot": "bg-brand-dark-blue/80" },
+  "B3": { "bg": "bg-brand-light-blue/30",   "text": "text-brand-dark-blue/80",         "dot": "bg-brand-dark-blue/50" },
 
-  "C1": { "bg": "bg-sky-200",          "text": "text-sky-950 font-bold",     "dot": "bg-sky-600"     },
-  "C2": { "bg": "bg-sky-100",          "text": "text-sky-900",               "dot": "bg-sky-500"     },
-  "C3": { "bg": "bg-sky-100/60",       "text": "text-sky-800",               "dot": "bg-sky-400"     },
+    // C Tier: University Blue (Optimized for text contrast and clear stepping)
+  "C1": { "bg": "bg-university-blue",       "text": "text-white font-bold",            "dot": "bg-white" },
+  "C2": { "bg": "bg-university-blue/50",    "text": "text-brand-dark-blue font-bold",  "dot": "bg-brand-dark-blue" },
+  "C3": { "bg": "bg-university-blue/20",    "text": "text-brand-dark-blue",            "dot": "bg-brand-dark-blue/70" },
 
-  "D1": { "bg": "bg-indigo-200",       "text": "text-indigo-950 font-bold",  "dot": "bg-indigo-600"  },
-  "D2": { "bg": "bg-indigo-100",       "text": "text-indigo-900",            "dot": "bg-indigo-500"  },
-  "D3": { "bg": "bg-indigo-100/60",    "text": "text-indigo-800",            "dot": "bg-indigo-400"  },
+  // D Tier: Light Purple (Using brand light purple tokens)
+  "D1": { "bg": "bg-brand-light-purple",    "text": "text-brand-dark-purple font-bold", "dot": "bg-brand-dark-purple" },
+  "D2": { "bg": "bg-brand-light-purple/60", "text": "text-brand-dark-purple",           "dot": "bg-brand-dark-purple/80" },
+  "D3": { "bg": "bg-brand-light-purple/30", "text": "text-brand-dark-purple/80",        "dot": "bg-brand-dark-purple/50" },
 
-  "E1": { "bg": "bg-brand-light-yellow/60", "text": "text-amber-950 font-bold", "dot": "bg-amber-600"   },
-  "E2": { "bg": "bg-brand-light-yellow/40", "text": "text-amber-900",         "dot": "bg-amber-500"   },
-  "E3": { "bg": "bg-brand-light-yellow/20", "text": "text-amber-800",         "dot": "bg-amber-400"   },
+  // E Tier: Yellow (Using brand light yellow tokens)
+  "E1": { "bg": "bg-brand-light-yellow",    "text": "text-brand-dark-purple font-bold", "dot": "bg-brand-dark-purple/80" },
+  "E2": { "bg": "bg-brand-light-yellow/60", "text": "text-brand-dark-purple",           "dot": "bg-brand-dark-purple/60" },
+  "E3": { "bg": "bg-brand-light-yellow/30", "text": "text-brand-dark-purple/80",        "dot": "bg-brand-dark-purple/40" },
 
-  "F1": { "bg": "bg-orange-200",       "text": "text-orange-950 font-bold",  "dot": "bg-orange-600"  },
-  "F2": { "bg": "bg-orange-100",       "text": "text-orange-900",            "dot": "bg-orange-500"  },
-  "F3": { "bg": "bg-orange-100/50",    "text": "text-orange-800",            "dot": "bg-orange-400"  },
+  // F Tier: Pink (Using brand pink tokens instead of generic orange)
+  "F1": { "bg": "bg-brand-light-pink",      "text": "text-brand-dark-pink font-bold",  "dot": "bg-brand-dark-pink" },
+  "F2": { "bg": "bg-brand-light-pink/60",   "text": "text-brand-dark-pink",            "dot": "bg-brand-dark-pink/80" },
+  "F3": { "bg": "bg-brand-light-pink/30",   "text": "text-brand-dark-pink/80",         "dot": "bg-brand-dark-pink/50" },
 
-  "G1": { "bg": "bg-brand-light-red/30",    "text": "text-brand-dark-red",     "dot": "bg-brand-dark-red" },
-  "G2": { "bg": "bg-brand-light-red/60",    "text": "text-brand-dark-red font-semibold", "dot": "bg-brand-dark-red" },
+  // G Tier: Red Low Grades (Using light variations of brand dark red)
+  "G1": { "bg": "bg-brand-dark-red/10",     "text": "text-brand-dark-red",             "dot": "bg-brand-dark-red/60" },
+  "G2": { "bg": "bg-brand-dark-red/30",     "text": "text-brand-dark-red font-semibold", "dot": "bg-brand-dark-red/80" },
   
-  "H":  { "bg": "bg-brand-light-red",       "text": "text-white font-black",   "dot": "bg-white" },
+  // H Tier: Critical Red (Solid brand dark red with stark contrast)
+  "H":  { "bg": "bg-brand-dark-red",        "text": "text-white font-black",           "dot": "bg-white" },
 
-  "A0": { "bg": "bg-emerald-200",      "text": "text-emerald-950 font-bold", "dot": "bg-emerald-600" },
-  "B0": { "bg": "bg-cyan-200",         "text": "text-cyan-950 font-bold",    "dot": "bg-cyan-600"    },
-  "C0": { "bg": "bg-sky-200",          "text": "text-sky-950 font-bold",     "dot": "bg-sky-600"     },
-  "D0": { "bg": "bg-indigo-200",       "text": "text-indigo-950 font-bold",  "dot": "bg-indigo-600"  },
-  "E0": { "bg": "bg-brand-light-yellow/50", "text": "text-amber-950 font-bold", "dot": "bg-amber-600"   },
-  "F0": { "bg": "bg-orange-200",       "text": "text-orange-950 font-bold",  "dot": "bg-orange-600"  },
-  "G0": { "bg": "bg-brand-light-red/50",    "text": "text-brand-dark-red font-bold", "dot": "bg-brand-dark-red" }
+  // 0-Baselines (Aligned with their tier roots)
+  "A0": { "bg": "bg-brand-light-green",     "text": "text-brand-dark-green font-bold", "dot": "bg-brand-dark-green" },
+  "B0": { "bg": "bg-brand-light-blue",      "text": "text-brand-dark-blue font-bold",  "dot": "bg-brand-dark-blue" },
+  "C0": { "bg": "bg-university-blue",       "text": "text-white font-bold",            "dot": "bg-white" },
+  "D0": { "bg": "bg-brand-light-purple",    "text": "text-brand-dark-purple font-bold", "dot": "bg-brand-dark-purple" },
+  "E0": { "bg": "bg-brand-light-yellow",    "text": "text-brand-dark-purple font-bold", "dot": "bg-brand-dark-purple/80" },
+  "F0": { "bg": "bg-brand-light-pink",      "text": "text-brand-dark-pink font-bold",  "dot": "bg-brand-dark-pink" },
+  "G0": { "bg": "bg-brand-dark-red/40",     "text": "text-brand-dark-red font-bold",   "dot": "bg-brand-dark-red" }
 }
+
 
