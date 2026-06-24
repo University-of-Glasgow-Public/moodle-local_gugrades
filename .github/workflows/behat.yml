@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         php: ['8.3']
-        moodle-branch: ['MOODLE_501_STABLE']
+        moodle-branch: ['MOODLE_405_STABLE']
         database: [mariadb]
     
     steps:
@@ -47,7 +47,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '24'
       
       - name: Initialise moodle-plugin-ci
         run: |

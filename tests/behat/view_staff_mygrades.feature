@@ -44,23 +44,29 @@ Feature: Testing view_staff_mygrades in local_gugrades
   Scenario: View MyGrades menu items
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "MyGrades (Beta)" in current page administration
-    Then "Assessment grade capture" should exist
-    And I click on "Reassessment management"
+    And I navigate to "MyGrades" in current page administration
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    Then "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element" should exist
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Reassessment management')]" "xpath_element"
     Then I should see "Summative"
-    And I click on "Assessment grade capture" "button"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element"
     Then I should see "Test assignment 1" in the "captureselect" "region"
-    And I click on "Manage conversion maps" "button"
-    Then I should see "Conversion Maps"
-    And I click on "Course grade aggregation" "button"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Manage conversion maps')]" "xpath_element"
+    Then I should see "No conversion maps have been defined. Click 'Add map' to create one."
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then "Export aggregation" "button" should exist
-    And I click on "Audit log" "button"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Audit log')]" "xpath_element"
     Then "Download to CSV" "button" should exist
-    And I click on "Settings" "button" in the "tabmenu" "region"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Settings')]" "xpath_element"
     Then I should see "Hide MyGrades on student dashboard for this course. Moodle Gradebook will be used, instead."
   Scenario: View Assignment MyGrades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "MyGrades (Beta)" in current page administration
+    And I navigate to "MyGrades" in current page administration
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     Then I should see "Student 1"
