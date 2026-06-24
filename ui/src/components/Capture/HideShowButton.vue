@@ -39,14 +39,15 @@
         )
         .then(() => {
             emit('changed');
+            if (props.close) {
+                props.close();
+            }
         })
         .catch((error) => {
             console.error(error);
             debug.value = error;
         });
 
-        if (props.close) {
-            props.close();
-        }
+
     }
 </script>
