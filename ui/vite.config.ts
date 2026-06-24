@@ -23,11 +23,19 @@ export default defineConfig({
     commonjsOptions: {
       include: [/vue3-easy-data-table/, /node_modules/]
     },
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,
         assetFileNames: `assets/[name].[ext]`
+      },
+      onwarn(warning, warn) {
+        // Silence the invalid pure annotation warning specifically for node_modules
+        if (warning.code === 'INVALID_ANNOTATION' && warning.message.includes('__PURE__')) {
+          return;
+        }
+        warn(warning);
       }
     }
   },
