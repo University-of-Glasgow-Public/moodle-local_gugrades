@@ -1982,7 +1982,7 @@ class grades {
     public static function check_grade_type_integrity(int $courseid) {
         global $DB;
 
-        //return [];
+        return [];
 
         $erroritems = [];
 
@@ -2034,6 +2034,7 @@ class grades {
             AND gradetype <> 'RELEASED'
             AND admingrade = ''
             AND iscurrent = 1
+            AND points = 0
             GROUP BY gradeitemid";
         $grades = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
