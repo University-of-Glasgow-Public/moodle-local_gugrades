@@ -289,7 +289,8 @@ class custom extends base {
             // If option for released grades.
             if ($options['released'] && $isreleased) {
                 if (!$released = \local_gugrades\grades::get_released_grade($courseid, $gradeitemid, $userid)) {
-                    throw new \moodle_exception('Missing released gradee. $gradeitemid = ' . $gradeitemid . 'UserID = ' . $userid);
+                    //throw new \moodle_exception('Missing released grade. $gradeitemid = ' . $gradeitemid . ', UserID = ' . $userid);
+                    $csvitems[$identifier . '_released'] = $strnodata;
                 }
                 if ($provisional) {
                     $csvitems[$identifier . '_released'] = $released->displaygrade;
