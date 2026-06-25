@@ -1982,6 +1982,12 @@ class grades {
     public static function check_grade_type_integrity(int $courseid) {
         global $DB;
 
+        //return [];
+
+        $erroritems = [];
+
+        // I'm just going to take this check out because I don't think we need it any more.
+        /*
         // We only store points or not points but that will do.
         // Get possible gradeitemids against points/not points flag.
         $sql = "SELECT DISTINCT gradeitemid, points FROM {local_gugrades_grade}
@@ -1993,7 +1999,6 @@ class grades {
             AND iscurrent = 1";
         $items = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
 
-        $erroritems = [];
         foreach ($items as $item) {
             // If there are first grades then check is irrelevant.
             if (self::any_first($courseid, $item->gradeitemid)) {
@@ -2018,6 +2023,7 @@ class grades {
             }
         }
         $items->close();
+        */
 
         // Check for out of range grades.
         $sql = "SELECT DISTINCT gradeitemid, max(rawgrade) AS maxgrade FROM {local_gugrades_grade}
@@ -2026,6 +2032,7 @@ class grades {
             AND gradetype <> 'CATEGORY'
             AND gradetype <> 'CONVERTED'
             AND gradetype <> 'RELEASED'
+            AND admingrade = ''
             AND iscurrent = 1
             GROUP BY gradeitemid";
         $grades = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
