@@ -88,7 +88,7 @@ class admingrades {
             ],
             'CREDITNOTAWARDED' => [
                 'default' => [
-                    'code' => 'CAN',
+                    'code' => 'CNA',
                     'description' => get_string('admincan', 'local_gugrades'),
                 ]
             ],
@@ -338,14 +338,22 @@ class admingrades {
     /**
      * Get admingrades formatted for CSV Import
      * The valid code is the key => internal code (e.g. NOSUBMISSION)
+     * @param int $courseid
      * @param int $level
      * @return array
      */
-    public static function get_admingrades_csv(int $level) {
+    public static function get_admingrades_csv(int $courseid, int $level) {
 
-        $defaults = self::defaults();
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $codes = $regulation->get_admingrades($courseid, $level);
         $admingrades = [];
 
+        foreach ($codes as $code) {
+            [$displaygrade, $description] = self::get_displaygrade_from_name($code);
+            $admingrades[$displaygrade] = $code;
+        }
+
+        /*
         foreach ($defaults as $name => $default) {
             // Has to be in items list.
             if (!self::flag_set($default, 'items')) {
@@ -360,6 +368,7 @@ class admingrades {
             [$displaygrade, ] = self::get_displaygrade_from_name($name);
             $admingrades[$displaygrade] = $name;
         }
+        */
 
         return $admingrades;
     }

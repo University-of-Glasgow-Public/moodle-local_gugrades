@@ -279,7 +279,7 @@ class api {
         $level = \local_gugrades\grades::get_category_level($gradecategoryid);
 
         // Get admingrades valid for this level.
-        $admingrades = \local_gugrades\admingrades::get_admingrades_csv($level);
+        $admingrades = \local_gugrades\admingrades::get_admingrades_csv($courseid, $level);
 
         // Can we aggregate?
         [$aggregationsupported, $unsupportedscales] = \local_gugrades\grades::are_all_grades_supported($courseid, $gradeitemid);
