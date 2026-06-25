@@ -107,6 +107,7 @@ class get_explain_aggregation extends external_api {
             'formattedatype' => new external_value(PARAM_TEXT, 'Human readable form of atype'),
             'error' => new external_value(PARAM_TEXT, 'Error condition'),
             'explain' => new external_value(PARAM_RAW, 'Explanation'),
+            'regulationname' => new external_value(PARAM_TEXT, 'Short name of prevailing regulation'),
             'fields' => new external_multiple_structure(
                 new external_single_structure([
                     'fieldname' => new external_value(PARAM_TEXT, 'Identifier for column'),

@@ -2056,6 +2056,10 @@ class api {
             $explain = get_string('explain_overridden', 'local_gugrades');
         }
 
+        // Regulation.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $user->regulationname = $regulation->shortname();
+
         // Add additional info.
         $user->showweights = $showweights;
         $user->strategy = \local_gugrades\aggregation::get_formatted_strategy($gradecategoryid);

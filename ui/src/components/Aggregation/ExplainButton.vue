@@ -62,7 +62,7 @@
                     <!-- Replaced text-info with your custom brand accent -->
                     <div class="text-university-blue font-semibold"><GradeColor :grade="user!.displaygrade"/></div>
                 </div>
-                <div class="flex-1 pl-4 border-l border-brand-light-purple/30">
+                <div v-if="user && user.regulationname == 'original'" class="flex-1 pl-4 border-l border-brand-light-purple/30">
                     <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.completed }}</div>
                     <div class="font-bold text-slate-900">{{ user!.completed }}%</div>
                 </div>
@@ -208,6 +208,8 @@
         )
         .then((result: any) => {
             user.value = result;
+            console.log(user.value);
+
             loading.value = false;
         })
         .catch((error) => {
