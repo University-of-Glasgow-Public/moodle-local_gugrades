@@ -711,6 +711,10 @@ class aggregation {
 
         $istoplevel = self::is_top_level($gradecategoryid);
 
+        // MGU-1503, if not weighted then counting weights doesn't work, so we just
+        // have to count the number of items of each type instead. 
+        $isweighted = $gradecategory->aggregation == \GRADE_AGGREGATE_WEIGHTED_MEAN;
+
         $sumofweights = 0;
         $sumscheduleaweights = 0;
         $sumschedulebweights = 0;
@@ -723,11 +727,11 @@ class aggregation {
                 $atype = \local_gugrades\GRADETYPE_ERROR;
                 $warnings[] = ['message' => get_string('childerror', 'local_gugrades')];
             }
-            $sumofweights += $item->weight;
+            $sumofweights += ($isweighted) ? $item->weight : 1;
             if ($item->schedule == 'A') {
-                $sumscheduleaweights += $item->weight;
+                $sumscheduleaweights += ($isweighted) ? $item->weight : 1;
             } else if ($item->schedule == 'B') {
-                $sumschedulebweights += $item->weight;
+                $sumschedulebweights += ($isweighted) ? $item->weight : 1;
             } else if ($item->schedule == 'P') {
                 $countpoints++;
             }
@@ -743,7 +747,7 @@ class aggregation {
         // ONLY if weighted mean aggregation...
         // If sumofweights is zero, we're going to get divide-by-zero
         // errors down the line.
-        if ($sumofweights == 0 && ($gradecategory->aggregation == \GRADE_AGGREGATE_WEIGHTED_MEAN)) {
+        if ($sumofweights == 0 && ($isweighted)) {
             $atype = \local_gugrades\GRADETYPE_ERROR;
             $warnings[] = ['message' => get_string('weightszero', 'local_gugrades')];
         }
