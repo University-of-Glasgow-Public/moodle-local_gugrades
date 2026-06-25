@@ -454,7 +454,7 @@ class conversion {
                 // Before marking converted grades as not current, restore admin grades (e.g. NS)
                 // to points format so they are preserved when switching back from Schedule A/B.
                 $admingrades = $DB->get_records_sql(
-                    'SELECT userid, admingrade, displaygrade, rawgrade, convertedgrade
+                    'SELECT *
                      FROM {local_gugrades_grade}
                      WHERE gradeitemid = :gradeitemid
                      AND points = 0
@@ -463,6 +463,14 @@ class conversion {
                      AND admingrade IS NOT NULL',
                     ['gradeitemid' => $gradeitemid, 'empty' => '']
                 );
+                // MGU-1487. Previous version was forcing admingrades back to FIRST after unconversion
+                // It's very likely that they were something other than FIRST to start with. 
+                foreach ($admingrades as $admingrade) {
+                    $admingrade->points = 1;
+                    $admingrade->iscurrent = 0;
+                    $DB->update_record('local_gugrades_grade', $admingrade);
+                }
+                /*
                 foreach ($admingrades as $grade) {
                     \local_gugrades\grades::write_grade(
                         courseid:           $courseid,
@@ -481,6 +489,7 @@ class conversion {
                         ispoints:           true,
                     );
                 }
+                */
                 $sql = 'UPDATE {local_gugrades_grade}
                     SET iscurrent = 0
                     WHERE points = 0
