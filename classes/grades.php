@@ -1703,27 +1703,6 @@ class grades {
         // I'm disabling this as MyGrades recalculates anyway when it is 
         // launched.
         return;
-
-        // If there are no grades then there's little point.
-        if (!self::any_grades($gradeitemid)) {
-            return;
-        }
-
-        // Need the categoryid.
-        if ($gradeitem = $DB->get_record('grade_items', ['id' => $gradeitemid])) {
-            if ($gradeitem->itemtype == 'category') {
-                $categoryid = $gradeitem->iteminstance;
-            } else {
-                $categoryid = $gradeitem->categoryid;
-            }
-            $level1 = self::get_level_one_parent($categoryid);
-
-            // Queue an adhoc-task.
-            if ($level1) {
-                $task = \local_gugrades\task\recalculate::instance($courseid, $level1);
-                \core\task\manager::queue_adhoc_task($task);
-            }
-        }
     }
 
     /**
@@ -1984,77 +1963,6 @@ class grades {
 
         return [];
 
-        $erroritems = [];
-
-        // I'm just going to take this check out because I don't think we need it any more.
-        /*
-        // We only store points or not points but that will do.
-        // Get possible gradeitemids against points/not points flag.
-        $sql = "SELECT DISTINCT gradeitemid, points FROM {local_gugrades_grade}
-            WHERE courseid = :courseid
-            AND gradetype <> 'CATEGORY'
-            AND gradetype <> 'CONVERTED'
-            AND gradetype <> 'RELEASED'
-            AND admingrade = ''
-            AND iscurrent = 1";
-        $items = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
-
-        foreach ($items as $item) {
-            // If there are first grades then check is irrelevant.
-            if (self::any_first($courseid, $item->gradeitemid)) {
-                continue;
-            }
-
-            // If this gradeitem is converted then we can't do check.
-            if (\local_gugrades\conversion::is_conversion_applied($courseid, $item->gradeitemid)) {
-                continue;
-            }
-
-            $gradeitem = self::get_gradeitem($item->gradeitemid);
-
-            // If scaleid in gradeitem is null then it's points
-            // However, forget it if exactly 22 points (special case).
-            $gradeispoints = empty($gradeitem->scaleid);
-            if (($gradeispoints != $item->points) && ($gradeitem->grademax != 22)) {
-                $erroritems[] = [
-                    'gradeitemid' => $item->gradeitemid,
-                    'itemname' => $gradeitem->itemname . ' (grade type)',
-                ];
-            }
-        }
-        $items->close();
-        */
-
-        // Check for out of range grades.
-        $sql = "SELECT DISTINCT gradeitemid, max(rawgrade) AS maxgrade FROM {local_gugrades_grade}
-            WHERE courseid = :courseid
-            AND rawgrade IS NOT NULL
-            AND gradetype <> 'CATEGORY'
-            AND gradetype <> 'CONVERTED'
-            AND gradetype <> 'RELEASED'
-            AND admingrade = ''
-            AND iscurrent = 1
-            AND points = 0
-            GROUP BY gradeitemid";
-        $grades = $DB->get_recordset_sql($sql, ['courseid' => $courseid]);
-
-        foreach ($grades as $grade) {
-            // If there are first grades then check is irrelevant.
-            if (self::any_first($courseid, $grade->gradeitemid)) {
-                continue;
-            }
-            $gradeitem = self::get_gradeitem($grade->gradeitemid);
-
-            if ($grade->maxgrade > $gradeitem->grademax) {
-                $erroritems[] = [
-                    'gradeitemid' => $gradeitem->gradeitemid,
-                    'itemname' => $gradeitem->itemname . ' (maximum grade)',
-                ];
-            }
-        }
-        $grades->close();
-
-        return $erroritems;
     }
 
     /**

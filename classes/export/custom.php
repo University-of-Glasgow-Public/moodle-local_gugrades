@@ -291,11 +291,12 @@ class custom extends base {
                 if (!$released = \local_gugrades\grades::get_released_grade($courseid, $gradeitemid, $userid)) {
                     //throw new \moodle_exception('Missing released grade. $gradeitemid = ' . $gradeitemid . ', UserID = ' . $userid);
                     $csvitems[$identifier . '_released'] = $strnodata;
-                }
-                if ($provisional) {
-                    $csvitems[$identifier . '_released'] = $released->displaygrade;
                 } else {
-                    $csvitems[$identifier . '_released'] = $strnodata;
+                    if ($provisional) {
+                        $csvitems[$identifier . '_released'] = $released->displaygrade;
+                    } else {
+                        $csvitems[$identifier . '_released'] = $strnodata;
+                    }
                 }
             }
         }

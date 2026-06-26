@@ -275,20 +275,6 @@ class admingrades {
     }
 
     /**
-     * Check the 'level' flags in the admingrades default array
-     * @param array $default
-     * @param string $key
-     * @return bool
-     */
-    private static function flag_set($default, $key) {
-        if (!array_key_exists($key, $default)) {
-            return false;
-        }
-
-        return $default[$key];
-    }
-
-    /**
      * Get grades for supplied
      * Level =
      * @param int $courseid

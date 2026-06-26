@@ -11,6 +11,7 @@
       :is="resolvedIcon" 
       :size="16" 
       class="shrink-0 opacity-70" 
+      :class="props.warning ? '!text-brand-dark-pink' : ''"
     />
     
     <span class="truncate">
@@ -29,8 +30,9 @@
 
     // 2. Define strict TypeScript Props interface
     interface Props {
-    iconName: LucideIconName;
-    disabled?: boolean;
+      iconName: LucideIconName;
+      disabled?: boolean;
+      warning?: boolean;
     }
 
     const props = withDefaults(defineProps<Props>(), {

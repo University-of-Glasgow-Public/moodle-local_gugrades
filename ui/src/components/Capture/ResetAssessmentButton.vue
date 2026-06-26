@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton  v-if="hascapability" @click="showconfirm = true" :disabled="processing" iconName="Bomb">
+    <MenuButton  v-if="hascapability" @click="showconfirm = true" :disabled="processing" :warning="true" iconName="Bomb">
         {{ mstrings.resetassessment }}
     </MenuButton>
 
