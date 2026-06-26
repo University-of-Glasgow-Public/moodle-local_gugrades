@@ -40,7 +40,7 @@
                 <span class="font-bold">{{ weight }}&percnt;</span>
             </div>
             <div v-if="categoryerror" class="col-span-2 bg-warning/20 p-2 text-sm rounded">
-                <span class="text-error">{{ mstrings.categoryerror }}</span>
+                <span class="text-brand-dark-red">{{ mstrings.categoryerror }}</span>
             </div>
         </div>
     </HeadlessModal>
