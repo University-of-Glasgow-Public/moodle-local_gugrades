@@ -8,7 +8,7 @@
         <ViewFullNamesButton v-if="props.usershidden"  @viewfullnames="viewfullnames"></ViewFullNamesButton>
         <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" @converted="emit('refreshtable')"></ConversionButton>
         <ExportCaptureButton :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :revealnames="revealnames"></ExportCaptureButton>
-        <ResetAssessmentButton v-if="caneditgrades" :itemid="props.itemid" :@reset="emit('refreshtable')"></ResetAssessmentButton>
+        <ResetAssessmentButton v-if="caneditgrades" :itemid="props.itemid" @reset="emit('refreshtable')"></ResetAssessmentButton>
         <NameFilterButton :usershidden="props.usershidden" ></NameFilterButton>
         <InfoButton :itemid="props.itemid" size="xl"></InfoButton>
         <ReloadButton size="3" @refreshtable="refresh_clicked"></ReloadButton>
