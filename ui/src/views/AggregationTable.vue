@@ -387,7 +387,7 @@
      */
     function itemclasses(item: IUserField) {
         if (item.overridden) {
-            return ['border-2', 'border-solid', 'border-brand-dark-red', 'rounded-lg', 'p-1.5'];
+            return ['border-2', 'border-solid', 'border-red-600', 'rounded-lg', 'p-1.5'];
         }
         if (item.hidden) {
             return ['border-2', 'border-solid', 'border-brand-light-yellow', 'rounded-lg', 'p-1.5'];
