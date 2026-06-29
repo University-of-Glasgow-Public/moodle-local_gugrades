@@ -33,7 +33,7 @@
                     <Switch 
                         :label="mstrings.reassessment + '?'"
                         @change="reassess_change($event, category.category.id)"
-                        :disabled="props.disablereassess"
+                        :disabled="props.disablereassess || disablefromchildren"
                     />
                 </div>
 
@@ -56,6 +56,7 @@
                 :depth="props.depth + 1"
                 :engineering="props.engineering"
                 :disablereassess="reassesscats.includes(Number(category.category.id)) || props.disablereassess"
+                @reassessup="reassessup"
             />
         </template>
     </div>
@@ -80,10 +81,15 @@
 
     const props = defineProps< IProps >();
 
+    const emit = defineEmits<{
+        reassessup: [categoryid: number, enabled: boolean];
+    }>();
+
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const engineeringcats = ref< number[] >([]);
     const reassesscats = ref< number[] >([]);
+    const disablefromchildren = ref(false);
 
     /**
      * Switch clicked.
@@ -124,13 +130,30 @@
         // If this is selected, then 
         reassesscats.value = reassesscats.value.filter(id => id != categoryid);
 
+        let emitstate = false;
         if (state === 'on' || state === true) {
             // Enforce pure integer values inside your tracking arrays
             reassesscats.value.push(Number(categoryid));
+            emitstate = true;
         }
+
+        // Alert the parent that this has changed, as they need to enable/disable themselves
+        // and (possibly) *their* parents as well. 
+        emit('reassessup', categoryid, emitstate);
 
         console.log(reassesscats.value);
 
+    }
+
+    /**
+     * Handle emit from recursive child categories
+     */
+    function reassessup(categoryid: number, enabled: boolean) {
+
+        disablefromchildren.value = enabled;
+
+        // Keep going up...
+        emit('reassessup', categoryid, enabled);
     }
 
     const hasNoCategories = computed(() => {
