@@ -99,8 +99,8 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $data = (object) $data;
         $oldid = $data->id;
         $data->courseid = $this->task->get_courseid();
-        $data->categoryid = 0 - $data->gradecategoryid;
-        $data->gradeitemid = 0 - $data->gradeitemid;
+        $data->gradecategoryid = $data->gradecategoryid;
+        $data->gradeitemid = $data->gradeitemid;
 
         $DB->insert_record('local_gugrades_resit', $data);
     }
@@ -255,11 +255,11 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
             $DB->update_record('local_gugrades_map_item', $item);
         }
 
-        // Resit catageories.
+        // Resit categories
         $resitcats = $DB->get_recordset('local_gugrades_resit', ['courseid' => $this->task->get_courseid()]);
         foreach ($resitcats as $resitcat) {
             $resitcat->gradeitemid = $this->get_mappingid('grade_item', $resitcat->gradeitemid);
-            $resitcat->gradecategoryid = $this->get_mappingid('grade_category', 0 - $resitcat->gradecategoryid);
+            $resitcat->gradecategoryid = $this->get_mappingid('grade_category', $resitcat->gradecategoryid);
             $DB->update_record('local_gugrades_resit', $resitcat);
         }
 

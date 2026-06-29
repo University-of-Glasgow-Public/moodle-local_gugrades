@@ -19,7 +19,7 @@
                     <div 
                         v-for="i in props.depth - 1" 
                         :key="i" 
-                        class="w-6 shrink-0 h-5 border-l border-brand-light-purple/40"
+                        class="w-6 shrink-0 h-5 border-l-2 border-brand-light-purple/80"
                     ></div>
                     
                     <!-- Text node label stays beautifully in-line next to the indents -->
@@ -29,16 +29,15 @@
                 </div>
 
                 <!-- COLUMN 2: Reassessment Toggle Switch -->
-                <!-- Occupies its fixed track comfortably with left alignment -->
                 <div class="w-52 shrink-0 flex items-center justify-start pr-2">
-                    <Switch :label="mstrings.reassessment + '?'"/>
+                    <Switch 
+                        :label="mstrings.reassessment + '?'"
+                        @change="reassess_change($event, category.category.id)"
+                        :disabled="props.disablereassess"
+                    />
                 </div>
 
                 <!-- COLUMN 3: Optional Engineering Toggle Switch -->
-                <!-- 
-                  FIXED: Parent track wraps in props.engineering so it completely vanishes 
-                  when the parent component turns engineering support off.
-                -->
                 <div v-if="props.engineering" class="w-52 shrink-0 flex items-center justify-start pr-2">
                     <Switch
                         v-if="props.depth === 1" 
@@ -56,6 +55,7 @@
                 :nodes="category" 
                 :depth="props.depth + 1"
                 :engineering="props.engineering"
+                :disablereassess="reassesscats.includes(Number(category.category.id)) || props.disablereassess"
             />
         </template>
     </div>
@@ -75,6 +75,7 @@
         nodes: ICategoryCategory;
         depth: number;
         engineering: boolean;
+        disablereassess: boolean;
     }
 
     const props = defineProps< IProps >();
@@ -82,6 +83,7 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const engineeringcats = ref< number[] >([]);
+    const reassesscats = ref< number[] >([]);
 
     /**
      * Switch clicked.
@@ -97,7 +99,7 @@
             engineeringcats.value.push(Number(categoryid));
         }
 
-        // Load into flags array (Duplicates are now permanently structurally impossible)
+        // Load into flags array 
         const flags = engineeringcats.value.map((id) => ({
             gradecategoryid: id,
             gradeitemid: 0,
@@ -114,6 +116,23 @@
         });
     }
 
+    /**
+     * Reassessment change
+     */
+    function reassess_change(state: boolean | string, categoryid: number) {
+
+        // If this is selected, then 
+        reassesscats.value = reassesscats.value.filter(id => id != categoryid);
+
+        if (state === 'on' || state === true) {
+            // Enforce pure integer values inside your tracking arrays
+            reassesscats.value.push(Number(categoryid));
+        }
+
+        console.log(reassesscats.value);
+
+    }
+
     const hasNoCategories = computed(() => {
         return !props.nodes.categories || props.nodes.categories.length === 0;
     });
@@ -122,9 +141,6 @@
         moodleFetch('local_gugrades_read_flags', {})
         .then((result: any) => {
             if (result && result.flags) {
-                // FIXED FOR REACTIVITY: 
-                // We map the values into a clean, fresh JavaScript array first,
-                // filtering out any empty or invalid entries on the fly.
                 const activeIds = result.flags
                     .filter((flag: IFlag) => flag.gradecategoryid)
                     .map((flag: IFlag) => flag.gradecategoryid);

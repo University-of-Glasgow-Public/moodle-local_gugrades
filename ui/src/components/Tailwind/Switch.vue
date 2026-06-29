@@ -2,7 +2,13 @@
 <template>
     <SwitchGroup as="div" class="flex items-center gap-3">
         <!-- Label Element -->
-        <SwitchLabel v-if="label" class="text-sm font-medium text-slate-700 select-none cursor-pointer">
+        <SwitchLabel 
+            v-if="label" 
+            :class="[
+                disabled ? 'text-slate-400 cursor-not-allowed' : 'text-slate-700 cursor-pointer',
+                'text-sm font-medium select-none'
+            ]"
+        >
             {{ label }}
         </SwitchLabel>
 
@@ -11,10 +17,12 @@
             v-model="model"
             :disabled="disabled"
             :class="[
-                model 
-                    ? 'bg-university-blue border-transparent' 
-                    : 'bg-slate-50 border-slate-400 hover:border-slate-500',
-                disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
+                // Track colour logic handling active, inactive, and disabled states
+                disabled 
+                    ? (model ? 'bg-slate-300 border-transparent' : 'bg-slate-100 border-slate-200')
+                    : (model ? 'bg-university-blue border-transparent' : 'bg-slate-50 border-slate-400 hover:border-slate-500'),
+                
+                disabled ? 'cursor-not-allowed' : 'cursor-pointer',
                 size === 'sm' ? 'h-5 w-9' : size === 'lg' ? 'h-7 w-14' : 'h-6 w-11',
                 'relative inline-flex shrink-0 rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-university-blue focus:ring-offset-2'
             ]"
@@ -24,13 +32,19 @@
                 :class="[
                     model ? (size === 'sm' ? 'translate-x-4' : size === 'lg' ? 'translate-x-7' : 'translate-x-5') : 'translate-x-0',
                     size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-6 w-6' : 'h-5 w-5',
-                    model ? 'bg-white' : 'bg-white border border-slate-300 shadow-sm',
+                    
+                    // Knob colour logic for disabled states
+                    disabled
+                        ? (model ? 'bg-slate-100' : 'bg-slate-200 border-transparent')
+                        : (model ? 'bg-white' : 'bg-white border border-slate-300 shadow-sm'),
+                    
                     'pointer-events-none inline-block rounded-full transform ring-0 transition duration-200 ease-in-out'
                 ]"
             />
         </Switch>
     </SwitchGroup>
 </template>
+
 
 <script setup lang="ts">
     import { watch, ref, onMounted } from 'vue';
