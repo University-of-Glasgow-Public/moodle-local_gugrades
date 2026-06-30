@@ -57,6 +57,7 @@ Feature: Testing view_staff_mygrades in local_gugrades
     Then I should see "No conversion maps have been defined. Click 'Add map' to create one."
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
+    And I wait 3 seconds
     Then "Export aggregation" "button" should exist
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Audit log')]" "xpath_element"
