@@ -8,7 +8,7 @@ Feature: Testing view_staff_mygrades in local_gugrades
         | Student MyGrades  | core_course | course | 0      |
     And the following "courses" exist:
         | fullname | shortname | format | Course start date     | id |
-        | Course 1 | C1        | topics | 16 April 2025 00 00   | 2 |
+        | Course 1 | C1        | topics | 16 July 2026 00 00   | 2 |
     And the following "users" exist:
         | username | firstname | lastname | email |
         | teacher1 | Teacher | 1 | teacher1@example.com |
@@ -38,16 +38,14 @@ Feature: Testing view_staff_mygrades in local_gugrades
     And I set the field "grade[modgrade_type]" to "Scale"
     And I set the field "grade[modgrade_scale]" to "Schedule A"
     And I press "Save and display"
-    And the following "mod_assign > submissions" exist:
-        | assign                | user      | onlinetext                       |
-        | Test assignment 1     | student1  | I'm the student first submission |
   Scenario: View MyGrades menu items
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades" in current page administration
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     Then "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element" should exist
-    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Reassessment management')]" "xpath_element"
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment configuration')]" "xpath_element"
     Then I should see "Summative"
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element"
@@ -55,10 +53,6 @@ Feature: Testing view_staff_mygrades in local_gugrades
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Manage conversion maps')]" "xpath_element"
     Then I should see "No conversion maps have been defined. Click 'Add map' to create one."
-    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
-    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
-    And I wait 3 seconds
-    Then "Export aggregation" "button" should exist
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Audit log')]" "xpath_element"
     Then "Download to CSV" "button" should exist

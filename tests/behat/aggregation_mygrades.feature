@@ -8,7 +8,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
         | Student MyGrades  | core_course | course | 0      |
     And the following "courses" exist:
         | fullname | shortname | format | Course start date     | id |
-        | Course 1 | C1        | topics | 16 April 2025 00 00   | 2 |
+        | Course 1 | C1        | topics | 16 July 2026 00 00   | 2 |
     And the following "users" exist:
         | username | firstname | lastname | email |
         | teacher1 | Teacher | 1 | teacher1@example.com |
@@ -125,8 +125,10 @@ Feature: Testing aggregation_mygrades in local_gugrades
         | Admin grade                 | IS - Interruption of Studies |
     And I wait 3 seconds
     And I click on "Submit" "button" in the ".vm-content" "css_element"
-    And I wait 3 seconds
+    And I wait until "//div[contains(@class, 'Vue-Toastification')]" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
+    And I click on "Recalculate" "button"
+    And I click on "Recalculate" "button" in the ".vm-content" "css_element"
     And I wait 3 seconds
     Then I should see "B1"
     And I should see "IS"
