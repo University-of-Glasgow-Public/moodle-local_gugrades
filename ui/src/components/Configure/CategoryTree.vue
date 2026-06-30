@@ -1,28 +1,20 @@
 <template>
-    <!-- Use a simple top-level container div to hold your rows sequentially -->
     <div class="flex flex-col w-full">
 
         <UAlert variant="error" v-if="hasNoCategories">No categories available to select.</UAlert>
 
         <template v-for="category in props.nodes.categories" :key="category.category.id">
             
-            <!-- 
-                MAIN ROW WRAPPER:
-                Items align naturally inside their explicit percentage tracking slots.
-            -->
             <div class="flex items-center py-2 border-b border-brand-light-purple/10 text-sm text-slate-700">
                 
                 <!-- COLUMN 1: Tree Spacing Indents & Category Name -->
-                <!-- FIXED: Added 'flex items-center min-w-0' to force side-by-side layout -->
                 <div class="flex-1 flex items-center min-w-0 pr-4">
-                    <!-- Recursive indent lines (Renders horizontally now) -->
                     <div 
                         v-for="i in props.depth - 1" 
                         :key="i" 
                         class="w-6 shrink-0 h-5 border-l-2 border-brand-light-purple/80"
                     ></div>
                     
-                    <!-- Text node label stays beautifully in-line next to the indents -->
                     <span class="truncate font-medium text-slate-800">
                         {{ category.category.fullname }}
                     </span>
@@ -33,7 +25,7 @@
                     <Switch 
                         :label="mstrings.reassessment + '?'"
                         @change="reassess_change($event, category.category.id)"
-                        :disabled="props.disablereassess || disablefromchildren"
+                        :disabled="props.disablereassess || disabledByChildrenIds.includes(Number(category.category.id))"
                     />
                 </div>
 
@@ -49,13 +41,14 @@
 
             </div>
 
-            <!-- Recursive Execution Block (Stepping down into sub-categories) -->
+            <!-- Recursive Execution Block -->
             <CategoryTree 
                 v-if="props.depth < 3 && category.categories.length" 
                 :nodes="category" 
                 :depth="props.depth + 1"
                 :engineering="props.engineering"
                 :disablereassess="reassesscats.includes(Number(category.category.id)) || props.disablereassess"
+                :parentid="Number(category.category.id)"
                 @reassessup="reassessup"
             />
         </template>
@@ -77,35 +70,29 @@
         depth: number;
         engineering: boolean;
         disablereassess: boolean;
+        parentid: number;
     }
 
     const props = defineProps< IProps >();
 
     const emit = defineEmits<{
-        reassessup: [categoryid: number, enabled: boolean];
+        reassessup: [targetParentId: number, enabled: boolean];
     }>();
 
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const engineeringcats = ref< number[] >([]);
     const reassesscats = ref< number[] >([]);
-    const disablefromchildren = ref(false);
+    
+    // FIX: Track exactly WHICH row item IDs are currently locked by a child selection
+    const disabledByChildrenIds = ref< number[] >([]);
 
-    /**
-     * Switch clicked.
-     * @param state 
-     * @param categoryid 
-     */
     function eng_change(state: boolean | string, categoryid: number) {
-
         engineeringcats.value = engineeringcats.value.filter(id => id != categoryid);
-
         if (state === 'on' || state === true) {
-            // Enforce pure integer values inside your tracking arrays
             engineeringcats.value.push(Number(categoryid));
         }
 
-        // Load into flags array 
         const flags = engineeringcats.value.map((id) => ({
             gradecategoryid: id,
             gradeitemid: 0,
@@ -113,47 +100,37 @@
             resit: false,
         }));
         
-        // Push results to Moodle
-        moodleFetch('local_gugrades_write_flags', {
-            flags: flags,
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+        moodleFetch('local_gugrades_write_flags', { flags }).catch(console.error);
     }
 
-    /**
-     * Reassessment change
-     */
     function reassess_change(state: boolean | string, categoryid: number) {
-
-        // If this is selected, then 
         reassesscats.value = reassesscats.value.filter(id => id != categoryid);
 
         let emitstate = false;
         if (state === 'on' || state === true) {
-            // Enforce pure integer values inside your tracking arrays
             reassesscats.value.push(Number(categoryid));
             emitstate = true;
         }
 
-        // Alert the parent that this has changed, as they need to enable/disable themselves
-        // and (possibly) *their* parents as well. 
-        emit('reassessup', categoryid, emitstate);
-
-        console.log(reassesscats.value);
-
+        // Pass UP the current node's parent ID to tell the layer above who to disable
+        emit('reassessup', props.parentid, emitstate);
     }
 
     /**
-     * Handle emit from recursive child categories
+     * FIX: Handle the upward emit
+     * @param targetId The ID of the category row at THIS level that needs updating
+     * @param enabled Whether it should be disabled
      */
-    function reassessup(categoryid: number, enabled: boolean) {
+    function reassessup(targetId: number, enabled: boolean) {
+        disabledByChildrenIds.value = disabledByChildrenIds.value.filter(id => id !== targetId);
+        
+        if (enabled) {
+            disabledByChildrenIds.value.push(targetId);
+        }
 
-        disablefromchildren.value = enabled;
-
-        // Keep going up...
-        emit('reassessup', categoryid, enabled);
+        // Continue bubbling up the tree. 
+        // We tell our parent component instance to disable the row matching OUR parentid.
+        emit('reassessup', props.parentid, enabled);
     }
 
     const hasNoCategories = computed(() => {
@@ -167,13 +144,9 @@
                 const activeIds = result.flags
                     .filter((flag: IFlag) => flag.gradecategoryid)
                     .map((flag: IFlag) => flag.gradecategoryid);
-
-                // Overwriting the whole value at once guarantees Vue triggers a full re-render!
                 engineeringcats.value = activeIds;
             }
         })
-        .catch((error) => {
-            console.error(error);
-        });
+        .catch(console.error);
     });
 </script>
