@@ -47,6 +47,9 @@ Feature: Testing view_staff_mygrades in local_gugrades
     And I navigate to "MyGrades" in current page administration
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     Then "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element" should exist
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
+    Then "Export aggregation" "button" should exist
+    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment configuration')]" "xpath_element"
     Then I should see "Summative"
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
@@ -55,10 +58,6 @@ Feature: Testing view_staff_mygrades in local_gugrades
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Manage conversion maps')]" "xpath_element"
     Then I should see "No conversion maps have been defined. Click 'Add map' to create one."
-    And I wait until "//div[@id='tabmenu']" "xpath_element" exists
-    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
-    And I wait 3 seconds
-    Then "Export aggregation" "button" should exist
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Audit log')]" "xpath_element"
     Then "Download to CSV" "button" should exist

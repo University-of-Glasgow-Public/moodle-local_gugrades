@@ -127,6 +127,8 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I click on "Submit" "button" in the ".vm-content" "css_element"
     And I wait until "//div[contains(@class, 'Vue-Toastification')]" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
+    And I click on "Recalculate" "button"
+    And I click on "Recalculate" "button" in the ".vm-content" "css_element"
     And I wait 3 seconds
     Then I should see "B1"
     And I should see "IS"
