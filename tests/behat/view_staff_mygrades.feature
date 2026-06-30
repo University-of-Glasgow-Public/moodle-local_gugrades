@@ -38,9 +38,6 @@ Feature: Testing view_staff_mygrades in local_gugrades
     And I set the field "grade[modgrade_type]" to "Scale"
     And I set the field "grade[modgrade_scale]" to "Schedule A"
     And I press "Save and display"
-    And the following "mod_assign > submissions" exist:
-        | assign                | user      | onlinetext                       |
-        | Test assignment 1     | student1  | I'm the student first submission |
   Scenario: View MyGrades menu items
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
