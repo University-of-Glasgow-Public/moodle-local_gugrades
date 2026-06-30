@@ -170,9 +170,15 @@ abstract class base {
      */
     public function validate_csv(float $grade) {
 
-        // Need to offset grademin and grademax by one, as Moodle stores scales 1 - based.
-        $grademin = $this->gradeitem->grademin - 1;
-        $grademax = $this->gradeitem->grademax - 1;
+        // If this is a scale, need to offset grademin and grademax by one, as Moodle stores scales 1 - based.
+        // If we're here and it isn't a scale then it must be converted and the min/max are correct
+        if (is_null($this->gradeitem->scaleid)) {
+            $grademin = $this->gradeitem->grademin;
+            $grademax = $this->gradeitem->grademax;           
+        } else {
+            $grademin = $this->gradeitem->grademin - 1;
+            $grademax = $this->gradeitem->grademax - 1;
+        }
         return ($grade >= $grademin) && ($grade <= $grademax);
     }
 
