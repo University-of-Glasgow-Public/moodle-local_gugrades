@@ -125,6 +125,9 @@ Feature: Testing aggregation_mygrades in local_gugrades
         | Admin grade                 | IS - Interruption of Studies |
     And I wait 3 seconds
     And I click on "Submit" "button" in the ".vm-content" "css_element"
+    And I wait 3 seconds
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
+    And I wait 3 seconds
     Then I should see "B1"
+    And I should see "IS"
     And I should see "IS" in the total cell
