@@ -47,7 +47,7 @@ Feature: Testing view_staff_mygrades in local_gugrades
     And I navigate to "MyGrades" in current page administration
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     Then "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element" should exist
-    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Reassessment management')]" "xpath_element"
+    And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment configuration')]" "xpath_element"
     Then I should see "Summative"
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element"
