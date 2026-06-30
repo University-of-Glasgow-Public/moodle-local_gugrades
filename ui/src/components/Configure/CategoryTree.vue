@@ -26,6 +26,7 @@
                         :label="mstrings.reassessment + '?'"
                         @change="reassess_change($event, category.category.id)"
                         :disabled="props.disablereassess || disabledByChildrenIds.includes(Number(category.category.id))"
+                        :active="reassesscats.includes(Number(category.category.id))"
                     />
                 </div>
 
@@ -83,43 +84,68 @@
     const { mstrings } = storeToRefs( mstringstore );
     const engineeringcats = ref< number[] >([]);
     const reassesscats = ref< number[] >([]);
-    
-    // FIX: Track exactly WHICH row item IDs are currently locked by a child selection
     const disabledByChildrenIds = ref< number[] >([]);
 
+    /**
+     * Engineering Change
+     */
     function eng_change(state: boolean | string, categoryid: number) {
-        engineeringcats.value = engineeringcats.value.filter(id => id != categoryid);
-        if (state === 'on' || state === true) {
-            engineeringcats.value.push(Number(categoryid));
-        }
+        const isEnabled = state === 'on' || state === true;
 
-        const flags = engineeringcats.value.map((id) => ({
-            gradecategoryid: id,
-            gradeitemid: 0,
-            engexam: true,
-            resit: false,
-        }));
-        
-        moodleFetch('local_gugrades_write_flags', { flags }).catch(console.error);
-    }
+        moodleFetch('local_gugrades_read_flags', {})
+        .then((result: any) => {
+            let currentFlags: any[] = result?.flags || [];
+            currentFlags = currentFlags.filter(f => !(Number(f.gradecategoryid) === Number(categoryid) && f.engexam));
 
-    function reassess_change(state: boolean | string, categoryid: number) {
-        reassesscats.value = reassesscats.value.filter(id => id != categoryid);
+            if (isEnabled) {
+                currentFlags.push({
+                    gradecategoryid: categoryid,
+                    gradeitemid: 0,
+                    engexam: true,
+                    resit: false
+                });
+            }
 
-        let emitstate = false;
-        if (state === 'on' || state === true) {
-            reassesscats.value.push(Number(categoryid));
-            emitstate = true;
-        }
-
-        // Pass UP the current node's parent ID to tell the layer above who to disable
-        emit('reassessup', props.parentid, emitstate);
+            engineeringcats.value = currentFlags.filter(f => f.engexam).map(f => Number(f.gradecategoryid));
+            return moodleFetch('local_gugrades_write_flags', { flags: currentFlags as IFlag[] });
+        })
+        .catch(console.error);
     }
 
     /**
-     * FIX: Handle the upward emit
-     * @param targetId The ID of the category row at THIS level that needs updating
-     * @param enabled Whether it should be disabled
+     * Reassessment Change
+     */
+    function reassess_change(state: boolean | string, categoryid: number) {
+        const isEnabled = state === 'on' || state === true;
+
+        reassesscats.value = reassesscats.value.filter(id => id != categoryid);
+        if (isEnabled) {
+            reassesscats.value.push(Number(categoryid));
+        }
+
+        moodleFetch('local_gugrades_read_flags', {})
+        .then((result: any) => {
+            let currentFlags: any[] = result?.flags || [];
+            currentFlags = currentFlags.filter(f => !(Number(f.gradecategoryid) === Number(categoryid) && f.resit));
+
+            if (isEnabled) {
+                currentFlags.push({
+                    gradecategoryid: categoryid,
+                    gradeitemid: 0,
+                    engexam: false,
+                    resit: true
+                });
+            }
+
+            return moodleFetch('local_gugrades_write_flags', { flags: currentFlags as IFlag[] });
+        })
+        .catch(console.error);
+
+        emit('reassessup', props.parentid, isEnabled);
+    }
+
+    /**
+     * Handle runtime updates bubbling from recursive branches
      */
     function reassessup(targetId: number, enabled: boolean) {
         disabledByChildrenIds.value = disabledByChildrenIds.value.filter(id => id !== targetId);
@@ -128,8 +154,6 @@
             disabledByChildrenIds.value.push(targetId);
         }
 
-        // Continue bubbling up the tree. 
-        // We tell our parent component instance to disable the row matching OUR parentid.
         emit('reassessup', props.parentid, enabled);
     }
 
@@ -137,16 +161,63 @@
         return !props.nodes.categories || props.nodes.categories.length === 0;
     });
 
+    /**
+     * Parse DB entries and explicitly establish active/disabled states across all nested lines
+     */
     onMounted(() => {
         moodleFetch('local_gugrades_read_flags', {})
         .then((result: any) => {
             if (result && result.flags) {
-                const activeIds = result.flags
-                    .filter((flag: IFlag) => flag.gradecategoryid)
-                    .map((flag: IFlag) => flag.gradecategoryid);
-                engineeringcats.value = activeIds;
+                const rawFlags: IFlag[] = result.flags;
+
+                // 1. Map Engineering flags strictly casting IDs to pure integers
+                engineeringcats.value = rawFlags
+                    .filter((flag: IFlag) => flag.gradecategoryid && flag.engexam)
+                    .map((flag: IFlag) => Number(flag.gradecategoryid));
+
+                // 2. Isolate all active reassessment IDs from the database payload
+                const allActiveResitIds = rawFlags
+                    .filter((flag: IFlag) => flag.gradecategoryid && flag.resit)
+                    .map((flag: IFlag) => Number(flag.gradecategoryid));
+
+                // FIX 1: Match and check nodes correctly by running a pure array scan against our sub-items
+                if (props.nodes && props.nodes.categories) {
+                    
+                    // Filter matching ids explicitly casting to Number to dodge type coercion bugs
+                    reassesscats.value = props.nodes.categories
+                        .map(c => Number(c.category.id))
+                        .filter(id => allActiveResitIds.includes(id));
+
+                    // 3. FIX 2: Evaluate child subtrees and handle locking up the hierarchy chains
+                    props.nodes.categories.forEach(cat => {
+                        const id = Number(cat.category.id);
+                        
+                        if (hasActiveChildResit(cat, allActiveResitIds)) {
+                            // Lock this row if a child under it is selected
+                            disabledByChildrenIds.value.push(id);
+                            
+                            // Bubble the active state up the UI component tree on mount
+                            emit('reassessup', props.parentid, true);
+                        }
+                    });
+                }
             }
         })
         .catch(console.error);
     });
+
+    /**
+     * Deep tree recursion matcher utility
+     */
+    function hasActiveChildResit(node: any, activeIds: number[]): boolean {
+        if (!node.categories || node.categories.length === 0) return false;
+        
+        return node.categories.some((child: any) => {
+            const childId = Number(child.category.id);
+            if (activeIds.includes(childId)) {
+                return true;
+            }
+            return hasActiveChildResit(child, activeIds);
+        });
+    }
 </script>

@@ -83,6 +83,7 @@ $string['categorynothighest'] = 'Aggregation strategy is NOT set to Highest grad
 $string['categoryoverridden'] = 'Category is overridden';
 $string['categoryremoveoverride'] = 'Category grade is overridden. Click \'Remove\' button to revert.';
 $string['changedgradetype'] = 'Some grade types have been changed in the Gradebook since grades were imported into MyGrades. This must be corrected in Gradebook. Please check settings for following grade items:';
+$string['changessaved'] = 'Changes are saved automatically';
 $string['checkall'] = 'Check all';
 $string['checknone'] = 'Check none';
 $string['childerror'] = 'One or more sub-categories could not be aggregated preventing further aggregation.';
