@@ -426,8 +426,8 @@ class aggregate {
         $totalweight = $examweight + $courseweight;
 
         // Normalise total weights.
-        $examweight = 100 * $examweight / $totalweight;
-        $courseweight = 100 * $courseweight / $totalweight; 
+        $examweight = round(100 * $examweight / $totalweight, 5);
+        $courseweight = round(100 * $courseweight / $totalweight, 5); 
 
         // Get "aggregated" grades.
         // It HAS to be weigghted mean - we wouldn't be here otherwise. 
