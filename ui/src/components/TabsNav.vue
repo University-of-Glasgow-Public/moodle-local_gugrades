@@ -46,7 +46,7 @@
 
     const tabs = ref([
         {
-            label: mstrings.value.configure ?? 'Reassessment management',
+            label: mstrings.value.configure ?? 'Assessment configuration',
             component: ConfigPage,
             icon: MonitorCog,
         },
