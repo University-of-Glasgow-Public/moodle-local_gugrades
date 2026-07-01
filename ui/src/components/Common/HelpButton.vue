@@ -1,7 +1,14 @@
 <template>
-    <UTooltip :text="title" v-bind="$attrs">
-        <UButton variant="info" size="sm" shape="circle" appearance="outline" @click.prevent="click_help"><CircleQuestionMark :size="18"></CircleQuestionMark></UButton>
-    </UTooltip>
+  <UTooltip :text="title" v-bind="$attrs">
+    <button 
+      @click.prevent="click_help"
+      class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-brand-light-yellow text-brand-dark-red text-xs font-medium hover:brightness-95 transition-all cursor-pointer shadow-xs"
+    >
+      <CircleQuestionMark :size="14" />
+      <span>Help</span>
+    </button>
+  </UTooltip>
+
 
 <!-- HeadlessUI Dialog -->
   <TransitionRoot appear :show="isOpen" as="template">
@@ -17,7 +24,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 bg-black/30" />
+        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs" />
       </TransitionChild>
 
       <!-- Modal positioner -->
@@ -33,22 +40,22 @@
             leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95"
           >
-            <DialogPanel class="w-full max-w-md bg-base-100 rounded-xl shadow-xl overflow-hidden">
+            <DialogPanel class="w-full max-w-md bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
 
               <!-- Header -->
-              <div class="bg-primary px-5 py-4 flex items-center gap-3">
-                <div class="bg-primary-content/20 rounded-full p-1.5 shrink-0">
-                  <CircleHelp :size="18" class="text-primary-content" />
+              <div class="bg-brand-dark-blue px-5 py-4 flex items-center gap-3">
+                <div class="bg-white/10 rounded-full p-1.5 shrink-0">
+                  <CircleHelp :size="18" class="text-white" />
                 </div>
                 <div class="flex-1">
-                  <DialogTitle class="text-sm font-semibold text-primary-content">
+                  <DialogTitle class="text-sm font-semibold text-white">
                     {{ title }}
                   </DialogTitle>
-                  <p class="text-xs text-primary-content/70 mt-0.5">Context help</p>
+                  <p class="text-xs text-white/70 mt-0.5">Context help</p>
                 </div>
                 <button
                   @click="isOpen = false"
-                  class="text-primary-content/60 hover:text-primary-content transition-colors"
+                  class="text-white/60 hover:text-white transition-colors cursor-pointer"
                   aria-label="Close"
                 >
                   <X :size="18" />
@@ -58,16 +65,16 @@
               <!-- Body -->
               <div class="px-5 py-4 space-y-3">
                 <slot>
-                  <p class="text-sm text-base-content leading-relaxed prose" v-html="help">
+                  <p class="text-sm text-slate-700 leading-relaxed prose prose-slate" v-html="help">
                   </p>
                 </slot>
               </div>
 
               <!-- Footer -->
-              <div class="px-5 py-3 border-t border-base-200 flex justify-end">
+              <div class="px-5 py-3 border-t border-slate-100 flex justify-end">
                 <button
                   @click="isOpen = false"
-                  class="btn btn-primary btn-sm"
+                  class="px-3 py-1.5 text-xs font-semibold text-white bg-brand-dark-blue hover:bg-brand-dark-blue/90 rounded-md transition-colors shadow-xs cursor-pointer"
                 >
                   Got it
                 </button>
@@ -91,7 +98,7 @@
       TransitionRoot,
       TransitionChild,
     } from '@headlessui/vue';
-    import { CircleQuestionMark, MoveLeft } from '@lucide/vue';
+    import { CircleQuestionMark, MoveLeft, CircleHelp, X } from '@lucide/vue';
     import { moodleFetch } from '@/js/moodlefetch';
     import UButton from './UButton.vue';
     import UTooltip from './UTooltip.vue';
