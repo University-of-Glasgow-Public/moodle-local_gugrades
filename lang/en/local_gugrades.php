@@ -72,6 +72,7 @@ $string['cachedef_availableusers'] = 'Cache MyGrades user data';
 $string['cachedef_gradeitems'] = 'Grade item info when building aggregation tree structure';
 $string['cachedef_progress'] = 'Cache current progress of long-running activities';
 $string['cachedef_provisionalgrade'] = 'Cache MyGrades provisional grades.';
+$string['cachedef_ugpg'] = 'Cache user UG PG status read from external enrolment';
 $string['cachedef_useraggdata'] = 'Cache MyGrades aggregated user data.';
 $string['cachedef_userpicture'] = 'Cache MyGrades user picture.';
 $string['cancel'] = 'Cancel';

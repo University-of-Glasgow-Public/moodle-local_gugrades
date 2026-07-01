@@ -456,5 +456,38 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026062200, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026070101) {
+
+        // Define field first_rawgrade to be added to local_gugrades_grade.
+        $table = new xmldb_table('local_gugrades_grade');
+
+        // Conditionally launch add field first_rawgrade.
+        $field = new xmldb_field('first_rawgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'rawgrade');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Conditionally launch add field first_convertedgrade.
+        $field = new xmldb_field('first_convertedgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'convertedgrade');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Conditionally launch add field first_admingrade.
+        $field = new xmldb_field('first_admingrade', XMLDB_TYPE_CHAR, '30', null, null, null, null, 'admingrade');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Conditionally launch add field first_displaygrade.
+        $field = new xmldb_field('first_displaygrade', XMLDB_TYPE_CHAR, '50', null, null, null, null, 'displaygrade');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026070101, 'local', 'gugrades');
+    }
+
     return true;
 }
