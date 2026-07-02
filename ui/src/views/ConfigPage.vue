@@ -84,6 +84,8 @@
      */
     onMounted(() => {
 
+        loaded.value = false;
+
         moodleFetch(
             'local_gugrades_has_capability',
             {
