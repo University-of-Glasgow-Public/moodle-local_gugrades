@@ -94,6 +94,7 @@
                                 }"
                                 :model-value="item.boundpc?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
+                                :aria-label="item.band + ' ' + mstrings.percentage"
                             ></FormKit>
                         </div>
                         <div class="w-60">
@@ -111,6 +112,7 @@
                                 }"
                                 :model-value="item.boundpoints?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
+                                :aria-label="item.band + ' ' + mstrings.points"
                             ></FormKit>
                         </div>
                     </div>
@@ -143,6 +145,7 @@
                                 }"
                                 :model-value="item.boundpc?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
+                                :aria-label="item.band + ' ' + mstrings.percentage"
                             ></FormKit>
                         </div>
                         <div class="w-60">
@@ -160,6 +163,7 @@
                                 }"
                                 :model-value="item.boundpoints?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
+                                :aria-label="item.band + ' ' + mstrings.points"
                             ></FormKit>
                         </div>
                     </div>

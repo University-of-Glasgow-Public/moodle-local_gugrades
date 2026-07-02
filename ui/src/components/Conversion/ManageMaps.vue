@@ -113,6 +113,7 @@
 
         columnHelper.display({
             id: 'actions',
+            header: () => h('span', { class: 'sr-only' }, mstringstore.getMstring('actions') || 'Actions'),
             cell: ({ row }) => {
                 const currentMap = row.original // This will now work perfectly!
                 return h(ConversionActionButtons, {
