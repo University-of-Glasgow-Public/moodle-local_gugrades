@@ -64,7 +64,7 @@ export const moodleFetch = async (
       methodname,
       args,
       async,
-      loginrequired
+      loginrequired,
     },
     timeout: false,
     throwHttpErrors: false,

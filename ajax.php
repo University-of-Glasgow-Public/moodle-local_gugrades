@@ -36,6 +36,7 @@ $data = json_decode($raw, true);
 $params = $data['args'];
 $courseid = $params['courseid'];
 $loginrequired = $data['loginrequired'];
+$sesskey = $data['sesskey'];
 
 if ($loginrequired) {
     // Flag login errors. Note that AJAX_SCRIPT makes sure an exception
@@ -59,12 +60,23 @@ session_write_close();
 
 $result = external_api::call_external_function(
     $data['methodname'],
-    $params
+    $params,
 );
 
-// If the external function fails, send back the $result json encoded.
+/// If the external function fails, handle the output securely
 if (!empty($result['error'])) {
     http_response_code(500);
+    
+    // 🛡️ SECURITY PATCH: If we are NOT in developer debugging mode,
+    // scrub the sensitive system paths from the exception payload.
+    if (empty($CFG->debugdisplay) || $CFG->debug < DEBUG_DEVELOPER) {
+        if (isset($result['exception'])) {
+            unset($result['exception']['backtrace']);
+            unset($result['exception']['debuginfo']);
+            unset($result['exception']['link']);
+        }
+    }
+
     echo json_encode($result);
     exit;
 }

@@ -1,43 +1,52 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm">
-        <div class="mt-5">
-            <LevelOneSelect  @levelchange="levelOneChange" @regulation="getregulation"></LevelOneSelect>
-        </div>
+    <UAlert v-if="!caneditgrades" variant="error" class="my-5">
+        You do not have permission to view this page.
+    </UAlert>
+    
+    <template v-else>
 
-        <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
+        <div class="bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm">
 
-        <div v-if="(showresitoption || engineering) && caneditgrades &&!newregs" class="my-2">
-            <button v-if="!configuringresits" type="button" class="btn btn-accent btn-outline" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
-            <div v-else>
-                <div class="alert alert-primary mb-2" v-html="mstrings['resit_help']"></div>
-                <button type="button" class="btn btn-success btn-outline" @click="click_finish">{{ mstrings['finish'] }}</button>
+
+            <div class="mt-5">
+                <LevelOneSelect  @levelchange="levelOneChange" @regulation="getregulation"></LevelOneSelect>
+            </div>
+
+            <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
+
+            <div v-if="(showresitoption || engineering) && caneditgrades &&!newregs" class="my-2">
+                <button v-if="!configuringresits" type="button" class="btn btn-accent btn-outline" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
+                <div v-else>
+                    <div class="alert alert-primary mb-2" v-html="mstrings['resit_help']"></div>
+                    <button type="button" class="btn btn-success btn-outline" @click="click_finish">{{ mstrings['finish'] }}</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- NEW regulations -->
-    <template v-if="loaded && !treeerror && newregs &&activitytree">
-        <CategoryConfig :categoryid="categoryid" :nodes="activitytree" :engineering="engineering"></CategoryConfig>
+        <!-- NEW regulations -->
+        <template v-if="loaded && !treeerror && newregs &&activitytree">
+            <CategoryConfig :categoryid="categoryid" :nodes="activitytree" :engineering="engineering"></CategoryConfig>
+        </template>
+
+        <!-- OLD regulations -->
+        <div v-if="loaded && !treeerror && !newregs">
+            <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
+                <tbody>
+                    <ConfigTree
+                        v-if="activitytree"
+                        :nodes="activitytree"
+                        :depth="1"
+                        :resitconfig="configuringresits"
+                        :resitfade="true"
+                        :engineering="engineering"
+                        @saveerror="handle_saveerror"
+                    ></ConfigTree>
+                </tbody>
+            </table>
+        </div>
     </template>
-
-    <!-- OLD regulations -->
-    <div v-if="loaded && !treeerror && !newregs">
-        <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
-            <tbody>
-                <ConfigTree
-                    v-if="activitytree"
-                    :nodes="activitytree"
-                    :depth="1"
-                    :resitconfig="configuringresits"
-                    :resitfade="true"
-                    :engineering="engineering"
-                    @saveerror="handle_saveerror"
-                ></ConfigTree>
-            </tbody>
-        </table>
-    </div>
 </template>
 
 <script setup lang="ts">
@@ -53,6 +62,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import CategoryConfig from '@/components/Configure/CategoryConfig.vue';
     import type { ICategoryCategory } from '@/js/Interfaces.js';
+    import UAlert from '@/components/Common/UAlert.vue';
 
     const categoryid = ref(0);
     const activitytree = ref<ICategoryCategory>();
