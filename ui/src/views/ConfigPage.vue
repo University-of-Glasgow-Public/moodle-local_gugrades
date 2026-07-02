@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <UAlert v-if="!caneditgrades" variant="error" class="my-5">
+    <UAlert v-if="!caneditgrades && loaded" variant="error" class="my-5">
         You do not have permission to view this page.
     </UAlert>
     

@@ -1,10 +1,10 @@
 <template>
-    <div v-if="canview" id="mygrades_container" class="px-4 mb-8">
+    <div v-if="canview && loaded" id="mygrades_container" class="px-4 mb-8">
         <PageHeader />
         <TabMenu />
     </div>
 
-    <div v-else class="p-8">
+    <div v-if="!canview && loaded" class="p-8">
         You do not have permission to access MyGrades.
     </div>
 </template>
@@ -16,6 +16,7 @@
     import { moodleFetch } from './js/moodlefetch.ts';
 
     const canview = ref(false);
+    const loaded = ref(false);
 
     onMounted(() => {
         moodleFetch(
@@ -26,6 +27,7 @@
         )
         .then((result: any) => {
             canview.value = result.hascapability;
+            loaded.value = true;
         })
         .catch((error) => {
             console.log(error);

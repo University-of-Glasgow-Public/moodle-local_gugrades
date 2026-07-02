@@ -79,6 +79,7 @@ class upload_csv extends external_api {
         // Security.
         $context = \context_course::instance($courseid);
         self::validate_context($context);
+        has_capability('local/gugrades:editgrades', $context);
 
         [$lines, $errorcount, $addcount, $errorlist] = \local_gugrades\api::csv_upload(
             $courseid,

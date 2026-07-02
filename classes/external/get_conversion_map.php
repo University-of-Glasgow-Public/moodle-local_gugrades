@@ -80,7 +80,7 @@ class get_conversion_map extends external_api {
      */
     public static function execute_returns() {
         return new external_single_structure([
-            'name' => new external_value(PARAM_TEXT, 'Conversion map name'),
+            'name' => new external_value(PARAM_NOTAGS, 'Conversion map name'),
             'schedule' => new external_value(PARAM_ALPHA, 'schedulea or scheduleb'),
             'maxgrade' => new external_value(PARAM_FLOAT, 'Maximum grade value'),
             'inuse' => new external_value(PARAM_BOOL, 'Is conversion map in use?'),

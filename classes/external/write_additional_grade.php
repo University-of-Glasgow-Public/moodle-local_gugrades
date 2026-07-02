@@ -103,6 +103,7 @@ class write_additional_grade extends external_api {
         // More security.
         $context = \context_course::instance($courseid);
         self::validate_context($context);
+        has_capability('local/gugrades:editgrades', $context);
 
         \local_gugrades\api::write_additional_grade(
             $courseid,
