@@ -1766,6 +1766,9 @@ class api {
         // Delete notes
         $DB->delete_records('local_gugrades_notes', ['courseid' => $courseid]);
 
+        // Delete flags
+        $DB->delete_records('local_gugrades_flag', ['courseid' => $courseid]);
+
         // As this will be a rarely used function we will take the liberty of purging the caches.
         self::reset_all_caches();
     }
