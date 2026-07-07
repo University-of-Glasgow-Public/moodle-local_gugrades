@@ -1,0 +1,33 @@
+<template>
+    <div class="mt-8 px-10 flex justify-center-safe gap-4 text-sm text-brand-light-purple">
+        <div><a href="https://www.gla.ac.uk">University website</a></div>
+        <div aria-hidden="true">•</div>
+        <div><a href="https://www.gla.ac.uk/legal/accessibility/statements/moodle">Acessibility</a></div>
+        <div aria-hidden="true">•</div>
+        <div><a :href="sitebase + 'local/guprivacy/privacy.php'">Privacy</a></div>
+        <div aria-hidden="true">•</div>
+        <div><a :href="sitebase + 'local/guprivacy/cookies.php'">Cookies</a></div>
+        <div aria-hidden="true">•</div>
+        <div>Reset user tour on this page</div>
+        <div aria-hidden="true">•</div>
+        <div><a :href="mstrings.lisuurl">Help with this page</a></div>
+    </div>
+    <div class="mt-4 px-10 flex justify-center-safe gap-8 text-sm text-brand-light-purple">
+        The University of Glasgow is a registered Scottish charity: Registration Number SC004401
+    </div>
+</template>
+
+<script setup lang="ts">
+    import { onMounted, ref } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useMstrings } from '@/stores/mstrings.js';
+
+    const sitebase = ref('');
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
+
+    onMounted(() => {
+        sitebase.value = new URL('../../../../', window.location.href).href;
+        console.log(sitebase);
+    })
+</script>

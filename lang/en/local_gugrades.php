@@ -294,6 +294,7 @@ $string['lastmodifiedgrade'] = 'Last modified (grade)';
 $string['lastname'] = 'Last name';
 $string['latestgrade'] = 'Latest grade';
 $string['lineswitherrors'] = 'Lines with errors';
+$string['lisuurl'] = 'https://gla.sharepoint.com/sites/learning-innovation/SitePages/LISU-Guides-MyGrades.aspx';
 $string['manage'] = 'MyGrades Settings';
 $string['manageconversion'] = 'Manage conversion maps';
 $string['manual'] = 'Manual grade';

@@ -2,6 +2,7 @@
     <div v-if="canview && loaded" id="mygrades_container" class="px-4 mb-8">
         <PageHeader />
         <TabMenu />
+        <PageFooter />
     </div>
 
     <div v-if="!canview && loaded" class="p-8">
@@ -12,6 +13,7 @@
 <script setup lang="ts">
     import { onMounted, ref } from 'vue';
     import PageHeader from './components/PageHeader.vue';
+    import PageFooter from './components/PageFooter.vue';
     import TabMenu from '../src/views/TabMenu.vue';
     import { moodleFetch } from './js/moodlefetch.ts';
 

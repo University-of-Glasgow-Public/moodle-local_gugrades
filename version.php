@@ -32,3 +32,9 @@ $plugin->component    = 'local_gugrades';
 $plugin->maturity     = MATURITY_BETA;
 
 $plugin->release      = '0.3 Beta';
+
+$plugin->dependencies = [
+    'local_guprivacy' => 2025020400,
+    'enrol_gudatabase' => 2023111300,
+    'report_guid' => 2025091800,
+];
