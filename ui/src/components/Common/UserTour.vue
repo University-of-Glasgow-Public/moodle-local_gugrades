@@ -55,8 +55,6 @@
     });
 
     const onTourComplete = () => {
-        console.log('COMPLETED');
-
         moodleFetch('local_gugrades_set_tour_state', {enabled: false})
         .catch((error) => {
             console.error(error);

@@ -269,7 +269,7 @@
             caneditgrades.value = result.hascapability;
         })
         .catch((error) => {
-            window.console.log(error);
+            console.error(error);
             debug.value = error;
         });
 

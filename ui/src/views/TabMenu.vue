@@ -54,7 +54,7 @@
             available.value = result.available;
         })
         .catch((error) => {
-            window.console.log(error);
+            console.error(error);
             debug.value = error;
         });
     })

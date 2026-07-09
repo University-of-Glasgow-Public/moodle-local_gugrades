@@ -29,7 +29,6 @@
 
     onMounted(() => {
         sitebase.value = new URL('../../../../', window.location.href).href;
-        console.log(sitebase);
     })
 
     function reset_tour() {
