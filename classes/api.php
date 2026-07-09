@@ -2928,4 +2928,24 @@ class api {
 
         return $flags;
     }
+
+    /**
+     * Do we show user tour for current user
+     * @return boolean
+     */
+    public static function usertour_active() {
+        global $USER;
+
+        return (bool)get_user_preferences('local_gugrades_enabletour', true, $USER);
+    }
+
+    /**
+     * Set user tour state for current user
+     * @param int $enabled
+     */
+    public static function set_tour_state(bool $enabled) {
+        global $USER;
+
+        set_user_preference('local_gugrades_enabletour', $enabled, $USER);
+    }
 }

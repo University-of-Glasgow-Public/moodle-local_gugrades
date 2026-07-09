@@ -229,5 +229,22 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // User tour
+    $settingspage->add(new admin_setting_heading(
+        'local_gugrades/headingtour',
+        new lang_string('toursettings', 'local_gugrades'),
+        new lang_string('toursettings_help', 'local_gugrades')
+    ));
+
+    $settingspage->add(new admin_setting_configtextarea(
+        'local_gugrades/touryaml',
+        new lang_string('usertouryaml', 'local_gugrades'),
+        new lang_string('usertouryaml_help', 'local_gugrades'),
+        '',
+        PARAM_RAW,
+        60,
+        30
+    ));
+
     $ADMIN->add('localplugins', $settingspage);
 }

@@ -8,7 +8,7 @@
         <div aria-hidden="true">•</div>
         <div><a :href="sitebase + 'local/guprivacy/cookies.php'">Cookies</a></div>
         <div aria-hidden="true">•</div>
-        <div>Reset user tour on this page</div>
+        <div><a href="#" @click.prevent="reset_tour">Reset user tour on this page</a></div>
         <div aria-hidden="true">•</div>
         <div><a :href="mstrings.lisuurl">Help with this page</a></div>
     </div>
@@ -21,6 +21,7 @@
     import { onMounted, ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
 
     const sitebase = ref('');
     const mstringstore = useMstrings();
@@ -30,4 +31,14 @@
         sitebase.value = new URL('../../../../', window.location.href).href;
         console.log(sitebase);
     })
+
+    function reset_tour() {
+        moodleFetch('local_gugrades_set_tour_state', {enabled: true})
+        .then(() => {
+            window.location.reload()
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
 </script>

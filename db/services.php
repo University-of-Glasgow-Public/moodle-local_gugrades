@@ -93,6 +93,8 @@ $services = [
             'local_gugrades_get_course_info',
             'local_gugrades_write_flags',
             'local_gugrades_read_flags',
+            'local_gugrades_get_usertour',
+            'local_gugrades_set_tour_state',
         ],
         'requiredcapability' => 'local/gugrades:view',
         'restrictedusers' => 1,
@@ -498,6 +500,18 @@ $functions = [
         'classname' => 'local_gugrades\external\read_flags',
         'description' => 'Read the reassessment/exams flags from the database',
         'type' => 'read',
+        'ajax' => true,
+    ],
+    'local_gugrades_get_usertour' => [
+        'classname' => 'local_gugrades\external\get_usertour',
+        'description' => 'Check if user should see user tour and return steps YAML',
+        'type' => 'read',
+        'ajax' => true,
+    ],
+    'local_gugrades_set_tour_state' => [
+        'classname' => 'local_gugrades\external\set_tour_state',
+        'description' => 'Set user preference for active/inactive user tour',
+        'type' => 'write',
         'ajax' => true,
     ],
 ];

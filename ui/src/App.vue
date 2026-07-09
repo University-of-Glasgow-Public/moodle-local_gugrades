@@ -3,6 +3,7 @@
         <PageHeader />
         <TabMenu />
         <PageFooter />
+        <UserTour />
     </div>
 
     <div v-if="!canview && loaded" class="p-8">
@@ -16,9 +17,11 @@
     import PageFooter from './components/PageFooter.vue';
     import TabMenu from '../src/views/TabMenu.vue';
     import { moodleFetch } from './js/moodlefetch.ts';
+    import UserTour from './components/Common/UserTour.vue';
 
     const canview = ref(false);
     const loaded = ref(false);
+
 
     onMounted(() => {
         moodleFetch(
@@ -30,6 +33,7 @@
         .then((result: any) => {
             canview.value = result.hascapability;
             loaded.value = true;
+
         })
         .catch((error) => {
             console.log(error);

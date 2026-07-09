@@ -36,7 +36,6 @@ $data = json_decode($raw, true);
 $params = $data['args'];
 $courseid = $params['courseid'];
 $loginrequired = $data['loginrequired'];
-$sesskey = $data['sesskey'];
 
 if ($loginrequired) {
     // Flag login errors. Note that AJAX_SCRIPT makes sure an exception

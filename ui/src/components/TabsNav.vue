@@ -4,8 +4,9 @@
     <div class="mt-0 w-full" role="navigation">
         <TabGroup :defaultIndex="1">
             <TabList class="flex justify-start space-x-1 bg-base-100 p-1 border border-base-300 rounded-b-md w-full shadow-sm focus:outline-none">
-                <Tab v-for="tab in tabs" v-slot="{ selected }" as="template">
+                <Tab v-for="tab in tabs" v-slot="{ selected }">
                     <a
+                        :id="tab.id"
                         class="tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center"
                         :class="{
                             'text-university-blue border-b-2 border-university-blue': selected,
@@ -49,31 +50,37 @@
             label: mstrings.value.configure ?? 'Assessment configuration',
             component: ConfigPage,
             icon: MonitorCog,
+            id: 'configpage',
         },
         {
             label: mstrings.value.assessmentgradecapture ?? 'Assessment grade capture',
             component: CaptureTable,
             icon: Camera,
+            id: 'capturetable',
         },
         {
             label: mstrings.value.manageconversion ?? 'Manage conversion maps',
             component: ConversionPage,
-            icon: Table
+            icon: Table,
+            id: 'conversionpage',
         },
         {
             label: mstrings.value.coursegradeaggregation ?? 'Course grade aggregation',
             component: AggregationTable,
-            icon: Calculator
+            icon: Calculator,
+            id: 'aggregationtable',
         },
         {
             label: mstrings.value.auditlog ?? 'Audit log',
             component: AuditPage,
-            icon: Shield
+            icon: Shield,
+            id: 'auditpage',
         },
         {
             label: mstrings.value.settings ?? 'Settings',
             component: SettingsPage,
-            icon: Settings2
+            icon: Settings2,
+            id: 'settingspage',
         },
     ]);
 

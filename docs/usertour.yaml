@@ -1,0 +1,64 @@
+- 
+  id: mygradeslogo
+  target: "#mygradeslogo"
+  title: Welcome to mygrades
+  content: This quick tour will walk you through the key steps for managing grades - from importing to aggregation.
+  direction: bottom
+-
+  id: configpage
+  target: "#configpage"
+  title: Assessment configuration
+  content: This is where you can manage student reassessments and resits. Both terms indicate opportunities where students can retake an assessment. In Engineering, Exam grade categories are also managed here.
+  direction: bottom
+-
+  id: capturetable
+  target: "#capturetable"
+  title: Assessment Grade Capture
+  content: Assessment Grade Capture is where you can import, add, adjust, and release grades.
+  direction: bottom
+-
+  id: level1select
+  target: "#level1select"
+  title: Grade category
+  content: |
+    Import grades from Moodle by category (summative/formative).
+    Use Import or CSV Import to bring them into Staff MyGrades.
+    You can also add grades with reasons (including admin grades), 
+    and release grades to students. 
+    Note: Convert points/percentages to GGS1 or GGS2 before aggregation (via Manage Conversion Maps).
+  direction: bottom
+-
+  id: conversionpage
+  target: "#conversionpage"
+  title: Manage conversion Maps
+  content: |
+    Convert grades only if not using GGS1 or GGS2 for all assessments.
+
+    Use the Add Map section to create your conversion map. 
+    After setting up your map, go back to Assessment Grade Capture tab, choose your assessment, and Convert Grades.
+  direction: bottom
+-
+  id: aggregationtable
+  target: "#aggregationtable"
+  title: Course grade aggregation
+  content: |
+    This is where you will aggregate grades, and:
+    View the total calculated grade for a course or subcategory.
+    View course ‘Total’  % complete.
+    Override category aggregations if required.
+    Recalculate / Release/ Unrelease aggregated category grades to Student MyGrades (not ‘Total’).
+    Convert aggregated grade totals and release to students (if not converted for individual assessments on import).
+    Create exports for MyCampus and Custom exports.
+  direction: bottom
+-
+  id: auditpage
+  target: "#auditpage"
+  title: Audit log
+  content: This is where you will find audit logs. You can download the logs as a CSV.
+  direction: bottom
+-
+  id: settingspage
+  target: "#settingspage"
+  title: Settings
+  content: Learning Innovation Support Unit (LISU) visual guides, short videos, step-by-step guides, and MyGrades Checklists. Find answers to often asked questions and much more.
+  direction: bottom

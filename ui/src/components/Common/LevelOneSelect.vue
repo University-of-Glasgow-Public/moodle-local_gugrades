@@ -20,7 +20,8 @@
         </TwAlert>
         <div>
             <div class="text-sm font-bold mb-1 opacity-70">CATEGORY</div>
-            <select 
+            <select
+                id="level1select"
                 v-if="!notsetup && !itemerror" 
                 v-model="categoryid" 
                 @change="handleUserSelection"
