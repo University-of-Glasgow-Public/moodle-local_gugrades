@@ -76,7 +76,7 @@ final class get_grade_item_test extends \local_gugrades\external\gugrades_advanc
             $item
         );
 
-        $this->assertEquals('Grade item 1', $item['itemname']);
+        $this->assertEquals('Second item 1', $item['itemname']);
         $this->assertFalse($item['isscale']);
         $this->assertEquals(100.0, $item['grademax']);
         $this->assertEquals('Points', $item['scalename']);

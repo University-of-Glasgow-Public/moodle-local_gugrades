@@ -2137,4 +2137,183 @@ class grades {
             self::set_latest_grade($courseid, $grade->gradeitemid, $grade->userid);
         }
     }
+
+    /**
+     * Check grademax=22 in new regs. 
+     * If new regs apply
+     * AND there are any grade items with grademax=22
+     * AND there are any gugrades for this item not in points
+     * AND no conversion has been applied
+     * THEN we have an error condition.
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity_grademax22_newregs(int $courseid) {
+        global $DB;
+
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        if ($regulation->shortname() != 'from2026') {
+            return [];
+        }
+
+        $errors = [];
+
+        // Find any grade items with grademax = 22
+        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22])) {
+            return [];
+        }
+
+        foreach ($items as $item) {
+
+            // If this item has been converted then it must have been points at some time.
+            if (\local_gugrades\conversion::is_conversion_applied($courseid, $item->id)) {
+                continue;
+            }
+
+            // If it's not converted then there cannot be any non-point gugrades
+            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => false])) {
+                $errors[] = [
+                    'gradeitemid' => $item->id,
+                    'itemname' => $item->itemname,
+                    'error' => 'Item graded out of exactly 22 automatic conversion, found in new regs',
+                ];
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Check grademax=22 in old regs. 
+     * If old regs apply
+     * AND there are any grade items with grademax=22
+     * AND there are FIRST grades in points
+     * THEN we have an error condition
+     * (This probably isn't a comprehensive check but will
+     * catch most.)
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity_grademax22_oldregs(int $courseid) {
+        global $DB;
+
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        if ($regulation->shortname() != 'original') {
+            return [];
+        }
+
+        $errors = [];
+
+        // Find any grade items with grademax = 22
+        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22])) {
+            return [];
+        }        
+
+        foreach ($items as $item) {
+
+            // There cannot be FIRST items in points as they should have been imported
+            // as a scale. 
+            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'gradetype' => 'FIRST', 'points' => true])) {
+                $errors[] = [
+                    'gradeitemid' => $item->id,
+                    'itemname' => $item->itemname,
+                    'error' => 'Item graded out of exactly 22 unconverted found in old regs',
+                ];
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Check for invalid admin grades
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity_admingrades(int $courseid) {
+        global $DB;
+
+        $admingrades = \local_gugrades\admingrades::get_all_admingrade_codes($courseid);
+
+        $admingrades = array_merge([''], $admingrades);
+        $admingrades = array_map(function ($a) { return '"' . $a . '"'; }, $admingrades);
+        $validgrades = implode(',', $admingrades);
+
+        // All admingrades found for this course must be in that list
+        $sql = "SELECT * FROM {local_gugrades_grade}
+            WHERE courseid = :courseid
+            AND iscurrent = 1
+            AND admingrade NOT IN (" . $validgrades . ")";
+        if (!$grades = $DB->get_records_sql($sql, ['courseid' => $courseid])) {
+            return [];
+        }
+
+        $itemids = array_unique(array_column($grades, 'gradeitemid'));
+        $errors = [];
+        foreach ($itemids as $id) {
+            $gradeitem = $DB->get_record('grade_items', ['id' => $id], '*', MUST_EXIST);
+            $errors[] = [
+                'gradeitemid' => $id,
+                'itemname' => $gradeitem->itemname,
+                'error' => 'Invalid Admin grade found',
+            ];           
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Check for out of range grades
+     * (if the Gradebook settings have been changed)
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity_range(int $courseid) {
+        global $DB;
+
+        // Get all the gradeitems in the course
+        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid])) {
+            return [];
+        }
+
+        $errors = [];
+
+        foreach ($items as $item) {
+            if ($item->itemtype == 'category') {
+                continue;
+            }
+
+            // If this item has been converted then it's converted to valid grade.
+            if (\local_gugrades\conversion::is_conversion_applied($courseid, $item->id)) {
+                continue;
+            }
+
+            // If this scale / points have to agree
+            $points = is_null($item->scaleid);
+            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => !$points])) {
+                $errors[] = [
+                    'gradeitemid' => $item->id,
+                    'itemname' => $item->itemname,
+                    'error' => 'Scale/points do not match',
+                ];  
+
+                continue;
+            }
+
+            // Are there any grades with a *higher* grade than this
+            $sql = "SELECT * FROM {local_gugrades_grade}
+                WHERE gradeitemid = :gradeitemid
+                AND iscurrent = 1
+                AND rawgrade > :grademax";
+            if ($DB->record_exists_sql($sql, ['gradeitemid' => $item->id, 'grademax' => $item->grademax])) {
+                $errors[] = [
+                    'gradeitemid' => $item->id,
+                    'itemname' => $item->itemname,
+                    'error' => 'Grade value out of range',
+                ];              
+            }
+        }
+
+        return $errors;
+    }
 }

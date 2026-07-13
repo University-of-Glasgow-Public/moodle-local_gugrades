@@ -95,6 +95,7 @@ $services = [
             'local_gugrades_read_flags',
             'local_gugrades_get_usertour',
             'local_gugrades_set_tour_state',
+            'local_gugrades_check_integrity',
         ],
         'requiredcapability' => 'local/gugrades:view',
         'restrictedusers' => 1,
@@ -512,6 +513,12 @@ $functions = [
         'classname' => 'local_gugrades\external\set_tour_state',
         'description' => 'Set user preference for active/inactive user tour',
         'type' => 'write',
+        'ajax' => true,
+    ],
+    'local_gugrades_check_integrity' => [
+        'classname' => 'local_gugrades\external\check_integrity',
+        'description' => 'Check integrity of MyGrades data',
+        'type' => 'read',
         'ajax' => true,
     ],
 ];

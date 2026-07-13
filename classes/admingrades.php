@@ -298,6 +298,22 @@ class admingrades {
     }
 
     /**
+     * Get all valid admingrades for prevailing regs
+     * Just return the codes
+     * @param int $courseid
+     * @return array
+     */
+    public static function get_all_admingrade_codes(int $courseid) {
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+
+        $admingrades = $regulation->get_admingrades($courseid, 0);
+        $admingrades = array_merge($admingrades, $regulation->get_admingrades($courseid, 1));
+        $admingrades = array_merge($admingrades, $regulation->get_admingrades($courseid, 2));
+
+        return array_unique($admingrades);
+    }
+
+    /**
      * Get admincodes for non level 1 total menu
      * @param int $courseid
      * @param int $gradeitemid

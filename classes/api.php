@@ -2948,4 +2948,26 @@ class api {
 
         set_user_preference('local_gugrades_enabletour', $enabled, $USER);
     }
+
+    /**
+     * Check integrity of MyGrades data for this course. 
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity(int $courseid) {
+
+        // grademax=22 check new regs
+        $errors = \local_gugrades\grades::check_integrity_grademax22_newregs($courseid);
+
+        // grademax=22 check old regs
+        $errors = array_merge($errors, \local_gugrades\grades::check_integrity_grademax22_oldregs($courseid));
+
+        // Check for valid admingrades
+        $errors = array_merge($errors, \local_gugrades\grades::check_integrity_admingrades($courseid));
+
+        // Check for range / points/scale mismatch
+        $errors = array_merge($errors, \local_gugrades\grades::check_integrity_range($courseid));
+
+        return ['erroritems' => $errors];
+    }
 }
