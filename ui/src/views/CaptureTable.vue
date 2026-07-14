@@ -154,6 +154,7 @@
                             :adminmenu="editadminmenu"
                             :grademax="editgrademax"
                             :cancelled="editcancelled"
+                            :shouldsave="editsaving"
                             @gradewritten="edit_grade_written()"
                             @gradecancel="edit_grade_written()"
                             @validitychange="edit_validity_change"
@@ -278,6 +279,7 @@
     const editother = ref('');
     const editnotes = ref('');
     const editcancelled = ref(false);
+    const editsaving = ref(false);
     const editblocking = ref(new Set<number>());
     const showconversion = ref(false);
     const provisionalslot = ref('');
@@ -475,6 +477,7 @@
         editother.value = cellform.other;
         editnotes.value = cellform.notes;
         editcancelled.value = false;
+        editsaving.value = false;
         editblocking.value = new Set();
         reload_page();
     }
@@ -494,14 +497,16 @@
     }
 
     /**
-     * In edit mode, the save button is clicked
-     * The cells save themselves using a hook on before close.
+     * In edit mode, the save button is clicked.
+     * Flag shouldsave before unmounting so cells persist; navigation alone must not.
      */
-    function edit_cell_saved() {
+    async function edit_cell_saved() {
         if (editblocking.value.size > 0) {
             toast.error(mstrings.value['bulkgradeinvalid'] || 'One or more grades are invalid.');
             return;
         }
+        editsaving.value = true;
+        await nextTick();
         editcolumn.value = '';
         editblocking.value = new Set();
     }
@@ -512,6 +517,7 @@
      * so it knows not to save.
      */
     function edit_cell_cancelled() {
+        editsaving.value = false;
         editcancelled.value = true;
         editblocking.value = new Set();
     }
@@ -535,6 +541,7 @@
 
             // Duplicated for cancel
             editcolumn.value = '';
+            editsaving.value = false;
 
             reload_page();
         },

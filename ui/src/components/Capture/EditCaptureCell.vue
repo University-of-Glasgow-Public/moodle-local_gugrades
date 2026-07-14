@@ -63,6 +63,8 @@
         adminmenu: IMenuItem[];
         grademax: number;
         cancelled: boolean;
+        /** Only true when the bulk-edit Save button was clicked. */
+        shouldsave: boolean;
     }
 
     const props = defineProps< ICaptureCellProps >();
@@ -272,15 +274,16 @@
     }
 
     /**
-     * When this component closes, save the data
+     * When this component closes, save only if bulk-edit Save was clicked.
+     * Navigating away / remounting must not persist pending edits.
      */
     onBeforeUnmount(() => {
 
         // Clear any Save block for this cell.
         emits('validitychange', { userid: props.item.id, blocking: false });
 
-        // if this cell hasn't been edited then nothing to do!
-        if (props.cancelled || !has_changed()) {
+        // Discard unless the user explicitly clicked Save.
+        if (!props.shouldsave || props.cancelled || !has_changed()) {
             return;
         }
 
