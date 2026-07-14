@@ -18,13 +18,14 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted, computed} from 'vue';
+    import { ref, onMounted, computed } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import UAlert from './Common/UAlert.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
+    import { usePopulateTrees } from '@/js/setuptrees.ts';
 
     interface iError {
         gradeitemid: number;
@@ -33,53 +34,58 @@
     }
 
     const treestore = useActivityTreeStore();
+    const populatetrees = usePopulateTrees();
     const { ready: treeReady } = storeToRefs(treestore);
     const mstringstore = useMstrings();
-    const { mstrings } = storeToRefs( mstringstore );
+    const { mstrings } = storeToRefs(mstringstore);
+    
     const debug = ref({});
-    const processing = ref(true);
-    const errors = ref< iError[] >([]);
+    const errors = ref<iError[]>([]);
     const showerrors = ref(false);
+    
+    // We replace the confusing 'processing' and 'waiting' flags 
+    // with one single status that tells us if the setup is running.
+    const isSettingUp = ref(true);
 
-    /**
-     * Anything in here that involves MyGrades waiting to open
-     */
-    const waiting = computed(() => {
-        return !treeReady.value;
-    })
-
-    // Combines both states to control the modal visibility
+    // Completely simplified visibility tracking
     const showModal = computed({
         get() {
-            // Show modal if backend is processing OR store is still waiting
-            // EXCEPT if there are integrity errors (we must keep it open to show errors)
-            return processing.value || waiting.value || showerrors.value;
+            // Keep modal open if we are setting up OR if we have data errors to display
+            return isSettingUp.value || showerrors.value;
         },
         set(value) {
-            // Handles internal close events from the modal component
             if (!value) {
-                processing.value = false;
+                isSettingUp.value = false;
             }
         }
     });
 
-    onMounted(() => {
-        moodleFetch(
-            'local_gugrades_check_integrity',
-            {}
-        )
-        .then((result: any) => {
+    onMounted(async () => {
+        try {
+            // Step 1: Force tree store ready to false immediately on mount
+            treestore.ready = false; 
+
+            // Step 2: Fetch your data integrity check from the server
+            const result: any = await moodleFetch('local_gugrades_check_integrity', {});
             errors.value = result.erroritems;
-            if (errors.value.length == 0) {
-                processing.value = false;
-            } else {
+
+            // Step 3: If there are errors, stop immediately and show them
+            if (errors.value.length > 0) {
                 console.log(errors.value);
                 showerrors.value = true;
+                return; // Stops execution here so modal stays open with errors
             }
-        })
-        .catch(error => {
+
+            // Step 4: No errors! Now kick off and populate your activity trees
+            // We use the new async composable here
+            await populatetrees.populate();
+
+            // Step 5: Everything is 100% finished. Now, and ONLY now, close the modal.
+            isSettingUp.value = false;
+
+        } catch (error: any) {
             debug.value = error;
             console.error(error);
-        });
+        }
     });
 </script>

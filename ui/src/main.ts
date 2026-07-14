@@ -66,8 +66,8 @@ moodleFetch('local_gugrades_get_all_strings', {})
         app.mount('#app');
 
         // Populate activity trees
-        const populatetrees = usePopulateTrees();
-        populatetrees.populate();
+        //const populatetrees = usePopulateTrees();
+        //populatetrees.populate();
 
         // Preload aggregation recalculations
         const preload = usePreload();

@@ -61,10 +61,25 @@
     const debug = ref({});
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
+    const treestore = useActivityTreeStore();
+
+    /**
+     * Watch the store for this category's data. 
+     * The moment the data arrives in the background, update this component.
+     */
+    watch(
+        () => treestore.trees[props.categoryid], 
+        (newData) => {
+            if (newData) {
+                getActivity();
+            }
+        },
+        { immediate: true } // Runs immediately on mount too!
+    );
 
     // Get the sub-category / activity
     function getActivity() {
-        const treestore = useActivityTreeStore();
+        
 
         const catid = props.categoryid;
         if (treestore.trees[catid]) {
