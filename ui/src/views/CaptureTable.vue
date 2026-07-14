@@ -156,6 +156,7 @@
                             :cancelled="editcancelled"
                             @gradewritten="edit_grade_written()"
                             @gradecancel="edit_grade_written()"
+                            @validitychange="edit_validity_change"
                         />
                         <GradeColor v-else :grade="item['GRADE' + column.id]" />
                     </template>
@@ -277,6 +278,7 @@
     const editother = ref('');
     const editnotes = ref('');
     const editcancelled = ref(false);
+    const editblocking = ref(new Set<number>());
     const showconversion = ref(false);
     const provisionalslot = ref('');
     const provisionalid = ref('');
@@ -473,7 +475,22 @@
         editother.value = cellform.other;
         editnotes.value = cellform.notes;
         editcancelled.value = false;
+        editblocking.value = new Set();
         reload_page();
+    }
+
+    /**
+     * A bulk-edit cell reported whether it currently has an invalid value
+     * that should block Save.
+     */
+    function edit_validity_change(payload: { userid: number, blocking: boolean }) {
+        const next = new Set(editblocking.value);
+        if (payload.blocking) {
+            next.add(payload.userid);
+        } else {
+            next.delete(payload.userid);
+        }
+        editblocking.value = next;
     }
 
     /**
@@ -481,7 +498,12 @@
      * The cells save themselves using a hook on before close.
      */
     function edit_cell_saved() {
+        if (editblocking.value.size > 0) {
+            toast.error(mstrings.value['bulkgradeinvalid'] || 'One or more grades are invalid.');
+            return;
+        }
         editcolumn.value = '';
+        editblocking.value = new Set();
     }
 
     /**
@@ -491,6 +513,7 @@
      */
     function edit_cell_cancelled() {
         editcancelled.value = true;
+        editblocking.value = new Set();
     }
 
     /**

@@ -197,4 +197,86 @@ final class write_additional_grade_test extends \local_gugrades\external\gugrade
         $fred = $page['users'][0];
         $this->assertEquals(false, $fred['alert']);
     }
+
+    /**
+     * Points grades outside grademin/grademax must be rejected.
+     * Previously these could be written via bulk edit and then broke capture (MGU-1344).
+     *
+     * @covers \local_gugrades\external\write_additional_grade::execute
+     */
+    public function test_points_grade_out_of_range_rejected(): void {
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        // Import points grades (assign1 defaults to max 100).
+        $userlist = [
+            $this->student->id,
+        ];
+        $this->import_grades($this->course->id, $this->gradeitemidassign1, $userlist);
+
+        $this->expectException(\moodle_exception::class);
+
+        write_additional_grade::execute(
+            $this->course->id,
+            $this->gradeitemidassign1,
+            $this->student->id,
+            'SECOND',
+            '',
+            '',
+            0,
+            999,
+            'Out of range grade'
+        );
+    }
+
+    /**
+     * Valid points grades within range are still accepted.
+     *
+     * @covers \local_gugrades\external\write_additional_grade::execute
+     */
+    public function test_points_grade_in_range_accepted(): void {
+
+        // Make sure that we're a teacher.
+        $this->setUser($this->teacher);
+
+        $userlist = [
+            $this->student->id,
+        ];
+        $this->import_grades($this->course->id, $this->gradeitemidassign1, $userlist);
+
+        $nothing = write_additional_grade::execute(
+            $this->course->id,
+            $this->gradeitemidassign1,
+            $this->student->id,
+            'SECOND',
+            '',
+            '',
+            0,
+            88.5,
+            'In range grade'
+        );
+        $nothing = external_api::clean_returnvalue(
+            write_additional_grade::execute_returns(),
+            $nothing
+        );
+
+        $page = get_capture_page::execute($this->course->id, $this->gradeitemidassign1, '', '', 0, false);
+        $page = external_api::clean_returnvalue(
+            get_capture_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $grades = $fred['grades'];
+        $second = null;
+        foreach ($grades as $grade) {
+            if ($grade['gradetype'] === 'SECOND') {
+                $second = $grade;
+                break;
+            }
+        }
+        $this->assertNotNull($second);
+        $this->assertEquals('88.5', (string)$second['displaygrade']);
+    }
 }

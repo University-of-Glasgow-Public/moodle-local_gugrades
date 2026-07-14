@@ -74,11 +74,13 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
-    const emits = defineEmits(['gradewritten', 'gradecancel']);
+    const emits = defineEmits(['gradewritten', 'gradecancel', 'validitychange']);
 
     // validation depends on grademax
+    // optional: empty cells are allowed in bulk edit (unchanged / skip on save)
     const gradevalidation = computed<[string, ...any[]][]>(() => {
         return [
+            ['optional'],
             ['number'],
             ['between', 0, props.grademax],
         ];
@@ -86,6 +88,52 @@
 
     let   originalgrade = '';
     let   originaladmingrade = '';
+
+    /**
+     * Has the cell value changed from what was loaded?
+     */
+    function has_changed(): boolean {
+        return (originalgrade != grade.value) || (originaladmingrade != admingrade.value);
+    }
+
+    /**
+     * Is the current points (or scale) value safe to save?
+     * Empty points cells are OK (unchanged / skip); edited invalid numbers are not.
+     */
+    function is_value_valid(): boolean {
+        if (admingrade.value != 'GRADE') {
+            return true;
+        }
+        if (props.usescale) {
+            return String(grade.value ?? '').trim() !== '';
+        }
+        const raw = String(grade.value ?? '').trim();
+        if (raw === '') {
+            return true;
+        }
+        const n = Number(raw);
+        if (!Number.isFinite(n)) {
+            return false;
+        }
+        return n >= 0 && n <= props.grademax;
+    }
+
+    /**
+     * Should this cell block the bulk Save button?
+     */
+    function is_blocking_invalid(): boolean {
+        return has_changed() && !is_value_valid();
+    }
+
+    /**
+     * Tell parent whether this cell currently blocks Save.
+     */
+    function emit_validity() {
+        emits('validitychange', {
+            userid: props.item.id,
+            blocking: is_blocking_invalid(),
+        });
+    }
 
     /**
      * Strip an optional raw points suffix from a displayed scale band.
@@ -154,6 +202,16 @@
     );
 
     /**
+     * Re-evaluate whether Save should be blocked when inputs change.
+     */
+    watch(
+        [grade, admingrade],
+        () => {
+            emit_validity();
+        }
+    );
+
+    /**
      * Mostly, set up initial values for the form.
      */
     onMounted(() => {
@@ -180,6 +238,7 @@
 
         originalgrade = grade.value;
         originaladmingrade = admingrade.value;
+        emit_validity();
     });
 
     /**
@@ -191,6 +250,7 @@
         // If anything has changed, flag that we will need
         // to save it at some point.
         edited.value = true;
+        emit_validity();
     }
 
     /**
@@ -216,8 +276,21 @@
      */
     onBeforeUnmount(() => {
 
+        // Clear any Save block for this cell.
+        emits('validitychange', { userid: props.item.id, blocking: false });
+
         // if this cell hasn't been edited then nothing to do!
-        if (props.cancelled || ((originalgrade == grade.value) && (originaladmingrade == admingrade.value))) {
+        if (props.cancelled || !has_changed()) {
+            return;
+        }
+
+        // Never persist invalid numbers — out-of-range grades break MyGrades capture.
+        if (!is_value_valid()) {
+            return;
+        }
+
+        // Empty points cell with GRADE selected: nothing to write.
+        if (admingrade.value == 'GRADE' && !props.usescale && String(grade.value ?? '').trim() === '') {
             return;
         }
 
@@ -229,7 +302,11 @@
         const savescale = (admingrade.value == 'GRADE') && props.usescale ? grade.value : '0';
         const savegrade = (admingrade.value == 'GRADE') && !props.usescale ? grade.value : '0';
         const notes = props.notes;
+        const parsedgrade = parseFloat(savegrade);
 
+        if ((admingrade.value == 'GRADE') && !props.usescale && !Number.isFinite(parsedgrade)) {
+            return;
+        }
 
         moodleFetch(
             'local_gugrades_write_additional_grade',
@@ -240,7 +317,7 @@
                 reason: reason,
                 other: other,
                 scale: savescale,
-                grade: parseFloat(savegrade),
+                grade: parsedgrade,
                 notes: notes,
             }
         )

@@ -1349,6 +1349,12 @@ class api {
                 $convertedgrade = $scale;
             }
         } else {
+            // Reject out-of-range points grades (same rules as CSV import).
+            // Invalid values previously broke MyGrades when loading the capture page (MGU-1344).
+            if (!is_finite($grade) || !$mapping->validate_csv($grade)) {
+                throw new \moodle_exception('gradeoutofrange', 'local_gugrades', '',
+                    (object)['grade' => $grade, 'grademax' => $mapping->get_grademax()]);
+            }
             $displaygrade = $grade;
             $rawgrade = $grade;
             $convertedgrade = $grade;
