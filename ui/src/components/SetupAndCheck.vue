@@ -7,8 +7,19 @@
                 A data integrity check has found invalid data in MyGrades. This is probably due to changing the course start
                 date or manipulating Gradebook settings AFTER grades have already been imported. MyGrades cannot continue.
             </div>
-            <div v-for="error in errors">
-                <b>{{ error.itemname }}</b> {{ error.error }}
+            <div class="table w-full border-separate border-spacing-y-2 border-spacing-x-4">
+                
+                <!-- Each loop iteration acts exactly like a <tr> row tag -->
+                <div v-for="error in errors" :key="error.gradeitemid" class="table-row items-center">
+                    
+                    <!-- Each child acts exactly like a <td> cell tag -->
+                    <div class="table-cell whitespace-nowrap font-bold align-middle">{{ error.itemname }}</div>
+                    <div class="table-cell align-middle text-slate-600">{{ error.error }}</div>
+                    <div class="table-cell align-middle text-right shrink-0">
+                        <ResetAssessmentButton :itemid="error.gradeitemid" :small="true" @reset="reload" />
+                    </div>
+                    
+                </div>
             </div>
         </UAlert>
         <UAlert v-else>
@@ -26,6 +37,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import { usePopulateTrees } from '@/js/setuptrees.ts';
+    import ResetAssessmentButton from './Capture/ResetAssessmentButton.vue';
 
     interface iError {
         gradeitemid: number;
@@ -88,4 +100,8 @@
             console.error(error);
         }
     });
+
+    function reload() {
+        window.location.reload();
+    }
 </script>

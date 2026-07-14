@@ -7,17 +7,6 @@
 
     <div>
         <TwAlert v-if="notsetup">{{ mstrings.notoplevel }}</TwAlert>
-        <TwAlert v-if="itemerror">
-            <p>{{ mstrings.changedgradetype }}
-            <ul>
-                <li v-for="item in erroritems" :key="item.gradeitemid" class="tw:flex tw:items-center tw:gap-2">
-                    <span>{{ item.itemname }}</span>
-                    <div class="tw:p-1">
-                        <ResetAssessmentButton :itemid="item.gradeitemid" :small="true" @reset="getLevelOne" />
-                    </div>
-                </li>
-            </ul></p>
-        </TwAlert>
         <div>
             <div class="text-sm font-bold mb-1 opacity-70">CATEGORY</div>
             <select
