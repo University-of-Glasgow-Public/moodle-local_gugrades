@@ -26,6 +26,8 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
 
+    const treestore = useActivityTreeStore();
+    const { ready: treeReady } = storeToRefs(treestore);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const debug = ref({});
@@ -37,9 +39,7 @@
      * Anything in here that involves MyGrades waiting to open
      */
     const waiting = computed(() => {
-        const treestore = useActivityTreeStore();
-
-        return !treestore.ready;
+        return !treeReady.value;
     })
 
     // Combines both states to control the modal visibility
