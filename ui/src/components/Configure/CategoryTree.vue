@@ -65,14 +65,14 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import type { ICategoryCategory, IFlag } from '@/js/Interfaces.ts';
     import UAlert from '../Common/UAlert.vue';
-import UHelp from '../Common/UHelp.vue';
+    import UHelp from '../Common/UHelp.vue';
 
     interface IProps {
         nodes: ICategoryCategory;
         depth: number;
         engineering: boolean;
-        disablereassess: boolean;
-        parentid: number;
+        disablereassess?: boolean;
+        parentid?: number;
     }
 
     const props = defineProps< IProps >();
