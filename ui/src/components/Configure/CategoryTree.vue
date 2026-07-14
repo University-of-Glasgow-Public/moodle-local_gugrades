@@ -142,7 +142,9 @@
         })
         .catch(console.error);
 
-        emit('reassessup', props.parentid, isEnabled);
+        if (props.parentid) {
+            emit('reassessup', props.parentid, isEnabled);
+        }
     }
 
     /**
@@ -155,7 +157,9 @@
             disabledByChildrenIds.value.push(targetId);
         }
 
-        emit('reassessup', props.parentid, enabled);
+        if (props.parentid) {
+            emit('reassessup', props.parentid, enabled);
+        }
     }
 
     const hasNoCategories = computed(() => {
@@ -198,7 +202,9 @@
                             disabledByChildrenIds.value.push(id);
                             
                             // Bubble the active state up the UI component tree on mount
-                            emit('reassessup', props.parentid, true);
+                            if (props.parentid) {
+                                emit('reassessup', props.parentid, true);
+                            }
                         }
                     });
                 }
