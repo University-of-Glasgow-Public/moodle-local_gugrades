@@ -2271,6 +2271,10 @@ class grades {
     public static function check_integrity_range(int $courseid) {
         global $DB;
 
+        // If it's the old regulations then grademax=22 will be a scale, not points.
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $originalregs = $regulation->shortname() == 'original';
+
         // Get all the gradeitems in the course
         if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid])) {
             return [];
@@ -2288,8 +2292,19 @@ class grades {
                 continue;
             }
 
+            // work out if it's points or scale. Complicated by grademmax=22 being scale
+            // in oldregs
+            if (is_null($item->scaleid)) {
+                if ($originalregs && ($item->grademax == 22)) {
+                    $points = false;
+                } else {
+                    $points = true;
+                }
+            } else {
+                $points = false;
+            }
+
             // If this scale / points have to agree
-            $points = is_null($item->scaleid);
             if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => !$points])) {
                 $errors[] = [
                     'gradeitemid' => $item->id,

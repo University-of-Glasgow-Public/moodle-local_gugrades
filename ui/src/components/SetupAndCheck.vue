@@ -26,13 +26,19 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
 
+    interface iError {
+        gradeitemid: number;
+        itemname: string;
+        error: string;
+    }
+
     const treestore = useActivityTreeStore();
     const { ready: treeReady } = storeToRefs(treestore);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const debug = ref({});
     const processing = ref(true);
-    const errors = ref([]);
+    const errors = ref< iError[] >([]);
     const showerrors = ref(false);
 
     /**
