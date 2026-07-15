@@ -33,7 +33,6 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import TwAlert from '@/components/Tailwind/TwAlert.vue';
-    import ResetAssessmentButton from '@/components/Capture/ResetAssessmentButton.vue';
 
     const level1categories = ref< ICategories[] >([]);
     const categoryid = ref(0);

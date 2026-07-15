@@ -173,7 +173,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
             $errors
         );
 
-        $this->assertCount(1, $errors['erroritems']);
+        $this->assertCount(2, $errors['erroritems']);
         $this->assertEquals('Assign 22', $errors['erroritems'][0]['itemname']);
     }
 

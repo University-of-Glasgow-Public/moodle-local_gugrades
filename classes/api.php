@@ -1697,20 +1697,21 @@ class api {
         $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, $groupid);
         $users = $activity->get_users();
 
+        // MGU-1527: Unrelease ALL items, as user may have been removed beteween release and unrelease.
+        if ($revert) {
+            $sql = 'UPDATE {local_gugrades_grade}
+                SET iscurrent = 0
+                WHERE gradetype = "RELEASED"
+                AND gradeitemid = :gradeitemid';
+            $DB->execute($sql, ['gradeitemid' => $gradeitemid]);   
+
+            // Remove any columns that this has orphaned.
+            \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
+        }     
+
         // Iterate over users releasing/reverting grades.
         foreach ($users as $user) {
             if ($revert) {
-                // If reverting, mark any grades marked RELEASED for this
-                // gradeitemid / user as not current.
-                $sql = 'UPDATE {local_gugrades_grade}
-                    SET iscurrent = 0
-                    WHERE gradetype = "RELEASED"
-                    AND gradeitemid = :gradeitemid
-                    AND userid = :userid';
-                $DB->execute($sql, ['gradeitemid' => $gradeitemid, 'userid' => $user->id]);
-
-                // Remove any columns that this has orphaned.
-                \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
 
                 // Activity action.
                 $activity->unrelease_grades($user->id);
