@@ -2315,17 +2315,23 @@ class grades {
                 continue;
             }
 
-            // Are there any grades with a *higher* grade than this
-            $sql = "SELECT * FROM {local_gugrades_grade}
-                WHERE gradeitemid = :gradeitemid
-                AND iscurrent = 1
-                AND rawgrade > :grademax";
-            if ($DB->record_exists_sql($sql, ['gradeitemid' => $item->id, 'grademax' => $item->grademax])) {
-                $errors[] = [
-                    'gradeitemid' => $item->id,
-                    'itemname' => $item->itemname,
-                    'error' => 'Grade value out of range',
-                ];              
+
+            // If it's a scale, then we won't worry about range. This CAN be out if Schedule B is selected
+            // (Max 8 in Gradebook, 22 in MyGrades)
+            if ($points) {
+
+                // Are there any grades with a *higher* grade than this
+                $sql = "SELECT * FROM {local_gugrades_grade}
+                    WHERE gradeitemid = :gradeitemid
+                    AND iscurrent = 1
+                    AND rawgrade > :grademax";
+                if ($DB->record_exists_sql($sql, ['gradeitemid' => $item->id, 'grademax' => $item->grademax])) {
+                    $errors[] = [
+                        'gradeitemid' => $item->id,
+                        'itemname' => $item->itemname,
+                        'error' => 'Grade value out of range',
+                    ];              
+                }
             }
         }
 
