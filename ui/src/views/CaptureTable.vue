@@ -260,6 +260,11 @@
     import CaptureTableWarning from '@/components/Capture/CaptureTableWarning.vue';
     import CaptureTableHeader from '@/components/Capture/CaptureTableHeader.vue';
 
+    interface IBulkEditStore {
+        admingrade: string;
+        grade: number;
+    }
+
     const users = ref< ICaptureUser[] >([]);
     const userids = ref< number[] >([]);
     const itemid = ref(0);
@@ -315,7 +320,7 @@
     const capturecellform = ref< ICaptureCellForm | null >(null);
     
     // store changed cells in bulk edit mode
-    let bulkeditstore = [];
+    let bulkeditstore: IBulkEditStore[] = [];
 
     type GradeRow = Record<string, any>;
     const columnHelper = createColumnHelper<GradeRow>();
@@ -517,10 +522,12 @@
     }
 
     /**
-     * A cell has been updated - store the update. 
+     * A cell has been updated by Bulk edit - store the update for later. 
      */
-    function bulk_edit_update(grade: any, user: any, column: any) {
-        bulkeditstore[user.id] = grade;
+    function bulk_edit_update(bulkitem: any, user: any, column: any) {
+        bulkeditstore[user.id] = bulkitem;
+
+        console.log(user);
     }
 
     /**

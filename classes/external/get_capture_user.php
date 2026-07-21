@@ -100,6 +100,7 @@ class get_capture_user extends external_api {
                     'gradetype' => new external_value(PARAM_TEXT, 'FIRST, SECOND and so on'),
                     'columnid' => new external_value(PARAM_INT, 'ID in column table'),
                     'rawgrade' => new external_value(PARAM_FLOAT, 'Raw scale/points value', VALUE_DEFAULT, null),
+                    'admingrade' => new external_value(PARAM_TEXT, 'Admin grade'),
                 ])
             ),
         ]);

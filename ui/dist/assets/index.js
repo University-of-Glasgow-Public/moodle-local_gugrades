@@ -70994,10 +70994,11 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 			});
 		}
 		/**
-		* A cell has been updated - store the update. 
+		* A cell has been updated by Bulk edit - store the update for later. 
 		*/
-		function bulk_edit_update(grade, user, column) {
-			bulkeditstore[user.id] = grade;
+		function bulk_edit_update(bulkitem, user, column) {
+			bulkeditstore[user.id] = bulkitem;
+			console.log(user);
 		}
 		/**
 		* Bulk edit has been cancelled
