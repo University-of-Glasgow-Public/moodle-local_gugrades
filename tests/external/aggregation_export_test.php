@@ -138,6 +138,8 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         $this->assertEquals('Summative', $form[7]['description']);
         $this->assertEquals('warnings', $form[15]['identifier']);
         $this->assertEquals(get_string('showwarnings', 'local_gugrades'), $form[15]['description']);
+        $this->assertEquals('auditcomment', $form[16]['identifier']);
+        $this->assertEquals(get_string('showauditcomment', 'local_gugrades'), $form[16]['description']);
 
         // Set *everything* for initial test.
         foreach ($form as $key => $record) {
@@ -160,7 +162,7 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
 
         // Check user preferences have been set.
         $preferences = explode(',', get_user_preferences('local_gugrades_customaggregationexportselect_' . $categoryid));
-        $this->assertCount(16, $preferences);
+        $this->assertCount(17, $preferences);
         $this->assertEquals('idnumber', $preferences[1]);
 
         // Get form again, to check saved settings.

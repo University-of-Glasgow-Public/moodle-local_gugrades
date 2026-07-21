@@ -150,6 +150,11 @@ class custom extends base {
             'description' => get_string('showwarnings', 'local_gugrades'),
             'category' => false,
         ];
+        $form[] = [
+            'identifier' => 'auditcomment',
+            'description' => get_string('showauditcomment', 'local_gugrades'),
+            'category' => false,
+        ];
 
         // Stored preferences.
         $preferencename = 'local_gugrades_customaggregationexportselect_' . $gradecategoryid;
@@ -252,6 +257,15 @@ class custom extends base {
                 $csvitems[$identifier] = $strnodata;
             }
 
+            // Override comment (only shown for overridden categories).
+            if ($options['auditcomment']) {
+                if ($category && !empty($category->catoverride)) {
+                    $csvitems[$identifier . '_auditcomment'] = $category->auditcomment;
+                } else {
+                    $csvitems[$identifier . '_auditcomment'] = '';
+                }
+            }
+
             // Released if there is one and released grades option.
             if ($options['released'] && $isreleased) {
                 if ($released) {
@@ -284,6 +298,16 @@ class custom extends base {
                 $csvitems[$identifier] = $displaygrade;
             } else {
                 $csvitems[$identifier] = get_string('nodata', 'local_gugrades');
+            }
+
+            // Override comment (only shown where a grade has been manually added/overridden,
+            // i.e. anything other than the original imported 'FIRST' grade).
+            if ($options['auditcomment']) {
+                if ($provisional && $provisional->gradetype != 'FIRST') {
+                    $csvitems[$identifier . '_auditcomment'] = $provisional->auditcomment;
+                } else {
+                    $csvitems[$identifier . '_auditcomment'] = '';
+                }
             }
 
             // If option for released grades.
@@ -353,7 +377,8 @@ class custom extends base {
                 str_ends_with($ident, '_weights') ||
                 str_ends_with($ident, '_strategy') ||
                 str_ends_with($ident, '_released') ||
-                str_ends_with($ident, '_warnings')
+                str_ends_with($ident, '_warnings') ||
+                str_ends_with($ident, '_auditcomment')
             ) {
                 $parts = explode('_', $ident);
                 if (count($parts) !== 3) {
@@ -453,6 +478,7 @@ class custom extends base {
             'strategy' => $this->identifier_enabled('strategy', $form),
             'released' => $this->identifier_enabled('released', $form),
             'warnings' => $this->identifier_enabled('warnings', $form),
+            'auditcomment' => $this->identifier_enabled('auditcomment', $form),
         ];
 
         // Array holds CSV lines.
@@ -480,6 +506,9 @@ class custom extends base {
                     continue;
                 }
                 if ($ident == 'warnings') {
+                    continue;
+                }
+                if ($ident == 'auditcomment') {
                     continue;
                 }
 
