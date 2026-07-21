@@ -1,12 +1,10 @@
 
 
 <template>
-  <!-- 1. SAFETY CHECK: If text is missing or empty, render a plain container with no hover logic -->
   <div v-if="!text || text.trim() === ''" v-bind="$attrs">
     <slot />
   </div>
 
-  <!-- 2. BRANDED SPEECH BUBBLE TOOLTIP -->
   <div 
     v-else 
     class="group relative inline-block transition-all"
@@ -21,14 +19,24 @@
     <!-- This is your wrapped content (e.g. your help button) -->
     <slot />
 
-    <!-- The Floating Speech Bubble Container -->
-    <div class="invisible absolute bottom-full left-1/2 z-50 mb-3 w-max max-w-xs -translate-x-1/2 rounded-lg bg-brand-dark-purple px-3 py-2 text-sm font-medium normal-case tracking-normal text-white opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 pointer-events-none">
+    <!-- 1. DYNAMIC FLOATING SPEECH BUBBLE CONTAINER -->
+    <div 
+      class="invisible absolute left-1/2 z-50 w-max max-w-xs -translate-x-1/2 rounded-lg bg-brand-dark-purple px-3 py-2 text-sm font-medium normal-case tracking-normal text-white opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 pointer-events-none"
+      :class="[
+        position === 'above' ? 'bottom-full mb-3' : 'top-full mt-3'
+      ]"
+    >
       
       <!-- The text content inside the bubble -->
       {{ text }}
 
-      <!-- 3. THE SPEECH BUBBLE ARROW POINTER -->
-      <div class="absolute top-full left-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-[5px] rotate-45 bg-brand-dark-purple"></div>
+      <!-- 2. DYNAMIC SPEECH BUBBLE ARROW POINTER -->
+      <div 
+        class="absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-brand-dark-purple"
+        :class="[
+          position === 'above' ? 'top-full -translate-y-[5px]' : 'bottom-full translate-y-[5px]'
+        ]"
+      ></div>
     
     </div>
 
@@ -39,11 +47,14 @@
     withDefaults(
       defineProps<{ 
         text?: string | null
-        hasUnderline?: boolean // New prop to turn underline on/off
+        hasUnderline?: boolean
+        position?: 'above' | 'below' // 3. NEW POSITION PROP
       }>(), 
       {
-        hasUnderline: false // Default to false so buttons don't get underlined
+        hasUnderline: false,
+        position: 'above' // 4. DEFAULT TO ABOVE (keeps your current layout intact)
       }
     )
 </script>
+
 

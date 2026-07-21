@@ -2,7 +2,7 @@
   <Popover class="relative">
     <PopoverButton class="cursor-pointer" aria-label="Open menu"><EllipsisVertical :size="18" class="text-base_content" tabindex="0"></EllipsisVertical></PopoverButton>
 
-    <PopoverPanel class="border-2 border-slate-200 rounded-md absolute z-999 top-auto bottom-full mb-2 left-1/2 -translate-x-1/2" v-slot="{ close }">
+    <PopoverPanel class="border-2 border-slate-200 rounded-md absolute z-999 left-0 top-0 ml-6 -mt-12" v-slot="{ close }">
         <ul class="menu dropdown-content bg-slate-100 text-university-blue rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">
             <li v-if="props.awaitingcapture && !props.converted && caneditgrades"><ImportUserGradeButton :itemid="props.itemid" :userid="props.userid" @imported="grade_added()" :close="close"></ImportUserGradeButton></li>
             <li v-if="caneditgrades"><AddGradeButton :itemid="props.itemid" :selectedcategoryid="props.categoryid" :userid="props.userid" :name="props.name" :itemname="props.itemname" @gradeadded = "grade_added()" :close="close"></AddGradeButton></li>

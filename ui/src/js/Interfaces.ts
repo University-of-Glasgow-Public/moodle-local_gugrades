@@ -399,3 +399,13 @@ export interface IFlag {
     engexam: boolean;
     resit: boolean;
 }
+
+/**
+ * Return from get_capture_cell_form
+ */
+export interface ICaptureCellForm {
+    usescale: boolean;
+    grademax: number;
+    scalemenu: IMenuItem[];
+    adminmenu: IMenuItem[];
+}

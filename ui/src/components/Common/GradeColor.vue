@@ -1,5 +1,15 @@
 <template>
-    <span :class="gradecolorclass(grade).concat(otherclasses)">{{ grade }}</span>
+    <!-- 
+      1. Use an array to merge classes safely.
+      2. 'inline-flex items-center justify-center' is perfect, but we use a fixed 
+         width 'w-[36px]' (or w-9) instead of min-w to force an exact box shape.
+    -->
+    <span 
+        :class="[gradecolorclass(grade), otherclasses]" 
+        class="inline-flex items-center justify-center w-[40px] h-6 text-center"
+    >
+        {{ grade }}
+    </span>
 </template>
 
 <script setup lang="ts">
@@ -12,27 +22,26 @@
         otherclasses?: string[];
     }>(),
         {
-            otherclasses: () => [], // Default to empty array
+            otherclasses: () => [],
         }
     );
 
-    /**
-     * Work out the fancy color class for grades
-     */
     function gradecolorclass(grade: string): string[] {
         let colorclass: string[] = [];
 
-        // Remove 'X' if it is the very first character, then take the first 2 characters
         const cleanGrade = grade.startsWith('X') ? grade.slice(1) : grade;
         const grade2 = cleanGrade.substring(0, 2);
 
         if (grade2 in gradecolors) {
             const classes = gradecolors[grade2]!;
-            colorclass = ['px-2.5', 'py-0.5', 'rounded-md', 'font-semibold', 'inline-block'];
+            
+            // 🚨 REMOVED 'inline-block' and 'px-2.5' from here so they don't break the layout!
+            colorclass = ['py-0.5', 'rounded-md', 'font-bold'];
+            
             if (props.size) {
                 colorclass.push(props.size);
             } else {
-                colorclass.push('text-sm');
+                colorclass.push('text-xs'); // Tweaked to text-xs so "E1:8" fits neatly inside 36px
             }
             colorclass.push(classes.bg);
             colorclass.push(classes.text);

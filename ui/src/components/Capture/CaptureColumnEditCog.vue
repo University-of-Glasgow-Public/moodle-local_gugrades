@@ -1,17 +1,18 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <UTooltip class="ml-1" aria-label="Bulk edit" text="Bulk edit" @click.prevent="cog_clicked">
-        <Settings class="text-brand-light-yellow"></Settings>
+    <UTooltip position="below" class="ml-1" aria-label="Bulk edit" text="Bulk edit" @click.prevent="cog_clicked">
+        <Settings class="text-brand-light-yellow cursor-pointer"></Settings>
     </UTooltip>
     <UTooltip
         v-if="candelete"
+        position="below"
         class="ml-1"
         aria-label="Delete column"
         :text="mstringstore.getMstring('deletecolumn')"
         @click.prevent="delete_clicked"
     >
-        <Trash2 class="text-brand-dark-pink"></Trash2>
+        <Trash2 class="text-brand-dark-pink cursor-pointer"></Trash2>
     </UTooltip>
     <ConfirmModal
         :show="showconfirm"
@@ -29,7 +30,6 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
-    import { useToast } from "vue-toastification";
     import { Settings, Trash2 } from '@lucide/vue';
     import UTooltip from '../Common/UTooltip.vue';
 
@@ -45,7 +45,6 @@
         active: Boolean,
     });
 
-    const toast = useToast();
     const debug = ref({});
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
@@ -54,12 +53,13 @@
     const showconfirm = ref(false);
     const hasadmincap = ref(false);
     const processingdelete = ref(false);
+
     const candelete = computed(() => {
         if (!hasadmincap.value) {
             return false;
         }
         // Only real DB-backed columns can be deleted.
-        if (!props.header?.columnid || props.header.columnid === 0) {
+        if (!props.header?.id || props.header.id === 0) {
             return false;
         }
         // Never allow deleting FIRST/PROVISIONAL columns.
@@ -68,6 +68,7 @@
         }
         return true;
     });
+
     onMounted(() => {
         moodleFetch('local_gugrades_has_capability', {
             capability: 'local/gugrades:resetcourse',
@@ -86,48 +87,17 @@
      */
     function cog_clicked() {
 
-        moodleFetch(
-            'local_gugrades_get_capture_cell_form',
-            {
-                gradeitemid: props.itemid,
-            }
-        )
-        .then((result: any) => {
-            const usescale = result.usescale;
-            const grademax = result.grademax;
-            const scalemenu = result.scalemenu;
-            const adminmenu = result.adminmenu;
-
-            // Add 'use grade' option onto front of adminmenu
-            adminmenu.unshift({
-                value: 'GRADE',
-                label: mstringstore.getMstring('selectnormalgradeshort'),
-            });
-
-            // send all this stuff back
-            emits('editcolumn', {
-                columnname: props.header.value,
-                gradetype: props.header.gradetype,
-                other: props.header.other,
-                columnid: props.header.columnid,
-                usescale: usescale,
-                grademax: grademax,
-                scalemenu: scalemenu,
-                adminmenu: adminmenu,
-                notes: '',
-            });
-        })
-        .catch((error) => {
-            window.console.error(error);
-            debug.value = error;
-        });
+        emits('editcolumn');
     }
-        function delete_clicked() {
+
+    function delete_clicked() {
         showconfirm.value = true;
     }
+
     function confirmdelete(confirm: boolean) {
+        showconfirm.value = false;
+
         if (!confirm) {
-            showconfirm.value = false;
             return;
         }
 
@@ -136,16 +106,19 @@
             'local_gugrades_delete_capture_column',
             {
                 gradeitemid: props.itemid,
-                columnid: props.header.columnid,
+                columnid: props.header.id,
             }
         )
         .then(() => {
-            toast.success(mstringstore.getMstring('deletecolumnsuccess'));
             emits('columnchanged');
+            processingdelete.value = false;
         })
         .catch((error) => {
-            window.console.error(error);
+            console.error(error);
             debug.value = error;
+        })
+        .finally(() => {
+            processingdelete.value = false;
         });
     }
 </script>

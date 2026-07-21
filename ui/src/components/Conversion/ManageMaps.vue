@@ -115,7 +115,7 @@
             id: 'actions',
             header: () => h('span', { class: 'sr-only' }, mstringstore.getMstring('actions') || 'Actions'),
             cell: ({ row }) => {
-                const currentMap = row.original // This will now work perfectly!
+                const currentMap = row.original 
                 return h(ConversionActionButtons, {
                     id: currentMap.id,
                     caneditgrades: caneditgrades.value,

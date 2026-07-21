@@ -12,11 +12,11 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     tailwindcss(),
-    viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
-      deleteOriginFile: false // Crucial: Keeps your standard app.js for development
-    })
+    //viteCompression({
+    //  algorithm: 'gzip',
+    //  ext: '.gz',
+    //  deleteOriginFile: false // Crucial: Keeps your standard app.js for development
+    //})
   ],
   resolve: {
     alias: {
@@ -25,6 +25,8 @@ export default defineConfig({
     dedupe: ['vue']
   },
   build: {
+    minify: false,
+    sourcemap: true,
     cssMinify: 'esbuild',
     commonjsOptions: {
       include: [/vue3-easy-data-table/, /node_modules/]

@@ -57,13 +57,25 @@
             <div v-if="showtable && loaded">
 
                 <!-- button for saving cell edits -->
+                <!--
                 <div class="pb-1 flex justify-end gap-2" v-if="ineditcellmode">
                     <UButton variant="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</UButton>
                     <UButton variant="primary" @click="edit_cell_saved">{{ mstrings.save }}</UButton>
                 </div>
+                -->
+
+                <!-- NEW TANSTACK TABLE -->
+                <UTable 
+                    :data="users"
+                    :columns="tablecolumns" 
+                    :filters="tablefilters"
+                    :visibility="{firstinitial: false, lastinitial: false}"
+                    class="my-8"
+                />
 
                 <!-- Note. The array 'users' contains the lines of data. One record for each user -->
                 <EasyDataTable
+                    v-if="false"
                     alternating
                     buttons-pagination
                     :current-page="currentpage"
@@ -206,10 +218,12 @@
                 </EasyDataTable>
 
                 <!-- button for saving cell edits -->
+                <!--
                 <div class="pb-1 mt-2 flex gap-2 justify-end" v-if="ineditcellmode">
                     <UButton variant="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</UButton>
                     <UButton variant="primary" @click="edit_cell_saved">{{ mstrings.save }}</UButton>
                 </div>
+                -->
             </div>
 
             <h2 v-if="!showtable">{{ mstrings['nothingtodisplay'] }}</h2>
@@ -218,7 +232,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, watch, onMounted, nextTick } from 'vue';
+    import {ref, computed, watch, onMounted, nextTick, h } from 'vue';
     import { storeToRefs } from 'pinia';
     import CaptureSelect from '@/components/Capture/CaptureSelect.vue';
     import CaptureMenu from '@/components/Capture/CaptureMenu.vue';
@@ -226,7 +240,7 @@
     import CaptureButtons from '@/components/Capture/CaptureButtons.vue';
     import CaptureAlerts from '@/components/Capture/CaptureAlerts.vue';
     import CaptureColumnEditCog from '@/components/Capture/CaptureColumnEditCog.vue';
-    import EditCaptureCell from '@/components/Capture/EditCaptureCell.vue';
+    //import EditCaptureCell from '@/components/Capture/EditCaptureCell.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
@@ -236,10 +250,15 @@
     import UButton from '@/components/Common/UButton.vue';
     import GradeColor from '@/components/Common/GradeColor.vue';
     import { watchDebounced } from '@vueuse/core';
-    import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
+    import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade, ICaptureCellForm } from '@/js/Interfaces';
     import NoteButton from '@/components/Common/NoteButton.vue';
     import { useFilter } from '@/stores/filter';
     import CaptureWarning from '@/components/Capture/CaptureWarning.vue';
+    import UTable from '@/components/Common/UTable.vue';
+    import { createColumnHelper, type ColumnFiltersState } from '@tanstack/vue-table';
+    import CaptureGradeCell from '@/components/Capture/CaptureGradeCell.vue';
+    import CaptureTableWarning from '@/components/Capture/CaptureTableWarning.vue';
+    import CaptureTableHeader from '@/components/Capture/CaptureTableHeader.vue';
 
     const users = ref< ICaptureUser[] >([]);
     const userids = ref< number[] >([]);
@@ -252,7 +271,6 @@
     const datatablekey = ref(1);
     const filterkey = ref(0);
     const usershidden = ref(false);
-    const namefilterref = ref(null);
     const itemtype = ref('');
     const itemname = ref('');
     const gradesupported = ref(true);
@@ -287,16 +305,20 @@
     const showcsvimport = ref(true);
     const debug = ref({});
     const staffuserid = ref(0);
-    const collapseclasses = ref(['collapse', 'show']);
     const caneditgrades = ref(false);
     const toast = useToast();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
-    // pagination related.
-    const dataTable = ref();
     const {monochrome, updateLogo} = useLogo();
     const filterstore = useFilter();
     const { firstname, lastname } = storeToRefs( filterstore );
+    const capturecellform = ref< ICaptureCellForm | null >(null);
+    
+    // store changed cells in bulk edit mode
+    let bulkeditstore = [];
+
+    type GradeRow = Record<string, any>;
+    const columnHelper = createColumnHelper<GradeRow>();
 
     /**
      * onMounted, get write grades capability
@@ -319,14 +341,234 @@
     });
 
     /**
-     * Page changed by pagination
+     * computed for tablecolumns.
+     * This is basically where the table is defined.
+     * (TanStack table version)
      */
-    function page_changed(newpage: number) {
-        currentpage.value = newpage;
-        datatablekey.value++;
-        nextTick(() => {
-            filterkey.value++;
+    const tablecolumns = computed(() => {
+        const cols = [];
+
+        if (!usershidden.value) {
+
+            // First initial (column hidden)
+            cols.push(columnHelper.accessor('firstinitial', {
+                header: 'firstinitial'
+            }));
+
+            // Last initial (column hidden)
+            cols.push(columnHelper.accessor('lastinitial', {
+                header: 'lastinitial'
+            }));
+
+            // Note
+            cols.push(columnHelper.display({
+                id: 'note',
+                header: mstringstore.getMstring('note'),
+                cell: ({row}) => {
+                    const user = row.original;
+                    return h(NoteButton, {
+                        gradeitemid: itemid.value,
+                        userid: user.id,
+                        name: user.displayname + ' for ' + itemname.value,
+                        shortnote: user.shortnote,
+                        onUpdated: () => get_user_data(user.id),
+                    })
+                }
+            }));
+
+            // Displayname (not hidden)
+            cols.push(columnHelper.accessor('displayname', {
+                header: mstringstore.getMstring('firstnamelastname')
+            }));
+        } else {
+
+            // Displayname (hidden)
+            cols.push(columnHelper.accessor('displayname', {
+                header: mstringstore.getMstring('participant')
+            }));           
+        }
+
+        // ID Number
+        cols.push(columnHelper.accessor('idnumber', {
+            header: mstringstore.getMstring('idnumber')
+        }));    
+        
+        // Actions
+        cols.push(columnHelper.display({
+            id: 'actions',
+            header: mstringstore.getMstring('actions'),
+            cell: ({row}) => {
+                if (ineditcellmode.value) {
+                    return '';
+                } else {
+                    const user = row.original;
+                    return h(CaptureMenu, {
+                        item: user,
+                        itemid: itemid.value,
+                        categoryid: categoryid.value,
+                        userid: user.id,
+                        name: user.displayname,
+                        itemname: itemname.value,
+                        gradesimported: gradesimported.value,
+                        awaitingcapture: user.awaitingcapture,
+                        gradehidden: user.gradehidden,
+                        converted: converted.value,
+                        caneditgrades: caneditgrades.value,
+                        onGradeadded: () => get_user_data(user.id),
+                    })
+                }
+            }
+        }));
+
+        // Alerts.
+        if (showalert.value) {
+            cols.push(columnHelper.display({
+                id: 'alert',
+                header: mstringstore.getMstring('warnings'),
+                cell: ({row}) => {
+                    const user = row.original;
+                    return h(CaptureTableWarning, {
+                        user: user,
+                    })
+                }
+            }))
+        }
+
+        // Loop over columns
+        columns.value.forEach(column => {
+            cols.push(columnHelper.accessor('GRADE' + column.id, {
+                // header: column.description,
+                header: () => {
+                    return h(CaptureTableHeader, {
+                        column: column,
+                        caneditgrades: caneditgrades.value,
+                        ineditcellmode: ineditcellmode.value,
+                        itemid: itemid.value,
+                        onColumnchanged: () => reload_page(),
+                        onEditcolumn: () => bulk_edit_clicked(column),
+                        onBulkcancel: () => bulkedit_cancel(),
+                        onBulksave: () => bulkedit_save(column),
+                    })
+                },
+                cell: ({row}) => {
+                    const user = row.original;
+                    return h(CaptureGradeCell, {
+                        user: user,
+                        column: column,
+                        form: capturecellform.value,
+                        editcolumnid: editcolumnid.value,
+                        onUpdate: (grade) => bulk_edit_update(grade, user, column),
+                    })
+                }
+            }));
         });
+
+        return cols;
+    });
+
+    /**
+     * Computed for table filters
+     * (TanStack table version)
+     */
+    const tablefilters = computed(() => {
+        const filters: ColumnFiltersState = [];
+
+            if (firstname.value != 'all') {
+            filters.push({
+                id: 'firstinitial',
+                value: firstname.value,
+            });
+        }
+
+        if (lastname.value != 'all') {
+            filters.push({
+                id: 'lastinitial',
+                value: lastname.value,
+            });
+        }
+
+        return filters;
+    })
+
+    /**
+     * Bulk edit cog clicked
+     */
+    function bulk_edit_clicked(column: any) {
+
+        moodleFetch('local_gugrades_get_capture_cell_form',
+            {
+                gradeitemid: itemid.value,
+            }
+        )
+        .then((result: any) => {
+            capturecellform.value = result;
+            editcolumnid.value = column?.id ?? null;
+            bulkeditstore = [];
+
+            // Add 'use grade' option onto front of adminmenu
+            capturecellform.value!.adminmenu.unshift({
+                value: 'GRADE',
+                label: mstrings.value['selectnormalgradeshort']!,
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
+
+    /**
+     * A cell has been updated - store the update. 
+     */
+    function bulk_edit_update(grade: any, user: any, column: any) {
+        bulkeditstore[user.id] = grade;
+    }
+
+    /**
+     * Bulk edit has been cancelled
+     * 
+     */
+    function bulkedit_cancel() {
+        editcolumnid.value = 0;
+        bulkeditstore = [];
+
+        reload_page();
+    }
+
+    /**
+     * Bulkedit has been saved
+     */
+    function bulkedit_save(column: ICaptureColumn) {
+        console.log("BULK SAVE");
+        console.log(column);
+
+        bulkeditstore.forEach((bulkitem, userid) => {
+            const admingrade = bulkitem.admingrade;
+            const grade = bulkitem.grade;
+
+            // TODO: Notes comes from the bulk edit button (somehow)
+            const notes = '';
+
+            moodleFetch(
+                'local_gugrades_write_additional_grade',
+                {
+                    gradeitemid: itemid.value,
+                    userid: userid,
+                    admingrade: admingrade == 'GRADE' ? '' : admingrade,
+                    reason: column.gradetype,
+                    other: column.other,
+                    scale: column.points? 0 : grade,
+                    grade: column.points ? grade : 0,
+                    notes: notes,
+                }
+            )
+            .catch((error) => {
+                console.error(error);
+                debug.value = error;
+            });
+        });
+
+        editcolumnid.value = 0;
+        reload_page();
     }
 
     /**
@@ -553,7 +795,7 @@
      * Stuff doesn't appear, if so, and 'Save' button appears.
      */
     const ineditcellmode = computed(() => {
-        return editcolumn.value != '';
+        return editcolumnid.value != 0;
     });
 
     /**
@@ -782,7 +1024,11 @@
                     return user.id == updateduser.id;
                 });
                 if (found > -1) {
+
+                    // This re-references the array and is VITAL because tanstack is shit
+                    // at spotting that data in the array has changed (only the array itself)
                     users.value[found] = result;
+                    users.value = [...users.value];
                 }
             }
         })

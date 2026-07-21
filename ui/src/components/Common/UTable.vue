@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex flex-col gap-4">
     <!-- Main Scrollable Table Containment Frame -->
-    <div class="w-full overflow-x-auto rounded-lg border border-brand-light-purple/30 bg-white shadow-md">
+    <div class="w-full overflow-x-auto overflow-y-visible rounded-lg border border-brand-light-purple/30 bg-white shadow-md pb-12">
       
       <!-- NATIVE TABLE: Restored proper semantics for bulletproof auto-alignment -->
       <table class="w-full text-left border-collapse text-sm">
@@ -12,7 +12,7 @@
             <th 
               v-for="header in headerGroup.headers" 
               :key="header.id" 
-              class="font-semibold transition-all duration-150"
+              class="font-semibold transition-all duration-150 align-middle"
               :class="dense ? 'px-3 py-1.5 text-xs' : 'px-6 py-2.5'"
             >
               <FlexRender 
@@ -129,35 +129,71 @@
 
 
 <script setup lang="ts" generic="TData">
+    import { ref, watch } from 'vue' // 1. Import watch from vue
     import { 
         useVueTable, 
         getCoreRowModel, 
         getPaginationRowModel,
         FlexRender,
-        type ColumnDef 
+        getFilteredRowModel,
+        type ColumnDef,
+        type ColumnFiltersState, 
+        type VisibilityState 
     } from '@tanstack/vue-table'
 
     interface BaseTableProps {
         data: TData[];
         columns: ColumnDef<TData, any>[];
         dense?: boolean;
+        filters?: ColumnFiltersState;
+        visibility?: VisibilityState;
     }
 
     const props = withDefaults(defineProps<BaseTableProps>(), {
-        dense: false
-    })
+        dense: false,
+        filters: () => [],
+        visibility: () => ({})
+    });
 
     const table = useVueTable({
         get data() { return props.data },
         get columns() { return props.columns },
+        
+        // 2. ADD THE ACTIVE STATE GETTERS
+        state: {
+            get columnFilters() { return props.filters },
+            get columnVisibility() { return props.visibility }
+        },
+        
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        
+        // 3. ADD THE FILTERING ENGINE
+        getFilteredRowModel: getFilteredRowModel(), 
+        
+        autoResetAll: false,
         initialState: {
             pagination: {
                 pageSize: 25,
             },
         },
     });
+
+    /**
+     * 3. Deep watch incoming data changes from parents.
+     * Whenever any child component spot-updates a row, this intercepts it
+     * and forces the TanStack row model processor to rerun immediately.
+     */
+    watch(
+        () => props.data,
+        (newData) => {
+            table.setOptions((prev) => ({
+                ...prev,
+                data: newData,
+            }))
+        },
+        { deep: true } // Tells Vue to scan deep properties inside the rows
+    )
 </script>
 
 <style scoped>

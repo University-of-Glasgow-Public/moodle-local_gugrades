@@ -4,7 +4,7 @@
     <div class="flex justify-center" style="min-width: 250px;">
         <FormKit
             type="select"
-            name="admingrades"
+            name="admingrades_select"
             outer-class="w-42 pr-1"
             v-model="admingrade"
             :options="adminmenu"
@@ -18,7 +18,7 @@
             :validation="gradevalidation"
             validation-visibility="live"
             maxlength="8"
-            name="grade"
+            name="grade_select"
             v-model="grade"
             :disabled="admingrade != 'GRADE'"
             @input="input_updated"
@@ -29,7 +29,7 @@
             :placeholder="mstrings.scale"
             outer-class="w-42 pl-0"
             :disabled="admingrade != 'GRADE'"
-            name="scale"
+            name="scale_select"
             v-model="grade"
             :options="scalemenu"
             @input="input_updated"
