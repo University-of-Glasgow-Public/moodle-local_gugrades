@@ -42,6 +42,7 @@ Feature: Testing view_staff_mygrades in local_gugrades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades" in current page administration
+    And I wait 5 seconds
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     Then "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Assessment grade capture')]" "xpath_element" should exist
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
