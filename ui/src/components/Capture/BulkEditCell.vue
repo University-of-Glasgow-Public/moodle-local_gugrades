@@ -36,13 +36,14 @@
     import { ref, onMounted, computed, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import type { IMenuItem, ICaptureUser } from '@/js/Interfaces';
+    import type { IMenuItem, IMenuIntItem, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
 
     interface IBulkEdit {
         usescale: boolean;
         grademax: number;
         adminmenu: IMenuItem[];
-        scalemenu: IMenuItem[];
+        scalemenu: IMenuIntItem[];
+        activegrade: ICaptureGrade;
     }
 
     const props = defineProps< IBulkEdit >();
@@ -52,7 +53,7 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const admingrade = ref('GRADE');
-    const grade = ref(0);
+    const grade = ref(-1);
 
     /**
      * Watch both reactive refs simultaneously 
@@ -76,5 +77,16 @@
     });
 
     onMounted(() => {
+        if (!props.activegrade) {
+            return;
+        }
+
+        if (props.activegrade.admingrade) {
+            admingrade.value = props.activegrade.admingrade;
+        }
+
+        if (props.activegrade.rawgrade) {
+            grade.value = props.activegrade.rawgrade;
+        }
     });
 </script>

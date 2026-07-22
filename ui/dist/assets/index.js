@@ -70580,7 +70580,8 @@ var BulkEditCell_default = /* @__PURE__ */ defineComponent({
 		usescale: { type: Boolean },
 		grademax: {},
 		adminmenu: {},
-		scalemenu: {}
+		scalemenu: {},
+		activegrade: {}
 	},
 	emits: ["update"],
 	setup(__props, { emit: __emit }) {
@@ -70588,7 +70589,7 @@ var BulkEditCell_default = /* @__PURE__ */ defineComponent({
 		const emits = __emit;
 		const { mstrings } = storeToRefs(useMstrings());
 		const admingrade = /* @__PURE__ */ ref("GRADE");
-		const grade = /* @__PURE__ */ ref(0);
+		const grade = /* @__PURE__ */ ref(-1);
 		/**
 		* Watch both reactive refs simultaneously 
 		*/
@@ -70612,7 +70613,11 @@ var BulkEditCell_default = /* @__PURE__ */ defineComponent({
 				]
 			];
 		});
-		onMounted(() => {});
+		onMounted(() => {
+			if (!props.activegrade) return;
+			if (props.activegrade.admingrade) admingrade.value = props.activegrade.admingrade;
+			if (props.activegrade.rawgrade) grade.value = props.activegrade.rawgrade;
+		});
 		return (_ctx, _cache) => {
 			const _component_FormKit = resolveComponent("FormKit");
 			return openBlock(), createElementBlock("div", _hoisted_1$30, [
@@ -70688,6 +70693,15 @@ var CaptureGradeCell_default = /* @__PURE__ */ defineComponent({
 		function bulk_edit_update(grade) {
 			emits("update", grade);
 		}
+		/**
+		* Get the active grade object based on columnid
+		*/
+		const activegrade = computed(() => {
+			return props.user.grades.find((grade) => {
+				return grade.columnid == props.column.id;
+			});
+		});
+		onMounted(() => {});
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock(Fragment, null, [!isbulkedit.value ? (openBlock(), createBlock(GradeColor_default, {
 				key: 0,
@@ -70698,12 +70712,14 @@ var CaptureGradeCell_default = /* @__PURE__ */ defineComponent({
 				grademax: __props.form.grademax,
 				adminmenu: __props.form.adminmenu,
 				scalemenu: __props.form.scalemenu,
+				activegrade: activegrade.value,
 				onUpdate: bulk_edit_update
 			}, null, 8, [
 				"usescale",
 				"grademax",
 				"adminmenu",
-				"scalemenu"
+				"scalemenu",
+				"activegrade"
 			])) : createCommentVNode("", true)], 64);
 		};
 	}
@@ -70987,7 +71003,7 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 				bulkeditstore = [];
 				capturecellform.value.adminmenu.unshift({
 					value: "GRADE",
-					label: mstrings.value["selectnormalgradeshort"]
+					label: mstrings.value["admingrade"] + "..."
 				});
 			}).catch((error) => {
 				console.error(error);
@@ -71013,27 +71029,34 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 		* Bulkedit has been saved
 		*/
 		function bulkedit_save(column) {
-			console.log("BULK SAVE");
-			console.log(column);
+			console.log("BULK SAVE", column);
+			const promises = [];
 			bulkeditstore.forEach((bulkitem, userid) => {
 				const admingrade = bulkitem.admingrade;
 				const grade = bulkitem.grade;
-				moodleFetch("local_gugrades_write_additional_grade", {
+				const request = moodleFetch("local_gugrades_write_additional_grade", {
 					gradeitemid: itemid.value,
 					userid,
-					admingrade: admingrade == "GRADE" ? "" : admingrade,
+					admingrade: admingrade === "GRADE" ? "" : admingrade,
 					reason: column.gradetype,
 					other: column.other,
 					scale: column.points ? 0 : grade,
 					grade: column.points ? grade : 0,
 					notes: ""
 				}).catch((error) => {
-					console.error(error);
+					console.error(`Failed to save for user ${userid}:`, error);
 					debug.value = error;
 				});
+				promises.push(request);
 			});
-			editcolumnid.value = 0;
-			reload_page();
+			Promise.all(promises).then(() => {
+				console.log("All grades saved successfully!");
+			}).catch((err) => {
+				console.error("An error occurred during bulk save:", err);
+			}).finally(() => {
+				editcolumnid.value = 0;
+				reload_page();
+			});
 		}
 		/**
 		* A watch for the itemid changing

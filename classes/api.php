@@ -967,11 +967,17 @@ class api {
      * Convert array to FormKit menu
      * @param array $inputarray
      * @param bool $reverse
+     * @param bool $intkey
      * @return array (of objects)
      */
     private static function formkit_menu(array $inputarray, bool $reverse = false) {
         $menu = array_map(function ($key, $value) {
             $item = new \stdClass();
+            if ($intkey) {
+                $item->value = (int)$key;
+            } else {
+                $item->value = $key;
+            }
             $item->value = $key;
             $item->label = $value;
             return $item;
@@ -1006,13 +1012,13 @@ class api {
         // Scale.
         if ($converted) {
             $scale = \local_gugrades\conversion::get_conversion_scale($courseid, $gradeitemid);
-            $scalemenu = self::formkit_menu($scale, true);
+            $scalemenu = self::formkit_menu($scale, true, true);
         } else if ($itemtype == 'scale') {
             $scale = \local_gugrades\grades::get_scale($gradeitem->scaleid);
-            $scalemenu = self::formkit_menu($scale, true);
+            $scalemenu = self::formkit_menu($scale, true, true);
         } else if ($itemtype == 'scale22') {
             $scale = \local_gugrades\grades::get_scale(0);
-            $scalemenu = self::formkit_menu($scale, true);
+            $scalemenu = self::formkit_menu($scale, true, true);
         } else {
             $scalemenu = [];
         }

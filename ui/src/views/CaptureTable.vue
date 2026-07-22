@@ -510,10 +510,10 @@
             editcolumnid.value = column?.id ?? null;
             bulkeditstore = [];
 
-            // Add 'use grade' option onto front of adminmenu
+            // Add admingrade onto front of admin grades
             capturecellform.value!.adminmenu.unshift({
                 value: 'GRADE',
-                label: mstrings.value['selectnormalgradeshort']!,
+                label: mstrings.value['admingrade']! + '...',
             });
         })
         .catch((error) => {
@@ -545,38 +545,53 @@
      * Bulkedit has been saved
      */
     function bulkedit_save(column: ICaptureColumn) {
-        console.log("BULK SAVE");
-        console.log(column);
+        console.log("BULK SAVE", column);
+
+        // 1. Create an array to hold all active network requests
+        const promises: Promise<any>[] = [];
 
         bulkeditstore.forEach((bulkitem, userid) => {
             const admingrade = bulkitem.admingrade;
             const grade = bulkitem.grade;
-
-            // TODO: Notes comes from the bulk edit button (somehow)
             const notes = '';
 
-            moodleFetch(
+            // Capture the fetch promise
+            const request = moodleFetch(
                 'local_gugrades_write_additional_grade',
                 {
                     gradeitemid: itemid.value,
                     userid: userid,
-                    admingrade: admingrade == 'GRADE' ? '' : admingrade,
+                    admingrade: admingrade === 'GRADE' ? '' : admingrade,
                     reason: column.gradetype,
                     other: column.other,
-                    scale: column.points? 0 : grade,
+                    scale: column.points ? 0 : grade,
                     grade: column.points ? grade : 0,
                     notes: notes,
                 }
             )
             .catch((error) => {
-                console.error(error);
+                console.error(`Failed to save for user ${userid}:`, error);
                 debug.value = error;
             });
+
+            promises.push(request);
         });
 
-        editcolumnid.value = 0;
-        reload_page();
+        // 2. Wait for all requests to finish using a standard .then() callback
+        Promise.all(promises)
+            .then(() => {
+                console.log("All grades saved successfully!");
+            })
+            .catch((err) => {
+                console.error("An error occurred during bulk save:", err);
+            })
+            .finally(() => {
+                // 3. This executes strictly AFTER all network calls resolve or fail
+                editcolumnid.value = 0;
+                reload_page();
+            });
     }
+
 
     /**
      * Number of pages changed

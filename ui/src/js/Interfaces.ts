@@ -16,6 +16,12 @@ export interface IMenuItem {
     label: string;
 }
 
+// Version with integer value
+export interface IMenuIntItem {
+    value: number;
+    label: string;
+}
+
 /**
  * See get_grade_item
  */
@@ -406,6 +412,6 @@ export interface IFlag {
 export interface ICaptureCellForm {
     usescale: boolean;
     grademax: number;
-    scalemenu: IMenuItem[];
+    scalemenu: IMenuIntItem[];
     adminmenu: IMenuItem[];
 }
