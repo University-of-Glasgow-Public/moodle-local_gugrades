@@ -29,7 +29,7 @@
                         :caneditgrades="caneditgrades"
                         @refreshtable="refresh"
                         @viewfullnames="viewfullnames"
-                        @editcolumn="editcog_clicked"
+                        @openmultiple="open_multiple"
                         >
                     </CaptureButtons>
                 </div>
@@ -56,14 +56,6 @@
 
             <div v-if="showtable && loaded">
 
-                <!-- button for saving cell edits -->
-                <!--
-                <div class="pb-1 flex justify-end gap-2" v-if="ineditcellmode">
-                    <UButton variant="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</UButton>
-                    <UButton variant="primary" @click="edit_cell_saved">{{ mstrings.save }}</UButton>
-                </div>
-                -->
-
                 <!-- NEW TANSTACK TABLE -->
                 <UTable 
                     :data="users"
@@ -72,158 +64,6 @@
                     :visibility="{firstinitial: false, lastinitial: false}"
                     class="my-8"
                 />
-
-                <!-- Note. The array 'users' contains the lines of data. One record for each user -->
-                <EasyDataTable
-                    v-if="false"
-                    alternating
-                    buttons-pagination
-                    :current-page="currentpage"
-                    sort-by="displayname"
-                    sort-type="asc"
-                    table-class-name="uofg-table"
-                    :items="users"
-                    :headers="headers"
-                    header-text-direction="center"
-                    :body-row-class-name="table_row_class"
-                    :body-item-class-name="table_item_class"
-                    :header-item-class-name="header_item_class"
-                    :filter-options="table_filter"
-                    @update-page-items="pagination_change"
-                    :rows-per-page="rowsperpage"
-                    :rows-items="[25,50,100,250]"
-                    :style="{ overflow: 'visible' }"
-                    ref="dataTable"
-                    >
-
-                    <!-- add header text and edit cog next to cell if required -->
-                    <!-- component needs to return info about which column (which reason/gradetype has been selected)-->
-                    <template #header="header">
-                        {{ header.text }}
-                        <CaptureColumnEditCog v-if="header.editable  && !ineditcellmode && caneditgrades" :header="header" :itemid="itemid" @editcolumn="editcog_clicked" @columnchanged="refresh"></CaptureColumnEditCog>
-                    </template>
-
-                    <!-- notes -->
-                     <template #item-slotnote="item">
-                        <NoteButton
-                            :gradeitemid="itemid"
-                            :userid="item.id"
-                            :name="item.displayname + ' for ' + itemname"
-                            :shortnote="item.shortnote"
-                            @updated="get_user_data(item.id)"
-                            />
-                     </template>
-
-                    <!-- User picture column -->
-                    <template #item-slotuserpicture="item">
-                        <a :href="item.profileurl" class="avatar">
-                            <img :src="item.pictureurl" :alt="item.displayname" class="rounded-full" width="35" height="35"/>
-                        </a>
-                    </template>
-
-                    <!-- Latest grade column -->
-                    <template v-slot:[provisionalslot]="item">
-                        <div v-if="item[provisionalid]" class="text-sm font-medium">
-                            
-                            <span 
-                                v-if="item.gradehidden && !item.gradebookhidden" 
-                                class="inline-block border-2 border-brand-light-yellow rounded-md px-2 py-0.5 bg-brand-light-yellow/10 text-brand-dark-purple"
-                            >
-                                {{ item[provisionalid] }}
-                            </span>
-
-                            <span 
-                                v-if="item.gradebookhidden" 
-                                class="inline-block border-2 border-brand-light-green rounded-md px-2 py-0.5 bg-brand-light-green/10 text-brand-dark-purple"
-                            >
-                                {{ item[provisionalid] }}
-                            </span>
-
-                            <span 
-                                v-if="!item.gradebookhidden && !item.gradehidden"
-                                class="text-brand-dark-purple"
-                            >
-                                {{ item[provisionalid] }}
-                            </span>
-
-                        </div>
-                    </template>
-
-                    <!-- Grade display, or bulk-edit inputs when a column is selected -->
-                    <template v-for="column in columns" :key="column.id" v-slot:['item-GRADE'+column.id]="item">
-                        <EditCaptureCell
-                            v-if="editcolumn === ('GRADE' + column.id)"
-                            :item="item"
-                            :column="editcolumn"
-                            :columnid="editcolumnid"
-                            :other="editother"
-                            :notes="editnotes"
-                            :gradeitemid="itemid"
-                            :categoryid="categoryid"
-                            :gradetype="editgradetype"
-                            :usescale="editusescale"
-                            :scalemenu="editscalemenu"
-                            :adminmenu="editadminmenu"
-                            :grademax="editgrademax"
-                            :cancelled="editcancelled"
-                            :shouldsave="editsaving"
-                            @gradewritten="edit_grade_written()"
-                            @gradecancel="edit_grade_written()"
-                            @validitychange="edit_validity_change"
-                        />
-                        <GradeColor v-else :grade="item['GRADE' + column.id]" />
-                    </template>
-
-                    <!-- dropdown in the final column -->
-                    <template #item-actions="item">
-                        <CaptureMenu
-                            v-if="!ineditcellmode"
-                            :item="item"
-                            :itemid="itemid"
-                            :categoryid="categoryid"
-                            :userid="parseInt(item.id)"
-                            :name="item.displayname"
-                            :itemname="itemname"
-                            :gradesimported="gradesimported"
-                            :awaitingcapture="item.awaitingcapture"
-                            :gradehidden="item.gradehidden"
-                            :converted="converted"
-                            :caneditgrades="caneditgrades"
-                            @gradeadded = "get_user_data(item.id)"
-                            >
-                        </CaptureMenu>
-                    </template>
-
-                    <!-- show warning if grades do not agree -->
-                    <template #item-alert="item">
-                        <div class="flex flex-wrap gap-1.5 items-center">
-                            <CaptureWarning v-if="item.alert" variant="discrepancy">
-                                {{ mstrings['discrepancy'] }}
-                            </CaptureWarning>
-                            
-                            <CaptureWarning v-if="item.gradebookhidden" variant="gradebook-hidden">
-                                {{ mstrings['hiddengradebook'] }}
-                            </CaptureWarning>
-                            
-                            <CaptureWarning v-if="item.gradehidden" variant="grade-hidden">
-                                {{ mstrings['hiddenmygrades'] }}
-                            </CaptureWarning>
-                        </div>
-                    </template>
-
-                    <!-- Override pagination if bulk editing -->
-                    <template v-if="ineditcellmode" #pagination>
-                        <span>{{ mstrings['pleasesavefirst'] }}</span>
-                    </template>
-                </EasyDataTable>
-
-                <!-- button for saving cell edits -->
-                <!--
-                <div class="pb-1 mt-2 flex gap-2 justify-end" v-if="ineditcellmode">
-                    <UButton variant="warning" @click="edit_cell_cancelled">{{ mstrings.cancel }}</UButton>
-                    <UButton variant="primary" @click="edit_cell_saved">{{ mstrings.save }}</UButton>
-                </div>
-                -->
             </div>
 
             <h2 v-if="!showtable">{{ mstrings['nothingtodisplay'] }}</h2>
@@ -239,21 +79,16 @@
     import { useToast } from "vue-toastification";
     import CaptureButtons from '@/components/Capture/CaptureButtons.vue';
     import CaptureAlerts from '@/components/Capture/CaptureAlerts.vue';
-    import CaptureColumnEditCog from '@/components/Capture/CaptureColumnEditCog.vue';
-    //import EditCaptureCell from '@/components/Capture/EditCaptureCell.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo.js';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { Header, Item } from "vue3-easy-data-table";
-    import UButton from '@/components/Common/UButton.vue';
-    import GradeColor from '@/components/Common/GradeColor.vue';
     import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade, ICaptureCellForm } from '@/js/Interfaces';
     import NoteButton from '@/components/Common/NoteButton.vue';
     import { useFilter } from '@/stores/filter';
-    import CaptureWarning from '@/components/Capture/CaptureWarning.vue';
     import UTable from '@/components/Common/UTable.vue';
     import { createColumnHelper, type ColumnFiltersState } from '@tanstack/vue-table';
     import CaptureGradeCell from '@/components/Capture/CaptureGradeCell.vue';
@@ -272,9 +107,6 @@
     const groupid = ref(0);
     const totalrows = ref(0);
     const currentpage = ref(1);
-    const rowsperpage = ref(25);
-    const datatablekey = ref(1);
-    const filterkey = ref(0);
     const usershidden = ref(false);
     const itemtype = ref('');
     const itemname = ref('');
@@ -292,21 +124,10 @@
     const revealnames = ref(false);
     const collapsed = ref(false);
     const editcolumn = ref('');
-    const editusescale = ref(false);
-    const editscalemenu = ref< IMenuItem[] >([]);
-    const editadminmenu = ref< IMenuItem[] >([]);
-    const editgradetype = ref('');
-    const editgrademax = ref(0);
     const editgradecount = ref(0);
     const editcolumnid = ref(0);
-    const editother = ref('');
-    const editnotes = ref('');
-    const editcancelled = ref(false);
     const editsaving = ref(false);
-    const editblocking = ref(new Set<number>());
     const showconversion = ref(false);
-    const provisionalslot = ref('');
-    const provisionalid = ref('');
     const showcsvimport = ref(true);
     const debug = ref({});
     const staffuserid = ref(0);
@@ -449,6 +270,7 @@
                         caneditgrades: caneditgrades.value,
                         ineditcellmode: ineditcellmode.value,
                         itemid: itemid.value,
+                        editcolumnid: editcolumnid.value,
                         onColumnchanged: () => reload_page(),
                         onEditcolumn: () => bulk_edit_clicked(column),
                         onBulkcancel: () => bulkedit_cancel(),
@@ -462,6 +284,7 @@
                         column: column,
                         form: capturecellform.value,
                         editcolumnid: editcolumnid.value,
+                        bulkselect: bulkeditstore[user.id] ?? null,
                         onUpdate: (grade) => bulk_edit_update(grade, user, column),
                     })
                 }
@@ -515,9 +338,21 @@
                 value: 'GRADE',
                 label: mstrings.value['admingrade']! + '...',
             });
+
+            // Bump the page data to cause refresh.
+            reload_page();
         })
         .catch((error) => {
             console.error(error);
+        });
+    }
+
+    /**
+     * Multiple button requesting bulk edit
+     */
+    function open_multiple(columnid: number) {
+        bulk_edit_clicked({
+            id: columnid,
         });
     }
 
@@ -526,8 +361,6 @@
      */
     function bulk_edit_update(bulkitem: any, user: any, column: any) {
         bulkeditstore[user.id] = bulkitem;
-
-        console.log(user);
     }
 
     /**
@@ -545,7 +378,6 @@
      * Bulkedit has been saved
      */
     function bulkedit_save(column: ICaptureColumn) {
-        console.log("BULK SAVE", column);
 
         // 1. Create an array to hold all active network requests
         const promises: Promise<any>[] = [];
@@ -592,44 +424,6 @@
             });
     }
 
-
-    /**
-     * Number of pages changed
-     */
-    function pagination_change(rows: any) {
-        rowsperpage.value = rows.length;
-        currentpage.value = 1;
-        datatablekey.value++;
-        nextTick(() => {
-            filterkey.value++;
-        });
-    }
-
-    /**
-     * Table name filter
-     */
-    const table_filter = computed(() => {
-        const options = [];
-
-        if (firstname.value != 'all') {
-            options.push({
-                field: 'firstinitial',
-                comparison: '=',
-                criteria: firstname.value,
-            });
-        }
-
-        if (lastname.value != 'all') {
-            options.push({
-                field: 'lastinitial',
-                comparison: '=',
-                criteria: lastname.value,
-            });
-        }
-
-        return options.length ? options : null;
-    });
-
     /**
      * A watch for the itemid changing
      * Lots of stuff gets reset if the itemid is changed.
@@ -662,52 +456,6 @@
     }
 
     /**
-     * Get class name for table row depending on criteria
-     * Used to show hidden rows
-     */
-    function table_row_class(item: Item) {
-        return 'non-hidden-row'
-        if (item.gradehidden) {
-            return 'hidden-row';
-        } else if (item.gradebookhidden) {
-            return 'gradebookhidden-row';
-        } else {
-            return 'non-hidden-row';
-        }
-    }
-
-    /**
-     * Get class name for table items
-     */
-    function table_item_class(column: string) {
-
-        // Hide name initial columns
-        if ((column == 'firstinitial') || (column == 'lastinitial')) {
-            return 'hidden';
-        }
-        if (column != 'displayname') {
-            return '!text-center';
-        }
-    }
-
-    /**
-     * Get class name for header items
-     */
-     function header_item_class(header: Header) {
-        if ((header.value == 'firstinitial') || (header.value == 'lastinitial')) {
-            return 'hidden';
-        }
-    }
-
-    /**
-     * Collapse selection area
-     */
-    function selectcollapse() {
-
-        collapsed.value = !collapsed.value;
-    }
-
-    /**
      * New itemid and/or groupid has been selected
      * If itemid = 0, then reset the table
      */
@@ -721,78 +469,6 @@
         } else {
             reload_page();
         }
-    }
-
-    /**
-     * Column editcog has been clicked
-     */
-     function editcog_clicked(cellform: IEmitEditColumn) {
-
-        // Unpack data
-        const columnname = cellform.columnname;
-
-        editcolumn.value = columnname;
-        editusescale.value = cellform.usescale;
-        editscalemenu.value = cellform.scalemenu;
-        editadminmenu.value = cellform.adminmenu;
-        editgradetype.value = cellform.gradetype;
-        editgrademax.value = cellform.grademax;
-        editcolumnid.value = cellform.columnid;
-        editother.value = cellform.other;
-        editnotes.value = cellform.notes;
-        editcancelled.value = false;
-        editsaving.value = false;
-        editblocking.value = new Set();
-        reload_page();
-    }
-
-    /**
-     * A bulk-edit cell reported whether it currently has an invalid value
-     * that should block Save.
-     */
-    function edit_validity_change(payload: { userid: number, blocking: boolean }) {
-        const next = new Set(editblocking.value);
-        if (payload.blocking) {
-            next.add(payload.userid);
-        } else {
-            next.delete(payload.userid);
-        }
-        editblocking.value = next;
-    }
-
-    /**
-     * In edit mode, the save button is clicked.
-     * Flag shouldsave before unmounting so cells persist; navigation alone must not.
-     */
-    async function edit_cell_saved() {
-        if (editblocking.value.size > 0) {
-            toast.error(mstrings.value['bulkgradeinvalid'] || 'One or more grades are invalid.');
-            return;
-        }
-        editsaving.value = true;
-        await nextTick();
-        editcolumn.value = '';
-        editblocking.value = new Set();
-    }
-
-    /**
-     * In edit mode, the cancel button is clicked
-     * Set editcancelled to true and pass as prop to edit cells
-     * so it knows not to save.
-     */
-    function edit_cell_cancelled() {
-        editsaving.value = false;
-        editcancelled.value = true;
-        editblocking.value = new Set();
-    }
-
-    /**
-     * A cell has declared that it has been written (or cancelled)
-     * (We're probably getting lots of these)
-     * Just count them and we'll watch/debounce the count to update the table
-     */
-    function edit_grade_written() {
-        editgradecount.value++;
     }
 
     /**
@@ -818,53 +494,6 @@
      */
     const ineditcellmode = computed(() => {
         return editcolumnid.value != 0;
-    });
-
-    /**
-     * Get headers for table
-     * These also define what data is displayed.
-     */
-    const headers = computed(() => {
-        let heads = [];
-        if (!usershidden.value) {
-            heads.push({text: 'firstinitial', value: 'firstinitial'}),
-            heads.push({text: 'lastinitial', value: 'lastinitial'}),
-            heads.push({text: mstrings.value['userpicture'], value: "slotuserpicture"});
-            heads.push({text: mstrings.value['note'], value: "slotnote"});
-            heads.push({text: mstrings.value['firstnamelastname'], value: "displayname", sortable: true})
-        } else {
-            heads.push({text: mstrings.value['participant'], value: "displayname", sortable: true});
-        }
-        heads.push({text: mstrings.value['idnumber'], value: "idnumber", sortable: true});
-        if (showalert.value) {
-            heads.push({text: mstrings.value['warnings'], value: "alert"});
-        }
-
-        // Add the grades columns
-        columns.value.forEach(column => {
-
-            // grab the value of the provisional column
-            // We'll use it to style the column in the table.
-            if (column.gradetype == 'PROVISIONAL') {
-                provisionalslot.value = 'item-GRADE' + column.id;
-                provisionalid.value = 'GRADE' + column.id;
-            }
-
-            // Make sure that the value is a string
-            heads.push({
-                text: column.description,
-                value: 'GRADE' + column.id,
-                gradetype: column.gradetype,
-                editable: column.editable,
-                columnid: column.id,
-                other: column.other,
-            });
-        });
-
-        // Space for the buttons column
-        heads.push({text: mstrings.value['actions'], value: "actions"});
-
-        return heads;
     });
 
     /**

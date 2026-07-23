@@ -7,6 +7,7 @@
         :adminmenu="form!.adminmenu"
         :scalemenu="form!.scalemenu"
         :activegrade="activegrade"
+        :bulkselect="bulkselect"
         @update="bulk_edit_update"
     />
 </template>
@@ -17,11 +18,17 @@
     import type { ICaptureCellForm } from '@/js/Interfaces';
     import BulkEditCell from './BulkEditCell.vue';
 
+    interface IBulkEditStore {
+        admingrade: string;
+        grade: number;
+    }
+
     interface iProps {
         user: Record<string, any>;   // Keys are strings, values are anything
         column: Record<string, any>; // Keys are strings, values are anything
         form: ICaptureCellForm | null;  
         editcolumnid: number;
+        bulkselect: IBulkEditStore | null;
     }
 
     const props = defineProps< iProps >();
@@ -56,7 +63,6 @@
     });
 
     onMounted(() => {
-        //console.log(props.user);
     })
 
 </script>

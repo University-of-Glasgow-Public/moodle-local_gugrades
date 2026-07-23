@@ -68,9 +68,7 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
-    const emits = defineEmits<{
-        editcolumn: [payload: IEmitEditColumn]
-    }>()
+    const emits = defineEmits(['openmultiple']);
 
     const toast = useToast();
 
@@ -110,51 +108,6 @@
     }
 
     /**
-     * Get all the details for the cell forms
-     * This is called immediately after the submit_form() promise
-     * completes.
-     */
-     function get_capture_cell_form(columnid: number) {
-
-        moodleFetch(
-            'local_gugrades_get_capture_cell_form',
-            {
-                gradeitemid: props.itemid,
-            }
-        )
-        .then((result: any) => {
-            const usescale = result.usescale;
-            const grademax = result.grademax;
-            const scalemenu = result.scalemenu;
-            const adminmenu = result.adminmenu;
-
-            // Add 'use grade' option onto front of adminmenu
-            adminmenu.unshift({
-                value: 'GRADE',
-                label: mstrings.value['selectnormalgradeshort'],
-            });
-
-            // send all this stuff back
-            emits('editcolumn', {
-                columnname: 'GRADE' + columnid,
-                gradetype: reason.value,
-                other: other.value,
-                usescale: usescale,
-                grademax: grademax,
-                scalemenu: scalemenu,
-                adminmenu: adminmenu,
-                notes: notes.value,
-                columnid: 0,
-            });
-        })
-        .catch((error) => {
-            window.console.error(error);
-            showaddmultiplemodal.value = false;
-            debug.value = error;
-        });
-    }
-
-    /**
      * Process form submission
      */
     function submit_form() {
@@ -181,7 +134,7 @@
         )
         .then((result: any) => {
             const columnid = result.columnid;
-            get_capture_cell_form(columnid);
+            emits('openmultiple', columnid);
         })
         .catch((error) => {
             window.console.error(error);

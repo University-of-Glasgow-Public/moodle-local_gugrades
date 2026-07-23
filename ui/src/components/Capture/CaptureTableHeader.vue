@@ -6,14 +6,14 @@
         </span>
 
         <CaptureColumnEditCog 
-            v-if="column.editable && !ineditcellmode && caneditgrades"
+            v-if="showeditcog"
             :header="column"
             :itemid="itemid"
             v-bind="$attrs"
             class="shrink-0" 
         />
 
-        <div v-if="column.editable && ineditcellmode && caneditgrades" class="flex gap-1">
+        <div v-if="showbuttons" class="flex gap-1">
             <UButton size="xs" variant="info" @click="bulksave_clicked">Save</UButton>
             <UButton size="xs" variant="warning" @click="bulkcancel_clicked">Cancel</UButton>
         </div>
@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+    import { computed } from 'vue';
     import CaptureColumnEditCog from './CaptureColumnEditCog.vue';
     import UButton from '../Common/UButton.vue';
 
@@ -29,6 +30,7 @@
         caneditgrades: boolean;
         ineditcellmode: boolean;
         itemid: number;
+        editcolumnid: number;
     }
 
     const props = defineProps< iProps >();
@@ -42,4 +44,19 @@
     function bulkcancel_clicked() {
         emits('bulkcancel');
     }
+
+    /**
+     * Can we show the edit cog?
+     * 
+     */
+    const showeditcog = computed(() => {
+        return props.column.editable && !props.ineditcellmode && props.caneditgrades;
+    });
+
+    /**
+     * Can we show the save/cancel buttons?
+     */
+    const showbuttons = computed(() => {
+        return props.column.editable && props.ineditcellmode && props.caneditgrades && (props.editcolumnid == props.column.id);
+    });
 </script>

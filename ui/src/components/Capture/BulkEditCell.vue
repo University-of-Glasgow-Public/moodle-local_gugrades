@@ -38,12 +38,18 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import type { IMenuItem, IMenuIntItem, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
 
+    interface IBulkEditStore {
+        admingrade: string;
+        grade: number;
+    }
+
     interface IBulkEdit {
         usescale: boolean;
         grademax: number;
         adminmenu: IMenuItem[];
         scalemenu: IMenuIntItem[];
         activegrade: ICaptureGrade;
+        bulkselect: IBulkEditStore | null;
     }
 
     const props = defineProps< IBulkEdit >();
@@ -77,6 +83,15 @@
     });
 
     onMounted(() => {
+        // If there's something in bulkselect then set that
+        if (props.bulkselect) {
+            admingrade.value = props.bulkselect.admingrade;
+            grade.value = props.bulkselect.grade;
+
+            return;
+        }
+
+        // Failing that, consider using existing grade. 
         if (!props.activegrade) {
             return;
         }

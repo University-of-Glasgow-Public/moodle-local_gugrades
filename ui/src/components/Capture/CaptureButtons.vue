@@ -3,7 +3,7 @@
     <div v-else class="flex justify-start gap-2">
         <ImportButton :enable="!converted && caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :userids="props.userids" :staffuserid="props.staffuserid" @imported="emit('refreshtable')"></ImportButton>
         <CSVImportButton :enable="caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :show="props.showcsvimport" :staffuserid="props.staffuserid" @uploaded="emit('refreshtable')"></CSVImportButton>
-        <AddMultipleButton :enable="caneditgrades" :itemid="props.itemid"  @editcolumn="multipleclicked"></AddMultipleButton>
+        <AddMultipleButton :enable="caneditgrades" :itemid="props.itemid"  @openmultiple="multipleclicked"></AddMultipleButton>
         <ReleaseButton :enable="props.gradesimported && caneditgrades" :gradeitemid="props.itemid" :groupid="props.groupid" :released="props.released" @released="emit('refreshtable')"></ReleaseButton>
         <ViewFullNamesButton v-if="props.usershidden"  @viewfullnames="viewfullnames"></ViewFullNamesButton>
         <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" @converted="emit('refreshtable')"></ConversionButton>
@@ -62,7 +62,7 @@
         caneditgrades: Boolean,
     });
 
-    const emit = defineEmits(['viewfullnames', 'refreshtable', 'editcolumn']);
+    const emit = defineEmits(['viewfullnames', 'refreshtable', 'openmultiple']);
 
     /**
      * Handle viewfullnames
@@ -76,8 +76,8 @@
      * Multiple button has added another column
      * We need to know what it was
      */
-    function multipleclicked(cellform: IEmitEditColumn) {
-        emit('editcolumn', cellform);
+    function multipleclicked(columnid: number) {
+        emit('openmultiple', columnid);
     }
 
     /**

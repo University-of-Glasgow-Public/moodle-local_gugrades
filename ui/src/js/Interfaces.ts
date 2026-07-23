@@ -143,6 +143,7 @@ export interface ICaptureGrade {
     gradetype: string;
     columnid: number;
     rawgrade?: number | null;
+    admingrade: string;
 }
 
 export interface ICaptureUser {
