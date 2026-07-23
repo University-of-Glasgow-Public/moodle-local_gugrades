@@ -539,8 +539,9 @@ class aggregate {
         $strnotavailable = get_string('notavailable', 'local_gugrades');
 
         // MGU-1349: At level 1, return CW and no error.
+        // MGU-1531: For new regs, changed to CNA.
         if ($level == 1) {
-            $admingrade = 'CREDITWITHHELD';
+            $admingrade = 'CREDITNOTAWARDED';
             [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
             return [$admingrade, '', $displaygrade];
         } else {
