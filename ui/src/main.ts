@@ -11,6 +11,8 @@ import { useMstrings } from './stores/mstrings';
 import { moodleFetch } from '@/js/moodlefetch';
 import '../src/assets/VueModal.css';
 import '../src/assets/MyGrades.css';
+import '../src/assets/accessibility.css';
+import { bootstrapAccessibility } from './stores/accessibility';
 import type { IMoodleString } from './js/Interfaces';
 import VueAwesomePaginate from 'vue-awesome-paginate';
 
@@ -30,6 +32,10 @@ const toastoptions = {
     position: 'top-center' as const, // fixed typescript strict literal warning
     timeout: 5000,
 };
+
+// Apply any persisted accessibility profile to the document as early as
+// possible so the chosen theme is active before the app renders (no flash).
+bootstrapAccessibility();
 
 const pinia = createPinia();
 const app = createApp(App);

@@ -140,6 +140,14 @@ if ($hassiteconfig) {
     );
     $settingspage->add($maxparticipants);
 
+    // Enable the accessibility tool in the MyGrades interface.
+    $settingspage->add(new admin_setting_configcheckbox(
+        'local_gugrades/enableaccessibility',
+        new lang_string('enableaccessibility', 'local_gugrades'),
+        new lang_string('enableaccessibility_help', 'local_gugrades'),
+        1
+    ));
+
     // Start date after for past tab.
     $startdateafter = new \local_gugrades\adminsetting\admin_setting_configdate(
         'local_gugrades/startdateafter',

@@ -41,6 +41,7 @@ $services = [
             'local_gugrades_get_history',
             'local_gugrades_get_audit',
             'local_gugrades_has_capability',
+            'local_gugrades_get_accessibility_enabled',
             'local_gugrades_is_grades_imported',
             'local_gugrades_get_all_strings',
             'local_gugrades_get_add_grade_form',
@@ -173,6 +174,12 @@ $functions = [
     'local_gugrades_has_capability' => [
         'classname' => 'local_gugrades\external\has_capability',
         'description' => 'Check if current user has a given capability.',
+        'type' => 'read',
+        'ajax' => true,
+    ],
+    'local_gugrades_get_accessibility_enabled' => [
+        'classname' => 'local_gugrades\external\get_accessibility_enabled',
+        'description' => 'Check if the accessibility tool is enabled and return mapped Hillhead accessibility preferences.',
         'type' => 'read',
         'ajax' => true,
     ],
