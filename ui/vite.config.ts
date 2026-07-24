@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import viteCompression from 'vite-plugin-compression';
+import { webUpdateNotice } from '@plugin-web-update-notification/vite';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -17,6 +18,16 @@ export default defineConfig({
     //  ext: '.gz',
     //  deleteOriginFile: false // Crucial: Keeps your standard app.js for development
     //})
+    webUpdateNotice({
+      checkInterval: 60 * 1000 * 5, // Check every 5 minutes
+      
+      // Customize the text directly in the config
+      notificationProps: {
+        title: 'System Update',
+        description: 'A new version of MyGrades is available.',
+        buttonText: 'Refresh Now',
+      },
+    }),
   ],
   resolve: {
     alias: {
