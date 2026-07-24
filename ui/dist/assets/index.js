@@ -73551,7 +73551,7 @@ var _hoisted_20 = {
 	key: 0,
 	class: "alert alert-danger my-3"
 };
-var _hoisted_21 = { class: "flex justify-start mt-1" };
+var _hoisted_21 = { class: "flex justify-start mt-2" };
 //#endregion
 //#region src/components/Conversion/EditMap.vue
 var EditMap_default = /* @__PURE__ */ defineComponent({

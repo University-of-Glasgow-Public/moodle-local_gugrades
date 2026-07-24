@@ -184,5 +184,57 @@
   outline-offset: -2px;
 }
 
+/* 1. Turn the banner container into a full-screen locking backdrop */
+.plugin-web-update-notice-anchor {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(15, 23, 42, 0.75) !important; /* Dark dim backdrop */
+  backdrop-filter: blur(4px) !important;              /* Blurs background content */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 999999 !important;                         /* Pushes it above absolutely everything */
+}
+
+/* 2. Style the actual alert card right in the middle of the screen */
+.plugin-web-update-notice {
+  position: relative !important;
+  inset: auto !important;                             /* Resets the default bottom-right positioning */
+  transform: none !important;
+  max-width: 420px !important;
+  width: 90% !important;
+  padding: 24px !important;
+  background: #ffffff !important;                     /* Clean white alert box */
+  color: #0f172a !important;
+  border-radius: 12px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  text-align: center !important;
+}
+
+/* 3. Make the action button giant, bold, and center-aligned */
+.plugin-web-update-notice-btn {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 16px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  background-color: #002f6c !important;              /* Example University Blue - swap to yours */
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.plugin-web-update-notice-btn:hover {
+  opacity: 0.9 !important;
+}
 
 
