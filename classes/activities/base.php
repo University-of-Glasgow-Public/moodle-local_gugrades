@@ -148,6 +148,9 @@ abstract class base {
             [$user->firstinitial, $user->lastinitial] = \local_gugrades\users::get_initials($user);
         }
 
+        // Sort by displayname.
+        usort($users, fn($a, $b) => $a->displayname <=> $b->displayname);
+
         return array_values($users);
     }
 
