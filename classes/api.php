@@ -943,6 +943,104 @@ class api {
         return [$itemcount, $gradecount];
     }
 
+        /**
+     * Is the accessibility tool enabled in the site settings?
+     * Defaults to true when the setting has never been saved.
+     * @return bool
+     */
+    public static function is_accessibility_enabled() {
+        // Default to enabled if the setting has never been saved.
+        $enabled = get_config('local_gugrades', 'enableaccessibility');
+        return ($enabled === false) ? true : (bool)$enabled;
+    }
+
+    /**
+     * Read the current user's Hillhead theme accessibility preferences and
+     * map them onto the MyGrades accessibility tool shape.
+     *
+     * Hillhead stores these as Moodle user preferences
+     * (theme_hillhead40_contrast, _font, _size, _spacing, _bold).
+     *
+     * @return array Mapped settings always including 'hassettings'.
+     */
+    public static function get_hillhead_accessibility_settings() {
+        $contrast = (string) get_user_preferences('theme_hillhead40_contrast', '');
+        $font = (string) get_user_preferences('theme_hillhead40_font', '');
+        $size = (string) get_user_preferences('theme_hillhead40_size', '');
+        $spacing = (string) get_user_preferences('theme_hillhead40_spacing', '');
+        $bold = (string) get_user_preferences('theme_hillhead40_bold', '');
+
+        $contrastactive = ($contrast !== '' && $contrast !== 'clear');
+        $fontactive = ($font !== '' && $font !== 'clear');
+        $sizeactive = ($size !== '' && $size !== 'clear');
+        $spacingactive = ($spacing === 'on');
+        $boldactive = ($bold === 'on');
+
+        $hassettings = $contrastactive || $fontactive || $sizeactive || $spacingactive || $boldactive;
+
+        // Defaults matching the Vue store's defaults.
+        $theme = 'default';
+        $fontscale = 1.0;
+        $dyslexiafont = false;
+        $linespacing = false;
+        $letterspacing = false;
+
+        if ($hassettings) {
+            // Contrast / colour theme → MyGrades display theme.
+            if ($contrast === 'night') {
+                $theme = 'dark';
+            } else if (in_array($contrast, ['wb', 'yb', 'by', 'wg', 'br', 'bb', 'bw'], true)) {
+                // All Hillhead "simple"/high-contrast themes.
+                $theme = 'contrast';
+            }
+
+            // Text size percentages → fontScale multipliers (clamped to 1.6).
+            switch ($size) {
+                case '120':
+                    $fontscale = 1.2;
+                    break;
+                case '140':
+                    $fontscale = 1.4;
+                    break;
+                case '160':
+                case '180':
+                    $fontscale = 1.6;
+                    break;
+            }
+
+            // Dyslexia-friendly / comic fonts → dyslexia font toggle.
+            if (in_array($font, ['dyslexic', 'comic'], true)) {
+                $dyslexiafont = true;
+            }
+
+            // Mono is denser; a little letter spacing helps readability.
+            if ($font === 'mono') {
+                $letterspacing = true;
+            }
+
+            if ($spacingactive) {
+                $linespacing = true;
+            }
+
+            // Bold has no direct MyGrades toggle; treat it as a readability cue
+            // by also enabling letter spacing when nothing else has.
+            if ($boldactive && !$letterspacing) {
+                $letterspacing = true;
+            }
+        }
+
+        return [
+            'hassettings' => $hassettings,
+            'theme' => $theme,
+            'fontscale' => $fontscale,
+            'dyslexiafont' => $dyslexiafont,
+            'linespacing' => $linespacing,
+            'letterspacing' => $letterspacing,
+            'highlightlinks' => false,
+            'reducemotion' => false,
+        ];
+    }
+    
     /**
      * Get all the strings for this plugin as array of objects
      * @return array

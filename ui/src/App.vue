@@ -9,6 +9,10 @@
     <div v-if="!canview && loaded" class="p-8">
         You do not have permission to access MyGrades.
     </div>
+
+    <!-- Rendered outside #mygrades_container so the accessibility theme
+         filters never apply to the launcher/panel itself. -->
+    <AccessibilityPanel v-if="loaded" />
 </template>
 
 <script setup lang="ts">
@@ -18,6 +22,7 @@
     import TabMenu from '../src/views/TabMenu.vue';
     import { moodleFetch } from './js/moodlefetch.ts';
     import UserTour from './components/Common/UserTour.vue';
+    import AccessibilityPanel from './components/Common/AccessibilityPanel.vue';
 
     const canview = ref(false);
     const loaded = ref(false);
