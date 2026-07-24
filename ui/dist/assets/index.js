@@ -73551,7 +73551,7 @@ var _hoisted_20 = {
 	key: 0,
 	class: "alert alert-danger my-3"
 };
-var _hoisted_21 = { class: "flex justify-end" };
+var _hoisted_21 = { class: "flex justify-start mt-2" };
 //#endregion
 //#region src/components/Conversion/EditMap.vue
 var EditMap_default = /* @__PURE__ */ defineComponent({
@@ -73949,8 +73949,8 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 					!ordervalidated.value ? (openBlock(), createElementBlock("div", _hoisted_20, toDisplayString(unref(mstrings).mapnotinorder), 1)) : createCommentVNode("", true)
 				]),
 				_: 1
-			}, 8, ["disabled"])) : createCommentVNode("", true), createBaseVNode("div", _hoisted_21, [createVNode(TwButton_default, {
-				color: "warning",
+			}, 8, ["disabled"])) : createCommentVNode("", true), createBaseVNode("div", _hoisted_21, [createVNode(UButton_default, {
+				variant: "warning",
 				onClick: cancel_button
 			}, {
 				default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).cancel), 1)]),

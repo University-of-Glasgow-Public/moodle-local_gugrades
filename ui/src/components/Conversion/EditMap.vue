@@ -175,8 +175,8 @@
             </div>
         </FormKit>
 
-        <div class="flex justify-end">
-            <TwButton color="warning" @click="cancel_button">{{ mstrings.cancel }}</TwButton>
+        <div class="flex justify-start mt-2">
+            <UButton variant="warning" @click="cancel_button">{{ mstrings.cancel }}</UButton>
         </div>
 
     </div>
@@ -193,10 +193,12 @@
     import type { IConversionMap } from '@/js/Interfaces';
     import type { FormKitNode } from '@formkit/core';
     import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
     import { gradecolors } from '@/js/GradeColors';
     import { Circle } from '@lucide/vue';
     import HelpButton from '../Common/HelpButton.vue';
 import GradeColor from '../Common/GradeColor.vue';
+import ImportButton from '../Capture/ImportButton.vue';
 
     interface IBandItem {
         band: string;
