@@ -1,0 +1,181 @@
+/* ============================================================
+   Accessibility tool styles for MyGrades.
+
+   These classes are applied to the root <html> element by the
+   accessibility Pinia store (see stores/accessibility.ts). They are
+   intentionally implemented with container level filters and root font
+   scaling so they transform the WHOLE app reliably, even for components
+   that use hardcoded brand/slate colours rather than daisyui tokens.
+
+   IMPORTANT: modal dialogs (add grade, history, etc.) are rendered with
+   @kouts/vue-modal, which teleports its markup to <body> (outside
+   #mygrades_container). Every rule below therefore also targets the
+   modal wrapper (.vm-wrapper) so the chosen theme applies to dialogs too.
+   ============================================================ */
+
+/* Root variable set by the store; kept here as a sane fallback. */
+:root {
+    --a11y-font-scale: 1;
+}
+
+/* ------------------------------------------------------------
+   Accessibility "themes" (visual profiles).
+   The app content lives inside #mygrades_container, and modals are
+   teleported to body inside .vm-wrapper, so we filter those wrappers
+   rather than the whole document (keeps the floating accessibility
+   button/panel itself readable).
+   ------------------------------------------------------------ */
+
+/* High contrast: boost contrast and saturation, force strong text. */
+html.a11y-theme-contrast #mygrades_container,
+html.a11y-theme-contrast .vm-wrapper {
+    filter: contrast(1.35) saturate(1.15);
+}
+
+html.a11y-theme-contrast #mygrades_container a,
+html.a11y-theme-contrast .vm-wrapper a {
+    text-decoration: underline;
+}
+
+/* The page background (and default text colour) is applied by daisyui to
+   <html> itself, which sits OUTSIDE #mygrades_container and so is never
+   touched by the invert filter below. Because the dark profile keeps a light
+   daisyui base (so the filter can darken the app uniformly), we must darken
+   this page chrome explicitly here, otherwise the area around the app and any
+   gaps between sections stay light. */
+html.a11y-theme-dark {
+    --root-bg: #14171c;
+    background-color: #14171c !important;
+    color-scheme: dark;
+}
+
+/* Dark: a robust dark mode via inversion that works regardless of a
+   component's own colours. Images/logos are re-inverted so they look
+   normal. */
+html.a11y-theme-dark #mygrades_container,
+html.a11y-theme-dark .vm-wrapper {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+html.a11y-theme-dark #mygrades_container img,
+html.a11y-theme-dark #mygrades_container svg image,
+html.a11y-theme-dark #mygrades_container video,
+html.a11y-theme-dark #mygrades_container [data-a11y-keep-color],
+html.a11y-theme-dark .vm-wrapper img,
+html.a11y-theme-dark .vm-wrapper svg image,
+html.a11y-theme-dark .vm-wrapper video,
+html.a11y-theme-dark .vm-wrapper [data-a11y-keep-color] {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+/* Give the tab bar a distinctly darker panel in dark mode. Because the
+   container is inverted, a LIGHT pre-invert colour renders as a dark one,
+   so we deliberately set light values here to produce a dark slate bar. */
+html.a11y-theme-dark #mygrades_container [role="tablist"] {
+    background-color: #d5dae1; /* renders as ~#2a2f36 after inversion */
+    border-color: #c2c8d0; /* renders as a subtle darker edge */
+}
+
+/* Reading mode: warm, low glare background to reduce eye strain. */
+html.a11y-theme-reading #mygrades_container,
+html.a11y-theme-reading .vm-wrapper {
+    filter: sepia(0.35) contrast(0.95) brightness(1.02);
+}
+
+/* ------------------------------------------------------------
+   Independent toggles (stack on top of any theme).
+   ------------------------------------------------------------ */
+
+/* Dyslexia friendly font + spacing. Uses a widely available, evenly
+   weighted font stack and looser spacing to aid readability. */
+html.a11y-dyslexia #mygrades_container,
+html.a11y-dyslexia #mygrades_container *,
+html.a11y-dyslexia .vm-wrapper,
+html.a11y-dyslexia .vm-wrapper * {
+    font-family:
+        'Comic Sans MS', 'Trebuchet MS', 'Verdana', 'Atkinson Hyperlegible',
+        'OpenDyslexic', sans-serif !important;
+    letter-spacing: 0.03em;
+    word-spacing: 0.12em;
+}
+
+/* Comfortable line height for easier reading. */
+html.a11y-line-spacing #mygrades_container p,
+html.a11y-line-spacing #mygrades_container li,
+html.a11y-line-spacing #mygrades_container td,
+html.a11y-line-spacing #mygrades_container th,
+html.a11y-line-spacing #mygrades_container span,
+html.a11y-line-spacing #mygrades_container div,
+html.a11y-line-spacing .vm-wrapper p,
+html.a11y-line-spacing .vm-wrapper li,
+html.a11y-line-spacing .vm-wrapper td,
+html.a11y-line-spacing .vm-wrapper th,
+html.a11y-line-spacing .vm-wrapper span,
+html.a11y-line-spacing .vm-wrapper div {
+    line-height: 1.8 !important;
+}
+
+/* Wider letter/word spacing. */
+html.a11y-letter-spacing #mygrades_container,
+html.a11y-letter-spacing .vm-wrapper {
+    letter-spacing: 0.08em !important;
+    word-spacing: 0.18em !important;
+}
+
+/* Always show links clearly. */
+html.a11y-highlight-links #mygrades_container a,
+html.a11y-highlight-links .vm-wrapper a {
+    text-decoration: underline !important;
+    text-underline-offset: 2px;
+    font-weight: 600;
+}
+
+/* Respect / force reduced motion. */
+html.a11y-reduce-motion #mygrades_container *,
+html.a11y-reduce-motion #mygrades_container *::before,
+html.a11y-reduce-motion #mygrades_container *::after,
+html.a11y-reduce-motion .vm-wrapper *,
+html.a11y-reduce-motion .vm-wrapper *::before,
+html.a11y-reduce-motion .vm-wrapper *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* ------------------------------------------------------------
+   Stronger, always visible keyboard focus for the whole app when
+   any non-default profile is active, plus for the panel itself.
+   ------------------------------------------------------------ */
+html.a11y-theme-contrast #mygrades_container :focus-visible,
+html.a11y-theme-contrast .vm-wrapper :focus-visible,
+html.a11y-theme-dark #mygrades_container :focus-visible,
+html.a11y-theme-dark .vm-wrapper :focus-visible {
+    outline: 3px solid currentColor !important;
+    outline-offset: 2px !important;
+}
+
+/* ------------------------------------------------------------
+   Improve low-contrast brand purple TEXT whenever any accessibility
+   option is active. brand-light-purple (#A5A1CE) and faded opacity
+   variants of brand-dark-purple (e.g. text-brand-dark-purple/60) fail
+   contrast guidelines, so we force a strong, near-solid tone.
+
+   Attribute selectors are used so the opacity variants (…/60, …/80, etc.)
+   are all caught, and !important removes the transparency that caused the
+   weak contrast in the first place. In the dark profile this dark value is
+   inverted to a light one, so it stays readable there too.
+   ------------------------------------------------------------ */
+html.a11y-active #mygrades_container [class*="text-brand-dark-purple"],
+html.a11y-active #mygrades_container [class*="text-brand-light-purple"],
+html.a11y-active .vm-wrapper [class*="text-brand-dark-purple"],
+html.a11y-active .vm-wrapper [class*="text-brand-light-purple"] {
+    color: #241a33 !important; /* dark aubergine: ~16:1 contrast on white */
+}
+
+/* Keep the accessibility launcher / panel unaffected by container filters
+   (it is rendered outside #mygrades_container) and always readable. */
+.a11y-launcher,
+.a11y-panel {
+    color-scheme: light;
+}
