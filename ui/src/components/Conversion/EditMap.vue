@@ -175,7 +175,7 @@
             </div>
         </FormKit>
 
-        <div class="flex justify-start mt-2">
+        <div class="flex justify-start mt-1">
             <UButton variant="warning" @click="cancel_button">{{ mstrings.cancel }}</UButton>
         </div>
 
