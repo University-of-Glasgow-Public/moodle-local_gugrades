@@ -13,12 +13,21 @@
               v-for="header in headerGroup.headers" 
               :key="header.id" 
               class="font-semibold transition-all duration-150 align-middle"
-              :class="dense ? 'px-3 py-1.5 text-xs' : 'px-6 py-2.5'"
+              :class="[
+                dense ? 'px-3 py-1.5 text-xs' : 'px-6 py-2.5',
+                header.column.getCanSort() ? 'cursor-pointer select-none' : ''
+                ]"
+                @click="header.column.getToggleSortingHandler()?.($event)"
             >
-              <FlexRender 
-                :render="header.column.columnDef.header" 
-                :props="header.getContext()" 
-              />
+              <div class="inline-flex items-center gap-1.5 w-max">          
+                <FlexRender 
+                  :render="header.column.columnDef.header" 
+                  :props="header.getContext()" 
+                />
+                <span v-if="header.column.getIsSorted() === 'asc'">🔼</span>
+                <span v-else-if="header.column.getIsSorted() === 'desc'">🔽</span>
+                <span v-else-if="header.column.getCanSort()" class="opacity-30">↕️</span>
+              </div>
             </th>
           </tr>
         </thead>
@@ -136,9 +145,11 @@
         getPaginationRowModel,
         FlexRender,
         getFilteredRowModel,
+        getSortedRowModel,
         type ColumnDef,
         type ColumnFiltersState, 
-        type VisibilityState 
+        type VisibilityState,
+        type SortingState
     } from '@tanstack/vue-table'
 
     interface BaseTableProps {
@@ -147,13 +158,18 @@
         dense?: boolean;
         filters?: ColumnFiltersState;
         visibility?: VisibilityState;
+        initialSort?: SortingState;
     }
 
     const props = withDefaults(defineProps<BaseTableProps>(), {
         dense: false,
         filters: () => [],
-        visibility: () => ({})
+        visibility: () => ({}),
+        initialSort: () => []
     });
+
+    // This allows users to click and change sorting later if needed
+    const sorting = ref<SortingState>(props.initialSort);
 
     const table = useVueTable({
         get data() { return props.data },
@@ -162,14 +178,18 @@
         // 2. ADD THE ACTIVE STATE GETTERS
         state: {
             get columnFilters() { return props.filters },
-            get columnVisibility() { return props.visibility }
+            get columnVisibility() { return props.visibility },
+            get sorting() { return sorting.value }
+        },
+
+        onSortingChange: (updater) => {
+            sorting.value = typeof updater === 'function' ? updater(sorting.value) : updater
         },
         
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-        
-        // 3. ADD THE FILTERING ENGINE
         getFilteredRowModel: getFilteredRowModel(), 
+        getSortedRowModel: getSortedRowModel(),
         
         autoResetAll: false,
         initialState: {

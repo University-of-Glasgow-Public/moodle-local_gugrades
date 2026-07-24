@@ -62,6 +62,7 @@
                     :columns="tablecolumns" 
                     :filters="tablefilters"
                     :visibility="{firstinitial: false, lastinitial: false}"
+                    :initial-sort="[{ id: 'displayname', desc: false }]" 
                     class="my-8"
                 />
             </div>
@@ -418,7 +419,6 @@
                 console.error("An error occurred during bulk save:", err);
             })
             .finally(() => {
-                // 3. This executes strictly AFTER all network calls resolve or fail
                 editcolumnid.value = 0;
                 reload_page();
             });

@@ -62813,7 +62813,7 @@ var VtToast_default = /* @__PURE__ */ defineComponent({
 		}
 	}
 });
-var _hoisted_16$6 = ["role"];
+var _hoisted_16$7 = ["role"];
 function render8(_ctx, _cache) {
 	const _component_Icon = resolveComponent("Icon");
 	const _component_CloseButton = resolveComponent("CloseButton");
@@ -62836,7 +62836,7 @@ function render8(_ctx, _cache) {
 		}, [typeof _ctx.content === "string" ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [createTextVNode(toDisplayString(_ctx.content), 1)], 2112)) : (openBlock(), createBlock(resolveDynamicComponent(_ctx.getVueComponentFromObj(_ctx.content)), mergeProps$1({
 			key: 1,
 			"toast-id": _ctx.id
-		}, _ctx.hasProp(_ctx.content, "props") ? _ctx.content.props : {}, toHandlers(_ctx.hasProp(_ctx.content, "listeners") ? _ctx.content.listeners : {}), { onCloseToast: _ctx.closeToast }), null, 16, ["toast-id", "onCloseToast"]))], 10, _hoisted_16$6),
+		}, _ctx.hasProp(_ctx.content, "props") ? _ctx.content.props : {}, toHandlers(_ctx.hasProp(_ctx.content, "listeners") ? _ctx.content.listeners : {}), { onCloseToast: _ctx.closeToast }), null, 16, ["toast-id", "onCloseToast"]))], 10, _hoisted_16$7),
 		!!_ctx.closeButton ? (openBlock(), createBlock(_component_CloseButton, {
 			key: 1,
 			component: _ctx.closeButton,
@@ -65772,6 +65772,69 @@ function getPaginationRowModel(opts) {
 		return paginatedRowModel;
 	}, getMemoOptions(table.options, "debugTable", "getPaginationRowModel"));
 }
+function getSortedRowModel() {
+	return (table) => memo$1(() => [table.getState().sorting, table.getPreSortedRowModel()], (sorting, rowModel) => {
+		if (!rowModel.rows.length || !(sorting != null && sorting.length)) return rowModel;
+		const sortingState = table.getState().sorting;
+		const sortedFlatRows = [];
+		const availableSorting = sortingState.filter((sort) => {
+			var _table$getColumn;
+			return (_table$getColumn = table.getColumn(sort.id)) == null ? void 0 : _table$getColumn.getCanSort();
+		});
+		const columnInfoById = {};
+		availableSorting.forEach((sortEntry) => {
+			const column = table.getColumn(sortEntry.id);
+			if (!column) return;
+			columnInfoById[sortEntry.id] = {
+				sortUndefined: column.columnDef.sortUndefined,
+				invertSorting: column.columnDef.invertSorting,
+				sortingFn: column.getSortingFn()
+			};
+		});
+		const sortData = (rows) => {
+			const sortedData = rows.map((row) => ({ ...row }));
+			sortedData.sort((rowA, rowB) => {
+				for (let i = 0; i < availableSorting.length; i += 1) {
+					var _sortEntry$desc;
+					const sortEntry = availableSorting[i];
+					const columnInfo = columnInfoById[sortEntry.id];
+					const sortUndefined = columnInfo.sortUndefined;
+					const isDesc = (_sortEntry$desc = sortEntry == null ? void 0 : sortEntry.desc) != null ? _sortEntry$desc : false;
+					let sortInt = 0;
+					if (sortUndefined) {
+						const aValue = rowA.getValue(sortEntry.id);
+						const bValue = rowB.getValue(sortEntry.id);
+						const aUndefined = aValue === void 0;
+						const bUndefined = bValue === void 0;
+						if (aUndefined || bUndefined) {
+							if (sortUndefined === "first") return aUndefined ? -1 : 1;
+							if (sortUndefined === "last") return aUndefined ? 1 : -1;
+							sortInt = aUndefined && bUndefined ? 0 : aUndefined ? sortUndefined : -sortUndefined;
+						}
+					}
+					if (sortInt === 0) sortInt = columnInfo.sortingFn(rowA, rowB, sortEntry.id);
+					if (sortInt !== 0) {
+						if (isDesc) sortInt *= -1;
+						if (columnInfo.invertSorting) sortInt *= -1;
+						return sortInt;
+					}
+				}
+				return rowA.index - rowB.index;
+			});
+			sortedData.forEach((row) => {
+				var _row$subRows;
+				sortedFlatRows.push(row);
+				if ((_row$subRows = row.subRows) != null && _row$subRows.length) row.subRows = sortData(row.subRows);
+			});
+			return sortedData;
+		};
+		return {
+			rows: sortData(rowModel.rows),
+			flatRows: sortedFlatRows,
+			rowsById: rowModel.rowsById
+		};
+	}, getMemoOptions(table.options, "debugTable", "getSortedRowModel", () => table._autoResetPageIndex()));
+}
 //#endregion
 //#region node_modules/@tanstack/vue-table/build/lib/index.mjs
 /**
@@ -65893,17 +65956,25 @@ var _hoisted_1$56 = { class: "w-full flex flex-col gap-4" };
 var _hoisted_2$43 = { class: "w-full overflow-x-auto overflow-y-visible rounded-lg border border-brand-light-purple/30 bg-white shadow-md pb-12" };
 var _hoisted_3$31 = { class: "w-full text-left border-collapse text-sm" };
 var _hoisted_4$28 = { class: "bg-university-blue text-white uppercase text-xs tracking-wider" };
-var _hoisted_5$23 = { class: "divide-y divide-brand-light-purple/20 text-brand-dark-purple" };
-var _hoisted_6$21 = { class: "flex items-center gap-1 select-none text-brand-dark-purple/70" };
-var _hoisted_7$17 = { class: "text-university-blue font-bold" };
-var _hoisted_8$14 = { class: "text-university-blue font-bold" };
-var _hoisted_9$11 = { class: "flex items-center gap-1.5" };
-var _hoisted_10$11 = ["disabled"];
-var _hoisted_11$10 = ["disabled"];
-var _hoisted_12$8 = ["disabled"];
-var _hoisted_13$8 = ["disabled"];
-var _hoisted_14$8 = ["value"];
-var _hoisted_15$6 = ["value"];
+var _hoisted_5$23 = ["onClick"];
+var _hoisted_6$21 = { class: "inline-flex items-center gap-1.5 w-max" };
+var _hoisted_7$17 = { key: 0 };
+var _hoisted_8$14 = { key: 1 };
+var _hoisted_9$11 = {
+	key: 2,
+	class: "opacity-30"
+};
+var _hoisted_10$11 = { class: "divide-y divide-brand-light-purple/20 text-brand-dark-purple" };
+var _hoisted_11$10 = { class: "flex items-center gap-1 select-none text-brand-dark-purple/70" };
+var _hoisted_12$8 = { class: "text-university-blue font-bold" };
+var _hoisted_13$8 = { class: "text-university-blue font-bold" };
+var _hoisted_14$8 = { class: "flex items-center gap-1.5" };
+var _hoisted_15$6 = ["disabled"];
+var _hoisted_16$6 = ["disabled"];
+var _hoisted_17$6 = ["disabled"];
+var _hoisted_18$6 = ["disabled"];
+var _hoisted_19$6 = ["value"];
+var _hoisted_20$5 = ["value"];
 //#endregion
 //#region src/components/Common/UTable.vue
 var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ */ defineComponent({
@@ -65916,10 +65987,12 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 			default: false
 		},
 		filters: { default: () => [] },
-		visibility: { default: () => ({}) }
+		visibility: { default: () => ({}) },
+		initialSort: { default: () => [] }
 	},
 	setup(__props) {
 		const props = __props;
+		const sorting = /* @__PURE__ */ ref(props.initialSort);
 		const table = useVueTable({
 			get data() {
 				return props.data;
@@ -65933,11 +66006,18 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 				},
 				get columnVisibility() {
 					return props.visibility;
+				},
+				get sorting() {
+					return sorting.value;
 				}
+			},
+			onSortingChange: (updater) => {
+				sorting.value = typeof updater === "function" ? updater(sorting.value) : updater;
 			},
 			getCoreRowModel: getCoreRowModel(),
 			getPaginationRowModel: getPaginationRowModel(),
 			getFilteredRowModel: getFilteredRowModel(),
+			getSortedRowModel: getSortedRowModel(),
 			autoResetAll: false,
 			initialState: { pagination: { pageSize: 25 } }
 		});
@@ -65957,13 +66037,14 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 				return openBlock(), createElementBlock("tr", { key: headerGroup.id }, [(openBlock(true), createElementBlock(Fragment, null, renderList(headerGroup.headers, (header) => {
 					return openBlock(), createElementBlock("th", {
 						key: header.id,
-						class: normalizeClass(["font-semibold transition-all duration-150 align-middle", __props.dense ? "px-3 py-1.5 text-xs" : "px-6 py-2.5"])
-					}, [createVNode(unref(FlexRender), {
+						class: normalizeClass(["font-semibold transition-all duration-150 align-middle", [__props.dense ? "px-3 py-1.5 text-xs" : "px-6 py-2.5", header.column.getCanSort() ? "cursor-pointer select-none" : ""]]),
+						onClick: ($event) => header.column.getToggleSortingHandler()?.($event)
+					}, [createBaseVNode("div", _hoisted_6$21, [createVNode(unref(FlexRender), {
 						render: header.column.columnDef.header,
 						props: header.getContext()
-					}, null, 8, ["render", "props"])], 2);
+					}, null, 8, ["render", "props"]), header.column.getIsSorted() === "asc" ? (openBlock(), createElementBlock("span", _hoisted_7$17, "🔼")) : header.column.getIsSorted() === "desc" ? (openBlock(), createElementBlock("span", _hoisted_8$14, "🔽")) : header.column.getCanSort() ? (openBlock(), createElementBlock("span", _hoisted_9$11, "↕️")) : createCommentVNode("", true)])], 10, _hoisted_5$23);
 				}), 128))]);
-			}), 128))]), createBaseVNode("tbody", _hoisted_5$23, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getRowModel().rows, (row) => {
+			}), 128))]), createBaseVNode("tbody", _hoisted_10$11, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getRowModel().rows, (row) => {
 				return openBlock(), createElementBlock("tr", {
 					key: row.id,
 					class: "transition-colors duration-150 ease-in-out hover:text-university-blue"
@@ -65976,34 +66057,34 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 						props: cell.getContext()
 					}, null, 8, ["render", "props"])], 2);
 				}), 128))]);
-			}), 128))])])]), createBaseVNode("div", { class: normalizeClass(["flex items-center justify-between text-sm text-brand-dark-purple font-medium", __props.dense ? "px-1 gap-2 text-xs" : "px-2"]) }, [createBaseVNode("div", _hoisted_6$21, [
+			}), 128))])])]), createBaseVNode("div", { class: normalizeClass(["flex items-center justify-between text-sm text-brand-dark-purple font-medium", __props.dense ? "px-1 gap-2 text-xs" : "px-2"]) }, [createBaseVNode("div", _hoisted_11$10, [
 				_cache[5] || (_cache[5] = createBaseVNode("span", null, "Showing page", -1)),
-				createBaseVNode("strong", _hoisted_7$17, toDisplayString(unref(table).getState().pagination.pageIndex + 1), 1),
+				createBaseVNode("strong", _hoisted_12$8, toDisplayString(unref(table).getState().pagination.pageIndex + 1), 1),
 				_cache[6] || (_cache[6] = createBaseVNode("span", null, "of", -1)),
-				createBaseVNode("strong", _hoisted_8$14, toDisplayString(unref(table).getPageCount()), 1)
-			]), createBaseVNode("div", _hoisted_9$11, [
+				createBaseVNode("strong", _hoisted_13$8, toDisplayString(unref(table).getPageCount()), 1)
+			]), createBaseVNode("div", _hoisted_14$8, [
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-bold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-xs" : "px-3 py-1.5"]),
 					disabled: !unref(table).getCanPreviousPage(),
 					onClick: _cache[0] || (_cache[0] = ($event) => unref(table).setPageIndex(0)),
 					"aria-label": "First page"
-				}, " « ", 10, _hoisted_10$11),
+				}, " « ", 10, _hoisted_15$6),
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-semibold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-[11px]" : "px-3 py-1.5 text-xs"]),
 					disabled: !unref(table).getCanPreviousPage(),
 					onClick: _cache[1] || (_cache[1] = ($event) => unref(table).previousPage())
-				}, " ‹ Previous ", 10, _hoisted_11$10),
+				}, " ‹ Previous ", 10, _hoisted_16$6),
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-semibold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-[11px]" : "px-3 py-1.5 text-xs"]),
 					disabled: !unref(table).getCanNextPage(),
 					onClick: _cache[2] || (_cache[2] = ($event) => unref(table).nextPage())
-				}, " Next › ", 10, _hoisted_12$8),
+				}, " Next › ", 10, _hoisted_17$6),
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-bold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-xs" : "px-3 py-1.5"]),
 					disabled: !unref(table).getCanNextPage(),
 					onClick: _cache[3] || (_cache[3] = ($event) => unref(table).setPageIndex(unref(table).getPageCount() - 1)),
 					"aria-label": "Last page"
-				}, " » ", 10, _hoisted_13$8),
+				}, " » ", 10, _hoisted_18$6),
 				createBaseVNode("select", {
 					class: normalizeClass(["ml-2 bg-white text-brand-dark-purple border border-brand-light-purple/30 rounded-lg shadow-sm focus:outline-none focus:border-university-blue font-semibold cursor-pointer", __props.dense ? "px-1.5 py-1 text-[11px]" : "px-2.5 py-1.5 text-xs"]),
 					value: unref(table).getState().pagination.pageSize,
@@ -66019,12 +66100,12 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 					return createBaseVNode("option", {
 						key: size,
 						value: size
-					}, " Show " + toDisplayString(size), 9, _hoisted_15$6);
-				}), 64))], 42, _hoisted_14$8)
+					}, " Show " + toDisplayString(size), 9, _hoisted_20$5);
+				}), 64))], 42, _hoisted_19$6)
 			])], 2)]);
 		};
 	}
-}), [["__scopeId", "data-v-097db845"]]);
+}), [["__scopeId", "data-v-3353bab0"]]);
 //#endregion
 //#region src/js/GradeColors.ts
 var gradecolors = {
@@ -71321,6 +71402,10 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 						firstinitial: false,
 						lastinitial: false
 					},
+					"initial-sort": [{
+						id: "displayname",
+						desc: false
+					}],
 					class: "my-8"
 				}, null, 8, [
 					"data",
