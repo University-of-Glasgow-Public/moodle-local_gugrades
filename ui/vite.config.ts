@@ -20,6 +20,7 @@ export default defineConfig({
     //})
     webUpdateNotice({
       checkInterval: 60 * 1000 * 5, // Check every 5 minutes
+      hiddenDismissButton: true,
       
       // Customize the text directly in the config
       notificationProps: {
