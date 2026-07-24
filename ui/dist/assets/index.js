@@ -65988,7 +65988,11 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 		},
 		filters: { default: () => [] },
 		visibility: { default: () => ({}) },
-		initialSort: { default: () => [] }
+		initialSort: { default: () => [] },
+		sortable: {
+			type: Boolean,
+			default: true
+		}
 	},
 	setup(__props) {
 		const props = __props;
@@ -66014,6 +66018,7 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 			onSortingChange: (updater) => {
 				sorting.value = typeof updater === "function" ? updater(sorting.value) : updater;
 			},
+			enableSorting: props.sortable,
 			getCoreRowModel: getCoreRowModel(),
 			getPaginationRowModel: getPaginationRowModel(),
 			getFilteredRowModel: getFilteredRowModel(),
@@ -66105,7 +66110,7 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 			])], 2)]);
 		};
 	}
-}), [["__scopeId", "data-v-3353bab0"]]);
+}), [["__scopeId", "data-v-f99d2ccb"]]);
 //#endregion
 //#region src/js/GradeColors.ts
 var gradecolors = {
@@ -74490,6 +74495,7 @@ var AuditPage_default = /* @__PURE__ */ defineComponent({
 				createBaseVNode("div", _hoisted_1$12, [createVNode(UTable_default, {
 					data: items.value,
 					columns,
+					sortable: false,
 					class: "mt-3"
 				}, null, 8, ["data"])]),
 				createVNode(UButton_default, {

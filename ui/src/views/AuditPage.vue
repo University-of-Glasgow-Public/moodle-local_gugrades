@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div class="my-5">
-        <UTable :data="items" :columns="columns" class="mt-3"></UTable>
+        <UTable :data="items" :columns="columns" :sortable="false" class="mt-3"></UTable>
     </div>
     <UButton class="mt-2" variant="success" @click="download_clicked">{{ mstrings.downloadtocsv }}</UButton>
 </template>

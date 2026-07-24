@@ -159,13 +159,15 @@
         filters?: ColumnFiltersState;
         visibility?: VisibilityState;
         initialSort?: SortingState;
+        sortable?: boolean;
     }
 
     const props = withDefaults(defineProps<BaseTableProps>(), {
         dense: false,
         filters: () => [],
         visibility: () => ({}),
-        initialSort: () => []
+        initialSort: () => [],
+        sortable: true 
     });
 
     // This allows users to click and change sorting later if needed
@@ -185,6 +187,8 @@
         onSortingChange: (updater) => {
             sorting.value = typeof updater === 'function' ? updater(sorting.value) : updater
         },
+
+        enableSorting: props.sortable,
         
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
