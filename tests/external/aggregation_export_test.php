@@ -158,7 +158,11 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         $path = $CFG->dirroot . '/local/gugrades/tests/external/gradedata/aggregation_export.csv';
         $expected = file_get_contents($path);
 
-        $this->assertEquals($expected, $data['csv']);
+        // Parse the CSVs to make errors easier to see. 
+        $expectedArray = str_getcsv($expected, "\n");
+        $actualArray = str_getcsv($data['csv'], "\n");
+
+        $this->assertSame($expectedArray, $actualArray);
 
         // Check user preferences have been set.
         $preferences = explode(',', get_user_preferences('local_gugrades_customaggregationexportselect_' . $categoryid));

@@ -1068,8 +1068,8 @@ class api {
      * @param bool $intkey
      * @return array (of objects)
      */
-    private static function formkit_menu(array $inputarray, bool $reverse = false) {
-        $menu = array_map(function ($key, $value) {
+    private static function formkit_menu(array $inputarray, bool $reverse = false, bool $intkey = false) {
+        $menu = array_map(function ($key, $value) use ($intkey) {
             $item = new \stdClass();
             if ($intkey) {
                 $item->value = (int)$key;

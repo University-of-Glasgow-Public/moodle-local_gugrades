@@ -70940,7 +70940,6 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 		const debug = /* @__PURE__ */ ref({});
 		const staffuserid = /* @__PURE__ */ ref(0);
 		const caneditgrades = /* @__PURE__ */ ref(false);
-		useToast();
 		const mstringstore = useMstrings();
 		const { mstrings } = storeToRefs(mstringstore);
 		const { monochrome, updateLogo } = useLogo();

@@ -77,7 +77,6 @@
     import { storeToRefs } from 'pinia';
     import CaptureSelect from '@/components/Capture/CaptureSelect.vue';
     import CaptureMenu from '@/components/Capture/CaptureMenu.vue';
-    import { useToast } from "vue-toastification";
     import CaptureButtons from '@/components/Capture/CaptureButtons.vue';
     import CaptureAlerts from '@/components/Capture/CaptureAlerts.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
@@ -85,9 +84,8 @@
     import { useLogo } from '@/js/monochromelogo.js';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import type { Header, Item } from "vue3-easy-data-table";
     import { watchDebounced } from '@vueuse/core';
-    import type { IEmitItemData, IEmitEditColumn, IMenuItem, ICaptureColumn, ICaptureUser, ICaptureGrade, ICaptureCellForm } from '@/js/Interfaces';
+    import type { IEmitItemData, ICaptureColumn, ICaptureUser, ICaptureGrade, ICaptureCellForm } from '@/js/Interfaces';
     import NoteButton from '@/components/Common/NoteButton.vue';
     import { useFilter } from '@/stores/filter';
     import UTable from '@/components/Common/UTable.vue';
@@ -133,7 +131,6 @@
     const debug = ref({});
     const staffuserid = ref(0);
     const caneditgrades = ref(false);
-    const toast = useToast();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const {monochrome, updateLogo} = useLogo();

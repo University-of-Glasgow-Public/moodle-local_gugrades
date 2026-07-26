@@ -259,6 +259,8 @@
     import GradeColor from '@/components/Common/GradeColor.vue';
     import { useFilter } from '@/stores/filter';
     import UButton from '@/components/Common/UButton.vue';
+    import UTable from '@/components/Common/UTable.vue';
+    import { createColumnHelper, type ColumnFiltersState } from '@tanstack/vue-table';
 
     interface IAggregationHeader {
         infocol?: boolean;
