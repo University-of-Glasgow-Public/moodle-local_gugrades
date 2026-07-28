@@ -14,7 +14,6 @@
               class="font-semibold transition-all duration-150 align-middle"
               :class="[
                 dense ? 'px-3 py-1.5 text-xs' : 'px-6 py-2.5',
-                header.column.getCanSort() ? 'cursor-pointer select-none' : ''
                 ]"
             >
               <div class="inline-flex items-center gap-1.5 w-max">          

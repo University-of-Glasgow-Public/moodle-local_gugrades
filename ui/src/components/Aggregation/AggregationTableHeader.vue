@@ -3,22 +3,19 @@
     <div>
         <UTooltip :text="column.fullname" position="below">
             <div>
-                <!-- column title -->
-                <!--
-                <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.shortname ?? ''" size="lg" color="text-warning"></InfoButton>
-                -->
-                <span @click="toggleSorting">{{ column.shortname ?? '' }}</span>
+                <span @click="toggleSorting" class="cursor-pointer">{{ column.shortname ?? '' }}</span>
             </div>
             <div v-if="!infocol && column.showweights">{{ column.weight }}%</div>
             <div v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></div>
             <div v-if="column.isresitgradeitem" class="badge badge-success">{{ mstrings.reassessment}}</div>
         </UTooltip>
-        <div class="py-1" v-if="column.strategy">
+        <div class="font-light normal-case py-1" v-if="column.strategy">
             <i>{{ column.strategy }}</i>
         </div>
         <div v-if="totaltype">
             ({{ totaltype }})
         </div>
+        <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.shortname ?? ''" size="lg" color="text-warning"></InfoButton>
     </div>
 </template>
 
