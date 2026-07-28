@@ -66286,14 +66286,14 @@ var GradeColor_default = /* @__PURE__ */ defineComponent({
 				];
 				if (props.size) colorclass.push(props.size);
 				else colorclass.push("text-xs");
-				colorclass.push("w-[40px]");
+				colorclass.push("min-w-10");
 				colorclass.push(classes.bg);
 				colorclass.push(classes.text);
 			}
 			return colorclass;
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("span", { class: normalizeClass([[gradecolorclass(__props.grade), __props.otherclasses], "inline-flex items-center justify-center h-6 text-center"]) }, toDisplayString(__props.grade), 3);
+			return openBlock(), createElementBlock("span", { class: normalizeClass([[gradecolorclass(__props.grade), __props.otherclasses], "inline-flex items-center justify-center h-6 text-start text-nowrap px-1"]) }, toDisplayString(__props.grade), 3);
 		};
 	}
 });
@@ -73165,6 +73165,24 @@ var TotalCell_default = /* @__PURE__ */ defineComponent({
 	}
 });
 //#endregion
+//#region src/components/Aggregation/TotalHeader.vue
+var TotalHeader_default = /* @__PURE__ */ defineComponent({
+	__name: "TotalHeader",
+	props: {
+		shortname: {},
+		strategy: {},
+		headercontext: {}
+	},
+	setup(__props) {
+		const props = __props;
+		const { mstrings } = storeToRefs(useMstrings());
+		const toggleSorting = computed(() => props.headercontext.column.getToggleSortingHandler());
+		return (_ctx, _cache) => {
+			return openBlock(), createElementBlock("div", null, [createBaseVNode("div", null, [createBaseVNode("span", { onClick: _cache[0] || (_cache[0] = (...args) => toggleSorting.value && toggleSorting.value(...args)) }, toDisplayString(__props.shortname), 1)])]);
+		};
+	}
+});
+//#endregion
 //#region src/views/AggregationTable.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$18 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
 var _hoisted_2$14 = { class: "p-2" };
@@ -73287,7 +73305,13 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 					}
 				}));
 				cols.push(columnHelper.accessor("coursetotal", {
-					header: mstringstore.getMstring("coursetotal"),
+					header: (context) => {
+						return h$1(TotalHeader_default, {
+							shortname: mstringstore.getMstring("coursetotal"),
+							strategy: strategy.value,
+							headercontext: context
+						});
+					},
 					cell: ({ row, table }) => {
 						const user = row.original;
 						const rows = table.getRowModel().rows;

@@ -540,7 +540,7 @@ class api {
         foreach ($categories as $category) {
             $results[] = [
                 'id' => $category->id,
-                'fullname' => $category->fullname,
+                'fullname' => shorten_text($category->fullname, 35),
             ];
         }
 

@@ -6,7 +6,7 @@
     -->
     <span 
         :class="[gradecolorclass(grade), otherclasses]" 
-        class="inline-flex items-center justify-center h-6 text-center"
+        class="inline-flex items-center justify-center h-6 text-start text-nowrap px-1"
     >
         {{ grade }}
     </span>
@@ -43,7 +43,7 @@
             } else {
                 colorclass.push('text-xs'); // Tweaked to text-xs so "E1:8" fits neatly inside 36px
             }
-            colorclass.push('w-[40px]');
+            colorclass.push('min-w-10');
             colorclass.push(classes.bg);
             colorclass.push(classes.text);
         }

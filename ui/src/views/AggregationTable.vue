@@ -276,6 +276,7 @@
     import ResitRequired from '@/components/Aggregation/ResitRequired.vue';
     import CompletionPercentage from '@/components/Aggregation/CompletionPercentage.vue';
     import TotalCell from '@/components/Aggregation/TotalCell.vue';
+    import TotalHeader from '@/components/Aggregation/TotalHeader.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -446,7 +447,13 @@
 
             // "Grand" Total
             cols.push(columnHelper.accessor('coursetotal', {
-                header: mstringstore.getMstring('coursetotal'),
+                header: (context) => {
+                    return h(TotalHeader, {
+                        shortname: mstringstore.getMstring('coursetotal'),
+                        strategy: strategy.value,
+                        headercontext: context,
+                    });
+                },
                 cell: ({row, table}) => {
                     const user = row.original;
                     const rows = table.getRowModel().rows;
