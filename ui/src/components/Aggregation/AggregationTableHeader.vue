@@ -1,7 +1,7 @@
 <template>
     <!-- keep all this info together and vertically aligned -->
-    <div>
-        <UTooltip :text="column.fullname" position="below">
+    <div class="flex flex-col gap-2">
+        <UTooltip :text="column.fullname" position="below" class="block">
             <div>
                 <span @click="toggleSorting" class="cursor-pointer">{{ column.shortname ?? '' }}</span>
             </div>
@@ -9,7 +9,6 @@
                 <div v-if="!infocol && column.showweights">{{ column.weight }}%</div>
                 <div v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></div>
             </div>
-            <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
         </UTooltip>
         <div class="font-light normal-case py-1" v-if="column.strategy">
             <i>{{ column.strategy }}</i>
@@ -18,6 +17,8 @@
             ({{ totaltype }})
         </div>
         <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.shortname ?? ''" size="lg" color="text-warning"></InfoButton>
+
+        <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
 
         <div v-if="column.categoryid">
             <UButton class="mt-2" size="sm" @click="expand_clicked" aria-label="Drill down into grade category.">
