@@ -485,6 +485,35 @@
                     });
                 }
             }));
+        } else {
+
+            // Subcategory total
+            cols.push(columnHelper.accessor('total', {
+                header: (context) => {
+                    return h(TotalHeader, {
+                        shortname: mstringstore.getMstring('subcattotal'),
+                        strategy: strategy.value,
+                        headercontext: context,
+                    });
+                },
+                cell: ({row, table}) => {
+                    const user = row.original;
+                    const rows = table.getRowModel().rows;
+                    const indexOnPage = rows.findIndex(r => r.id === row.id);
+                    const isBeforeHalfway = indexOnPage < rows.length / 2;
+                    return h(TotalCell, {
+                        user: user,
+                        toplevel: toplevel.value,
+                        gradeitemid: gradeitemid.value,
+                        level1category: level1category.value,
+                        categoryid: categoryid.value,
+                        showweights: showweights.value,
+                        caneditgrades: caneditgrades.value,
+                        beforehalfway: isBeforeHalfway,
+                        onGradeadded: (userid) => grade_changed(userid),
+                    });
+                }
+            }));
         }
 
         return cols;

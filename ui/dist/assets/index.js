@@ -72870,7 +72870,7 @@ var _hoisted_3$12 = { key: 1 };
 var _hoisted_4$11 = { key: 0 };
 var _hoisted_5$8 = {
 	key: 0,
-	class: "badge badge-success"
+	class: "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content"
 };
 var _hoisted_6$6 = {
 	key: 0,
@@ -73395,7 +73395,31 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 						});
 					}
 				}));
-			}
+			} else cols.push(columnHelper.accessor("total", {
+				header: (context) => {
+					return h$1(TotalHeader_default, {
+						shortname: mstringstore.getMstring("subcattotal"),
+						strategy: strategy.value,
+						headercontext: context
+					});
+				},
+				cell: ({ row, table }) => {
+					const user = row.original;
+					const rows = table.getRowModel().rows;
+					const isBeforeHalfway = rows.findIndex((r) => r.id === row.id) < rows.length / 2;
+					return h$1(TotalCell_default, {
+						user,
+						toplevel: toplevel.value,
+						gradeitemid: gradeitemid.value,
+						level1category: level1category.value,
+						categoryid: categoryid.value,
+						showweights: showweights.value,
+						caneditgrades: caneditgrades.value,
+						beforehalfway: isBeforeHalfway,
+						onGradeadded: (userid) => grade_changed(userid)
+					});
+				}
+			}));
 			return cols;
 		});
 		/**

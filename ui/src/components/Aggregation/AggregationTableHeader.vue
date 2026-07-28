@@ -9,7 +9,7 @@
                 <div v-if="!infocol && column.showweights">{{ column.weight }}%</div>
                 <div v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></div>
             </div>
-            <div v-if="column.isresitgradeitem" class="badge badge-success">{{ mstrings.reassessment}}</div>
+            <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
         </UTooltip>
         <div class="font-light normal-case py-1" v-if="column.strategy">
             <i>{{ column.strategy }}</i>
