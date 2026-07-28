@@ -478,6 +478,30 @@
     });
 
     /**
+     * Computed for table filters
+     * (TanStack table version)
+     */
+    const tablefilters = computed(() => {
+        const filters: ColumnFiltersState = [];
+
+            if (firstname.value != 'all') {
+            filters.push({
+                id: 'firstinitial',
+                value: firstname.value,
+            });
+        }
+
+        if (lastname.value != 'all') {
+            filters.push({
+                id: 'lastinitial',
+                value: lastname.value,
+            });
+        }
+
+        return filters;
+    });
+
+    /**
      * Table name filter
      */
     const table_filter = computed(() => {

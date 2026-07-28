@@ -315,7 +315,7 @@
         }
 
         return filters;
-    })
+    });
 
     /**
      * Bulk edit cog clicked
