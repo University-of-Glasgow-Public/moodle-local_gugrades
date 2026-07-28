@@ -73240,6 +73240,17 @@ var BackButton_default = /* @__PURE__ */ defineComponent({
 	}
 });
 //#endregion
+//#region src/components/Aggregation/ReleaseGrade.vue
+var ReleaseGrade_default = /* @__PURE__ */ defineComponent({
+	__name: "ReleaseGrade",
+	props: { grade: {} },
+	setup(__props) {
+		return (_ctx, _cache) => {
+			return openBlock(), createBlock(GradeColor_default, { grade: __props.grade }, null, 8, ["grade"]);
+		};
+	}
+});
+//#endregion
 //#region src/views/AggregationTable.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$18 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
 var _hoisted_2$14 = { class: "p-2" };
@@ -73417,6 +73428,13 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 						beforehalfway: isBeforeHalfway,
 						onGradeadded: (userid) => grade_changed(userid)
 					});
+				}
+			}));
+			if (released.value && !toplevel.value) cols.push(columnHelper.accessor("releasegrade", {
+				header: mstringstore.getMstring("released"),
+				cell: ({ row }) => {
+					const user = row.original;
+					return h$1(ReleaseGrade_default, { grade: user.releasegrade });
 				}
 			}));
 			return cols;

@@ -278,6 +278,7 @@
     import TotalCell from '@/components/Aggregation/TotalCell.vue';
     import TotalHeader from '@/components/Aggregation/TotalHeader.vue';
     import BackButton from '@/components/Aggregation/BackButton.vue';
+    import ReleaseGrade from '@/components/Aggregation/ReleaseGrade.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -511,6 +512,19 @@
                         caneditgrades: caneditgrades.value,
                         beforehalfway: isBeforeHalfway,
                         onGradeadded: (userid) => grade_changed(userid),
+                    });
+                }
+            }));
+        }
+
+        // Released grade
+        if (released.value && !toplevel.value) {
+            cols.push(columnHelper.accessor('releasegrade', {
+                header: mstringstore.getMstring('released'),
+                cell: ({row}) => {
+                    const user = row.original;
+                    return h(ReleaseGrade, {
+                        grade: user.releasegrade
                     });
                 }
             }));
