@@ -90,7 +90,6 @@
                                 validation-visibility="blur"
                                 :validation-messages="{
                                     between: 'Percentage must be between 0 and 100',
-                                    validate_order: 'Values must be in ascending sequence',
                                 }"
                                 :model-value="item.boundpc?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
@@ -104,11 +103,10 @@
                                 outer-class="mb-3"
                                 :disabled="(entrytype != 'points') || (item.band == 'H') || !caneditgrades"
                                 :validation-rules="{ validate_points }"
-                                validation="validate_points|validate_order"
+                                validation="validate_points"
                                 validation-visibility="blur"
                                 :validation-messages="{
                                     validate_points: 'Number must be between 0 and ' + maxgrade,
-                                    validate_order: 'Values must be in ascending sequence',
                                 }"
                                 :model-value="item.boundpoints?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
@@ -141,7 +139,6 @@
                                 validation-visibility="blur"
                                 :validation-messages="{
                                     between: 'Percentage must be between 0 and 100',
-                                    validate_order: 'Values must be in ascending sequence',
                                 }"
                                 :model-value="item.boundpc?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
@@ -155,11 +152,10 @@
                                 outer-class="mb-3"
                                 :disabled="(entrytype != 'points') || (item.band == 'H') || !caneditgrades"
                                 :validation-rules="{ validate_points }"
-                                validation="validate_points|validate_order"
+                                validation="validate_points"
                                 validation-visibility="blur"
                                 :validation-messages="{
                                     validate_points: 'Number must be between 0 and ' + maxgrade,
-                                    validate_order: 'Values must be in ascending sequence',
                                 }"
                                 :model-value="item.boundpoints?.toString() ?? ''"
                                 @input="(event) => handleInput(item, event)"
@@ -255,14 +251,20 @@ import ImportButton from '../Capture/ImportButton.vue';
         return parseFloat(num.toFixed(decimals));
     }
 
-    // Method to handle input changes and convert string to number
+    // Method to handle input changes and convert string to number.
+    // Write to the field matching the active entry type; recalculate() syncs the other.
     const handleInput = (item: IBandItem, newValue: unknown) => {
+        let value = 0;
         if (typeof newValue === 'string') {
-            item.boundpc = parseFloat(newValue) || 0; // Convert to number, default to 0 if invalid
+            value = parseFloat(newValue) || 0;
         } else if (typeof newValue === 'number') {
-            item.boundpc = newValue; // Use the number directly
+            value = newValue;
+        }
+
+        if (entrytype.value === 'points') {
+            item.boundpoints = value;
         } else {
-            item.boundpc = 0; // Fallback to 0 if newValue is undefined
+            item.boundpc = value;
         }
     };
 
@@ -348,15 +350,20 @@ import ImportButton from '../Capture/ImportButton.vue';
     );
 
     /**
-     * Custom rule for points values
+     * Custom rule for points values.
+     * Maximum grade is inclusive so the top band can be set to maxgrade.
      */
     function validate_points(node: FormKitNode) {
 
         // Careful about text fields not being treated as numbers properly.
+        // maxgrade may be a string when bound via FormKit.
         const points = Number(node.value);
-        const validated = (points >= 0) && (points <= maxgrade.value);
+        const max = Number(maxgrade.value);
+        if (!Number.isFinite(points) || !Number.isFinite(max)) {
+            return false;
+        }
 
-        return validated;
+        return (points >= 0) && (points <= max);
     }
 
     /**

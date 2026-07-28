@@ -73698,9 +73698,11 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 			return parseFloat(num.toFixed(decimals));
 		}
 		const handleInput = (item, newValue) => {
-			if (typeof newValue === "string") item.boundpc = parseFloat(newValue) || 0;
-			else if (typeof newValue === "number") item.boundpc = newValue;
-			else item.boundpc = 0;
+			let value = 0;
+			if (typeof newValue === "string") value = parseFloat(newValue) || 0;
+			else if (typeof newValue === "number") value = newValue;
+			if (entrytype.value === "points") item.boundpoints = value;
+			else item.boundpc = value;
 		};
 		/**
 		* Build items array
@@ -73757,11 +73759,14 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 			recalculate();
 		}, { deep: true });
 		/**
-		* Custom rule for points values
+		* Custom rule for points values.
+		* Maximum grade is inclusive so the top band can be set to maxgrade.
 		*/
 		function validate_points(node) {
 			const points = Number(node.value);
-			return points >= 0 && points <= maxgrade.value;
+			const max = Number(maxgrade.value);
+			if (!Number.isFinite(points) || !Number.isFinite(max)) return false;
+			return points >= 0 && points <= max;
 		}
 		/**
 		* computed to check that points/percentages are in order.
@@ -73945,10 +73950,7 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 								disabled: entrytype.value != "percentage" || item.band == "H" || !__props.caneditgrades,
 								validation: "between:0,100",
 								"validation-visibility": "blur",
-								"validation-messages": {
-									between: "Percentage must be between 0 and 100",
-									validate_order: "Values must be in ascending sequence"
-								},
+								"validation-messages": { between: "Percentage must be between 0 and 100" },
 								"model-value": item.boundpc?.toString() ?? "",
 								onInput: (event) => handleInput(item, event),
 								"aria-label": item.band + " " + unref(mstrings).percentage
@@ -73964,12 +73966,9 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 								"outer-class": "mb-3",
 								disabled: entrytype.value != "points" || item.band == "H" || !__props.caneditgrades,
 								"validation-rules": { validate_points },
-								validation: "validate_points|validate_order",
+								validation: "validate_points",
 								"validation-visibility": "blur",
-								"validation-messages": {
-									validate_points: "Number must be between 0 and " + maxgrade.value,
-									validate_order: "Values must be in ascending sequence"
-								},
+								"validation-messages": { validate_points: "Number must be between 0 and " + maxgrade.value },
 								"model-value": item.boundpoints?.toString() ?? "",
 								onInput: (event) => handleInput(item, event),
 								"aria-label": item.band + " " + unref(mstrings).points
@@ -74005,10 +74004,7 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 								disabled: entrytype.value != "percentage" || item.band == "H" || !__props.caneditgrades,
 								validation: "between:0,100",
 								"validation-visibility": "blur",
-								"validation-messages": {
-									between: "Percentage must be between 0 and 100",
-									validate_order: "Values must be in ascending sequence"
-								},
+								"validation-messages": { between: "Percentage must be between 0 and 100" },
 								"model-value": item.boundpc?.toString() ?? "",
 								onInput: (event) => handleInput(item, event),
 								"aria-label": item.band + " " + unref(mstrings).percentage
@@ -74024,12 +74020,9 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 								"outer-class": "mb-3",
 								disabled: entrytype.value != "points" || item.band == "H" || !__props.caneditgrades,
 								"validation-rules": { validate_points },
-								validation: "validate_points|validate_order",
+								validation: "validate_points",
 								"validation-visibility": "blur",
-								"validation-messages": {
-									validate_points: "Number must be between 0 and " + maxgrade.value,
-									validate_order: "Values must be in ascending sequence"
-								},
+								"validation-messages": { validate_points: "Number must be between 0 and " + maxgrade.value },
 								"model-value": item.boundpoints?.toString() ?? "",
 								onInput: (event) => handleInput(item, event),
 								"aria-label": item.band + " " + unref(mstrings).points
