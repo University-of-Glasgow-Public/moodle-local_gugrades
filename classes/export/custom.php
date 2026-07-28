@@ -260,7 +260,7 @@ class custom extends base {
             // Override comment (only shown for overridden categories).
             if ($options['auditcomment']) {
                 if ($category && !empty($category->catoverride)) {
-                    $csvitems[$identifier . '_auditcomment'] = $category->auditcomment;
+                    $csvitems[$identifier . '_auditcomment'] = (string)($category->auditcomment ?? '');
                 } else {
                     $csvitems[$identifier . '_auditcomment'] = '';
                 }
@@ -304,7 +304,7 @@ class custom extends base {
             // i.e. anything other than the original imported 'FIRST' grade).
             if ($options['auditcomment']) {
                 if ($provisional && $provisional->gradetype != 'FIRST') {
-                    $csvitems[$identifier . '_auditcomment'] = $provisional->auditcomment;
+                    $csvitems[$identifier . '_auditcomment'] = (string)($provisional->auditcomment ?? '');
                 } else {
                     $csvitems[$identifier . '_auditcomment'] = '';
                 }
