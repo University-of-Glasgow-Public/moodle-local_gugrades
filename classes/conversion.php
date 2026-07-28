@@ -637,13 +637,16 @@ class conversion {
             $lower = (int) round(((float) $values[$i]->percentage) * $scale, 0, PHP_ROUND_HALF_UP);
 
             if ($i == count($values) - 1) {
+                // Last band runs up to and including 100%, so a lower bound of 100 is valid.
                 $upper = 100 * $scale;
+                if ($percentgrade >= $lower && $percentgrade <= $upper) {
+                    return $values[$i];
+                }
             } else {
                 $upper = (int) round(((float) $values[$i + 1]->percentage) * $scale, 0, PHP_ROUND_HALF_UP);
-            }
-
-            if ($percentgrade >= $lower && $percentgrade < $upper) {
-                return $values[$i];
+                if ($percentgrade >= $lower && $percentgrade < $upper) {
+                    return $values[$i];
+                }
             }
         }
 
