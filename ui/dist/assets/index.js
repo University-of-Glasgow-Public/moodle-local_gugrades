@@ -74556,6 +74556,7 @@ var AuditPage_default = /* @__PURE__ */ defineComponent({
 //#endregion
 //#region src/components/TabsNav.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$12 = {
+	key: 0,
 	class: "mt-0 w-full",
 	role: "navigation"
 };
@@ -74566,6 +74567,8 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 	__name: "TabsNav",
 	setup(__props) {
 		const debug = /* @__PURE__ */ ref({});
+		const haschangesettings = /* @__PURE__ */ ref(false);
+		const permissionsloaded = /* @__PURE__ */ ref(false);
 		const { mstrings } = storeToRefs(useMstrings());
 		const tabs = /* @__PURE__ */ ref([
 			{
@@ -74605,10 +74608,26 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 				id: "settingspage"
 			}
 		]);
+		const filteredtabs = computed(() => {
+			return tabs.value.filter((tab) => {
+				if (tab.id == "settingspage") return haschangesettings.value;
+				return true;
+			});
+		});
+		onMounted(() => {
+			moodleFetch("local_gugrades_has_capability", { capability: "local/gugrades:changesettings" }).then((result) => {
+				haschangesettings.value = !!result.hascapability;
+				permissionsloaded.value = true;
+			}).catch((error) => {
+				console.error(error);
+				debug.value = error;
+				permissionsloaded.value = true;
+			});
+		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", _hoisted_1$12, [createVNode(unref(me$1), { defaultIndex: 1 }, {
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), permissionsloaded.value ? (openBlock(), createElementBlock("div", _hoisted_1$12, [createVNode(unref(me$1), { defaultIndex: 1 }, {
 				default: withCtx(() => [createVNode(unref(pe$1), { class: "flex justify-start space-x-1 bg-base-100 p-1 border border-base-300 rounded-b-md w-full shadow-sm focus:outline-none" }, {
-					default: withCtx(() => [(openBlock(true), createElementBlock(Fragment, null, renderList(tabs.value, (tab) => {
+					default: withCtx(() => [(openBlock(true), createElementBlock(Fragment, null, renderList(filteredtabs.value, (tab) => {
 						return openBlock(), createBlock(unref(xe), null, {
 							default: withCtx(({ selected }) => [createBaseVNode("a", {
 								id: tab.id,
@@ -74625,7 +74644,7 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 					}), 256))]),
 					_: 1
 				}), createVNode(unref(Ie), null, {
-					default: withCtx(() => [(openBlock(true), createElementBlock(Fragment, null, renderList(tabs.value, (tab) => {
+					default: withCtx(() => [(openBlock(true), createElementBlock(Fragment, null, renderList(filteredtabs.value, (tab) => {
 						return openBlock(), createBlock(unref(ye), { role: "main" }, {
 							default: withCtx(() => [(openBlock(), createBlock(resolveDynamicComponent(tab.component)))]),
 							_: 2
@@ -74634,7 +74653,7 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 					_: 1
 				})]),
 				_: 1
-			})])], 64);
+			})])) : createCommentVNode("", true)], 64);
 		};
 	}
 });

@@ -1,10 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <div class="mt-0 w-full" role="navigation">
+    <div v-if="permissionsloaded" class="mt-0 w-full" role="navigation">
         <TabGroup :defaultIndex="1">
             <TabList class="flex justify-start space-x-1 bg-base-100 p-1 border border-base-300 rounded-b-md w-full shadow-sm focus:outline-none">
-                <Tab v-for="tab in tabs" v-slot="{ selected }">
+                <Tab v-for="tab in filteredtabs" v-slot="{ selected }">
                     <a
                         :id="tab.id"
                         class="tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center"
@@ -18,7 +18,7 @@
                 </Tab>
             </TabList>
             <TabPanels >
-                <TabPanel v-for="tab in tabs" role="main">
+                <TabPanel v-for="tab in filteredtabs" role="main">
                     <component :is="tab.component" />
                 </TabPanel>
             </TabPanels>
@@ -27,9 +27,10 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
     import { MonitorCog, Camera, Calculator, Shield, Settings2, Table } from '@lucide/vue';
@@ -42,6 +43,8 @@
     import AuditPage from '@/views/AuditPage.vue';
 
     const debug = ref({});
+    const haschangesettings = ref(false);
+    const permissionsloaded = ref(false);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
@@ -83,5 +86,32 @@
             id: 'settingspage',
         },
     ]);
+
+    const filteredtabs = computed(() => {
+        return tabs.value.filter((tab) => {
+            if (tab.id == 'settingspage') {
+                return haschangesettings.value;
+            }
+            return true;
+        });
+    });
+
+    onMounted(() => {
+        moodleFetch(
+            'local_gugrades_has_capability',
+            {
+                capability: 'local/gugrades:changesettings',
+            }
+        )
+        .then((result: any) => {
+            haschangesettings.value = !!result.hascapability;
+            permissionsloaded.value = true;
+        })
+        .catch((error) => {
+            console.error(error);
+            debug.value = error;
+            permissionsloaded.value = true;
+        });
+    });
 
 </script>
