@@ -81515,7 +81515,7 @@ var UserTour_default = /* @__PURE__ */ defineComponent({
 		const tourManager = /* @__PURE__ */ ref(null);
 		const toursteps = /* @__PURE__ */ ref([]);
 		const tooltip = {
-			backgroundColor: "var(--color-brand-light-purple)",
+			backgroundColor: "#ffffff",
 			textColor: "var(--color-brand-dark-purple)",
 			buttonBackgroundColor: "var(--color-university-blue)",
 			buttonTextColor: "#ffffff",
