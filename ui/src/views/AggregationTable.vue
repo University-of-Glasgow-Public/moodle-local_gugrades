@@ -277,6 +277,7 @@
     import CompletionPercentage from '@/components/Aggregation/CompletionPercentage.vue';
     import TotalCell from '@/components/Aggregation/TotalCell.vue';
     import TotalHeader from '@/components/Aggregation/TotalHeader.vue';
+    import BackButton from '@/components/Aggregation/BackButton.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -390,6 +391,17 @@
         })); 
 
         // Back button goes here.
+        if (!toplevel.value) {
+            cols.push(columnHelper.display({
+                id: 'back',
+                header: () => {
+                    return h(BackButton, {
+                        onBackclick: () => expand_clicked(backid.value)
+                    });
+                },
+                cell: '',
+            }))
+        }
 
         // Iterate over grade item columns.
         columns.value.forEach(column => {
@@ -398,6 +410,7 @@
                     return h(AggregationTableHeader, {
                         column: column,
                         headercontext: context,
+                        onExpandclicked: () => expand_clicked(column.categoryid),
                     });
                 },
                 cell: ({row, table}) => {

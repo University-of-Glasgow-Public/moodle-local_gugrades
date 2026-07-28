@@ -47,6 +47,8 @@
 
     const props = defineProps< iProps >();
 
+    const emits = defineEmits(['expandclicked']);
+
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
@@ -56,7 +58,7 @@
      * Drill down
      */
     function expand_clicked() {
-        console.log('DRILL DOWN');
+        emits('expandclicked');
     }
 
 </script>

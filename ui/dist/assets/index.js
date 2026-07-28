@@ -72888,15 +72888,17 @@ var AggregationTableHeader_default = /* @__PURE__ */ defineComponent({
 		infocol: { type: Boolean },
 		totaltype: {}
 	},
-	setup(__props) {
+	emits: ["expandclicked"],
+	setup(__props, { emit: __emit }) {
 		const props = __props;
+		const emits = __emit;
 		const { mstrings } = storeToRefs(useMstrings());
 		const toggleSorting = computed(() => props.headercontext.column.getToggleSortingHandler());
 		/**
 		* Drill down
 		*/
 		function expand_clicked() {
-			console.log("DRILL DOWN");
+			emits("expandclicked");
 		}
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock("div", null, [
@@ -73221,6 +73223,24 @@ var TotalHeader_default = /* @__PURE__ */ defineComponent({
 	}
 });
 //#endregion
+//#region src/components/Aggregation/BackButton.vue
+var BackButton_default = /* @__PURE__ */ defineComponent({
+	__name: "BackButton",
+	emits: ["backclick"],
+	setup(__props, { emit: __emit }) {
+		const emits = __emit;
+		function backclicked() {
+			emits("backclick");
+		}
+		return (_ctx, _cache) => {
+			return openBlock(), createBlock(UButton_default, { onClick: backclicked }, {
+				default: withCtx(() => [createVNode(unref(ArrowBigLeft), { size: 18 }), _cache[0] || (_cache[0] = createTextVNode(" Back ", -1))]),
+				_: 1
+			});
+		};
+	}
+});
+//#endregion
 //#region src/views/AggregationTable.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$18 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
 var _hoisted_2$14 = { class: "p-2" };
@@ -73300,12 +73320,20 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 			cols.push(columnHelper.accessor("lastinitial", { header: "lastinitial" }));
 			cols.push(columnHelper.accessor("displayname", { header: mstringstore.getMstring("firstnamelastname") }));
 			cols.push(columnHelper.accessor("idnumber", { header: mstringstore.getMstring("idnumber") }));
+			if (!toplevel.value) cols.push(columnHelper.display({
+				id: "back",
+				header: () => {
+					return h$1(BackButton_default, { onBackclick: () => expand_clicked(backid.value) });
+				},
+				cell: ""
+			}));
 			columns.value.forEach((column) => {
 				cols.push(columnHelper.accessor(column.fieldname, {
 					header: (context) => {
 						return h$1(AggregationTableHeader_default, {
 							column,
-							headercontext: context
+							headercontext: context,
+							onExpandclicked: () => expand_clicked(column.categoryid)
 						});
 					},
 					cell: ({ row, table }) => {
