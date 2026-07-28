@@ -3,7 +3,6 @@
     <!-- Main Scrollable Table Containment Frame -->
     <div class="w-full overflow-x-auto overflow-y-visible rounded-lg border border-brand-light-purple/30 bg-white shadow-md pb-12">
       
-      <!-- NATIVE TABLE: Restored proper semantics for bulletproof auto-alignment -->
       <table class="w-full text-left border-collapse text-sm">
         
         <!-- HEADER ROW GROUP -->
@@ -17,7 +16,6 @@
                 dense ? 'px-3 py-1.5 text-xs' : 'px-6 py-2.5',
                 header.column.getCanSort() ? 'cursor-pointer select-none' : ''
                 ]"
-                @click="header.column.getToggleSortingHandler()?.($event)"
             >
               <div class="inline-flex items-center gap-1.5 w-max">          
                 <FlexRender 
@@ -48,7 +46,7 @@
             <td 
               v-for="cell in row.getVisibleCells()" 
               :key="cell.id" 
-              class="whitespace-normal break-words transition-all duration-150"
+              class="transition-all duration-150"
               :class="dense ? 'px-3 py-1 text-xs' : 'px-6 py-2'"
             >
               <FlexRender 

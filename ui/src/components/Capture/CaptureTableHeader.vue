@@ -1,7 +1,7 @@
 <template>
     <div class="flex items-center justify-start w-full gap-2 leading-tight">
         
-        <span class="font-semibold break-words">
+        <span class="font-semibold break-words" @click="toggleSorting">
             {{ column.description }}
         </span>
 
@@ -24,9 +24,11 @@
     import { computed } from 'vue';
     import CaptureColumnEditCog from './CaptureColumnEditCog.vue';
     import UButton from '../Common/UButton.vue';
+    import type { HeaderContext } from '@tanstack/vue-table';
 
     interface iProps {
         column: Record<string, any>; // Keys are strings, values are anything
+        headercontext: HeaderContext<any, any>;
         caneditgrades: boolean;
         ineditcellmode: boolean;
         itemid: number;
@@ -36,6 +38,8 @@
     const props = defineProps< iProps >();
 
     const emits = defineEmits(['bulksave', 'bulkcancel']);
+
+    const toggleSorting = computed(() => props.headercontext.column.getToggleSortingHandler());
 
     function bulksave_clicked() {
         emits('bulksave');

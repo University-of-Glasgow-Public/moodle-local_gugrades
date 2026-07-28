@@ -48,11 +48,11 @@
       defineProps<{ 
         text?: string | null
         hasUnderline?: boolean
-        position?: 'above' | 'below' // 3. NEW POSITION PROP
+        position?: 'above' | 'below' 
       }>(), 
       {
         hasUnderline: false,
-        position: 'above' // 4. DEFAULT TO ABOVE (keeps your current layout intact)
+        position: 'above' 
       }
     )
 </script>

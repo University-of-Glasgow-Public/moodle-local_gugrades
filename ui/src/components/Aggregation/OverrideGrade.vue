@@ -2,7 +2,7 @@
     <Popover class="relative">
         <PopoverButton class="cursor-pointer" aria-label="Open menu"><EllipsisVertical :size="18" class="text-base-content" tabindex="0"></EllipsisVertical></PopoverButton>
 
-        <PopoverPanel class="border-2 border-base-300 rounded-md absolute z-999 top-auto bottom-full mb-2 left-1/2 -translate-x-1/2" v-slot="{ close }">
+        <PopoverPanel class="border-2 border-base-300 rounded-md absolute z-999 left-1/2 -translate-x-1/2" :class="panelPositionClasses" v-slot="{ close }">
             <ul v-if="props.categoryid == 0" class="menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">
                 <li v-if="caneditgrades" >
                     <AddGradeButton :itemid="props.itemid" :selectedcategoryid="props.selectedcategoryid" :userid="props.userid" :name="props.name" :itemname="props.itemname" :released="props.released" @gradeadded="grade_added" :close="close"></AddGradeButton>
@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+    import { computed } from 'vue';
     import HistoryButton from '@/components/Capture/HistoryButton.vue';
     import AddGradeButton from '@/components/Capture/AddGradeButton.vue';
     import HideShowButton from '@/components/Capture/HideShowButton.vue';
@@ -39,22 +40,22 @@
     import { EllipsisVertical } from '@lucide/vue';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
 
-    const props = defineProps({
-        userid: Number,
-        item: Object,
-        itemid: Number,
-        categoryid: Number,
-        selectedcategoryid: Number,
-        itemname: String,
-        name: String,
-        awaitingcapture: Boolean,
-        gradehidden: Boolean,
-        converted: Boolean,
-        overridden: Boolean,
-        showweights: Boolean,
-        released: Boolean,
-        caneditgrades: Boolean,
-    });
+    interface IProps {
+        itemid: number;
+        categoryid: number;
+        selectedcategoryid: number;
+        userid: number;
+        gradehidden: boolean;
+        overridden: boolean;
+        itemname: string;
+        name: string;
+        showweights: boolean;
+        released: boolean;
+        caneditgrades: boolean;
+        position: 'above' | 'below';
+    }
+
+    const props = defineProps< IProps >();
 
     const emit = defineEmits([
         'gradeadded'
@@ -63,6 +64,12 @@
     function grade_added() {
         emit('gradeadded');
     }
+
+    const panelPositionClasses = computed(() => {
+        return props.position === 'below'
+            ? 'top-full mt-2'
+            : 'bottom-full mb-2';
+    });
 
     const handleItemClick = (event: MouseEvent) => {
         // Close the dropdown by removing the 'open' attribute

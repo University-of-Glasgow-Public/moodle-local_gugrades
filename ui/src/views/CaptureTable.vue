@@ -262,13 +262,14 @@
         columns.value.forEach(column => {
             cols.push(columnHelper.accessor('GRADE' + column.id, {
                 // header: column.description,
-                header: () => {
+                header: (context) => {
                     return h(CaptureTableHeader, {
                         column: column,
                         caneditgrades: caneditgrades.value,
                         ineditcellmode: ineditcellmode.value,
                         itemid: itemid.value,
                         editcolumnid: editcolumnid.value,
+                        headercontext: context,
                         onColumnchanged: () => reload_page(),
                         onEditcolumn: () => bulk_edit_clicked(column),
                         onBulkcancel: () => bulkedit_cancel(),

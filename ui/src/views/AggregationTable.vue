@@ -72,8 +72,19 @@
         <!-- Please wait spinner -->
         <PleaseWait v-if="loading"></PleaseWait>
 
-        <EasyDataTable
+        <!-- NEW TANSTACK TABLE -->
+        <UTable 
             v-if="!loading"
+            :data="users"
+            :columns="tablecolumns" 
+            :filters="tablefilters"
+            :visibility="{firstinitial: false, lastinitial: false}"
+            :initial-sort="[{ id: 'displayname', desc: false }]" 
+            class="my-8"
+        />
+
+        <EasyDataTable
+            v-if="!loading && false"
             alternating
             buttons-pagination
             :current-page="currentpage"
@@ -207,7 +218,6 @@
                     <div>
                         <span v-if="item.error">{{ item.error }}</span>
                         <GradeColor v-else :grade="item.displaygrade"></GradeColor>
-                        <!-- <span :class="itemclasses(item).concat(gradecolorclass(item.displaygrade))" v-else>{{ item.displaygrade }}</span> -->
                         <span v-if="item.alteredweight">
                             <br />
                             <span class="badge badge-warning mt-1">ALTERED</span>
@@ -239,7 +249,7 @@
 </template>
 
 <script setup lang="ts">
-    import {ref, computed, onMounted, nextTick } from 'vue';
+    import {ref, computed, onMounted, h } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -255,12 +265,17 @@
     import type { Header, Item } from "vue3-easy-data-table";
     import UAlert from '@/components/Common/UAlert.vue';
     import UTooltip from '@/components/Common/UTooltip.vue';
+    import AggregationTableHeader from '@/components/Aggregation/AggregationTableHeader.vue';
+    import AggregationGradeCell from '@/components/Aggregation/AggregationGradeCell.vue';
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
     import GradeColor from '@/components/Common/GradeColor.vue';
     import { useFilter } from '@/stores/filter';
     import UButton from '@/components/Common/UButton.vue';
     import UTable from '@/components/Common/UTable.vue';
     import { createColumnHelper, type ColumnFiltersState } from '@tanstack/vue-table';
+    import ResitRequired from '@/components/Aggregation/ResitRequired.vue';
+    import CompletionPercentage from '@/components/Aggregation/CompletionPercentage.vue';
+    import TotalCell from '@/components/Aggregation/TotalCell.vue';
 
     interface IAggregationHeader {
         infocol?: boolean;
@@ -322,6 +337,9 @@
     const issetupcomplete = ref(false);
     const { firstname, lastname } = storeToRefs( filterstore );
 
+    type GradeRow = Record<string, any>;
+    const columnHelper = createColumnHelper<GradeRow>();
+
     /**
      * onMounted, get write grades capability
      */
@@ -340,6 +358,116 @@
             console.error(error);
             debug.value = error;
         });
+    });
+
+    /**
+     * computed for tablecolumns.
+     * This is basically where the table is defined.
+     * (TanStack table version)
+     */
+    const tablecolumns = computed(() => {
+        const cols = [];
+
+        // First initial (column hidden)
+        cols.push(columnHelper.accessor('firstinitial', {
+            header: 'firstinitial'
+        }));
+
+        // Last initial (column hidden)
+        cols.push(columnHelper.accessor('lastinitial', {
+            header: 'lastinitial'
+        }));
+
+        // Displayname (not hidden)
+        cols.push(columnHelper.accessor('displayname', {
+            header: mstringstore.getMstring('firstnamelastname')
+        }));
+
+        // ID Number
+        cols.push(columnHelper.accessor('idnumber', {
+            header: mstringstore.getMstring('idnumber')
+        })); 
+
+        // Back button goes here.
+
+        // Iterate over grade item columns.
+        columns.value.forEach(column => {
+            cols.push(columnHelper.accessor(column.fieldname, {
+                header: (context) => {
+                    return h(AggregationTableHeader, {
+                        column: column,
+                        headercontext: context,
+                    });
+                },
+                cell: ({row, table}) => {
+                    const user = row.original;
+                    const rows = table.getRowModel().rows;
+                    const indexOnPage = rows.findIndex(r => r.id === row.id);
+                    const isBeforeHalfway = indexOnPage < rows.length / 2;
+                    return h(AggregationGradeCell, {
+                        user: user,
+                        column: column,
+                        level1category: level1category.value,
+                        caneditgrades: caneditgrades.value,
+                        beforehalfway: isBeforeHalfway,
+                        onGradeadded: (userid) => grade_changed(userid),
+                    });
+                }
+            }));
+        });
+
+        if (toplevel.value) {
+
+            // Resit required
+            cols.push(columnHelper.accessor('resitrequired', {
+                header: mstringstore.getMstring('resitrequired'),
+                cell: ({row}) => {
+                    const user = row.original;
+                    return h(ResitRequired, {
+                        user: user,
+                        caneditgrades: caneditgrades.value,
+                        onUserupdated: () => user_update(user.id),
+                    });
+                }
+            }));
+
+            // Completion.
+            if (completionused.value) {
+                cols.push(columnHelper.accessor('completed', {
+                    header: mstringstore.getMstring('completed'),
+                    cell: ({row}) => {
+                        const user = row.original;
+                        return h(CompletionPercentage, {
+                            user: user
+                        });
+                    }
+                }));
+            }
+
+            // "Grand" Total
+            cols.push(columnHelper.accessor('coursetotal', {
+                header: mstringstore.getMstring('coursetotal'),
+                cell: ({row, table}) => {
+                    const user = row.original;
+                    const rows = table.getRowModel().rows;
+                    const indexOnPage = rows.findIndex(r => r.id === row.id);
+                    const isBeforeHalfway = indexOnPage < rows.length / 2;
+                    return h(TotalCell, {
+                        user: user,
+                        toplevel: toplevel.value,
+                        gradeitemid: gradeitemid.value,
+                        level1category: level1category.value,
+                        categoryid: categoryid.value,
+                        showweights: showweights.value,
+                        caneditgrades: caneditgrades.value,
+                        beforehalfway: isBeforeHalfway,
+                        onGradeadded: (userid) => grade_changed(userid),
+                    });
+                }
+            }));
+        }
+
+        return cols;
     });
 
     /**
@@ -647,6 +775,9 @@
             if (found > -1) {
                 users.value[found] = process_user(result);
             }
+
+            // Bodge to force Tanstack to see change :(
+            users.value = [...users.value];
         })
         .catch((error) => {
             window.console.error(error);
