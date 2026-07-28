@@ -1,13 +1,13 @@
 //#region \0rolldown/runtime.js
-var __defProp$3 = Object.defineProperty;
+var __defProp$2 = Object.defineProperty;
 var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 var __exportAll = (all, no_symbols) => {
 	let target = {};
-	for (var name in all) __defProp$3(target, name, {
+	for (var name in all) __defProp$2(target, name, {
 		get: all[name],
 		enumerable: true
 	});
-	if (!no_symbols) __defProp$3(target, Symbol.toStringTag, { value: "Module" });
+	if (!no_symbols) __defProp$2(target, Symbol.toStringTag, { value: "Module" });
 	return target;
 };
 //#endregion
@@ -1768,12 +1768,6 @@ function setCurrentRenderingInstance(instance) {
 	currentScopeId = instance && instance.type.__scopeId || null;
 	return prev;
 }
-function pushScopeId(id) {
-	currentScopeId = id;
-}
-function popScopeId() {
-	currentScopeId = null;
-}
 function withCtx(fn, ctx = currentRenderingInstance, isNonScopedSlot) {
 	if (!ctx) return fn;
 	if (fn._n) return fn;
@@ -2721,13 +2715,6 @@ var PublicInstanceProxyHandlers = {
 		return Reflect.defineProperty(target, key, descriptor);
 	}
 };
-function useSlots() {
-	return getContext$1("useSlots").slots;
-}
-function getContext$1(calledFunctionName) {
-	const i = getCurrentInstance();
-	return i.setupContext || (i.setupContext = createSetupContext(i));
-}
 function normalizePropsOrEmits(props) {
 	return isArray(props) ? props.reduce((normalized, p) => (normalized[p] = null, normalized), {}) : props;
 }
@@ -57749,11 +57736,11 @@ function useLogo() {
 }
 //#endregion
 //#region src/components/Common/GreyLogo.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$80 = {
+var _hoisted_1$73 = {
 	key: 0,
 	class: "flex justify-center"
 };
-var _hoisted_2$62 = ["src"];
+var _hoisted_2$56 = ["src"];
 //#endregion
 //#region src/components/Common/GreyLogo.vue
 var GreyLogo_default = /* @__PURE__ */ defineComponent({
@@ -57780,27 +57767,27 @@ var GreyLogo_default = /* @__PURE__ */ defineComponent({
 			updateLogo();
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), !loading.value ? (openBlock(), createElementBlock("div", _hoisted_1$80, [createBaseVNode("img", {
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), !loading.value ? (openBlock(), createElementBlock("div", _hoisted_1$73, [createBaseVNode("img", {
 				src: url.value,
 				id: "mygradeslogo",
 				alt: "MyGrades Logo",
 				class: normalizeClass(["border-2 rounded-2xl border-gray-300 px-5 bg-white", { "grayscale": unref(monochrome) }])
-			}, null, 10, _hoisted_2$62)])) : createCommentVNode("", true)], 64);
+			}, null, 10, _hoisted_2$56)])) : createCommentVNode("", true)], 64);
 		};
 	}
 });
 //#endregion
 //#region src/components/PageHeader.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$79 = { class: "w-full mt-4 grid grid-cols-3 items-center justify-between border-x border-t border-brand-light-purple/30 bg-white rounded-t-xl px-6 py-3 text-brand-dark-purple shadow-sm" };
-var _hoisted_2$61 = { class: "flex items-start gap-3 max-w-xs md:max-w-sm" };
-var _hoisted_3$45 = ["href"];
-var _hoisted_4$39 = { class: "flex flex-col min-w-0 space-y-1" };
-var _hoisted_5$33 = ["href", "title"];
-var _hoisted_6$28 = { class: "text-xs text-brand-dark-purple/60 font-medium" };
-var _hoisted_7$22 = { class: "font-mono text-brand-dark-purple/80" };
-var _hoisted_8$18 = { class: "pt-0.5" };
-var _hoisted_9$15 = { class: "inline-block text-[11px] font-bold tracking-wider uppercase bg-brand-dark-pink/10 text-brand-dark-pink px-2 py-0.5 rounded border border-brand-dark-pink/20 shadow-inner" };
-var _hoisted_10$14 = { class: "flex justify-center shrink-0" };
+var _hoisted_1$72 = { class: "w-full mt-4 grid grid-cols-3 items-center justify-between border-x border-t border-brand-light-purple/30 bg-white rounded-t-xl px-6 py-3 text-brand-dark-purple shadow-sm" };
+var _hoisted_2$55 = { class: "flex items-start gap-3 max-w-xs md:max-w-sm" };
+var _hoisted_3$42 = ["href"];
+var _hoisted_4$36 = { class: "flex flex-col min-w-0 space-y-1" };
+var _hoisted_5$32 = ["href", "title"];
+var _hoisted_6$26 = { class: "text-xs text-brand-dark-purple/60 font-medium" };
+var _hoisted_7$21 = { class: "font-mono text-brand-dark-purple/80" };
+var _hoisted_8$17 = { class: "pt-0.5" };
+var _hoisted_9$14 = { class: "inline-block text-[11px] font-bold tracking-wider uppercase bg-brand-dark-pink/10 text-brand-dark-pink px-2 py-0.5 rounded border border-brand-dark-pink/20 shadow-inner" };
+var _hoisted_10$13 = { class: "flex justify-center shrink-0" };
 //#endregion
 //#region src/components/PageHeader.vue
 var PageHeader_default = /* @__PURE__ */ defineComponent({
@@ -57821,21 +57808,21 @@ var PageHeader_default = /* @__PURE__ */ defineComponent({
 			});
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$79, [
-				createBaseVNode("div", _hoisted_2$61, [createBaseVNode("a", {
+			return openBlock(), createElementBlock("div", _hoisted_1$72, [
+				createBaseVNode("div", _hoisted_2$55, [createBaseVNode("a", {
 					href: url.value,
 					class: "text-university-blue hover:text-brand-dark-blue transition-colors pt-0.5 shrink-0",
 					"aria-label": "Go back"
-				}, [createVNode(unref(MoveLeft), { size: 18 })], 8, _hoisted_3$45), createBaseVNode("div", _hoisted_4$39, [
+				}, [createVNode(unref(MoveLeft), { size: 18 })], 8, _hoisted_3$42), createBaseVNode("div", _hoisted_4$36, [
 					createBaseVNode("a", {
 						href: url.value,
 						class: "text-sm font-semibold text-university-blue hover:underline truncate block",
 						title: fullname.value
-					}, " Back to " + toDisplayString(fullname.value), 9, _hoisted_5$33),
-					createBaseVNode("p", _hoisted_6$28, [_cache[0] || (_cache[0] = createTextVNode(" Start date: ", -1)), createBaseVNode("span", _hoisted_7$22, toDisplayString(startdate.value), 1)]),
-					createBaseVNode("div", _hoisted_8$18, [createBaseVNode("span", _hoisted_9$15, toDisplayString(specialcategory.value), 1)])
+					}, " Back to " + toDisplayString(fullname.value), 9, _hoisted_5$32),
+					createBaseVNode("p", _hoisted_6$26, [_cache[0] || (_cache[0] = createTextVNode(" Start date: ", -1)), createBaseVNode("span", _hoisted_7$21, toDisplayString(startdate.value), 1)]),
+					createBaseVNode("div", _hoisted_8$17, [createBaseVNode("span", _hoisted_9$14, toDisplayString(specialcategory.value), 1)])
 				])]),
-				createBaseVNode("div", _hoisted_10$14, [createVNode(GreyLogo_default)]),
+				createBaseVNode("div", _hoisted_10$13, [createVNode(GreyLogo_default)]),
 				_cache[1] || (_cache[1] = createBaseVNode("div", { class: "hidden md:block" }, null, -1))
 			]);
 		};
@@ -58323,10 +58310,10 @@ var useMstrings = defineStore("mstringstore", () => {
 });
 //#endregion
 //#region src/components/PageFooter.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$78 = { class: "mt-8 px-10 flex justify-center-safe gap-4 text-sm text-brand-light-purple" };
-var _hoisted_2$60 = ["href"];
-var _hoisted_3$44 = ["href"];
-var _hoisted_4$38 = ["href"];
+var _hoisted_1$71 = { class: "mt-8 px-10 flex justify-center-safe gap-4 text-sm text-brand-light-purple" };
+var _hoisted_2$54 = ["href"];
+var _hoisted_3$41 = ["href"];
+var _hoisted_4$35 = ["href"];
 //#endregion
 //#region src/components/PageFooter.vue
 var PageFooter_default = /* @__PURE__ */ defineComponent({
@@ -58345,21 +58332,21 @@ var PageFooter_default = /* @__PURE__ */ defineComponent({
 			});
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createBaseVNode("div", _hoisted_1$78, [
+			return openBlock(), createElementBlock(Fragment, null, [createBaseVNode("div", _hoisted_1$71, [
 				_cache[0] || (_cache[0] = createBaseVNode("div", null, [createBaseVNode("a", { href: "https://www.gla.ac.uk" }, "University website")], -1)),
 				_cache[1] || (_cache[1] = createBaseVNode("div", { "aria-hidden": "true" }, "•", -1)),
 				_cache[2] || (_cache[2] = createBaseVNode("div", null, [createBaseVNode("a", { href: "https://www.gla.ac.uk/legal/accessibility/statements/moodle" }, "Acessibility")], -1)),
 				_cache[3] || (_cache[3] = createBaseVNode("div", { "aria-hidden": "true" }, "•", -1)),
-				createBaseVNode("div", null, [createBaseVNode("a", { href: sitebase.value + "local/guprivacy/privacy.php" }, "Privacy", 8, _hoisted_2$60)]),
+				createBaseVNode("div", null, [createBaseVNode("a", { href: sitebase.value + "local/guprivacy/privacy.php" }, "Privacy", 8, _hoisted_2$54)]),
 				_cache[4] || (_cache[4] = createBaseVNode("div", { "aria-hidden": "true" }, "•", -1)),
-				createBaseVNode("div", null, [createBaseVNode("a", { href: sitebase.value + "local/guprivacy/cookies.php" }, "Cookies", 8, _hoisted_3$44)]),
+				createBaseVNode("div", null, [createBaseVNode("a", { href: sitebase.value + "local/guprivacy/cookies.php" }, "Cookies", 8, _hoisted_3$41)]),
 				_cache[5] || (_cache[5] = createBaseVNode("div", { "aria-hidden": "true" }, "•", -1)),
 				createBaseVNode("div", null, [createBaseVNode("a", {
 					href: "#",
 					onClick: withModifiers(reset_tour, ["prevent"])
 				}, "Reset user tour on this page")]),
 				_cache[6] || (_cache[6] = createBaseVNode("div", { "aria-hidden": "true" }, "•", -1)),
-				createBaseVNode("div", null, [createBaseVNode("a", { href: unref(mstrings).lisuurl }, "Help with this page", 8, _hoisted_4$38)])
+				createBaseVNode("div", null, [createBaseVNode("a", { href: unref(mstrings).lisuurl }, "Help with this page", 8, _hoisted_4$35)])
 			]), _cache[7] || (_cache[7] = createBaseVNode("div", { class: "mt-4 px-10 flex justify-center-safe gap-8 text-sm text-brand-light-purple" }, " The University of Glasgow is a registered Scottish charity: Registration Number SC004401 ", -1))], 64);
 		};
 	}
@@ -60978,11 +60965,11 @@ var useLeve1Store = defineStore("level1", () => {
 });
 //#endregion
 //#region src/components/Common/LevelOneSelect.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$77 = {
+var _hoisted_1$70 = {
 	disabled: "",
 	value: "0"
 };
-var _hoisted_2$59 = ["value", "selected"];
+var _hoisted_2$53 = ["value", "selected"];
 //#endregion
 //#region src/components/Common/LevelOneSelect.vue
 var LevelOneSelect_default = /* @__PURE__ */ defineComponent({
@@ -61055,20 +61042,20 @@ var LevelOneSelect_default = /* @__PURE__ */ defineComponent({
 				onChange: handleUserSelection,
 				class: "select select-bordered bg-white text-neutral border-slate-300 w-80 shadow-md focus:outline-none focus:border-primary",
 				"aria-label": "Select top-level grade category"
-			}, [createBaseVNode("option", _hoisted_1$77, toDisplayString(unref(mstrings).selectgradecategory), 1), (openBlock(true), createElementBlock(Fragment, null, renderList(level1categories.value, (category) => {
+			}, [createBaseVNode("option", _hoisted_1$70, toDisplayString(unref(mstrings).selectgradecategory), 1), (openBlock(true), createElementBlock(Fragment, null, renderList(level1categories.value, (category) => {
 				return openBlock(), createElementBlock("option", {
 					key: category.id,
 					value: category.id,
 					selected: selected.value == category.id
-				}, toDisplayString(category.fullname), 9, _hoisted_2$59);
+				}, toDisplayString(category.fullname), 9, _hoisted_2$53);
 			}), 128))], 544)), [[vModelSelect, categoryid.value]]) : createCommentVNode("", true)])])], 64);
 		};
 	}
 });
 //#endregion
 //#region src/components/Configure/ConfigTreeIcon.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$76 = ["title", "src"];
-var _hoisted_2$58 = ["title"];
+var _hoisted_1$69 = ["title", "src"];
+var _hoisted_2$52 = ["title"];
 //#endregion
 //#region src/components/Configure/ConfigTreeIcon.vue
 var ConfigTreeIcon_default = /* @__PURE__ */ defineComponent({
@@ -61084,19 +61071,19 @@ var ConfigTreeIcon_default = /* @__PURE__ */ defineComponent({
 				class: "w-6 h-6 inline-block object-contain",
 				title: __props.gradeitem.info.itemmodule,
 				src: __props.gradeitem.icon
-			}, null, 8, _hoisted_1$76)) : createCommentVNode("", true), __props.gradeitem.itemtype == "manual" ? (openBlock(), createElementBlock("i", {
+			}, null, 8, _hoisted_1$69)) : createCommentVNode("", true), __props.gradeitem.itemtype == "manual" ? (openBlock(), createElementBlock("i", {
 				key: 1,
 				class: "icon fa fa-pen-to-square fa-fw icon itemicon",
 				role: "img",
 				title: __props.gradeitem.info.itemmodule,
 				"aria-label": "Manual item"
-			}, null, 8, _hoisted_2$58)) : createCommentVNode("", true)], 64);
+			}, null, 8, _hoisted_2$52)) : createCommentVNode("", true)], 64);
 		};
 	}
 });
 //#endregion
 //#region src/components/Configure/ResitCheckbox.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$75 = { class: "flex" };
+var _hoisted_1$68 = { class: "flex" };
 //#endregion
 //#region src/components/Configure/ResitCheckbox.vue
 var ResitCheckbox_default = /* @__PURE__ */ defineComponent({
@@ -61137,7 +61124,7 @@ var ResitCheckbox_default = /* @__PURE__ */ defineComponent({
 			return { "padding-left": (props.depth - 1) * 20 + "px" };
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$75, [createBaseVNode("a", {
+			return openBlock(), createElementBlock("div", _hoisted_1$68, [createBaseVNode("a", {
 				href: "#/",
 				onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("checked", __props.itemid)),
 				class: "plainlink",
@@ -61154,28 +61141,28 @@ var ResitCheckbox_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Configure/ConfigTree.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$74 = {
+var _hoisted_1$67 = {
 	key: 0,
 	class: "px-2 resit_select border-none"
 };
-var _hoisted_2$57 = { class: "resit_select px-2" };
-var _hoisted_3$43 = {
+var _hoisted_2$51 = { class: "resit_select px-2" };
+var _hoisted_3$40 = {
 	key: 0,
 	class: "badge badge-pill badge-success"
 };
-var _hoisted_4$37 = { key: 0 };
-var _hoisted_5$32 = {
+var _hoisted_4$34 = { key: 0 };
+var _hoisted_5$31 = {
 	key: 0,
 	class: "px-2 resit_select"
 };
-var _hoisted_6$27 = ["title"];
-var _hoisted_7$21 = ["title"];
-var _hoisted_8$17 = { class: "resit_select px-2" };
-var _hoisted_9$14 = {
+var _hoisted_6$25 = ["title"];
+var _hoisted_7$20 = ["title"];
+var _hoisted_8$16 = { class: "resit_select px-2" };
+var _hoisted_9$13 = {
 	key: 0,
 	class: "badge badge-pill badge-success"
 };
-var _hoisted_10$13 = { key: 0 };
+var _hoisted_10$12 = { key: 0 };
 //#endregion
 //#region src/components/Configure/ConfigTree.vue
 var ConfigTree_default = /* @__PURE__ */ defineComponent({
@@ -61270,7 +61257,7 @@ var ConfigTree_default = /* @__PURE__ */ defineComponent({
 					key: item.id,
 					class: normalizeClass(resitclass.value)
 				}, [
-					__props.resitconfig ? (openBlock(), createElementBlock("td", _hoisted_1$74, [!__props.resitfade ? (openBlock(), createBlock(ResitCheckbox_default, {
+					__props.resitconfig ? (openBlock(), createElementBlock("td", _hoisted_1$67, [!__props.resitfade ? (openBlock(), createBlock(ResitCheckbox_default, {
 						key: 0,
 						itemid: item.id,
 						checkeditemid: resititemid.value,
@@ -61285,9 +61272,9 @@ var ConfigTree_default = /* @__PURE__ */ defineComponent({
 						style: normalizeStyle(indentstyle.value),
 						class: "flex justify-start"
 					}, [createVNode(ConfigTreeIcon_default, { gradeitem: item }, null, 8, ["gradeitem"]), createTextVNode(" " + toDisplayString(item.itemname), 1)], 4),
-					createBaseVNode("td", _hoisted_2$57, [item.id == resititemid.value ? (openBlock(), createElementBlock("span", _hoisted_3$43, toDisplayString(unref(mstrings)["resitselected"]), 1)) : createCommentVNode("", true)]),
+					createBaseVNode("td", _hoisted_2$51, [item.id == resititemid.value ? (openBlock(), createElementBlock("span", _hoisted_3$40, toDisplayString(unref(mstrings)["resitselected"]), 1)) : createCommentVNode("", true)]),
 					_cache[0] || (_cache[0] = createBaseVNode("td", null, "\xA0", -1)),
-					createBaseVNode("td", null, [createTextVNode(toDisplayString(item.info.scalename) + " ", 1), !item.info.isscale ? (openBlock(), createElementBlock("span", _hoisted_4$37, "\xA0(" + toDisplayString(parseFloat(item.grademax)) + ")", 1)) : createCommentVNode("", true)]),
+					createBaseVNode("td", null, [createTextVNode(toDisplayString(item.info.scalename) + " ", 1), !item.info.isscale ? (openBlock(), createElementBlock("span", _hoisted_4$34, "\xA0(" + toDisplayString(parseFloat(item.grademax)) + ")", 1)) : createCommentVNode("", true)]),
 					createBaseVNode("td", null, [showeights.value ? (openBlock(), createElementBlock("span", {
 						key: 0,
 						style: normalizeStyle(indentstyle.value)
@@ -61295,7 +61282,7 @@ var ConfigTree_default = /* @__PURE__ */ defineComponent({
 				], 2);
 			}), 128)), (openBlock(true), createElementBlock(Fragment, null, renderList(props.nodes.categories, (category) => {
 				return openBlock(), createElementBlock(Fragment, { key: category.id }, [createBaseVNode("tr", { class: normalizeClass(["pb-2", { "bg-light": category.category.even }]) }, [
-					__props.resitconfig ? (openBlock(), createElementBlock("td", _hoisted_5$32, [createTextVNode(toDisplayString(__props.depth) + " ", 1), !__props.resitfade ? (openBlock(), createBlock(ResitCheckbox_default, {
+					__props.resitconfig ? (openBlock(), createElementBlock("td", _hoisted_5$31, [createTextVNode(toDisplayString(__props.depth) + " ", 1), !__props.resitfade ? (openBlock(), createBlock(ResitCheckbox_default, {
 						key: 0,
 						itemid: category.category.itemid,
 						checkeditemid: resititemid.value,
@@ -61311,16 +61298,16 @@ var ConfigTree_default = /* @__PURE__ */ defineComponent({
 						class: "fa fa-folder icon itemicon",
 						title: unref(mstrings)["gradecategory"],
 						"aria-hidden": "true"
-					}, null, 8, _hoisted_6$27)) : (openBlock(), createElementBlock("i", {
+					}, null, 8, _hoisted_6$25)) : (openBlock(), createElementBlock("i", {
 						key: 1,
 						class: "fa fa-folder-o",
 						title: unref(mstrings)["gradecategory"],
 						"aria-hidden": "true"
-					}, null, 8, _hoisted_7$21)), createTextVNode(" " + toDisplayString(category.category.fullname), 1)])], 4),
-					createBaseVNode("td", _hoisted_8$17, [category.category.itemid == resititemid.value ? (openBlock(), createElementBlock("span", _hoisted_9$14, toDisplayString(unref(mstrings)["resitselected"]), 1)) : createCommentVNode("", true)]),
+					}, null, 8, _hoisted_7$20)), createTextVNode(" " + toDisplayString(category.category.fullname), 1)])], 4),
+					createBaseVNode("td", _hoisted_8$16, [category.category.itemid == resititemid.value ? (openBlock(), createElementBlock("span", _hoisted_9$13, toDisplayString(unref(mstrings)["resitselected"]), 1)) : createCommentVNode("", true)]),
 					createBaseVNode("td", null, toDisplayString(category.category.strategy), 1),
 					_cache[1] || (_cache[1] = createBaseVNode("td", null, null, -1)),
-					createBaseVNode("td", null, [showeights.value ? (openBlock(), createElementBlock("span", _hoisted_10$13, toDisplayString(category.category.info.weight) + "%", 1)) : createCommentVNode("", true)])
+					createBaseVNode("td", null, [showeights.value ? (openBlock(), createElementBlock("span", _hoisted_10$12, toDisplayString(category.category.info.weight) + "%", 1)) : createCommentVNode("", true)])
 				], 2), createVNode(_component_ConfigTree, {
 					nodes: category,
 					onActivityselected: sub_activity_click,
@@ -61340,8 +61327,8 @@ var ConfigTree_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/ConfigError.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$73 = ["innerHTML"];
-var _hoisted_2$56 = ["innerHTML"];
+var _hoisted_1$66 = ["innerHTML"];
+var _hoisted_2$50 = ["innerHTML"];
 //#endregion
 //#region src/components/ConfigError.vue
 var ConfigError_default = /* @__PURE__ */ defineComponent({
@@ -61354,7 +61341,7 @@ var ConfigError_default = /* @__PURE__ */ defineComponent({
 				color: "error",
 				class: "mt-1"
 			}, {
-				default: withCtx(() => [createBaseVNode("p", null, [createBaseVNode("b", null, [createBaseVNode("span", { innerHTML: unref(mstrings).configerror }, null, 8, _hoisted_1$73), _cache[0] || (_cache[0] = createTextVNode(":", -1))])]), createBaseVNode("p", { innerHTML: __props.errormessage }, null, 8, _hoisted_2$56)]),
+				default: withCtx(() => [createBaseVNode("p", null, [createBaseVNode("b", null, [createBaseVNode("span", { innerHTML: unref(mstrings).configerror }, null, 8, _hoisted_1$66), _cache[0] || (_cache[0] = createTextVNode(":", -1))])]), createBaseVNode("p", { innerHTML: __props.errormessage }, null, 8, _hoisted_2$50)]),
 				_: 1
 			});
 		};
@@ -61468,8 +61455,8 @@ var Switch_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/UAlert.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$72 = { class: "flex-1" };
-var _hoisted_2$55 = {
+var _hoisted_1$65 = { class: "flex-1" };
+var _hoisted_2$49 = {
 	key: 0,
 	class: "mb-0.5 font-semibold"
 };
@@ -61518,7 +61505,7 @@ var UAlert_default = /* @__PURE__ */ defineComponent({
 				key: 0,
 				class: normalizeClass(classes.value),
 				role: "alert"
-			}, [createBaseVNode("div", _hoisted_1$72, [__props.title ? (openBlock(), createElementBlock("p", _hoisted_2$55, toDisplayString(__props.title), 1)) : createCommentVNode("", true), renderSlot(_ctx.$slots, "default")]), __props.dismissible ? (openBlock(), createElementBlock("button", {
+			}, [createBaseVNode("div", _hoisted_1$65, [__props.title ? (openBlock(), createElementBlock("p", _hoisted_2$49, toDisplayString(__props.title), 1)) : createCommentVNode("", true), renderSlot(_ctx.$slots, "default")]), __props.dismissible ? (openBlock(), createElementBlock("button", {
 				key: 0,
 				type: "button",
 				class: "shrink-0 opacity-60 transition hover:opacity-100",
@@ -61530,12 +61517,12 @@ var UAlert_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Configure/CategoryTree.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$71 = { class: "flex flex-col w-full" };
-var _hoisted_2$54 = { class: "flex items-center py-2 border-b border-brand-light-purple/10 text-sm text-slate-700" };
-var _hoisted_3$42 = { class: "flex-1 flex items-center min-w-0 pr-4" };
-var _hoisted_4$36 = { class: "truncate font-medium text-slate-800" };
-var _hoisted_5$31 = { class: "w-52 shrink-0 flex items-center justify-start pr-2" };
-var _hoisted_6$26 = {
+var _hoisted_1$64 = { class: "flex flex-col w-full" };
+var _hoisted_2$48 = { class: "flex items-center py-2 border-b border-brand-light-purple/10 text-sm text-slate-700" };
+var _hoisted_3$39 = { class: "flex-1 flex items-center min-w-0 pr-4" };
+var _hoisted_4$33 = { class: "truncate font-medium text-slate-800" };
+var _hoisted_5$30 = { class: "w-52 shrink-0 flex items-center justify-start pr-2" };
+var _hoisted_6$24 = {
 	key: 0,
 	class: "w-52 shrink-0 flex items-center justify-start pr-2"
 };
@@ -61642,21 +61629,21 @@ var CategoryTree_default = /* @__PURE__ */ defineComponent({
 		}
 		return (_ctx, _cache) => {
 			const _component_CategoryTree = resolveComponent("CategoryTree", true);
-			return openBlock(), createElementBlock("div", _hoisted_1$71, [hasNoCategories.value ? (openBlock(), createBlock(UAlert_default, {
+			return openBlock(), createElementBlock("div", _hoisted_1$64, [hasNoCategories.value ? (openBlock(), createBlock(UAlert_default, {
 				key: 0,
 				variant: "error"
 			}, {
 				default: withCtx(() => [..._cache[0] || (_cache[0] = [createTextVNode("No categories available to select.", -1)])]),
 				_: 1
 			})) : createCommentVNode("", true), (openBlock(true), createElementBlock(Fragment, null, renderList(props.nodes.categories, (category) => {
-				return openBlock(), createElementBlock(Fragment, { key: category.category.id }, [createBaseVNode("div", _hoisted_2$54, [
-					createBaseVNode("div", _hoisted_3$42, [(openBlock(true), createElementBlock(Fragment, null, renderList(props.depth - 1, (i) => {
+				return openBlock(), createElementBlock(Fragment, { key: category.category.id }, [createBaseVNode("div", _hoisted_2$48, [
+					createBaseVNode("div", _hoisted_3$39, [(openBlock(true), createElementBlock(Fragment, null, renderList(props.depth - 1, (i) => {
 						return openBlock(), createElementBlock("div", {
 							key: i,
 							class: "w-6 shrink-0 h-5 border-l-2 border-brand-light-purple/80"
 						});
-					}), 128)), createBaseVNode("span", _hoisted_4$36, toDisplayString(category.category.fullname), 1)]),
-					createBaseVNode("div", _hoisted_5$31, [createVNode(Switch_default, {
+					}), 128)), createBaseVNode("span", _hoisted_4$33, toDisplayString(category.category.fullname), 1)]),
+					createBaseVNode("div", _hoisted_5$30, [createVNode(Switch_default, {
 						label: unref(mstrings).reassessment + "?",
 						onChange: ($event) => reassess_change($event, category.category.id),
 						disabled: props.disablereassess || disabledByChildrenIds.value.includes(Number(category.category.id)),
@@ -61667,7 +61654,7 @@ var CategoryTree_default = /* @__PURE__ */ defineComponent({
 						"disabled",
 						"active"
 					])]),
-					props.engineering ? (openBlock(), createElementBlock("div", _hoisted_6$26, [props.depth === 1 ? (openBlock(), createBlock(Switch_default, {
+					props.engineering ? (openBlock(), createElementBlock("div", _hoisted_6$24, [props.depth === 1 ? (openBlock(), createBlock(Switch_default, {
 						key: 0,
 						onChange: ($event) => eng_change($event, category.category.id),
 						label: unref(mstrings).exam + "?",
@@ -61698,12 +61685,12 @@ var CategoryTree_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Configure/CategoryConfig.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$70 = { class: "bg-slate-100 border border-slate-300 rounded-md mt-4 p-6" };
-var _hoisted_2$53 = { class: "max-w-2xl" };
-var _hoisted_3$41 = { class: "flex items-center text-xs font-bold uppercase tracking-wider text-brand-dark-purple/70 pb-3 border-b border-brand-light-purple/20" };
-var _hoisted_4$35 = { class: "flex-1 pr-4" };
-var _hoisted_5$30 = { class: "w-52 shrink-0 pr-2" };
-var _hoisted_6$25 = {
+var _hoisted_1$63 = { class: "bg-slate-100 border border-slate-300 rounded-md mt-4 p-6" };
+var _hoisted_2$47 = { class: "max-w-2xl" };
+var _hoisted_3$38 = { class: "flex items-center text-xs font-bold uppercase tracking-wider text-brand-dark-purple/70 pb-3 border-b border-brand-light-purple/20" };
+var _hoisted_4$32 = { class: "flex-1 pr-4" };
+var _hoisted_5$29 = { class: "w-52 shrink-0 pr-2" };
+var _hoisted_6$23 = {
 	key: 0,
 	class: "w-52 shrink-0 pr-2"
 };
@@ -61719,16 +61706,16 @@ var CategoryConfig_default = /* @__PURE__ */ defineComponent({
 	setup(__props) {
 		const { mstrings } = storeToRefs(useMstrings());
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$70, [createVNode(UAlert_default, {
+			return openBlock(), createElementBlock("div", _hoisted_1$63, [createVNode(UAlert_default, {
 				variant: "info",
 				class: "mb-5"
 			}, {
 				default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).changessaved), 1)]),
 				_: 1
-			}), createBaseVNode("div", _hoisted_2$53, [createBaseVNode("div", _hoisted_3$41, [
-				createBaseVNode("div", _hoisted_4$35, toDisplayString(unref(mstrings).gradecategory), 1),
-				createBaseVNode("div", _hoisted_5$30, toDisplayString(unref(mstrings).reassessment), 1),
-				__props.engineering ? (openBlock(), createElementBlock("div", _hoisted_6$25, " Final exam / classwork (Engineering) ")) : createCommentVNode("", true)
+			}), createBaseVNode("div", _hoisted_2$47, [createBaseVNode("div", _hoisted_3$38, [
+				createBaseVNode("div", _hoisted_4$32, toDisplayString(unref(mstrings).gradecategory), 1),
+				createBaseVNode("div", _hoisted_5$29, toDisplayString(unref(mstrings).reassessment), 1),
+				__props.engineering ? (openBlock(), createElementBlock("div", _hoisted_6$23, " Final exam / classwork (Engineering) ")) : createCommentVNode("", true)
 			]), createVNode(CategoryTree_default, {
 				depth: 1,
 				nodes: __props.nodes,
@@ -61739,16 +61726,16 @@ var CategoryConfig_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/views/ConfigPage.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$69 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
-var _hoisted_2$52 = { class: "mt-5" };
-var _hoisted_3$40 = {
+var _hoisted_1$62 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
+var _hoisted_2$46 = { class: "mt-5" };
+var _hoisted_3$37 = {
 	key: 1,
 	class: "my-2"
 };
-var _hoisted_4$34 = { key: 1 };
-var _hoisted_5$29 = ["innerHTML"];
-var _hoisted_6$24 = { key: 1 };
-var _hoisted_7$20 = {
+var _hoisted_4$31 = { key: 1 };
+var _hoisted_5$28 = ["innerHTML"];
+var _hoisted_6$22 = { key: 1 };
+var _hoisted_7$19 = {
 	id: "config_table",
 	class: "table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm"
 };
@@ -61846,8 +61833,8 @@ var ConfigPage_default = /* @__PURE__ */ defineComponent({
 				default: withCtx(() => [..._cache[0] || (_cache[0] = [createTextVNode(" You do not have permission to view this page. ", -1)])]),
 				_: 1
 			})) : (openBlock(), createElementBlock(Fragment, { key: 1 }, [
-				createBaseVNode("div", _hoisted_1$69, [
-					createBaseVNode("div", _hoisted_2$52, [createVNode(LevelOneSelect_default, {
+				createBaseVNode("div", _hoisted_1$62, [
+					createBaseVNode("div", _hoisted_2$46, [createVNode(LevelOneSelect_default, {
 						onLevelchange: levelOneChange,
 						onRegulation: getregulation
 					})]),
@@ -61855,15 +61842,15 @@ var ConfigPage_default = /* @__PURE__ */ defineComponent({
 						key: 0,
 						errormessage: treeerror.value
 					}, null, 8, ["errormessage"])) : createCommentVNode("", true),
-					(showresitoption.value || engineering.value) && caneditgrades.value && !newregs.value ? (openBlock(), createElementBlock("div", _hoisted_3$40, [!configuringresits.value ? (openBlock(), createElementBlock("button", {
+					(showresitoption.value || engineering.value) && caneditgrades.value && !newregs.value ? (openBlock(), createElementBlock("div", _hoisted_3$37, [!configuringresits.value ? (openBlock(), createElementBlock("button", {
 						key: 0,
 						type: "button",
 						class: "btn btn-accent btn-outline",
 						onClick: click_configure
-					}, toDisplayString(unref(mstrings)["configurereassessments"]), 1)) : (openBlock(), createElementBlock("div", _hoisted_4$34, [createBaseVNode("div", {
+					}, toDisplayString(unref(mstrings)["configurereassessments"]), 1)) : (openBlock(), createElementBlock("div", _hoisted_4$31, [createBaseVNode("div", {
 						class: "alert alert-primary mb-2",
 						innerHTML: unref(mstrings)["resit_help"]
-					}, null, 8, _hoisted_5$29), createBaseVNode("button", {
+					}, null, 8, _hoisted_5$28), createBaseVNode("button", {
 						type: "button",
 						class: "btn btn-success btn-outline",
 						onClick: click_finish
@@ -61879,7 +61866,7 @@ var ConfigPage_default = /* @__PURE__ */ defineComponent({
 					"nodes",
 					"engineering"
 				])) : createCommentVNode("", true),
-				loaded.value && !treeerror.value && !newregs.value ? (openBlock(), createElementBlock("div", _hoisted_6$24, [createBaseVNode("table", _hoisted_7$20, [createBaseVNode("tbody", null, [activitytree.value ? (openBlock(), createBlock(ConfigTree_default, {
+				loaded.value && !treeerror.value && !newregs.value ? (openBlock(), createElementBlock("div", _hoisted_6$22, [createBaseVNode("table", _hoisted_7$19, [createBaseVNode("tbody", null, [activitytree.value ? (openBlock(), createBlock(ConfigTree_default, {
 					key: 0,
 					nodes: activitytree.value,
 					depth: 1,
@@ -61898,9 +61885,9 @@ var ConfigPage_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/ActivityTree.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$68 = { class: "list-none pl-8" };
-var _hoisted_2$51 = ["onClick"];
-var _hoisted_3$39 = { class: "font-bold flex justify-start space-x-4" };
+var _hoisted_1$61 = { class: "list-none pl-8" };
+var _hoisted_2$45 = ["onClick"];
+var _hoisted_3$36 = { class: "font-bold flex justify-start space-x-4" };
 //#endregion
 //#region src/components/ActivityTree.vue
 var ActivityTree_default = /* @__PURE__ */ defineComponent({
@@ -61927,13 +61914,13 @@ var ActivityTree_default = /* @__PURE__ */ defineComponent({
 		}
 		return (_ctx, _cache) => {
 			const _component_ActivityTree = resolveComponent("ActivityTree", true);
-			return openBlock(), createElementBlock("ul", _hoisted_1$68, [(openBlock(true), createElementBlock(Fragment, null, renderList(props.nodes.items, (item) => {
+			return openBlock(), createElementBlock("ul", _hoisted_1$61, [(openBlock(true), createElementBlock(Fragment, null, renderList(props.nodes.items, (item) => {
 				return openBlock(), createElementBlock("li", { key: item.id }, [createBaseVNode("a", {
 					href: "#",
 					onClick: withModifiers(($event) => activity_click(item.id), ["prevent"])
-				}, toDisplayString(item.itemname), 9, _hoisted_2$51)]);
+				}, toDisplayString(item.itemname), 9, _hoisted_2$45)]);
 			}), 128)), (openBlock(true), createElementBlock(Fragment, null, renderList(props.nodes.categories, (category) => {
-				return openBlock(), createElementBlock("li", { key: category.id }, [createBaseVNode("div", _hoisted_3$39, [props.depth == 1 ? (openBlock(), createBlock(unref(Folder), {
+				return openBlock(), createElementBlock("li", { key: category.id }, [createBaseVNode("div", _hoisted_3$36, [props.depth == 1 ? (openBlock(), createBlock(unref(Folder), {
 					key: 0,
 					size: 18,
 					class: "mr-2"
@@ -61952,17 +61939,17 @@ var ActivityTree_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/ActivitySelect.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$67 = {
+var _hoisted_1$60 = {
 	key: 0,
 	class: "text-xs truncate"
 };
-var _hoisted_2$50 = { class: "opacity-60" };
-var _hoisted_3$38 = {
+var _hoisted_2$44 = { class: "opacity-60" };
+var _hoisted_3$35 = {
 	key: 1,
 	class: "space-y-2 w-full text-xs"
 };
-var _hoisted_4$33 = { class: "flex items-center justify-between border-b border-slate-200 pb-1 mb-1" };
-var _hoisted_5$28 = { class: "text-xs font-semibold" };
+var _hoisted_4$30 = { class: "flex items-center justify-between border-b border-slate-200 pb-1 mb-1" };
+var _hoisted_5$27 = { class: "text-xs font-semibold" };
 var ActivitySelect_vue_vue_type_script_setup_true_lang_default = /*@__PURE__*/ defineComponent({
 	__name: "ActivitySelect",
 	props: {
@@ -62047,11 +62034,11 @@ var ActivitySelect_vue_vue_type_script_setup_true_lang_default = /*@__PURE__*/ d
 				key: 0,
 				onClick: open_selection,
 				class: "cursor-pointer flex items-center justify-between gap-2 select-none w-full h-full"
-			}, [selectedactivity.value ? (openBlock(), createElementBlock("div", _hoisted_1$67, [createBaseVNode("span", _hoisted_2$50, toDisplayString(unref(mstrings).selected) + ":", 1), createTextVNode(" " + toDisplayString(selectedactivity.value.itemname), 1)])) : createCommentVNode("", true), _cache[0] || (_cache[0] = createBaseVNode("div", { class: "opacity-60 shrink-0" }, [createBaseVNode("i", {
+			}, [selectedactivity.value ? (openBlock(), createElementBlock("div", _hoisted_1$60, [createBaseVNode("span", _hoisted_2$44, toDisplayString(unref(mstrings).selected) + ":", 1), createTextVNode(" " + toDisplayString(selectedactivity.value.itemname), 1)])) : createCommentVNode("", true), _cache[0] || (_cache[0] = createBaseVNode("div", { class: "opacity-60 shrink-0" }, [createBaseVNode("i", {
 				class: "fa fa-chevron-down text-[10px]",
 				"aria-hidden": "true"
-			})], -1))])) : (openBlock(), createElementBlock("div", _hoisted_3$38, [
-				createBaseVNode("div", _hoisted_4$33, [createBaseVNode("b", _hoisted_5$28, toDisplayString(categoryname.value), 1)]),
+			})], -1))])) : (openBlock(), createElementBlock("div", _hoisted_3$35, [
+				createBaseVNode("div", _hoisted_4$30, [createBaseVNode("b", _hoisted_5$27, toDisplayString(categoryname.value), 1)]),
 				!treeerror.value ? (openBlock(), createBlock(ActivityTree_default, {
 					key: 0,
 					nodes: activitytree.value,
@@ -62078,9 +62065,9 @@ var _plugin_vue_export_helper_default = (sfc, props) => {
 var ActivitySelect_default = /*#__PURE__*/ _plugin_vue_export_helper_default(ActivitySelect_vue_vue_type_script_setup_true_lang_default, [["__scopeId", "data-v-dccd18c8"]]);
 //#endregion
 //#region src/components/Common/GroupSelect.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$66 = { key: 0 };
-var _hoisted_2$49 = { value: "0" };
-var _hoisted_3$37 = ["value"];
+var _hoisted_1$59 = { key: 0 };
+var _hoisted_2$43 = { value: "0" };
+var _hoisted_3$34 = ["value"];
 //#endregion
 //#region src/components/Common/GroupSelect.vue
 var GroupSelect_default = /* @__PURE__ */ defineComponent({
@@ -62112,23 +62099,23 @@ var GroupSelect_default = /* @__PURE__ */ defineComponent({
 			get_groups();
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), showgroupselect.value ? (openBlock(), createElementBlock("div", _hoisted_1$66, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "text-sm font-bold mb-1 opacity-70" }, "GROUP", -1)), withDirectives(createBaseVNode("select", {
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), showgroupselect.value ? (openBlock(), createElementBlock("div", _hoisted_1$59, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "text-sm font-bold mb-1 opacity-70" }, "GROUP", -1)), withDirectives(createBaseVNode("select", {
 				class: "select select-bordered bg-white text-neutral border-slate-300 w-120 shadow-md focus:outline-none focus:border-primary",
 				"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => groupid.value = $event),
 				onChange: handleUserSelection,
 				"aria-label": "Group select"
-			}, [createBaseVNode("option", _hoisted_2$49, toDisplayString(unref(mstrings).allparticipants), 1), (openBlock(true), createElementBlock(Fragment, null, renderList(groups.value, (group) => {
+			}, [createBaseVNode("option", _hoisted_2$43, toDisplayString(unref(mstrings).allparticipants), 1), (openBlock(true), createElementBlock(Fragment, null, renderList(groups.value, (group) => {
 				return openBlock(), createElementBlock("option", {
 					key: group.id,
 					value: group.id
-				}, toDisplayString(group.name), 9, _hoisted_3$37);
+				}, toDisplayString(group.name), 9, _hoisted_3$34);
 			}), 128))], 544), [[vModelSelect, groupid.value]])])) : createCommentVNode("", true)], 64);
 		};
 	}
 });
 //#endregion
 //#region src/components/Capture/CaptureSelect.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$65 = { class: "w-full flex flex-start gap-2 mb-4" };
+var _hoisted_1$58 = { class: "w-full flex flex-start gap-2 mb-4" };
 //#endregion
 //#region src/components/Capture/CaptureSelect.vue
 var CaptureSelect_default = /* @__PURE__ */ defineComponent({
@@ -62176,7 +62163,7 @@ var CaptureSelect_default = /* @__PURE__ */ defineComponent({
 			emitdata();
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$65, [
+			return openBlock(), createElementBlock("div", _hoisted_1$58, [
 				createVNode(LevelOneSelect_default, { onLevelchange: levelOneChange }),
 				showactivityselect.value ? (openBlock(), createBlock(ActivitySelect_default, {
 					key: 0,
@@ -62194,20 +62181,20 @@ var CaptureSelect_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region node_modules/vue-toastification/dist/index.mjs
-var __defProp$2 = Object.defineProperty;
-var __getOwnPropSymbols$1 = Object.getOwnPropertySymbols;
-var __hasOwnProp$1 = Object.prototype.hasOwnProperty;
-var __propIsEnum$1 = Object.prototype.propertyIsEnumerable;
-var __defNormalProp$1 = (obj, key, value) => key in obj ? __defProp$2(obj, key, {
+var __defProp$1 = Object.defineProperty;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp$1(obj, key, {
 	enumerable: true,
 	configurable: true,
 	writable: true,
 	value
 }) : obj[key] = value;
-var __spreadValues$1 = (a, b) => {
-	for (var prop in b || (b = {})) if (__hasOwnProp$1.call(b, prop)) __defNormalProp$1(a, prop, b[prop]);
-	if (__getOwnPropSymbols$1) {
-		for (var prop of __getOwnPropSymbols$1(b)) if (__propIsEnum$1.call(b, prop)) __defNormalProp$1(a, prop, b[prop]);
+var __spreadValues = (a, b) => {
+	for (var prop in b || (b = {})) if (__hasOwnProp.call(b, prop)) __defNormalProp(a, prop, b[prop]);
+	if (__getOwnPropSymbols) {
+		for (var prop of __getOwnPropSymbols(b)) if (__propIsEnum.call(b, prop)) __defNormalProp(a, prop, b[prop]);
 	}
 	return a;
 };
@@ -62523,20 +62510,20 @@ var VtCloseButton_default = /* @__PURE__ */ defineComponent({
 		}
 	}
 });
-var _hoisted_1$64 = /* @__PURE__ */ createTextVNode(" × ");
+var _hoisted_1$57 = /* @__PURE__ */ createTextVNode(" × ");
 function render2(_ctx, _cache) {
 	return openBlock(), createBlock(resolveDynamicComponent(_ctx.buttonComponent), mergeProps$1({
 		"aria-label": _ctx.ariaLabel,
 		class: _ctx.classes
 	}, _ctx.$attrs), {
-		default: withCtx(() => [_hoisted_1$64]),
+		default: withCtx(() => [_hoisted_1$57]),
 		_: 1
 	}, 16, ["aria-label", "class"]);
 }
 VtCloseButton_default.render = render2;
 var VtCloseButton_default2 = VtCloseButton_default;
 var VtSuccessIcon_default = {};
-var _hoisted_12$9 = {
+var _hoisted_12$8 = {
 	"aria-hidden": "true",
 	focusable: "false",
 	"data-prefix": "fas",
@@ -62546,17 +62533,17 @@ var _hoisted_12$9 = {
 	xmlns: "http://www.w3.org/2000/svg",
 	viewBox: "0 0 512 512"
 };
-var _hoisted_3$36 = [/* @__PURE__ */ createBaseVNode("path", {
+var _hoisted_3$33 = [/* @__PURE__ */ createBaseVNode("path", {
 	fill: "currentColor",
 	d: "M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"
 }, null, -1)];
 function render3(_ctx, _cache) {
-	return openBlock(), createElementBlock("svg", _hoisted_12$9, _hoisted_3$36);
+	return openBlock(), createElementBlock("svg", _hoisted_12$8, _hoisted_3$33);
 }
 VtSuccessIcon_default.render = render3;
 var VtSuccessIcon_default2 = VtSuccessIcon_default;
 var VtInfoIcon_default = {};
-var _hoisted_13$9 = {
+var _hoisted_13$8 = {
 	"aria-hidden": "true",
 	focusable: "false",
 	"data-prefix": "fas",
@@ -62571,12 +62558,12 @@ var _hoisted_32$1 = [/* @__PURE__ */ createBaseVNode("path", {
 	d: "M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"
 }, null, -1)];
 function render4(_ctx, _cache) {
-	return openBlock(), createElementBlock("svg", _hoisted_13$9, _hoisted_32$1);
+	return openBlock(), createElementBlock("svg", _hoisted_13$8, _hoisted_32$1);
 }
 VtInfoIcon_default.render = render4;
 var VtInfoIcon_default2 = VtInfoIcon_default;
 var VtWarningIcon_default = {};
-var _hoisted_14$9 = {
+var _hoisted_14$8 = {
 	"aria-hidden": "true",
 	focusable: "false",
 	"data-prefix": "fas",
@@ -62591,7 +62578,7 @@ var _hoisted_33$1 = [/* @__PURE__ */ createBaseVNode("path", {
 	d: "M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"
 }, null, -1)];
 function render5(_ctx, _cache) {
-	return openBlock(), createElementBlock("svg", _hoisted_14$9, _hoisted_33$1);
+	return openBlock(), createElementBlock("svg", _hoisted_14$8, _hoisted_33$1);
 }
 VtWarningIcon_default.render = render5;
 var VtWarningIcon_default2 = VtWarningIcon_default;
@@ -63001,7 +62988,7 @@ var VtToastContainer_default2 = VtToastContainer_default;
 var buildInterface = (globalOptions = {}, mountContainer = true) => {
 	const events = globalOptions.eventBus = globalOptions.eventBus || new EventBus();
 	if (mountContainer) nextTick(() => {
-		const app = createApp(VtToastContainer_default2, __spreadValues$1({}, globalOptions));
+		const app = createApp(VtToastContainer_default2, __spreadValues({}, globalOptions));
 		const component = app.mount(document.createElement("div"));
 		const onMounted = globalOptions.onMounted;
 		if (!isUndefined(onMounted)) onMounted(component, app);
@@ -63062,7 +63049,7 @@ var toastInjectionKey = Symbol("VueToastification");
 var globalEventBus = new EventBus();
 var VueToastificationPlugin = (App, options) => {
 	if ((options == null ? void 0 : options.shareAppContext) === true) options.shareAppContext = App;
-	const inter = createToastInterface(__spreadValues$1({ eventBus: globalEventBus }, options));
+	const inter = createToastInterface(__spreadValues({ eventBus: globalEventBus }, options));
 	App.provide(toastInjectionKey, inter);
 };
 var useToast = (eventBus) => {
@@ -63073,7 +63060,7 @@ var useToast = (eventBus) => {
 var src_default = VueToastificationPlugin;
 //#endregion
 //#region src/components/Common/UButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$63 = {
+var _hoisted_1$56 = {
 	key: 0,
 	class: "h-4 w-4 animate-spin",
 	viewBox: "0 0 24 24",
@@ -63225,7 +63212,7 @@ var UButton_default = /* @__PURE__ */ defineComponent({
 				"aria-disabled": isDisabled.value || void 0,
 				"aria-busy": __props.loading || void 0
 			}, {
-				default: withCtx(() => [__props.loading ? (openBlock(), createElementBlock("svg", _hoisted_1$63, [..._cache[0] || (_cache[0] = [createBaseVNode("circle", {
+				default: withCtx(() => [__props.loading ? (openBlock(), createElementBlock("svg", _hoisted_1$56, [..._cache[0] || (_cache[0] = [createBaseVNode("circle", {
 					class: "opacity-25",
 					cx: "12",
 					cy: "12",
@@ -65952,23 +65939,23 @@ function useVueTable(initialOptions) {
 }
 //#endregion
 //#region src/components/Common/UTable.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$62 = { class: "w-full flex flex-col gap-4" };
-var _hoisted_2$48 = { class: "w-full overflow-x-auto overflow-y-visible rounded-lg border border-brand-light-purple/30 bg-white shadow-md pb-12" };
-var _hoisted_3$35 = { class: "w-full text-left border-collapse text-sm" };
-var _hoisted_4$32 = { class: "bg-university-blue text-white uppercase text-xs tracking-wider" };
-var _hoisted_5$27 = { class: "inline-flex items-center gap-1.5 w-max" };
-var _hoisted_6$23 = { key: 0 };
-var _hoisted_7$19 = { key: 1 };
-var _hoisted_8$16 = {
+var _hoisted_1$55 = { class: "w-full flex flex-col gap-4" };
+var _hoisted_2$42 = { class: "w-full overflow-x-auto overflow-y-visible rounded-lg border border-brand-light-purple/30 bg-white shadow-md pb-12" };
+var _hoisted_3$32 = { class: "w-full text-left border-collapse text-sm" };
+var _hoisted_4$29 = { class: "bg-university-blue text-white uppercase text-xs tracking-wider" };
+var _hoisted_5$26 = { class: "inline-flex items-center gap-1.5 w-max" };
+var _hoisted_6$21 = { key: 0 };
+var _hoisted_7$18 = { key: 1 };
+var _hoisted_8$15 = {
 	key: 2,
 	class: "opacity-30"
 };
-var _hoisted_9$13 = { class: "divide-y divide-brand-light-purple/20 text-brand-dark-purple" };
-var _hoisted_10$12 = { class: "flex items-center gap-1 select-none text-brand-dark-purple/70" };
-var _hoisted_11$10 = { class: "text-university-blue font-bold" };
-var _hoisted_12$8 = { class: "text-university-blue font-bold" };
-var _hoisted_13$8 = { class: "flex items-center gap-1.5" };
-var _hoisted_14$8 = ["disabled"];
+var _hoisted_9$12 = { class: "divide-y divide-brand-light-purple/20 text-brand-dark-purple" };
+var _hoisted_10$11 = { class: "flex items-center gap-1 select-none text-brand-dark-purple/70" };
+var _hoisted_11$9 = { class: "text-university-blue font-bold" };
+var _hoisted_12$7 = { class: "text-university-blue font-bold" };
+var _hoisted_13$7 = { class: "flex items-center gap-1.5" };
+var _hoisted_14$7 = ["disabled"];
 var _hoisted_15$6 = ["disabled"];
 var _hoisted_16$6 = ["disabled"];
 var _hoisted_17$6 = ["disabled"];
@@ -66037,17 +66024,17 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 			}));
 		}, { deep: true });
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$62, [createBaseVNode("div", _hoisted_2$48, [createBaseVNode("table", _hoisted_3$35, [createBaseVNode("thead", _hoisted_4$32, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getHeaderGroups(), (headerGroup) => {
+			return openBlock(), createElementBlock("div", _hoisted_1$55, [createBaseVNode("div", _hoisted_2$42, [createBaseVNode("table", _hoisted_3$32, [createBaseVNode("thead", _hoisted_4$29, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getHeaderGroups(), (headerGroup) => {
 				return openBlock(), createElementBlock("tr", { key: headerGroup.id }, [(openBlock(true), createElementBlock(Fragment, null, renderList(headerGroup.headers, (header) => {
 					return openBlock(), createElementBlock("th", {
 						key: header.id,
 						class: normalizeClass(["font-semibold transition-all duration-150 align-middle", [__props.dense ? "px-3 py-1.5 text-xs" : "px-6 py-2.5"]])
-					}, [createBaseVNode("div", _hoisted_5$27, [createVNode(unref(FlexRender), {
+					}, [createBaseVNode("div", _hoisted_5$26, [createVNode(unref(FlexRender), {
 						render: header.column.columnDef.header,
 						props: header.getContext()
-					}, null, 8, ["render", "props"]), header.column.getIsSorted() === "asc" ? (openBlock(), createElementBlock("span", _hoisted_6$23, "🔼")) : header.column.getIsSorted() === "desc" ? (openBlock(), createElementBlock("span", _hoisted_7$19, "🔽")) : header.column.getCanSort() ? (openBlock(), createElementBlock("span", _hoisted_8$16, "↕️")) : createCommentVNode("", true)])], 2);
+					}, null, 8, ["render", "props"]), header.column.getIsSorted() === "asc" ? (openBlock(), createElementBlock("span", _hoisted_6$21, "🔼")) : header.column.getIsSorted() === "desc" ? (openBlock(), createElementBlock("span", _hoisted_7$18, "🔽")) : header.column.getCanSort() ? (openBlock(), createElementBlock("span", _hoisted_8$15, "↕️")) : createCommentVNode("", true)])], 2);
 				}), 128))]);
-			}), 128))]), createBaseVNode("tbody", _hoisted_9$13, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getRowModel().rows, (row) => {
+			}), 128))]), createBaseVNode("tbody", _hoisted_9$12, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getRowModel().rows, (row) => {
 				return openBlock(), createElementBlock("tr", {
 					key: row.id,
 					class: "transition-colors duration-150 ease-in-out hover:text-university-blue"
@@ -66060,18 +66047,18 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 						props: cell.getContext()
 					}, null, 8, ["render", "props"])], 2);
 				}), 128))]);
-			}), 128))])])]), createBaseVNode("div", { class: normalizeClass(["flex items-center justify-between text-sm text-brand-dark-purple font-medium", __props.dense ? "px-1 gap-2 text-xs" : "px-2"]) }, [createBaseVNode("div", _hoisted_10$12, [
+			}), 128))])])]), createBaseVNode("div", { class: normalizeClass(["flex items-center justify-between text-sm text-brand-dark-purple font-medium", __props.dense ? "px-1 gap-2 text-xs" : "px-2"]) }, [createBaseVNode("div", _hoisted_10$11, [
 				_cache[5] || (_cache[5] = createBaseVNode("span", null, "Showing page", -1)),
-				createBaseVNode("strong", _hoisted_11$10, toDisplayString(unref(table).getState().pagination.pageIndex + 1), 1),
+				createBaseVNode("strong", _hoisted_11$9, toDisplayString(unref(table).getState().pagination.pageIndex + 1), 1),
 				_cache[6] || (_cache[6] = createBaseVNode("span", null, "of", -1)),
-				createBaseVNode("strong", _hoisted_12$8, toDisplayString(unref(table).getPageCount()), 1)
-			]), createBaseVNode("div", _hoisted_13$8, [
+				createBaseVNode("strong", _hoisted_12$7, toDisplayString(unref(table).getPageCount()), 1)
+			]), createBaseVNode("div", _hoisted_13$7, [
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-bold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-xs" : "px-3 py-1.5"]),
 					disabled: !unref(table).getCanPreviousPage(),
 					onClick: _cache[0] || (_cache[0] = ($event) => unref(table).setPageIndex(0)),
 					"aria-label": "First page"
-				}, " « ", 10, _hoisted_14$8),
+				}, " « ", 10, _hoisted_14$7),
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-semibold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-[11px]" : "px-3 py-1.5 text-xs"]),
 					disabled: !unref(table).getCanPreviousPage(),
@@ -66299,8 +66286,8 @@ var GradeColor_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/HistoryButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$61 = { class: "list-none" };
-var _hoisted_2$47 = { class: "flex justify-end mt-5" };
+var _hoisted_1$54 = { class: "list-none" };
+var _hoisted_2$41 = { class: "flex justify-end mt-5" };
 //#endregion
 //#region src/components/Capture/HistoryButton.vue
 var HistoryButton_default = /* @__PURE__ */ defineComponent({
@@ -66370,7 +66357,7 @@ var HistoryButton_default = /* @__PURE__ */ defineComponent({
 					title: unref(mstrings).gradehistory
 				}, {
 					default: withCtx(() => [
-						createBaseVNode("div", null, [createBaseVNode("ul", _hoisted_1$61, [createBaseVNode("li", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings).name) + ":", 1), createTextVNode(" " + toDisplayString(props.name), 1)]), createBaseVNode("li", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings).itemname) + ":", 1), createTextVNode(" " + toDisplayString(props.itemname), 1)])])]),
+						createBaseVNode("div", null, [createBaseVNode("ul", _hoisted_1$54, [createBaseVNode("li", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings).name) + ":", 1), createTextVNode(" " + toDisplayString(props.name), 1)]), createBaseVNode("li", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings).itemname) + ":", 1), createTextVNode(" " + toDisplayString(props.itemname), 1)])])]),
 						grades.value.length == 0 ? (openBlock(), createBlock(UAlert_default, { key: 0 }, {
 							default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).nohistory), 1)]),
 							_: 1
@@ -66381,7 +66368,7 @@ var HistoryButton_default = /* @__PURE__ */ defineComponent({
 							dense: true,
 							class: "mt-3"
 						}, null, 8, ["data"]),
-						createBaseVNode("div", _hoisted_2$47, [createVNode(UButton_default, {
+						createBaseVNode("div", _hoisted_2$41, [createVNode(UButton_default, {
 							variant: "warning",
 							onClick: closemodal
 						}, {
@@ -66436,7 +66423,7 @@ var ImportUserGradeButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Tailwind/TwButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$60 = ["disabled"];
+var _hoisted_1$53 = ["disabled"];
 //#endregion
 //#region src/components/Tailwind/TwButton.vue
 var TwButton_default = /* @__PURE__ */ defineComponent({
@@ -66478,7 +66465,7 @@ var TwButton_default = /* @__PURE__ */ defineComponent({
 				tabindex: "-1",
 				role: "button",
 				"aria-disabled": "true"
-			}, [renderSlot(_ctx.$slots, "default")], 8, _hoisted_1$60)) : (openBlock(), createElementBlock("button", mergeProps$1({
+			}, [renderSlot(_ctx.$slots, "default")], 8, _hoisted_1$53)) : (openBlock(), createElementBlock("button", mergeProps$1({
 				key: 1,
 				class: ["btn btn-outline btn-sm mr-1", btnclasses.value]
 			}, _ctx.$attrs), [renderSlot(_ctx.$slots, "default")], 16));
@@ -66487,23 +66474,23 @@ var TwButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/AddGradeButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$59 = {
+var _hoisted_1$52 = {
 	key: 0,
 	class: "p-6 text-brand-dark-purple"
 };
-var _hoisted_2$46 = { class: "mb-6 p-4 rounded-lg bg-brand-light-purple/10 border border-brand-light-purple/30 shadow-inner" };
-var _hoisted_3$34 = { class: "grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" };
-var _hoisted_4$31 = { class: "space-y-2" };
-var _hoisted_5$26 = { class: "flex flex-col" };
-var _hoisted_6$22 = { class: "text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60" };
-var _hoisted_7$18 = { class: "font-bold text-base text-university-blue" };
-var _hoisted_8$15 = { class: "flex flex-col" };
-var _hoisted_9$12 = { class: "text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60" };
-var _hoisted_10$11 = { class: "font-medium text-brand-dark-purple" };
-var _hoisted_11$9 = { class: "space-y-2 flex flex-col md:items-end justify-between" };
-var _hoisted_12$7 = { class: "flex flex-col md:items-end" };
-var _hoisted_13$7 = { class: "text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60" };
-var _hoisted_14$7 = { class: "font-mono text-xs bg-university-blue/10 px-2 py-0.5 rounded text-university-blue font-bold" };
+var _hoisted_2$40 = { class: "mb-6 p-4 rounded-lg bg-brand-light-purple/10 border border-brand-light-purple/30 shadow-inner" };
+var _hoisted_3$31 = { class: "grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" };
+var _hoisted_4$28 = { class: "space-y-2" };
+var _hoisted_5$25 = { class: "flex flex-col" };
+var _hoisted_6$20 = { class: "text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60" };
+var _hoisted_7$17 = { class: "font-bold text-base text-university-blue" };
+var _hoisted_8$14 = { class: "flex flex-col" };
+var _hoisted_9$11 = { class: "text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60" };
+var _hoisted_10$10 = { class: "font-medium text-brand-dark-purple" };
+var _hoisted_11$8 = { class: "space-y-2 flex flex-col md:items-end justify-between" };
+var _hoisted_12$6 = { class: "flex flex-col md:items-end" };
+var _hoisted_13$6 = { class: "text-xs font-bold uppercase tracking-wider text-brand-dark-purple/60" };
+var _hoisted_14$6 = { class: "font-mono text-xs bg-university-blue/10 px-2 py-0.5 rounded text-university-blue font-bold" };
 var _hoisted_15$5 = { class: "flex flex-wrap gap-1.5 pt-1" };
 var _hoisted_16$5 = {
 	key: 0,
@@ -66720,8 +66707,8 @@ var AddGradeButton_default = /* @__PURE__ */ defineComponent({
 					modalClass: "rounded-xl max-w-3xl border border-brand-light-purple/30 bg-white shadow-xl",
 					title: buttontitle.value
 				}, {
-					default: withCtx(() => [!showreleaseddialogue.value ? (openBlock(), createElementBlock("div", _hoisted_1$59, [
-						createBaseVNode("div", _hoisted_2$46, [createBaseVNode("div", _hoisted_3$34, [createBaseVNode("div", _hoisted_4$31, [createBaseVNode("div", _hoisted_5$26, [createBaseVNode("span", _hoisted_6$22, toDisplayString(props.categoryid ? unref(mstrings).category : unref(mstrings).itemname), 1), createBaseVNode("span", _hoisted_7$18, toDisplayString(__props.itemname), 1)]), createBaseVNode("div", _hoisted_8$15, [createBaseVNode("span", _hoisted_9$12, toDisplayString(unref(mstrings).username), 1), createBaseVNode("span", _hoisted_10$11, toDisplayString(__props.name), 1)])]), createBaseVNode("div", _hoisted_11$9, [createBaseVNode("div", _hoisted_12$7, [createBaseVNode("span", _hoisted_13$7, toDisplayString(unref(mstrings).idnumber), 1), createBaseVNode("code", _hoisted_14$7, toDisplayString(idnumber.value), 1)]), createBaseVNode("div", _hoisted_15$5, [overridden.value ? (openBlock(), createElementBlock("span", _hoisted_16$5, " ⚠ " + toDisplayString(unref(mstrings).categoryoverridden), 1)) : createCommentVNode("", true), props.released ? (openBlock(), createElementBlock("span", _hoisted_17$5, " ✓ " + toDisplayString(unref(mstrings).releasedgrade), 1)) : createCommentVNode("", true)])])]), reason.value ? (openBlock(), createElementBlock("div", _hoisted_18$5, toDisplayString(reason.value), 1)) : createCommentVNode("", true)]),
+					default: withCtx(() => [!showreleaseddialogue.value ? (openBlock(), createElementBlock("div", _hoisted_1$52, [
+						createBaseVNode("div", _hoisted_2$40, [createBaseVNode("div", _hoisted_3$31, [createBaseVNode("div", _hoisted_4$28, [createBaseVNode("div", _hoisted_5$25, [createBaseVNode("span", _hoisted_6$20, toDisplayString(props.categoryid ? unref(mstrings).category : unref(mstrings).itemname), 1), createBaseVNode("span", _hoisted_7$17, toDisplayString(__props.itemname), 1)]), createBaseVNode("div", _hoisted_8$14, [createBaseVNode("span", _hoisted_9$11, toDisplayString(unref(mstrings).username), 1), createBaseVNode("span", _hoisted_10$10, toDisplayString(__props.name), 1)])]), createBaseVNode("div", _hoisted_11$8, [createBaseVNode("div", _hoisted_12$6, [createBaseVNode("span", _hoisted_13$6, toDisplayString(unref(mstrings).idnumber), 1), createBaseVNode("code", _hoisted_14$6, toDisplayString(idnumber.value), 1)]), createBaseVNode("div", _hoisted_15$5, [overridden.value ? (openBlock(), createElementBlock("span", _hoisted_16$5, " ⚠ " + toDisplayString(unref(mstrings).categoryoverridden), 1)) : createCommentVNode("", true), props.released ? (openBlock(), createElementBlock("span", _hoisted_17$5, " ✓ " + toDisplayString(unref(mstrings).releasedgrade), 1)) : createCommentVNode("", true)])])]), reason.value ? (openBlock(), createElementBlock("div", _hoisted_18$5, toDisplayString(reason.value), 1)) : createCommentVNode("", true)]),
 						!available.value ? (openBlock(), createBlock(UAlert_default, {
 							key: 0,
 							class: "mb-4 bg-brand-light-yellow/10 border border-brand-light-yellow/50 rounded-lg p-3 text-brand-dark-purple"
@@ -66946,13 +66933,13 @@ var HideShowButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/CaptureMenu.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$58 = {
+var _hoisted_1$51 = {
 	class: "menu dropdown-content bg-slate-100 text-university-blue rounded-box z-999 w-52 p-2 shadow-sm",
 	tabindex: "-1"
 };
-var _hoisted_2$45 = { key: 0 };
-var _hoisted_3$33 = { key: 1 };
-var _hoisted_4$30 = { key: 2 };
+var _hoisted_2$39 = { key: 0 };
+var _hoisted_3$30 = { key: 1 };
+var _hoisted_4$27 = { key: 2 };
 //#endregion
 //#region src/components/Capture/CaptureMenu.vue
 var CaptureMenu_default = /* @__PURE__ */ defineComponent({
@@ -66989,8 +66976,8 @@ var CaptureMenu_default = /* @__PURE__ */ defineComponent({
 					})]),
 					_: 1
 				}), createVNode(unref(je), { class: "border-2 border-slate-200 rounded-md absolute z-999 left-0 top-0 ml-6 -mt-12" }, {
-					default: withCtx(({ close }) => [createBaseVNode("ul", _hoisted_1$58, [
-						props.awaitingcapture && !props.converted && __props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_2$45, [createVNode(ImportUserGradeButton_default, {
+					default: withCtx(({ close }) => [createBaseVNode("ul", _hoisted_1$51, [
+						props.awaitingcapture && !props.converted && __props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_2$39, [createVNode(ImportUserGradeButton_default, {
 							itemid: props.itemid,
 							userid: props.userid,
 							onImported: _cache[0] || (_cache[0] = ($event) => grade_added()),
@@ -67000,7 +66987,7 @@ var CaptureMenu_default = /* @__PURE__ */ defineComponent({
 							"userid",
 							"close"
 						])])) : createCommentVNode("", true),
-						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_3$33, [createVNode(AddGradeButton_default, {
+						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_3$30, [createVNode(AddGradeButton_default, {
 							itemid: props.itemid,
 							selectedcategoryid: props.categoryid,
 							userid: props.userid,
@@ -67029,7 +67016,7 @@ var CaptureMenu_default = /* @__PURE__ */ defineComponent({
 							"itemname",
 							"close"
 						])]),
-						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_4$30, [createVNode(HideShowButton_default, {
+						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_4$27, [createVNode(HideShowButton_default, {
 							gradehidden: props.gradehidden,
 							itemid: props.itemid,
 							userid: props.userid,
@@ -67051,8 +67038,8 @@ var CaptureMenu_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/MenuButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$57 = ["disabled"];
-var _hoisted_2$44 = { class: "truncate" };
+var _hoisted_1$50 = ["disabled"];
+var _hoisted_2$38 = { class: "truncate" };
 //#endregion
 //#region src/components/Common/MenuButton.vue
 var MenuButton_default = /* @__PURE__ */ defineComponent({
@@ -67081,7 +67068,7 @@ var MenuButton_default = /* @__PURE__ */ defineComponent({
 			}, [(openBlock(), createBlock(resolveDynamicComponent(resolvedIcon.value), {
 				size: 16,
 				class: normalizeClass(["shrink-0 opacity-70", props.warning ? "!text-brand-dark-pink" : ""])
-			}, null, 8, ["class"])), createBaseVNode("span", _hoisted_2$44, [renderSlot(_ctx.$slots, "default")])], 8, _hoisted_1$57);
+			}, null, 8, ["class"])), createBaseVNode("span", _hoisted_2$38, [renderSlot(_ctx.$slots, "default")])], 8, _hoisted_1$50);
 		};
 	}
 });
@@ -67628,8 +67615,8 @@ var script = /* @__PURE__ */ defineComponent({
 		};
 	}
 });
-var _hoisted_1$56 = ["width", "height"];
-var _hoisted_2$43 = [
+var _hoisted_1$49 = ["width", "height"];
+var _hoisted_2$37 = [
 	"id",
 	"fx",
 	"fy",
@@ -67637,9 +67624,9 @@ var _hoisted_2$43 = [
 	"cy",
 	"r"
 ];
-var _hoisted_3$32 = ["stop-color"];
-var _hoisted_4$29 = ["stop-color"];
-var _hoisted_5$25 = [
+var _hoisted_3$29 = ["stop-color"];
+var _hoisted_4$26 = ["stop-color"];
+var _hoisted_5$24 = [
 	"r",
 	"cx",
 	"cy",
@@ -67647,7 +67634,7 @@ var _hoisted_5$25 = [
 	"stroke-dasharray",
 	"stroke-linecap"
 ];
-var _hoisted_6$21 = [
+var _hoisted_6$19 = [
 	"transform",
 	"r",
 	"cx",
@@ -67680,10 +67667,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 		}, [createBaseVNode("stop", {
 			offset: "30%",
 			"stop-color": _ctx.startColor
-		}, null, 8, _hoisted_3$32), createBaseVNode("stop", {
+		}, null, 8, _hoisted_3$29), createBaseVNode("stop", {
 			offset: "100%",
 			"stop-color": _ctx.stopColor
-		}, null, 8, _hoisted_4$29)], 8, _hoisted_2$43)]),
+		}, null, 8, _hoisted_4$26)], 8, _hoisted_2$37)]),
 		createBaseVNode("circle", {
 			r: _ctx.innerCircleRadius,
 			cx: _ctx.radius,
@@ -67694,7 +67681,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 			"stroke-dashoffset": "0",
 			"stroke-linecap": _ctx.strokeLinecap,
 			style: normalizeStyle(_ctx.strokeStyle)
-		}, null, 12, _hoisted_5$25),
+		}, null, 12, _hoisted_5$24),
 		createBaseVNode("circle", {
 			transform: "rotate(270, " + _ctx.radius + "," + _ctx.radius + ")",
 			r: _ctx.innerCircleRadius,
@@ -67706,8 +67693,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 			"stroke-dashoffset": _ctx.circumference,
 			"stroke-linecap": _ctx.strokeLinecap,
 			style: normalizeStyle(_ctx.progressStyle)
-		}, null, 12, _hoisted_6$21)
-	], 8, _hoisted_1$56))], 4);
+		}, null, 12, _hoisted_6$19)
+	], 8, _hoisted_1$49))], 4);
 }
 function styleInject(css, ref) {
 	if (ref === void 0) ref = {};
@@ -67734,12 +67721,12 @@ var entry_esm = /*#__PURE__*/ (() => {
 })();
 //#endregion
 //#region src/components/Common/PleaseWait.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$55 = { class: "flex justify-center" };
-var _hoisted_2$42 = {
+var _hoisted_1$48 = { class: "flex justify-center" };
+var _hoisted_2$36 = {
 	class: "border-solid rounded-md m-1 p-2 flex justify-center",
 	style: { "min-width": "300px" }
 };
-var _hoisted_3$31 = {
+var _hoisted_3$28 = {
 	key: 0,
 	class: "loading loading-ring loading-xl"
 };
@@ -67802,7 +67789,7 @@ var PleaseWait_default = /* @__PURE__ */ defineComponent({
 				modalClass: "rounded max-w-xl",
 				title: titletext.value
 			}, {
-				default: withCtx(() => [createBaseVNode("div", _hoisted_1$55, [createBaseVNode("div", _hoisted_2$42, [!showprogress.value ? (openBlock(), createElementBlock("span", _hoisted_3$31)) : createCommentVNode("", true), showprogress.value ? (openBlock(), createBlock(unref(entry_esm), {
+				default: withCtx(() => [createBaseVNode("div", _hoisted_1$48, [createBaseVNode("div", _hoisted_2$36, [!showprogress.value ? (openBlock(), createElementBlock("span", _hoisted_3$28)) : createCommentVNode("", true), showprogress.value ? (openBlock(), createBlock(unref(entry_esm), {
 					key: 1,
 					diameter: 100,
 					totalSteps: 100,
@@ -67818,26 +67805,26 @@ var PleaseWait_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/ImportButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$54 = { key: 0 };
-var _hoisted_2$41 = { key: 1 };
-var _hoisted_3$30 = { key: 0 };
-var _hoisted_4$28 = {
+var _hoisted_1$47 = { key: 0 };
+var _hoisted_2$35 = { key: 1 };
+var _hoisted_3$27 = { key: 0 };
+var _hoisted_4$25 = {
 	key: 1,
 	class: "text-center"
 };
-var _hoisted_5$24 = ["innerHTML"];
-var _hoisted_6$20 = ["innerHTML"];
-var _hoisted_7$17 = {
+var _hoisted_5$23 = ["innerHTML"];
+var _hoisted_6$18 = ["innerHTML"];
+var _hoisted_7$16 = {
 	key: 2,
 	class: "text-[56px]/17 font-light"
 };
-var _hoisted_8$14 = { class: "mt-2 pt-2" };
-var _hoisted_9$11 = { key: 2 };
-var _hoisted_10$10 = { key: 0 };
-var _hoisted_11$8 = { key: 0 };
-var _hoisted_12$6 = { key: 1 };
-var _hoisted_13$6 = { key: 0 };
-var _hoisted_14$6 = { key: 0 };
+var _hoisted_8$13 = { class: "mt-2 pt-2" };
+var _hoisted_9$10 = { key: 2 };
+var _hoisted_10$9 = { key: 0 };
+var _hoisted_11$7 = { key: 0 };
+var _hoisted_12$5 = { key: 1 };
+var _hoisted_13$5 = { key: 0 };
+var _hoisted_14$5 = { key: 0 };
 var _hoisted_15$4 = {
 	key: 0,
 	class: "alert alert-danger"
@@ -68054,7 +68041,7 @@ var ImportButton_default = /* @__PURE__ */ defineComponent({
 					disabled: !__props.enable,
 					iconName: "Download"
 				}, {
-					default: withCtx(() => [groupimport.value ? (openBlock(), createElementBlock("span", _hoisted_1$54, toDisplayString(unref(mstrings)["importgradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_2$41, toDisplayString(unref(mstrings)["importgrades"]), 1))]),
+					default: withCtx(() => [groupimport.value ? (openBlock(), createElementBlock("span", _hoisted_1$47, toDisplayString(unref(mstrings)["importgradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_2$35, toDisplayString(unref(mstrings)["importgrades"]), 1))]),
 					_: 1
 				}, 8, ["disabled"]),
 				createVNode(_component_VueModal, {
@@ -68065,21 +68052,21 @@ var ImportButton_default = /* @__PURE__ */ defineComponent({
 					title: unref(mstrings)["importgrades"]
 				}, {
 					default: withCtx(() => [
-						loading.value ? (openBlock(), createElementBlock("div", _hoisted_3$30, [createVNode(PleaseWait_default, {
+						loading.value ? (openBlock(), createElementBlock("div", _hoisted_3$27, [createVNode(PleaseWait_default, {
 							progresstype: "import",
 							staffuserid: props.staffuserid
 						}, null, 8, ["staffuserid"])])) : createCommentVNode("", true),
-						showdryrun.value ? (openBlock(), createElementBlock("div", _hoisted_4$28, [
+						showdryrun.value ? (openBlock(), createElementBlock("div", _hoisted_4$25, [
 							dryruncount.value > 0 ? (openBlock(), createElementBlock("p", {
 								key: 0,
 								innerHTML: unref(mstrings)["importdryrun"]
-							}, null, 8, _hoisted_5$24)) : (openBlock(), createElementBlock("p", {
+							}, null, 8, _hoisted_5$23)) : (openBlock(), createElementBlock("p", {
 								key: 1,
 								innerHTML: unref(mstrings)["importdryrunzero"]
-							}, null, 8, _hoisted_6$20)),
-							dryruncount.value > 0 ? (openBlock(), createElementBlock("p", _hoisted_7$17, toDisplayString(dryruncount.value), 1)) : createCommentVNode("", true),
+							}, null, 8, _hoisted_6$18)),
+							dryruncount.value > 0 ? (openBlock(), createElementBlock("p", _hoisted_7$16, toDisplayString(dryruncount.value), 1)) : createCommentVNode("", true),
 							_cache[11] || (_cache[11] = createBaseVNode("div", { class: "divider" }, null, -1)),
-							createBaseVNode("div", _hoisted_8$14, [dryruncount.value > 0 ? (openBlock(), createBlock(UButton_default, {
+							createBaseVNode("div", _hoisted_8$13, [dryruncount.value > 0 ? (openBlock(), createBlock(UButton_default, {
 								key: 0,
 								variant: "primary",
 								onClick: _cache[0] || (_cache[0] = ($event) => importgrades())
@@ -68094,12 +68081,12 @@ var ImportButton_default = /* @__PURE__ */ defineComponent({
 								_: 1
 							})])
 						])) : createCommentVNode("", true),
-						!loading.value && !showdryrun.value ? (openBlock(), createElementBlock("div", _hoisted_9$11, [
+						!loading.value && !showdryrun.value ? (openBlock(), createElementBlock("div", _hoisted_9$10, [
 							createVNode(UAlert_default, {
 								variant: "neutral",
 								class: "mb-4"
 							}, {
-								default: withCtx(() => [is_importgrades.value ? (openBlock(), createElementBlock("div", _hoisted_10$10, [createTextVNode(toDisplayString(unref(mstrings).gradesimported) + " ", 1), groupimport.value ? (openBlock(), createElementBlock("p", _hoisted_11$8, [createBaseVNode("b", null, toDisplayString(unref(mstrings).importinfogroup), 1)])) : createCommentVNode("", true)])) : (openBlock(), createElementBlock("div", _hoisted_12$6, [createTextVNode(toDisplayString(unref(mstrings)["importinfo"]) + " ", 1), groupimport.value ? (openBlock(), createElementBlock("p", _hoisted_13$6, [createBaseVNode("b", null, toDisplayString(unref(mstrings)["importinfogroup"]), 1)])) : createCommentVNode("", true)])), createVNode(UButton_default, {
+								default: withCtx(() => [is_importgrades.value ? (openBlock(), createElementBlock("div", _hoisted_10$9, [createTextVNode(toDisplayString(unref(mstrings).gradesimported) + " ", 1), groupimport.value ? (openBlock(), createElementBlock("p", _hoisted_11$7, [createBaseVNode("b", null, toDisplayString(unref(mstrings).importinfogroup), 1)])) : createCommentVNode("", true)])) : (openBlock(), createElementBlock("div", _hoisted_12$5, [createTextVNode(toDisplayString(unref(mstrings)["importinfo"]) + " ", 1), groupimport.value ? (openBlock(), createElementBlock("p", _hoisted_13$5, [createBaseVNode("b", null, toDisplayString(unref(mstrings)["importinfogroup"]), 1)])) : createCommentVNode("", true)])), createVNode(UButton_default, {
 									variant: "warning",
 									onClick: _cache[2] || (_cache[2] = ($event) => showimportmodal.value = false),
 									class: "mt-2"
@@ -68114,7 +68101,7 @@ var ImportButton_default = /* @__PURE__ */ defineComponent({
 								actions: false
 							}, {
 								default: withCtx(() => [
-									recursiveavailable.value ? (openBlock(), createElementBlock("div", _hoisted_14$6, [!allgradesvalid.value ? (openBlock(), createElementBlock("div", _hoisted_15$4, toDisplayString(unref(mstrings)["invalidgradetype"]), 1)) : (openBlock(), createElementBlock("div", _hoisted_16$4, [createVNode(_component_FormKit, {
+									recursiveavailable.value ? (openBlock(), createElementBlock("div", _hoisted_14$5, [!allgradesvalid.value ? (openBlock(), createElementBlock("div", _hoisted_15$4, toDisplayString(unref(mstrings)["invalidgradetype"]), 1)) : (openBlock(), createElementBlock("div", _hoisted_16$4, [createVNode(_component_FormKit, {
 										type: "radio",
 										label: unref(mstrings)["recursiveimport"],
 										options: recursiveimportoptions,
@@ -68272,8 +68259,8 @@ var import_FileSaver_min = (/* @__PURE__ */ __commonJSMin(((exports, module) => 
 		f.saveAs = g.saveAs = g, "undefined" != typeof module && (module.exports = g);
 	});
 })))();
-var _hoisted_1$53 = { class: "flex flex-col items-center justify-center text-body pt-5 pb-6" };
-var _hoisted_2$40 = { key: 0 };
+var _hoisted_1$46 = { class: "flex flex-col items-center justify-center text-body pt-5 pb-6" };
+var _hoisted_2$34 = { key: 0 };
 //#endregion
 //#region src/components/Tailwind/TwDropzone.vue
 var TwDropzone_default = /* @__PURE__ */ defineComponent({
@@ -68337,7 +68324,7 @@ var TwDropzone_default = /* @__PURE__ */ defineComponent({
 				onDragenter: withModifiers(handleDragEnter, ["prevent"]),
 				onDragleave: withModifiers(handleDragLeave, ["prevent"]),
 				onDrop: withModifiers(handleDropEvent, ["prevent"])
-			}, [createBaseVNode("div", { class: normalizeClass(["flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border-2 border-dashed border-gray-400 rounded-base cursor-pointer hover:bg-neutral-tertiary-medium", { "border-primary border-2": isOverDropZone.value }]) }, [createBaseVNode("div", _hoisted_1$53, [
+			}, [createBaseVNode("div", { class: normalizeClass(["flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border-2 border-dashed border-gray-400 rounded-base cursor-pointer hover:bg-neutral-tertiary-medium", { "border-primary border-2": isOverDropZone.value }]) }, [createBaseVNode("div", _hoisted_1$46, [
 				_cache[0] || (_cache[0] = createBaseVNode("svg", {
 					class: "w-8 h-8 mb-4",
 					"aria-hidden": "true",
@@ -68355,42 +68342,42 @@ var TwDropzone_default = /* @__PURE__ */ defineComponent({
 				})], -1)),
 				_cache[1] || (_cache[1] = createBaseVNode("p", { class: "mb-2 text-sm" }, [createBaseVNode("span", { class: "font-semibold" }, "Click to upload"), createTextVNode(" or Drop file here ")], -1)),
 				renderSlot(_ctx.$slots, "default"),
-				filename.value ? (openBlock(), createElementBlock("p", _hoisted_2$40, toDisplayString(filename.value), 1)) : createCommentVNode("", true)
+				filename.value ? (openBlock(), createElementBlock("p", _hoisted_2$34, toDisplayString(filename.value), 1)) : createCommentVNode("", true)
 			])], 2)], 544);
 		};
 	}
 });
 //#endregion
 //#region src/components/Capture/CSVImportButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$52 = { key: 2 };
-var _hoisted_2$39 = { key: 0 };
-var _hoisted_3$29 = { key: 1 };
-var _hoisted_4$27 = { key: 0 };
-var _hoisted_5$23 = {
+var _hoisted_1$45 = { key: 2 };
+var _hoisted_2$33 = { key: 0 };
+var _hoisted_3$26 = { key: 1 };
+var _hoisted_4$24 = { key: 0 };
+var _hoisted_5$22 = {
 	key: 0,
 	class: "text-red-500 fa fa-times",
 	"aria-hidden": "true"
 };
-var _hoisted_6$19 = {
+var _hoisted_6$17 = {
 	key: 1,
 	class: "text-green-500 fa fa-check",
 	"aria-hidden": "true"
 };
-var _hoisted_7$16 = {
+var _hoisted_7$15 = {
 	key: 2,
 	class: "text-yellow-500 fa fa-info",
 	"aria-hidden": "true"
 };
-var _hoisted_8$13 = {
+var _hoisted_8$12 = {
 	key: 0,
 	class: "text-red-500 mt-1"
 };
-var _hoisted_9$10 = { class: "text-red-500" };
-var _hoisted_10$9 = {
+var _hoisted_9$9 = { class: "text-red-500" };
+var _hoisted_10$8 = {
 	key: 1,
 	class: "mt-2"
 };
-var _hoisted_11$7 = { class: "flex justify-end" };
+var _hoisted_11$6 = { class: "flex justify-end" };
 //#endregion
 //#region src/components/Capture/CSVImportButton.vue
 var CSVImportButton_default = /* @__PURE__ */ defineComponent({
@@ -68595,7 +68582,7 @@ var CSVImportButton_default = /* @__PURE__ */ defineComponent({
 							default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).incorrectfiletype), 1)]),
 							_: 1
 						})) : createCommentVNode("", true),
-						!incorrectfiletype.value ? (openBlock(), createElementBlock("div", _hoisted_1$52, [pagestate.value == "showuploadpage" ? (openBlock(), createElementBlock("div", _hoisted_2$39, [
+						!incorrectfiletype.value ? (openBlock(), createElementBlock("div", _hoisted_1$45, [pagestate.value == "showuploadpage" ? (openBlock(), createElementBlock("div", _hoisted_2$33, [
 							createBaseVNode("p", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings)["csvdownloadhelp"]), 1)]),
 							createVNode(UButton_default, {
 								variant: "primary",
@@ -68623,30 +68610,30 @@ var CSVImportButton_default = /* @__PURE__ */ defineComponent({
 								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).next), 1)]),
 								_: 1
 							}, 8, ["disabled"])
-						])) : createCommentVNode("", true), pagestate.value == "showtestrun" ? (openBlock(), createElementBlock("div", _hoisted_3$29, [
+						])) : createCommentVNode("", true), pagestate.value == "showtestrun" ? (openBlock(), createElementBlock("div", _hoisted_3$26, [
 							createBaseVNode("p", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings)["csvtestrun"]), 1)]),
 							createVNode(_component_EasyDataTable, {
 								headers: headers.value,
 								items: lines10.value
 							}, {
-								"item-gradevalue": withCtx((item) => [item.grade ? (openBlock(), createElementBlock("span", _hoisted_4$27, toDisplayString(item.gradevalue), 1)) : createCommentVNode("", true)]),
+								"item-gradevalue": withCtx((item) => [item.grade ? (openBlock(), createElementBlock("span", _hoisted_4$24, toDisplayString(item.gradevalue), 1)) : createCommentVNode("", true)]),
 								"item-error": withCtx((item) => [
-									item.state < 0 ? (openBlock(), createElementBlock("i", _hoisted_5$23)) : createCommentVNode("", true),
-									item.state > 0 ? (openBlock(), createElementBlock("i", _hoisted_6$19)) : createCommentVNode("", true),
-									item.state == 0 ? (openBlock(), createElementBlock("i", _hoisted_7$16)) : createCommentVNode("", true),
+									item.state < 0 ? (openBlock(), createElementBlock("i", _hoisted_5$22)) : createCommentVNode("", true),
+									item.state > 0 ? (openBlock(), createElementBlock("i", _hoisted_6$17)) : createCommentVNode("", true),
+									item.state == 0 ? (openBlock(), createElementBlock("i", _hoisted_7$15)) : createCommentVNode("", true),
 									createTextVNode(" " + toDisplayString(item.error), 1)
 								]),
 								_: 1
 							}, 8, ["headers", "items"]),
-							errorcount.value ? (openBlock(), createElementBlock("p", _hoisted_8$13, toDisplayString(unref(mstrings)["lineswitherrors"]) + ": " + toDisplayString(errorcount.value) + ":", 1)) : createCommentVNode("", true),
-							createBaseVNode("ul", _hoisted_9$10, [(openBlock(true), createElementBlock(Fragment, null, renderList(errorlist.value, (error) => {
+							errorcount.value ? (openBlock(), createElementBlock("p", _hoisted_8$12, toDisplayString(unref(mstrings)["lineswitherrors"]) + ": " + toDisplayString(errorcount.value) + ":", 1)) : createCommentVNode("", true),
+							createBaseVNode("ul", _hoisted_9$9, [(openBlock(true), createElementBlock(Fragment, null, renderList(errorlist.value, (error) => {
 								return withDirectives((openBlock(), createElementBlock("li", null, [
 									createBaseVNode("span", null, toDisplayString(error.error), 1),
 									_cache[8] || (_cache[8] = createTextVNode(": ", -1)),
 									createBaseVNode("b", null, toDisplayString(error.count) + " line(s)", 1)
 								])), [[_directive_key, error.error]]);
 							}), 256))]),
-							!errorcount.value ? (openBlock(), createElementBlock("div", _hoisted_10$9, [_cache[9] || (_cache[9] = createBaseVNode("div", { class: "divider" }, null, -1)), createVNode(_component_FormKit, {
+							!errorcount.value ? (openBlock(), createElementBlock("div", _hoisted_10$8, [_cache[9] || (_cache[9] = createBaseVNode("div", { class: "divider" }, null, -1)), createVNode(_component_FormKit, {
 								type: "form",
 								onSubmit: submit_reason_form
 							}, {
@@ -68680,7 +68667,7 @@ var CSVImportButton_default = /* @__PURE__ */ defineComponent({
 								_: 1
 							})])) : createCommentVNode("", true)
 						])) : createCommentVNode("", true)])) : createCommentVNode("", true),
-						createBaseVNode("div", _hoisted_11$7, [createVNode(UButton_default, {
+						createBaseVNode("div", _hoisted_11$6, [createVNode(UButton_default, {
 							variant: "warning",
 							onClick: _cache[4] || (_cache[4] = ($event) => close_modal())
 						}, {
@@ -68696,29 +68683,29 @@ var CSVImportButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/ReleaseButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$51 = { key: 0 };
-var _hoisted_2$38 = { key: 0 };
-var _hoisted_3$28 = { key: 1 };
-var _hoisted_4$26 = { key: 1 };
-var _hoisted_5$22 = { key: 0 };
-var _hoisted_6$18 = { key: 1 };
-var _hoisted_7$15 = { key: 0 };
-var _hoisted_8$12 = { key: 1 };
-var _hoisted_9$9 = {
+var _hoisted_1$44 = { key: 0 };
+var _hoisted_2$32 = { key: 0 };
+var _hoisted_3$25 = { key: 1 };
+var _hoisted_4$23 = { key: 1 };
+var _hoisted_5$21 = { key: 0 };
+var _hoisted_6$16 = { key: 1 };
+var _hoisted_7$14 = { key: 0 };
+var _hoisted_8$11 = { key: 1 };
+var _hoisted_9$8 = {
 	key: 0,
 	class: "mt-1"
 };
-var _hoisted_10$8 = {
+var _hoisted_10$7 = {
 	key: 0,
 	class: "mt-1"
 };
-var _hoisted_11$6 = { class: "mt-5 flex gap-2 justify-start" };
-var _hoisted_12$5 = { key: 2 };
-var _hoisted_13$5 = {
+var _hoisted_11$5 = { class: "mt-5 flex gap-2 justify-start" };
+var _hoisted_12$4 = { key: 2 };
+var _hoisted_13$4 = {
 	key: 0,
 	class: "mt-2"
 };
-var _hoisted_14$5 = { class: "mt-5 flex gap-2 justify-start" };
+var _hoisted_14$4 = { class: "mt-5 flex gap-2 justify-start" };
 //#endregion
 //#region src/components/Capture/ReleaseButton.vue
 var ReleaseButton_default = /* @__PURE__ */ defineComponent({
@@ -68803,7 +68790,7 @@ var ReleaseButton_default = /* @__PURE__ */ defineComponent({
 					disabled: !__props.enable,
 					iconName: "LockKeyholeOpen"
 				}, {
-					default: withCtx(() => [props.released ? (openBlock(), createElementBlock("span", _hoisted_1$51, [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_2$38, toDisplayString(unref(mstrings)["unreleasegradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_3$28, toDisplayString(unref(mstrings)["unreleasegrades"]), 1))])) : createCommentVNode("", true), !props.released ? (openBlock(), createElementBlock("span", _hoisted_4$26, [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_5$22, toDisplayString(unref(mstrings)["releasegradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_6$18, toDisplayString(unref(mstrings)["releasegrades"]), 1))])) : createCommentVNode("", true)]),
+					default: withCtx(() => [props.released ? (openBlock(), createElementBlock("span", _hoisted_1$44, [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_2$32, toDisplayString(unref(mstrings)["unreleasegradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_3$25, toDisplayString(unref(mstrings)["unreleasegrades"]), 1))])) : createCommentVNode("", true), !props.released ? (openBlock(), createElementBlock("span", _hoisted_4$23, [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_5$21, toDisplayString(unref(mstrings)["releasegradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_6$16, toDisplayString(unref(mstrings)["releasegrades"]), 1))])) : createCommentVNode("", true)]),
 					_: 1
 				}, 8, ["disabled"]),
 				createVNode(_component_VueModal, {
@@ -68814,23 +68801,23 @@ var ReleaseButton_default = /* @__PURE__ */ defineComponent({
 					title: unref(mstrings)["releasegrades"]
 				}, {
 					default: withCtx(() => [
-						loading.value ? (openBlock(), createElementBlock("div", _hoisted_7$15, [createVNode(PleaseWait_default)])) : createCommentVNode("", true),
-						!props.released ? (openBlock(), createElementBlock("div", _hoisted_8$12, [
+						loading.value ? (openBlock(), createElementBlock("div", _hoisted_7$14, [createVNode(PleaseWait_default)])) : createCommentVNode("", true),
+						!props.released ? (openBlock(), createElementBlock("div", _hoisted_8$11, [
 							!props.released ? (openBlock(), createBlock(UAlert_default, {
 								key: 0,
 								variant: "info"
 							}, {
-								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).releaseconfirm) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_9$9, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)]),
+								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).releaseconfirm) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_9$8, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)]),
 								_: 1
 							})) : createCommentVNode("", true),
 							props.released ? (openBlock(), createBlock(UAlert_default, {
 								key: 1,
 								variant: "info"
 							}, {
-								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).releaseconfirmstern) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_10$8, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)]),
+								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).releaseconfirmstern) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_10$7, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)]),
 								_: 1
 							})) : createCommentVNode("", true),
-							createBaseVNode("div", _hoisted_11$6, [createVNode(UButton_default, {
+							createBaseVNode("div", _hoisted_11$5, [createVNode(UButton_default, {
 								variant: "primary",
 								onClick: release_grades
 							}, {
@@ -68844,13 +68831,13 @@ var ReleaseButton_default = /* @__PURE__ */ defineComponent({
 								_: 1
 							})])
 						])) : createCommentVNode("", true),
-						props.released ? (openBlock(), createElementBlock("div", _hoisted_12$5, [
+						props.released ? (openBlock(), createElementBlock("div", _hoisted_12$4, [
 							_cache[3] || (_cache[3] = createBaseVNode("h4", { class: "font-bold mb-2" }, "Revert release of grades", -1)),
 							createVNode(UAlert_default, { variant: "info" }, {
-								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).removerelease) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_13$5, [createBaseVNode("b", null, toDisplayString(unref(mstrings).removereleasegroup), 1)])) : createCommentVNode("", true)]),
+								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).removerelease) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_13$4, [createBaseVNode("b", null, toDisplayString(unref(mstrings).removereleasegroup), 1)])) : createCommentVNode("", true)]),
 								_: 1
 							}),
-							createBaseVNode("div", _hoisted_14$5, [createVNode(UButton_default, {
+							createBaseVNode("div", _hoisted_14$4, [createVNode(UButton_default, {
 								variant: "primary",
 								onClick: revert_release
 							}, {
@@ -68873,8 +68860,8 @@ var ReleaseButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/ViewFullNamesButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$50 = { key: 0 };
-var _hoisted_2$37 = { key: 1 };
+var _hoisted_1$43 = { key: 0 };
+var _hoisted_2$31 = { key: 1 };
 //#endregion
 //#region src/components/Capture/ViewFullNamesButton.vue
 var ViewFullNamesButton_default = /* @__PURE__ */ defineComponent({
@@ -68910,15 +68897,15 @@ var ViewFullNamesButton_default = /* @__PURE__ */ defineComponent({
 				class: "btn btn-outline btn-secondary mr-2 btn-sm"
 			}, [
 				createVNode(unref(Binoculars), { size: 18 }),
-				!togglereveal.value ? (openBlock(), createElementBlock("span", _hoisted_1$50, toDisplayString(unref(mstrings).viewfullnames), 1)) : createCommentVNode("", true),
-				togglereveal.value ? (openBlock(), createElementBlock("span", _hoisted_2$37, toDisplayString(unref(mstrings).hidefullnames), 1)) : createCommentVNode("", true)
+				!togglereveal.value ? (openBlock(), createElementBlock("span", _hoisted_1$43, toDisplayString(unref(mstrings).viewfullnames), 1)) : createCommentVNode("", true),
+				togglereveal.value ? (openBlock(), createElementBlock("span", _hoisted_2$31, toDisplayString(unref(mstrings).hidefullnames), 1)) : createCommentVNode("", true)
 			])], 64);
 		};
 	}
 });
 //#endregion
 //#region src/components/Capture/AddMultipleButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$49 = { class: "flex justify-end mt-8" };
+var _hoisted_1$42 = { class: "flex justify-end mt-8" };
 //#endregion
 //#region src/components/Capture/AddMultipleButton.vue
 var AddMultipleButton_default = /* @__PURE__ */ defineComponent({
@@ -69048,7 +69035,7 @@ var AddMultipleButton_default = /* @__PURE__ */ defineComponent({
 							}, null, 8, ["placeholder", "modelValue"])
 						]),
 						_: 1
-					}), createBaseVNode("div", _hoisted_1$49, [createVNode(UButton_default, {
+					}), createBaseVNode("div", _hoisted_1$42, [createVNode(UButton_default, {
 						variant: "warning",
 						onClick: _cache[4] || (_cache[4] = ($event) => showaddmultiplemodal.value = false)
 					}, {
@@ -69063,16 +69050,16 @@ var AddMultipleButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/ConversionButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$48 = { key: 1 };
-var _hoisted_2$36 = { key: 2 };
-var _hoisted_3$27 = {
+var _hoisted_1$41 = { key: 1 };
+var _hoisted_2$30 = { key: 2 };
+var _hoisted_3$24 = {
 	key: 0,
 	class: "mb-2"
 };
-var _hoisted_4$25 = { key: 1 };
-var _hoisted_5$21 = { key: 1 };
-var _hoisted_6$17 = ["value"];
-var _hoisted_7$14 = { key: 2 };
+var _hoisted_4$22 = { key: 1 };
+var _hoisted_5$20 = { key: 1 };
+var _hoisted_6$15 = ["value"];
+var _hoisted_7$13 = { key: 2 };
 //#endregion
 //#region src/components/Capture/ConversionButton.vue
 var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
@@ -69243,7 +69230,7 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 				}, {
 					default: withCtx(() => [
 						waiting.value ? (openBlock(), createBlock(PleaseWait_default, { key: 0 })) : createCommentVNode("", true),
-						showmismatch.value ? (openBlock(), createElementBlock("div", _hoisted_1$48, [
+						showmismatch.value ? (openBlock(), createElementBlock("div", _hoisted_1$41, [
 							createVNode(TwAlert_default, { class: "mb-3" }, {
 								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings)["conversionmismatch"]), 1)]),
 								_: 1
@@ -69264,15 +69251,15 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 								_: 1
 							})
 						])) : createCommentVNode("", true),
-						!showmismatch.value ? (openBlock(), createElementBlock("div", _hoisted_2$36, [
-							mapname.value ? (openBlock(), createElementBlock("p", _hoisted_3$27, [createTextVNode(toDisplayString(unref(mstrings)["selectedmap"]) + ": ", 1), createBaseVNode("b", null, toDisplayString(mapname.value), 1)])) : createCommentVNode("", true),
-							!selection.value ? (openBlock(), createElementBlock("div", _hoisted_4$25, [!anygrades.value ? (openBlock(), createBlock(TwAlert_default, { key: 0 }, {
+						!showmismatch.value ? (openBlock(), createElementBlock("div", _hoisted_2$30, [
+							mapname.value ? (openBlock(), createElementBlock("p", _hoisted_3$24, [createTextVNode(toDisplayString(unref(mstrings)["selectedmap"]) + ": ", 1), createBaseVNode("b", null, toDisplayString(mapname.value), 1)])) : createCommentVNode("", true),
+							!selection.value ? (openBlock(), createElementBlock("div", _hoisted_4$22, [!anygrades.value ? (openBlock(), createBlock(TwAlert_default, { key: 0 }, {
 								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings)["nogradestoconvert"]) + " ", 1), createVNode(TwButton_default, { onClick: _cache[1] || (_cache[1] = ($event) => showselectmodal.value = false) }, {
 									default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings)["cancel"]), 1)]),
 									_: 1
 								})]),
 								_: 1
-							})) : createCommentVNode("", true), anygrades.value ? (openBlock(), createElementBlock("div", _hoisted_5$21, [
+							})) : createCommentVNode("", true), anygrades.value ? (openBlock(), createElementBlock("div", _hoisted_5$20, [
 								nomaps.value && loaded.value ? (openBlock(), createBlock(TwAlert_default, { key: 0 }, {
 									default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings)["nomaps"]), 1)]),
 									_: 1
@@ -69291,7 +69278,7 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 										type: "radio",
 										value: item.id,
 										"onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => mapid.value = $event)
-									}, null, 8, _hoisted_6$17), [[vModelRadio, mapid.value]])]),
+									}, null, 8, _hoisted_6$15), [[vModelRadio, mapid.value]])]),
 									_: 1
 								}, 8, ["items", "headers"])) : createCommentVNode("", true),
 								createBaseVNode("div", null, [createVNode(TwButton_default, {
@@ -69309,7 +69296,7 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 									_: 1
 								})])
 							])) : createCommentVNode("", true)])) : createCommentVNode("", true),
-							selection.value ? (openBlock(), createElementBlock("div", _hoisted_7$14, [
+							selection.value ? (openBlock(), createElementBlock("div", _hoisted_7$13, [
 								createVNode(TwAlert_default, { class: "mb-3" }, {
 									default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings)["conversionremovewarning"]), 1)]),
 									_: 1
@@ -69339,14 +69326,14 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Tailwind/HeadlessModal.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$47 = { class: "fixed inset-0 overflow-y-auto" };
-var _hoisted_2$35 = { class: "flex min-h-full items-center justify-center p-4" };
-var _hoisted_3$26 = { class: "bg-primary px-5 py-4 flex items-center gap-3" };
-var _hoisted_4$24 = { class: "bg-primary-content/20 rounded-full p-1.5 shrink-0" };
-var _hoisted_5$20 = { class: "flex-1" };
-var _hoisted_6$16 = { class: "text-xs text-primary-content/70 mt-0.5" };
-var _hoisted_7$13 = { class: "px-5 py-4 space-y-3" };
-var _hoisted_8$11 = { class: "px-5 py-3 border-t border-base-200 flex justify-end" };
+var _hoisted_1$40 = { class: "fixed inset-0 overflow-y-auto" };
+var _hoisted_2$29 = { class: "flex min-h-full items-center justify-center p-4" };
+var _hoisted_3$23 = { class: "bg-primary px-5 py-4 flex items-center gap-3" };
+var _hoisted_4$21 = { class: "bg-primary-content/20 rounded-full p-1.5 shrink-0" };
+var _hoisted_5$19 = { class: "flex-1" };
+var _hoisted_6$14 = { class: "text-xs text-primary-content/70 mt-0.5" };
+var _hoisted_7$12 = { class: "px-5 py-4 space-y-3" };
+var _hoisted_8$10 = { class: "px-5 py-3 border-t border-base-200 flex justify-end" };
 //#endregion
 //#region src/components/Tailwind/HeadlessModal.vue
 var HeadlessModal_default = /* @__PURE__ */ defineComponent({
@@ -69382,7 +69369,7 @@ var HeadlessModal_default = /* @__PURE__ */ defineComponent({
 					}, {
 						default: withCtx(() => [..._cache[3] || (_cache[3] = [createBaseVNode("div", { class: "fixed inset-0 bg-black/30" }, null, -1)])]),
 						_: 1
-					}), createBaseVNode("div", _hoisted_1$47, [createBaseVNode("div", _hoisted_2$35, [createVNode(unref(he), {
+					}), createBaseVNode("div", _hoisted_1$40, [createBaseVNode("div", _hoisted_2$29, [createVNode(unref(he), {
 						as: "template",
 						enter: "duration-200 ease-out",
 						"enter-from": "opacity-0 scale-95",
@@ -69399,23 +69386,23 @@ var HeadlessModal_default = /* @__PURE__ */ defineComponent({
 									tabindex: "-1",
 									class: "sr-only"
 								}, null, 512),
-								createBaseVNode("div", _hoisted_3$26, [
-									createBaseVNode("div", _hoisted_4$24, [createVNode(_component_CircleHelp, {
+								createBaseVNode("div", _hoisted_3$23, [
+									createBaseVNode("div", _hoisted_4$21, [createVNode(_component_CircleHelp, {
 										size: 18,
 										class: "text-primary-content"
 									})]),
-									createBaseVNode("div", _hoisted_5$20, [createVNode(unref(Ve$1), { class: "text-sm font-semibold text-primary-content" }, {
+									createBaseVNode("div", _hoisted_5$19, [createVNode(unref(Ve$1), { class: "text-sm font-semibold text-primary-content" }, {
 										default: withCtx(() => [renderSlot(_ctx.$slots, "title", {}, () => [_cache[4] || (_cache[4] = createTextVNode("Title", -1))])]),
 										_: 3
-									}), createBaseVNode("p", _hoisted_6$16, [renderSlot(_ctx.$slots, "tagline")])]),
+									}), createBaseVNode("p", _hoisted_6$14, [renderSlot(_ctx.$slots, "tagline")])]),
 									createBaseVNode("button", {
 										onClick: _cache[0] || (_cache[0] = ($event) => emits("closed")),
 										class: "text-primary-content/60 hover:text-primary-content transition-colors",
 										"aria-label": "Close"
 									}, [createVNode(_component_X, { size: 18 })])
 								]),
-								createBaseVNode("div", _hoisted_7$13, [renderSlot(_ctx.$slots, "default", {}, () => [_cache[5] || (_cache[5] = createBaseVNode("p", { class: "text-sm text-base-content leading-relaxed prose" }, null, -1))])]),
-								createBaseVNode("div", _hoisted_8$11, [createBaseVNode("button", {
+								createBaseVNode("div", _hoisted_7$12, [renderSlot(_ctx.$slots, "default", {}, () => [_cache[5] || (_cache[5] = createBaseVNode("p", { class: "text-sm text-base-content leading-relaxed prose" }, null, -1))])]),
+								createBaseVNode("div", _hoisted_8$10, [createBaseVNode("button", {
 									onClick: _cache[1] || (_cache[1] = ($event) => emits("closed")),
 									class: "btn btn-primary btn-sm"
 								}, " Close ")])
@@ -69454,29 +69441,29 @@ var UTooltip_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/InfoButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$46 = {
+var _hoisted_1$39 = {
 	class: "inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed shadow-sm font-semibold text-xs gap-2 transition-all duration-150",
 	"aria-label": "Show grade item info"
 };
-var _hoisted_2$34 = { class: "flex justify-start gap-2" };
-var _hoisted_3$25 = { class: "grid grid-cols-2 gap-2" };
-var _hoisted_4$23 = { class: "flex flex-col bg-warning/20 p-2 text-sm rounded" };
-var _hoisted_5$19 = { class: "uppercase" };
-var _hoisted_6$15 = { class: "font-bold" };
-var _hoisted_7$12 = { class: "flex flex-col bg-warning/20 p-2 text-sm rounded" };
-var _hoisted_8$10 = { class: "uppercase" };
-var _hoisted_9$8 = { class: "font-bold" };
-var _hoisted_10$7 = {
+var _hoisted_2$28 = { class: "flex justify-start gap-2" };
+var _hoisted_3$22 = { class: "grid grid-cols-2 gap-2" };
+var _hoisted_4$20 = { class: "flex flex-col bg-warning/20 p-2 text-sm rounded" };
+var _hoisted_5$18 = { class: "uppercase" };
+var _hoisted_6$13 = { class: "font-bold" };
+var _hoisted_7$11 = { class: "flex flex-col bg-warning/20 p-2 text-sm rounded" };
+var _hoisted_8$9 = { class: "uppercase" };
+var _hoisted_9$7 = { class: "font-bold" };
+var _hoisted_10$6 = {
 	key: 0,
 	class: "flex flex-col bg-warning/20 p-2 text-sm rounded"
 };
-var _hoisted_11$5 = { class: "uppercase" };
-var _hoisted_12$4 = { class: "font-bold" };
-var _hoisted_13$4 = {
+var _hoisted_11$4 = { class: "uppercase" };
+var _hoisted_12$3 = { class: "font-bold" };
+var _hoisted_13$3 = {
 	key: 1,
 	class: "flex flex-col bg-warning/20 p-2 text-sm rounded"
 };
-var _hoisted_14$4 = { class: "uppercase" };
+var _hoisted_14$3 = { class: "uppercase" };
 var _hoisted_15$3 = { class: "font-bold" };
 var _hoisted_16$3 = { class: "flex flex-col bg-warning/20 p-2 text-sm rounded" };
 var _hoisted_17$3 = { class: "uppercase" };
@@ -69539,7 +69526,7 @@ var InfoButton_default = /* @__PURE__ */ defineComponent({
 					onClick: info_clicked,
 					text: unref(mstrings)["gradeiteminfo"]
 				}, {
-					default: withCtx(() => [createBaseVNode("button", _hoisted_1$46, [createVNode(unref(Info), { size: 18 })])]),
+					default: withCtx(() => [createBaseVNode("button", _hoisted_1$39, [createVNode(unref(Info), { size: 18 })])]),
 					_: 1
 				}, 8, ["text"])) : createCommentVNode("", true),
 				createBaseVNode("i", null, [props.text ? (openBlock(), createElementBlock("a", {
@@ -69551,12 +69538,12 @@ var InfoButton_default = /* @__PURE__ */ defineComponent({
 					isopen: showinfomodal.value,
 					onClosed: _cache[0] || (_cache[0] = ($event) => showinfomodal.value = false)
 				}, {
-					title: withCtx(() => [createBaseVNode("div", _hoisted_2$34, [createVNode(unref(MessageCircleWarning)), createTextVNode(toDisplayString(itemname.value), 1)])]),
-					default: withCtx(() => [createBaseVNode("div", _hoisted_3$25, [
-						createBaseVNode("div", _hoisted_4$23, [createBaseVNode("span", _hoisted_5$19, toDisplayString(unref(mstrings).type), 1), createBaseVNode("span", _hoisted_6$15, toDisplayString(itemtype.value), 1)]),
-						createBaseVNode("div", _hoisted_7$12, [createBaseVNode("span", _hoisted_8$10, toDisplayString(unref(mstrings).module), 1), createBaseVNode("span", _hoisted_9$8, toDisplayString(itemmodule.value), 1)]),
-						isscale.value ? (openBlock(), createElementBlock("div", _hoisted_10$7, [createBaseVNode("span", _hoisted_11$5, toDisplayString(unref(mstrings).scale), 1), createBaseVNode("span", _hoisted_12$4, toDisplayString(scalename.value), 1)])) : createCommentVNode("", true),
-						!isscale.value && grademax.value ? (openBlock(), createElementBlock("div", _hoisted_13$4, [createBaseVNode("span", _hoisted_14$4, toDisplayString(unref(mstrings).maxgrade), 1), createBaseVNode("span", _hoisted_15$3, toDisplayString(grademax.value), 1)])) : createCommentVNode("", true),
+					title: withCtx(() => [createBaseVNode("div", _hoisted_2$28, [createVNode(unref(MessageCircleWarning)), createTextVNode(toDisplayString(itemname.value), 1)])]),
+					default: withCtx(() => [createBaseVNode("div", _hoisted_3$22, [
+						createBaseVNode("div", _hoisted_4$20, [createBaseVNode("span", _hoisted_5$18, toDisplayString(unref(mstrings).type), 1), createBaseVNode("span", _hoisted_6$13, toDisplayString(itemtype.value), 1)]),
+						createBaseVNode("div", _hoisted_7$11, [createBaseVNode("span", _hoisted_8$9, toDisplayString(unref(mstrings).module), 1), createBaseVNode("span", _hoisted_9$7, toDisplayString(itemmodule.value), 1)]),
+						isscale.value ? (openBlock(), createElementBlock("div", _hoisted_10$6, [createBaseVNode("span", _hoisted_11$4, toDisplayString(unref(mstrings).scale), 1), createBaseVNode("span", _hoisted_12$3, toDisplayString(scalename.value), 1)])) : createCommentVNode("", true),
+						!isscale.value && grademax.value ? (openBlock(), createElementBlock("div", _hoisted_13$3, [createBaseVNode("span", _hoisted_14$3, toDisplayString(unref(mstrings).maxgrade), 1), createBaseVNode("span", _hoisted_15$3, toDisplayString(grademax.value), 1)])) : createCommentVNode("", true),
 						createBaseVNode("div", _hoisted_16$3, [createBaseVNode("span", _hoisted_17$3, toDisplayString(unref(mstrings).weight), 1), createBaseVNode("span", _hoisted_18$3, toDisplayString(weight.value) + "%", 1)]),
 						categoryerror.value ? (openBlock(), createElementBlock("div", _hoisted_19$3, [createBaseVNode("span", _hoisted_20$2, toDisplayString(unref(mstrings).categoryerror), 1)])) : createCommentVNode("", true)
 					])]),
@@ -69568,7 +69555,7 @@ var InfoButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/ReloadButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$45 = {
+var _hoisted_1$38 = {
 	class: "inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed shadow-sm font-semibold text-xs gap-2 transition-all duration-150",
 	"aria-label": "Refresh table"
 };
@@ -69591,7 +69578,7 @@ var ReloadButton_default = /* @__PURE__ */ defineComponent({
 				onClick: refresh_clicked,
 				text: unref(mstrings).refreshpage
 			}, {
-				default: withCtx(() => [createBaseVNode("button", _hoisted_1$45, [createVNode(unref(RefreshCcw), { size: 18 })])]),
+				default: withCtx(() => [createBaseVNode("button", _hoisted_1$38, [createVNode(unref(RefreshCcw), { size: 18 })])]),
 				_: 1
 			}, 8, ["text"]);
 		};
@@ -69599,10 +69586,10 @@ var ReloadButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/ExportCaptureButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$44 = { class: "pl-8 mt-5" };
-var _hoisted_2$33 = { key: 0 };
-var _hoisted_3$24 = { key: 1 };
-var _hoisted_4$22 = { class: "flex justify-end" };
+var _hoisted_1$37 = { class: "pl-8 mt-5" };
+var _hoisted_2$27 = { key: 0 };
+var _hoisted_3$21 = { key: 1 };
+var _hoisted_4$19 = { class: "flex justify-end" };
 //#endregion
 //#region src/components/Capture/ExportCaptureButton.vue
 var ExportCaptureButton_default = /* @__PURE__ */ defineComponent({
@@ -69714,7 +69701,7 @@ var ExportCaptureButton_default = /* @__PURE__ */ defineComponent({
 							_: 1
 						}),
 						pleasewait.value ? (openBlock(), createBlock(PleaseWait_default, { key: 0 })) : createCommentVNode("", true),
-						createBaseVNode("div", _hoisted_1$44, [!pleasewait.value ? (openBlock(), createBlock(_component_FormKit, {
+						createBaseVNode("div", _hoisted_1$37, [!pleasewait.value ? (openBlock(), createBlock(_component_FormKit, {
 							key: 0,
 							type: "form",
 							"submit-label": unref(mstrings)["export"],
@@ -69725,7 +69712,7 @@ var ExportCaptureButton_default = /* @__PURE__ */ defineComponent({
 									variant: "accent",
 									onClick: withModifiers(clickallnone, ["prevent"])
 								}, {
-									default: withCtx(() => [allnone.value ? (openBlock(), createElementBlock("span", _hoisted_2$33, "Select none")) : (openBlock(), createElementBlock("span", _hoisted_3$24, "Select all"))]),
+									default: withCtx(() => [allnone.value ? (openBlock(), createElementBlock("span", _hoisted_2$27, "Select none")) : (openBlock(), createElementBlock("span", _hoisted_3$21, "Select all"))]),
 									_: 1
 								}),
 								_cache[1] || (_cache[1] = createBaseVNode("div", { class: "mb-1" }, "\xA0", -1)),
@@ -69744,7 +69731,7 @@ var ExportCaptureButton_default = /* @__PURE__ */ defineComponent({
 							]),
 							_: 1
 						}, 8, ["submit-label"])) : createCommentVNode("", true)]),
-						createBaseVNode("div", _hoisted_4$22, [createVNode(UButton_default, {
+						createBaseVNode("div", _hoisted_4$19, [createVNode(UButton_default, {
 							variant: "warning",
 							onClick: close_modal
 						}, {
@@ -69760,7 +69747,7 @@ var ExportCaptureButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/ConfirmModal.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$43 = { class: "mt-2 pt-2 flex gap-2" };
+var _hoisted_1$36 = { class: "mt-2 pt-2 flex gap-2" };
 //#endregion
 //#region src/components/Common/ConfirmModal.vue
 var ConfirmModal_default = /* @__PURE__ */ defineComponent({
@@ -69792,7 +69779,7 @@ var ConfirmModal_default = /* @__PURE__ */ defineComponent({
 						createTextVNode(toDisplayString(unref(mstrings).areyousure), 1)
 					])]),
 					_: 1
-				}), createBaseVNode("div", _hoisted_1$43, [createVNode(UButton_default, {
+				}), createBaseVNode("div", _hoisted_1$36, [createVNode(UButton_default, {
 					variant: "primary",
 					onClick: _cache[0] || (_cache[0] = ($event) => emit("confirm", true))
 				}, {
@@ -69882,14 +69869,14 @@ var ResetAssessmentButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/HelpButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$42 = { class: "fixed inset-0 overflow-y-auto" };
-var _hoisted_2$32 = { class: "flex min-h-full items-center justify-center p-4" };
-var _hoisted_3$23 = { class: "bg-brand-dark-blue px-5 py-4 flex items-center gap-3" };
-var _hoisted_4$21 = { class: "bg-white/10 rounded-full p-1.5 shrink-0" };
-var _hoisted_5$18 = { class: "flex-1" };
-var _hoisted_6$14 = { class: "px-5 py-4 space-y-3" };
-var _hoisted_7$11 = ["innerHTML"];
-var _hoisted_8$9 = { class: "px-5 py-3 border-t border-slate-100 flex justify-end" };
+var _hoisted_1$35 = { class: "fixed inset-0 overflow-y-auto" };
+var _hoisted_2$26 = { class: "flex min-h-full items-center justify-center p-4" };
+var _hoisted_3$20 = { class: "bg-brand-dark-blue px-5 py-4 flex items-center gap-3" };
+var _hoisted_4$18 = { class: "bg-white/10 rounded-full p-1.5 shrink-0" };
+var _hoisted_5$17 = { class: "flex-1" };
+var _hoisted_6$12 = { class: "px-5 py-4 space-y-3" };
+var _hoisted_7$10 = ["innerHTML"];
+var _hoisted_8$8 = { class: "px-5 py-3 border-t border-slate-100 flex justify-end" };
 //#endregion
 //#region src/components/Common/HelpButton.vue
 var HelpButton_default = /* @__PURE__ */ defineComponent({
@@ -69941,7 +69928,7 @@ var HelpButton_default = /* @__PURE__ */ defineComponent({
 					}, {
 						default: withCtx(() => [..._cache[4] || (_cache[4] = [createBaseVNode("div", { class: "fixed inset-0 bg-slate-900/40 backdrop-blur-xs" }, null, -1)])]),
 						_: 1
-					}), createBaseVNode("div", _hoisted_1$42, [createBaseVNode("div", _hoisted_2$32, [createVNode(unref(he), {
+					}), createBaseVNode("div", _hoisted_1$35, [createBaseVNode("div", _hoisted_2$26, [createVNode(unref(he), {
 						as: "template",
 						enter: "duration-200 ease-out",
 						"enter-from": "opacity-0 scale-95",
@@ -69952,12 +69939,12 @@ var HelpButton_default = /* @__PURE__ */ defineComponent({
 					}, {
 						default: withCtx(() => [createVNode(unref(Ge$1), { class: "w-full max-w-md bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden" }, {
 							default: withCtx(() => [
-								createBaseVNode("div", _hoisted_3$23, [
-									createBaseVNode("div", _hoisted_4$21, [createVNode(unref(CircleQuestionMark), {
+								createBaseVNode("div", _hoisted_3$20, [
+									createBaseVNode("div", _hoisted_4$18, [createVNode(unref(CircleQuestionMark), {
 										size: 18,
 										class: "text-white"
 									})]),
-									createBaseVNode("div", _hoisted_5$18, [createVNode(unref(Ve$1), { class: "text-sm font-semibold text-white" }, {
+									createBaseVNode("div", _hoisted_5$17, [createVNode(unref(Ve$1), { class: "text-sm font-semibold text-white" }, {
 										default: withCtx(() => [createTextVNode(toDisplayString(__props.title), 1)]),
 										_: 1
 									}), _cache[5] || (_cache[5] = createBaseVNode("p", { class: "text-xs text-white/70 mt-0.5" }, "Context help", -1))]),
@@ -69967,11 +69954,11 @@ var HelpButton_default = /* @__PURE__ */ defineComponent({
 										"aria-label": "Close"
 									}, [createVNode(unref(X), { size: 18 })])
 								]),
-								createBaseVNode("div", _hoisted_6$14, [renderSlot(_ctx.$slots, "default", {}, () => [createBaseVNode("p", {
+								createBaseVNode("div", _hoisted_6$12, [renderSlot(_ctx.$slots, "default", {}, () => [createBaseVNode("p", {
 									class: "text-sm text-slate-700 leading-relaxed prose prose-slate",
 									innerHTML: help.value
-								}, null, 8, _hoisted_7$11)])]),
-								createBaseVNode("div", _hoisted_8$9, [createBaseVNode("button", {
+								}, null, 8, _hoisted_7$10)])]),
+								createBaseVNode("div", _hoisted_8$8, [createBaseVNode("button", {
 									onClick: _cache[1] || (_cache[1] = ($event) => isOpen.value = false),
 									class: "px-3 py-1.5 text-xs font-semibold text-white bg-brand-dark-blue hover:bg-brand-dark-blue/90 rounded-md transition-colors shadow-xs cursor-pointer"
 								}, " Got it ")])
@@ -69989,13 +69976,13 @@ var HelpButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/InitialBar.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$41 = { class: "flex flex-col gap-1 mb-2" };
-var _hoisted_2$31 = { class: "font-semibold uppercase" };
-var _hoisted_3$22 = { class: "flex" };
-var _hoisted_4$20 = { class: "flex flex-wrap gap-1" };
-var _hoisted_5$17 = ["onClick"];
-var _hoisted_6$13 = { class: "flex flex-wrap gap-1" };
-var _hoisted_7$10 = ["onClick"];
+var _hoisted_1$34 = { class: "flex flex-col gap-1 mb-2" };
+var _hoisted_2$25 = { class: "font-semibold uppercase" };
+var _hoisted_3$19 = { class: "flex" };
+var _hoisted_4$17 = { class: "flex flex-wrap gap-1" };
+var _hoisted_5$16 = ["onClick"];
+var _hoisted_6$11 = { class: "flex flex-wrap gap-1" };
+var _hoisted_7$9 = ["onClick"];
 //#endregion
 //#region src/components/Common/InitialBar.vue
 var InitialBar_default = /* @__PURE__ */ defineComponent({
@@ -70026,16 +70013,16 @@ var InitialBar_default = /* @__PURE__ */ defineComponent({
 			}
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$41, [
-				createBaseVNode("div", _hoisted_2$31, toDisplayString(__props.label), 1),
-				createBaseVNode("div", _hoisted_3$22, [createBaseVNode("button", {
+			return openBlock(), createElementBlock("div", _hoisted_1$34, [
+				createBaseVNode("div", _hoisted_2$25, toDisplayString(__props.label), 1),
+				createBaseVNode("div", _hoisted_3$19, [createBaseVNode("button", {
 					class: normalizeClass(["px-2 btn border rounded font-mono", {
 						"btn-primary": __props.selected?.toLowerCase() === "all",
 						"btn-outline btn-secondary": __props.selected?.toLowerCase() !== "all"
 					}]),
 					onClick: _cache[0] || (_cache[0] = ($event) => letterclicked("ALL"))
 				}, " ALL ", 2)]),
-				createBaseVNode("div", _hoisted_4$20, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(lettersFirstHalf), (letter) => {
+				createBaseVNode("div", _hoisted_4$17, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(lettersFirstHalf), (letter) => {
 					return openBlock(), createElementBlock("button", {
 						key: letter,
 						class: normalizeClass(["px-1 btn border rounded font-mono", {
@@ -70043,9 +70030,9 @@ var InitialBar_default = /* @__PURE__ */ defineComponent({
 							"btn-outline btn-secondary": __props.selected?.toLowerCase() !== letter.toLowerCase()
 						}]),
 						onClick: ($event) => letterclicked(letter)
-					}, toDisplayString(letter), 11, _hoisted_5$17);
+					}, toDisplayString(letter), 11, _hoisted_5$16);
 				}), 128))]),
-				createBaseVNode("div", _hoisted_6$13, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(lettersSecondHalf), (letter) => {
+				createBaseVNode("div", _hoisted_6$11, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(lettersSecondHalf), (letter) => {
 					return openBlock(), createElementBlock("button", {
 						key: letter,
 						class: normalizeClass(["px-1 btn border rounded font-mono", {
@@ -70053,7 +70040,7 @@ var InitialBar_default = /* @__PURE__ */ defineComponent({
 							"btn-outline btn-secondary": __props.selected?.toLowerCase() !== letter.toLowerCase()
 						}]),
 						onClick: ($event) => letterclicked(letter)
-					}, toDisplayString(letter), 11, _hoisted_7$10);
+					}, toDisplayString(letter), 11, _hoisted_7$9);
 				}), 128))])
 			]);
 		};
@@ -70069,7 +70056,7 @@ var useFilter = defineStore("filterstore", () => {
 });
 //#endregion
 //#region src/components/Common/NameFilter.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$40 = { class: "mt-4" };
+var _hoisted_1$33 = { class: "mt-4" };
 //#endregion
 //#region src/components/Common/NameFilter.vue
 var NameFilter_default = /* @__PURE__ */ defineComponent({
@@ -70091,7 +70078,7 @@ var NameFilter_default = /* @__PURE__ */ defineComponent({
 			emit("selected", firstname.value, lastname.value);
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$40, [createBaseVNode("div", null, [createBaseVNode("div", null, [createVNode(InitialBar_default, {
+			return openBlock(), createElementBlock("div", _hoisted_1$33, [createBaseVNode("div", null, [createBaseVNode("div", null, [createVNode(InitialBar_default, {
 				selected: unref(firstname),
 				label: unref(mstrings).firstname,
 				onSelected: first_selected
@@ -70151,11 +70138,11 @@ var NameFilterButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/CaptureButtons.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$39 = {
+var _hoisted_1$32 = {
 	key: 0,
 	class: "w-full h-[40px] skeleton"
 };
-var _hoisted_2$30 = {
+var _hoisted_2$24 = {
 	key: 1,
 	class: "flex justify-start gap-2"
 };
@@ -70222,7 +70209,7 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 			emit("refreshtable");
 		}
 		return (_ctx, _cache) => {
-			return !__props.loaded ? (openBlock(), createElementBlock("div", _hoisted_1$39)) : (openBlock(), createElementBlock("div", _hoisted_2$30, [
+			return !__props.loaded ? (openBlock(), createElementBlock("div", _hoisted_1$32)) : (openBlock(), createElementBlock("div", _hoisted_2$24, [
 				createVNode(ImportButton_default, {
 					enable: !__props.converted && __props.caneditgrades,
 					itemid: props.itemid,
@@ -70315,17 +70302,17 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/AlertsBlock.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$38 = {
+var _hoisted_1$31 = {
 	key: 0,
 	class: "mt-2"
 };
-var _hoisted_2$29 = { class: "bg-warning/30 border-warning text-xs px-2 py-1 flex justify-start" };
-var _hoisted_3$21 = { class: "text-error font-bold" };
-var _hoisted_4$19 = { key: 0 };
-var _hoisted_5$16 = { key: 1 };
-var _hoisted_6$12 = { class: "bg-warning/30 border-warning border-t text-xs px-2 py-1 flex justify-start" };
-var _hoisted_7$9 = { class: "w-8 mr-3 inline-block align-middle" };
-var _hoisted_8$8 = { class: "font-bold" };
+var _hoisted_2$23 = { class: "bg-warning/30 border-warning text-xs px-2 py-1 flex justify-start" };
+var _hoisted_3$18 = { class: "text-error font-bold" };
+var _hoisted_4$16 = { key: 0 };
+var _hoisted_5$15 = { key: 1 };
+var _hoisted_6$10 = { class: "bg-warning/30 border-warning border-t text-xs px-2 py-1 flex justify-start" };
+var _hoisted_7$8 = { class: "w-8 mr-3 inline-block align-middle" };
+var _hoisted_8$7 = { class: "font-bold" };
 //#endregion
 //#region src/components/Common/AlertsBlock.vue
 var AlertsBlock_default = /* @__PURE__ */ defineComponent({
@@ -70333,8 +70320,8 @@ var AlertsBlock_default = /* @__PURE__ */ defineComponent({
 	props: { errors: {} },
 	setup(__props) {
 		return (_ctx, _cache) => {
-			return __props.errors.length ? (openBlock(), createElementBlock("div", _hoisted_1$38, [createBaseVNode("div", _hoisted_2$29, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "w-8 mr-3" }, "\xA0", -1)), createBaseVNode("div", null, [createBaseVNode("span", _hoisted_3$21, [createTextVNode(toDisplayString(__props.errors.length) + " ", 1), __props.errors.length == 1 ? (openBlock(), createElementBlock("span", _hoisted_4$19, "warning")) : (openBlock(), createElementBlock("span", _hoisted_5$16, "warnings"))]), _cache[0] || (_cache[0] = createTextVNode(" may require your attention. ", -1))])]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.errors, (error) => {
-				return openBlock(), createElementBlock("div", _hoisted_6$12, [createBaseVNode("div", _hoisted_7$9, [error.level == "error" ? (openBlock(), createBlock(unref(Circle), {
+			return __props.errors.length ? (openBlock(), createElementBlock("div", _hoisted_1$31, [createBaseVNode("div", _hoisted_2$23, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "w-8 mr-3" }, "\xA0", -1)), createBaseVNode("div", null, [createBaseVNode("span", _hoisted_3$18, [createTextVNode(toDisplayString(__props.errors.length) + " ", 1), __props.errors.length == 1 ? (openBlock(), createElementBlock("span", _hoisted_4$16, "warning")) : (openBlock(), createElementBlock("span", _hoisted_5$15, "warnings"))]), _cache[0] || (_cache[0] = createTextVNode(" may require your attention. ", -1))])]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.errors, (error) => {
+				return openBlock(), createElementBlock("div", _hoisted_6$10, [createBaseVNode("div", _hoisted_7$8, [error.level == "error" ? (openBlock(), createBlock(unref(Circle), {
 					key: 0,
 					size: 18,
 					class: "text-error",
@@ -70344,7 +70331,7 @@ var AlertsBlock_default = /* @__PURE__ */ defineComponent({
 					class: "text-warning",
 					size: 18,
 					fill: "var(--color-warning)"
-				}))]), createBaseVNode("div", null, [createBaseVNode("div", _hoisted_8$8, toDisplayString(error.warning), 1), createBaseVNode("div", null, toDisplayString(error.help), 1)])]);
+				}))]), createBaseVNode("div", null, [createBaseVNode("div", _hoisted_8$7, toDisplayString(error.warning), 1), createBaseVNode("div", null, toDisplayString(error.help), 1)])]);
 			}), 256))])) : createCommentVNode("", true);
 		};
 	}
@@ -70403,7 +70390,7 @@ var CaptureAlerts_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Common/NoteButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$37 = { key: 1 };
+var _hoisted_1$30 = { key: 1 };
 //#endregion
 //#region src/components/Common/NoteButton.vue
 var NoteButton_default = /* @__PURE__ */ defineComponent({
@@ -70472,7 +70459,7 @@ var NoteButton_default = /* @__PURE__ */ defineComponent({
 					_: 1
 				})]),
 				_: 1
-			}, 8, ["text"])) : (openBlock(), createElementBlock("div", _hoisted_1$37, [createVNode(UButton_default, {
+			}, 8, ["text"])) : (openBlock(), createElementBlock("div", _hoisted_1$30, [createVNode(UButton_default, {
 				appearance: "outline",
 				size: "xs",
 				onClick: withModifiers(opennote, ["stop", "prevent"])
@@ -70495,7 +70482,7 @@ var NoteButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/BulkEditCell.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$36 = {
+var _hoisted_1$29 = {
 	class: "flex justify-center",
 	style: { "min-width": "250px" }
 };
@@ -70553,7 +70540,7 @@ var BulkEditCell_default = /* @__PURE__ */ defineComponent({
 		});
 		return (_ctx, _cache) => {
 			const _component_FormKit = resolveComponent("FormKit");
-			return openBlock(), createElementBlock("div", _hoisted_1$36, [
+			return openBlock(), createElementBlock("div", _hoisted_1$29, [
 				createVNode(_component_FormKit, {
 					type: "select",
 					name: "admingrades",
@@ -70689,7 +70676,7 @@ var CaptureWarning_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/CaptureTableWarning.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$35 = { class: "flex flex-wrap gap-1.5 items-center" };
+var _hoisted_1$28 = { class: "flex flex-wrap gap-1.5 items-center" };
 //#endregion
 //#region src/components/Capture/CaptureTableWarning.vue
 var CaptureTableWarning_default = /* @__PURE__ */ defineComponent({
@@ -70698,7 +70685,7 @@ var CaptureTableWarning_default = /* @__PURE__ */ defineComponent({
 	setup(__props) {
 		const { mstrings } = storeToRefs(useMstrings());
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$35, [
+			return openBlock(), createElementBlock("div", _hoisted_1$28, [
 				__props.user.alert ? (openBlock(), createBlock(CaptureWarning_default, {
 					key: 0,
 					variant: "discrepancy"
@@ -70825,8 +70812,8 @@ var CaptureColumnEditCog_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Capture/CaptureTableHeader.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$34 = { class: "flex items-center justify-start w-full gap-2 leading-tight" };
-var _hoisted_2$28 = {
+var _hoisted_1$27 = { class: "flex items-center justify-start w-full gap-2 leading-tight" };
+var _hoisted_2$22 = {
 	key: 1,
 	class: "flex gap-1"
 };
@@ -70867,7 +70854,7 @@ var CaptureTableHeader_default = /* @__PURE__ */ defineComponent({
 			return props.column.editable && props.ineditcellmode && props.caneditgrades && props.editcolumnid == props.column.id;
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$34, [
+			return openBlock(), createElementBlock("div", _hoisted_1$27, [
 				createBaseVNode("span", {
 					class: "font-semibold break-words",
 					onClick: _cache[0] || (_cache[0] = (...args) => toggleSorting.value && toggleSorting.value(...args))
@@ -70877,7 +70864,7 @@ var CaptureTableHeader_default = /* @__PURE__ */ defineComponent({
 					header: __props.column,
 					itemid: __props.itemid
 				}, _ctx.$attrs, { class: "shrink-0" }), null, 16, ["header", "itemid"])) : createCommentVNode("", true),
-				showbuttons.value ? (openBlock(), createElementBlock("div", _hoisted_2$28, [createVNode(UButton_default, {
+				showbuttons.value ? (openBlock(), createElementBlock("div", _hoisted_2$22, [createVNode(UButton_default, {
 					size: "xs",
 					variant: "info",
 					onClick: bulksave_clicked
@@ -70898,14 +70885,14 @@ var CaptureTableHeader_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/views/CaptureTable.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$33 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
-var _hoisted_2$27 = { key: 0 };
-var _hoisted_3$20 = {
+var _hoisted_1$26 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
+var _hoisted_2$21 = { key: 0 };
+var _hoisted_3$17 = {
 	key: 0,
 	class: "mt-2"
 };
-var _hoisted_4$18 = { key: 1 };
-var _hoisted_5$15 = { key: 2 };
+var _hoisted_4$15 = { key: 1 };
+var _hoisted_5$14 = { key: 2 };
 //#endregion
 //#region src/views/CaptureTable.vue
 var CaptureTable_default = /* @__PURE__ */ defineComponent({
@@ -71344,10 +71331,10 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 			return users.value.length != 0;
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", null, [createBaseVNode("div", _hoisted_1$33, [createBaseVNode("div", {
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", null, [createBaseVNode("div", _hoisted_1$26, [createBaseVNode("div", {
 				id: "captureselect",
 				class: normalizeClass(["p-2 overflow-hidden transition-all duration-300", collapsed.value ? "max-h-0 opacity-0" : "max-h-screen opacity-100"])
-			}, [createVNode(CaptureSelect_default, { onSelecteditemid: selecteditemid }), itemid.value ? (openBlock(), createElementBlock("div", _hoisted_2$27, [gradesupported.value ? (openBlock(), createBlock(CaptureButtons_default, {
+			}, [createVNode(CaptureSelect_default, { onSelecteditemid: selecteditemid }), itemid.value ? (openBlock(), createElementBlock("div", _hoisted_2$21, [gradesupported.value ? (openBlock(), createBlock(CaptureButtons_default, {
 				key: 0,
 				loaded: loaded.value,
 				itemid: itemid.value,
@@ -71400,9 +71387,9 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 				"gradehidden",
 				"gradelocked",
 				"noids"
-			])) : createCommentVNode("", true)]), itemid.value && gradesupported.value ? (openBlock(), createElementBlock("div", _hoisted_3$20, [
+			])) : createCommentVNode("", true)]), itemid.value && gradesupported.value ? (openBlock(), createElementBlock("div", _hoisted_3$17, [
 				!loaded.value ? (openBlock(), createBlock(PleaseWait_default, { key: 0 })) : createCommentVNode("", true),
-				showtable.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_4$18, [createVNode(UTable_default, {
+				showtable.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_4$15, [createVNode(UTable_default, {
 					data: users.value,
 					columns: tablecolumns.value,
 					filters: tablefilters.value,
@@ -71420,16 +71407,16 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 					"columns",
 					"filters"
 				])])) : createCommentVNode("", true),
-				!showtable.value ? (openBlock(), createElementBlock("h2", _hoisted_5$15, toDisplayString(unref(mstrings)["nothingtodisplay"]), 1)) : createCommentVNode("", true)
+				!showtable.value ? (openBlock(), createElementBlock("h2", _hoisted_5$14, toDisplayString(unref(mstrings)["nothingtodisplay"]), 1)) : createCommentVNode("", true)
 			])) : createCommentVNode("", true)])], 64);
 		};
 	}
 });
 //#endregion
 //#region src/components/Aggregation/RecalculateButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$32 = { key: 0 };
-var _hoisted_2$26 = { key: 1 };
-var _hoisted_3$19 = { class: "flex gap-2" };
+var _hoisted_1$25 = { key: 0 };
+var _hoisted_2$20 = { key: 1 };
+var _hoisted_3$16 = { class: "flex gap-2" };
 //#endregion
 //#region src/components/Aggregation/RecalculateButton.vue
 var RecalculateButton_default = /* @__PURE__ */ defineComponent({
@@ -71487,16 +71474,16 @@ var RecalculateButton_default = /* @__PURE__ */ defineComponent({
 					modalClass: "rounded max-w-3xl",
 					title: unref(mstrings).recalculate
 				}, {
-					default: withCtx(() => [loading.value ? (openBlock(), createElementBlock("div", _hoisted_1$32, [createVNode(PleaseWait_default, {
+					default: withCtx(() => [loading.value ? (openBlock(), createElementBlock("div", _hoisted_1$25, [createVNode(PleaseWait_default, {
 						staffuserid: props.staffuserid,
 						progresstype: "aggregate"
-					}, null, 8, ["staffuserid"])])) : (openBlock(), createElementBlock("div", _hoisted_2$26, [createVNode(UAlert_default, {
+					}, null, 8, ["staffuserid"])])) : (openBlock(), createElementBlock("div", _hoisted_2$20, [createVNode(UAlert_default, {
 						class: "mb-5",
 						variant: "info"
 					}, {
 						default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).recalculatehelp), 1)]),
 						_: 1
-					}), createBaseVNode("div", _hoisted_3$19, [createVNode(UButton_default, {
+					}), createBaseVNode("div", _hoisted_3$16, [createVNode(UButton_default, {
 						variant: "primary",
 						onClick: _cache[0] || (_cache[0] = ($event) => do_recalculate())
 					}, {
@@ -71517,16 +71504,16 @@ var RecalculateButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/ConversionButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$31 = { key: 1 };
-var _hoisted_2$25 = {
+var _hoisted_1$24 = { key: 1 };
+var _hoisted_2$19 = {
 	key: 0,
 	class: "mb-2"
 };
-var _hoisted_3$18 = { key: 1 };
-var _hoisted_4$17 = ["value"];
-var _hoisted_5$14 = { class: "flex gap-2" };
-var _hoisted_6$11 = { key: 2 };
-var _hoisted_7$8 = { class: "mt-1 mb-4 flex gap-2" };
+var _hoisted_3$15 = { key: 1 };
+var _hoisted_4$14 = ["value"];
+var _hoisted_5$13 = { class: "flex gap-2" };
+var _hoisted_6$9 = { key: 2 };
+var _hoisted_7$7 = { class: "mt-1 mb-4 flex gap-2" };
 //#endregion
 //#region src/components/Aggregation/ConversionButton.vue
 var ConversionButton_default = /* @__PURE__ */ defineComponent({
@@ -71662,9 +71649,9 @@ var ConversionButton_default = /* @__PURE__ */ defineComponent({
 					modalClass: "rounded max-w-3xl",
 					title: unref(mstrings).conversionselect
 				}, {
-					default: withCtx(() => [waiting.value ? (openBlock(), createBlock(PleaseWait_default, { key: 0 })) : createCommentVNode("", true), !waiting.value ? (openBlock(), createElementBlock("div", _hoisted_1$31, [
-						mapname.value ? (openBlock(), createElementBlock("p", _hoisted_2$25, [createTextVNode(toDisplayString(unref(mstrings).selectedmap) + ": ", 1), createBaseVNode("b", null, toDisplayString(mapname.value), 1)])) : createCommentVNode("", true),
-						!selection.value ? (openBlock(), createElementBlock("div", _hoisted_3$18, [
+					default: withCtx(() => [waiting.value ? (openBlock(), createBlock(PleaseWait_default, { key: 0 })) : createCommentVNode("", true), !waiting.value ? (openBlock(), createElementBlock("div", _hoisted_1$24, [
+						mapname.value ? (openBlock(), createElementBlock("p", _hoisted_2$19, [createTextVNode(toDisplayString(unref(mstrings).selectedmap) + ": ", 1), createBaseVNode("b", null, toDisplayString(mapname.value), 1)])) : createCommentVNode("", true),
+						!selection.value ? (openBlock(), createElementBlock("div", _hoisted_3$15, [
 							nomaps.value && loaded.value ? (openBlock(), createBlock(_component_Ulert, {
 								key: 0,
 								class: "mb-4",
@@ -71684,10 +71671,10 @@ var ConversionButton_default = /* @__PURE__ */ defineComponent({
 									type: "radio",
 									value: item.id,
 									"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => mapid.value = $event)
-								}, null, 8, _hoisted_4$17), [[vModelRadio, mapid.value]])]),
+								}, null, 8, _hoisted_4$14), [[vModelRadio, mapid.value]])]),
 								_: 1
 							}, 8, ["items", "headers"])) : createCommentVNode("", true),
-							createBaseVNode("div", _hoisted_5$14, [createVNode(UButton_default, {
+							createBaseVNode("div", _hoisted_5$13, [createVNode(UButton_default, {
 								variant: "primary",
 								onClick: save_clicked,
 								disabled: mapid.value == 0
@@ -71702,10 +71689,10 @@ var ConversionButton_default = /* @__PURE__ */ defineComponent({
 								_: 1
 							})])
 						])) : createCommentVNode("", true),
-						selection.value ? (openBlock(), createElementBlock("div", _hoisted_6$11, [createVNode(UAlert_default, { variant: "warning" }, {
+						selection.value ? (openBlock(), createElementBlock("div", _hoisted_6$9, [createVNode(UAlert_default, { variant: "warning" }, {
 							default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).conversionremovewarning), 1)]),
 							_: 1
-						}), createBaseVNode("div", _hoisted_7$8, [createVNode(UButton_default, {
+						}), createBaseVNode("div", _hoisted_7$7, [createVNode(UButton_default, {
 							variant: "primary",
 							onClick: remove_clicked
 						}, {
@@ -71727,29 +71714,29 @@ var ConversionButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/ReleaseCategoryButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$30 = { key: 0 };
-var _hoisted_2$24 = { key: 0 };
-var _hoisted_3$17 = { key: 1 };
-var _hoisted_4$16 = { key: 0 };
-var _hoisted_5$13 = { key: 1 };
-var _hoisted_6$10 = {
+var _hoisted_1$23 = { key: 0 };
+var _hoisted_2$18 = { key: 0 };
+var _hoisted_3$14 = { key: 1 };
+var _hoisted_4$13 = { key: 0 };
+var _hoisted_5$12 = { key: 1 };
+var _hoisted_6$8 = {
 	key: 0,
 	class: "mt-1"
 };
-var _hoisted_7$7 = {
+var _hoisted_7$6 = {
 	key: 0,
 	class: "mt-1"
 };
-var _hoisted_8$7 = { class: "mt-4 flex gap-2" };
-var _hoisted_9$7 = {
+var _hoisted_8$6 = { class: "mt-4 flex gap-2" };
+var _hoisted_9$6 = {
 	key: 2,
 	class: "mt-4"
 };
-var _hoisted_10$6 = {
+var _hoisted_10$5 = {
 	key: 0,
 	class: "mt-1"
 };
-var _hoisted_11$4 = { class: "mt-4 flex gap-2" };
+var _hoisted_11$3 = { class: "mt-4 flex gap-2" };
 //#endregion
 //#region src/components/Aggregation/ReleaseCategoryButton.vue
 var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
@@ -71828,7 +71815,7 @@ var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
 					onClick: _cache[0] || (_cache[0] = ($event) => showreleasemodal.value = true),
 					iconName: "Rocket"
 				}, {
-					default: withCtx(() => [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_1$30, [props.released ? (openBlock(), createElementBlock("span", _hoisted_2$24, "(Un-)")) : createCommentVNode("", true), createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedgroup), 1)])) : (openBlock(), createElementBlock("span", _hoisted_3$17, [props.released ? (openBlock(), createElementBlock("span", _hoisted_4$16, "(Un-)")) : createCommentVNode("", true), createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedgrade), 1)]))]),
+					default: withCtx(() => [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_1$23, [props.released ? (openBlock(), createElementBlock("span", _hoisted_2$18, "(Un-)")) : createCommentVNode("", true), createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedgroup), 1)])) : (openBlock(), createElementBlock("span", _hoisted_3$14, [props.released ? (openBlock(), createElementBlock("span", _hoisted_4$13, "(Un-)")) : createCommentVNode("", true), createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedgrade), 1)]))]),
 					_: 1
 				}),
 				createVNode(_component_VueModal, {
@@ -71840,14 +71827,14 @@ var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
 				}, {
 					default: withCtx(() => [
 						loading.value ? (openBlock(), createBlock(PleaseWait_default, { key: 0 })) : createCommentVNode("", true),
-						!props.released ? (openBlock(), createElementBlock("div", _hoisted_5$13, [
+						!props.released ? (openBlock(), createElementBlock("div", _hoisted_5$12, [
 							createBaseVNode("h4", null, toDisplayString(unref(mstrings).releaseaggregatedgrade), 1),
 							!props.released ? (openBlock(), createBlock(UAlert_default, {
 								key: 0,
 								variant: "warning",
 								class: "mt-2"
 							}, {
-								default: withCtx(() => [createBaseVNode("div", null, [createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedconfirm) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_6$10, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)])]),
+								default: withCtx(() => [createBaseVNode("div", null, [createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedconfirm) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_6$8, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)])]),
 								_: 1
 							})) : createCommentVNode("", true),
 							props.released ? (openBlock(), createBlock(UAlert_default, {
@@ -71855,10 +71842,10 @@ var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
 								variant: "error",
 								class: "mt-2"
 							}, {
-								default: withCtx(() => [createBaseVNode("div", null, [createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedconfirmstern) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_7$7, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)])]),
+								default: withCtx(() => [createBaseVNode("div", null, [createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedconfirmstern) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_7$6, [createBaseVNode("b", null, toDisplayString(unref(mstrings).releaseconfirmgroup), 1)])) : createCommentVNode("", true)])]),
 								_: 1
 							})) : createCommentVNode("", true),
-							createBaseVNode("div", _hoisted_8$7, [createVNode(UButton_default, {
+							createBaseVNode("div", _hoisted_8$6, [createVNode(UButton_default, {
 								variant: "primary",
 								onClick: _cache[1] || (_cache[1] = ($event) => release_grades())
 							}, {
@@ -71872,16 +71859,16 @@ var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
 								_: 1
 							})])
 						])) : createCommentVNode("", true),
-						props.released ? (openBlock(), createElementBlock("div", _hoisted_9$7, [
+						props.released ? (openBlock(), createElementBlock("div", _hoisted_9$6, [
 							_cache[6] || (_cache[6] = createBaseVNode("h4", null, "Revert release of grades", -1)),
 							createVNode(UAlert_default, {
 								variant: "error",
 								class: "mt-2"
 							}, {
-								default: withCtx(() => [createBaseVNode("div", null, [createTextVNode(toDisplayString(unref(mstrings).removerelease) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_10$6, [createBaseVNode("b", null, toDisplayString(unref(mstrings).removereleasegroup), 1)])) : createCommentVNode("", true)])]),
+								default: withCtx(() => [createBaseVNode("div", null, [createTextVNode(toDisplayString(unref(mstrings).removerelease) + " ", 1), grouprelease.value ? (openBlock(), createElementBlock("p", _hoisted_10$5, [createBaseVNode("b", null, toDisplayString(unref(mstrings).removereleasegroup), 1)])) : createCommentVNode("", true)])]),
 								_: 1
 							}),
-							createBaseVNode("div", _hoisted_11$4, [createVNode(UButton_default, {
+							createBaseVNode("div", _hoisted_11$3, [createVNode(UButton_default, {
 								variant: "error",
 								onClick: _cache[3] || (_cache[3] = ($event) => revert_release())
 							}, {
@@ -71904,20 +71891,20 @@ var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/ExportAggregationButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$29 = {
+var _hoisted_1$22 = {
 	key: 1,
 	class: "mb-5"
 };
-var _hoisted_2$23 = {
+var _hoisted_2$17 = {
 	key: 2,
 	class: "mb-5 scrollable-content"
 };
-var _hoisted_3$16 = { class: "mb-2 flex gap-2" };
-var _hoisted_4$15 = {
+var _hoisted_3$13 = { class: "mb-2 flex gap-2" };
+var _hoisted_4$12 = {
 	key: 3,
 	class: "mb-5 scrollable-content"
 };
-var _hoisted_5$12 = { class: "flex justify-end" };
+var _hoisted_5$11 = { class: "flex justify-end" };
 //#endregion
 //#region src/components/Aggregation/ExportAggregationButton.vue
 var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
@@ -72061,7 +72048,7 @@ var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
 				}, {
 					default: withCtx(() => [
 						pleasewait.value ? (openBlock(), createBlock(PleaseWait_default, { key: 0 })) : createCommentVNode("", true),
-						step.value == "selectplugin" ? (openBlock(), createElementBlock("div", _hoisted_1$29, [createVNode(_component_FormKit, {
+						step.value == "selectplugin" ? (openBlock(), createElementBlock("div", _hoisted_1$22, [createVNode(_component_FormKit, {
 							type: "form",
 							onSubmit: _cache[2] || (_cache[2] = ($event) => plugin_selected()),
 							"submit-label": unref(mstrings).next
@@ -72087,7 +72074,7 @@ var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
 							}, null, 8, ["label", "modelValue"])]),
 							_: 1
 						}, 8, ["submit-label"])])) : createCommentVNode("", true),
-						step.value == "selectfields" && hasform.value ? (openBlock(), createElementBlock("div", _hoisted_2$23, [createVNode(_component_FormKit, {
+						step.value == "selectfields" && hasform.value ? (openBlock(), createElementBlock("div", _hoisted_2$17, [createVNode(_component_FormKit, {
 							type: "form",
 							onSubmit: _cache[3] || (_cache[3] = ($event) => fields_selected()),
 							"submit-label": unref(mstrings).export
@@ -72100,7 +72087,7 @@ var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
 									default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).selectfields), 1)]),
 									_: 1
 								}),
-								createBaseVNode("div", _hoisted_3$16, [createVNode(UButton_default, {
+								createBaseVNode("div", _hoisted_3$13, [createVNode(UButton_default, {
 									variant: "info",
 									onClick: all_selected
 								}, {
@@ -72130,7 +72117,7 @@ var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
 							]),
 							_: 1
 						}, 8, ["submit-label"])])) : createCommentVNode("", true),
-						step.value == "selectfields" && !hasform.value ? (openBlock(), createElementBlock("div", _hoisted_4$15, [
+						step.value == "selectfields" && !hasform.value ? (openBlock(), createElementBlock("div", _hoisted_4$12, [
 							createVNode(UAlert_default, { variant: "warning" }, {
 								default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).noselectfields), 1)]),
 								_: 1
@@ -72145,7 +72132,7 @@ var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
 							}),
 							_cache[7] || (_cache[7] = createTextVNode("\" ", -1))
 						])) : createCommentVNode("", true),
-						createBaseVNode("div", _hoisted_5$12, [createVNode(UButton_default, {
+						createBaseVNode("div", _hoisted_5$11, [createVNode(UButton_default, {
 							variant: "warning",
 							onClick: _cache[5] || (_cache[5] = ($event) => close_modal())
 						}, {
@@ -72161,7 +72148,7 @@ var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/AggregationButtons.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$28 = { class: "flex gap-2 mt-2" };
+var _hoisted_1$21 = { class: "flex gap-2 mt-2" };
 //#endregion
 //#region src/components/Aggregation/AggregationButtons.vue
 var AggregationButtons_default = /* @__PURE__ */ defineComponent({
@@ -72192,7 +72179,7 @@ var AggregationButtons_default = /* @__PURE__ */ defineComponent({
 			emits("refreshtable");
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$28, [
+			return openBlock(), createElementBlock("div", _hoisted_1$21, [
 				__props.caneditgrades ? (openBlock(), createBlock(RecalculateButton_default, {
 					key: 0,
 					categoryid: props.categoryid,
@@ -72230,15 +72217,15 @@ var AggregationButtons_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/AlterButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$27 = {
+var _hoisted_1$20 = {
 	key: 1,
 	class: "scrollable-content"
 };
-var _hoisted_2$22 = { class: "list-none" };
-var _hoisted_3$15 = { class: "table mt-3 p-2" };
-var _hoisted_4$14 = { class: "text-bold" };
-var _hoisted_5$11 = { class: "my-4" };
-var _hoisted_6$9 = { class: "mt-2 flex gap-2" };
+var _hoisted_2$16 = { class: "list-none" };
+var _hoisted_3$12 = { class: "table mt-3 p-2" };
+var _hoisted_4$11 = { class: "text-bold" };
+var _hoisted_5$10 = { class: "my-4" };
+var _hoisted_6$7 = { class: "mt-2 flex gap-2" };
 //#endregion
 //#region src/components/Aggregation/AlterButton.vue
 var AlterButton_default = /* @__PURE__ */ defineComponent({
@@ -72382,14 +72369,14 @@ var AlterButton_default = /* @__PURE__ */ defineComponent({
 					default: withCtx(() => [loading.value ? (openBlock(), createBlock(UAlert_default, { key: 0 }, {
 						default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).pleasewait), 1)]),
 						_: 1
-					})) : createCommentVNode("", true), !loading.value ? (openBlock(), createElementBlock("div", _hoisted_1$27, [
-						createBaseVNode("ul", _hoisted_2$22, [
+					})) : createCommentVNode("", true), !loading.value ? (openBlock(), createElementBlock("div", _hoisted_1$20, [
+						createBaseVNode("ul", _hoisted_2$16, [
 							createBaseVNode("li", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings).category) + ":", 1), createTextVNode(" " + toDisplayString(categoryname.value), 1)]),
 							createBaseVNode("li", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings).username) + ":", 1), createTextVNode(" " + toDisplayString(userfullname.value), 1)]),
 							createBaseVNode("li", null, [createBaseVNode("b", null, toDisplayString(unref(mstrings).idnumber) + ":", 1), createTextVNode(" " + toDisplayString(idnumber.value), 1)])
 						]),
 						_cache[5] || (_cache[5] = createBaseVNode("div", { class: "divider" }, null, -1)),
-						createBaseVNode("table", _hoisted_3$15, [createBaseVNode("thead", null, [createBaseVNode("tr", null, [
+						createBaseVNode("table", _hoisted_3$12, [createBaseVNode("thead", null, [createBaseVNode("tr", null, [
 							createBaseVNode("th", null, toDisplayString(unref(mstrings).gradeitem), 1),
 							createBaseVNode("th", null, toDisplayString(unref(mstrings).gradetype), 1),
 							createBaseVNode("th", null, toDisplayString(unref(mstrings).grade), 1),
@@ -72415,7 +72402,7 @@ var AlterButton_default = /* @__PURE__ */ defineComponent({
 								}, null, 8, ["modelValue", "onUpdate:modelValue"])])
 							]);
 						}), 128)), createBaseVNode("tr", null, [
-							createBaseVNode("td", _hoisted_4$14, toDisplayString(unref(mstrings).sumofweights), 1),
+							createBaseVNode("td", _hoisted_4$11, toDisplayString(unref(mstrings).sumofweights), 1),
 							_cache[3] || (_cache[3] = createBaseVNode("td", null, "\xA0", -1)),
 							_cache[4] || (_cache[4] = createBaseVNode("td", null, "\xA0", -1)),
 							createBaseVNode("td", null, toDisplayString(defaulttotal.value.toFixed(5)), 1),
@@ -72430,7 +72417,7 @@ var AlterButton_default = /* @__PURE__ */ defineComponent({
 							_: 1
 						})) : createCommentVNode("", true),
 						_cache[6] || (_cache[6] = createBaseVNode("div", { class: "divider" }, null, -1)),
-						createBaseVNode("div", _hoisted_5$11, [createVNode(_component_FormKit, {
+						createBaseVNode("div", _hoisted_5$10, [createVNode(_component_FormKit, {
 							type: "textarea",
 							"outer-class": "mb-3",
 							label: unref(mstrings).reasonforammendment,
@@ -72438,7 +72425,7 @@ var AlterButton_default = /* @__PURE__ */ defineComponent({
 							modelValue: reason.value,
 							"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => reason.value = $event)
 						}, null, 8, ["label", "modelValue"])]),
-						createBaseVNode("div", _hoisted_6$9, [
+						createBaseVNode("div", _hoisted_6$7, [
 							createVNode(UButton_default, {
 								variant: "primary",
 								onClick: save_altered_weights
@@ -72470,8 +72457,8 @@ var AlterButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/YesNo.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$26 = { key: 0 };
-var _hoisted_2$21 = { key: 1 };
+var _hoisted_1$19 = { key: 0 };
+var _hoisted_2$15 = { key: 1 };
 //#endregion
 //#region src/components/YesNo.vue
 var YesNo_default = /* @__PURE__ */ defineComponent({
@@ -72480,29 +72467,29 @@ var YesNo_default = /* @__PURE__ */ defineComponent({
 	setup(__props) {
 		const props = __props;
 		return (_ctx, _cache) => {
-			return props.yes ? (openBlock(), createElementBlock("span", _hoisted_1$26, "Yes")) : (openBlock(), createElementBlock("span", _hoisted_2$21, "No"));
+			return props.yes ? (openBlock(), createElementBlock("span", _hoisted_1$19, "Yes")) : (openBlock(), createElementBlock("span", _hoisted_2$15, "No"));
 		};
 	}
 });
 //#endregion
 //#region src/components/Aggregation/ExplainButton.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$25 = { class: "p-4 font-semibold flex justify-between gap-2 align-middle border-b border-base-300" };
-var _hoisted_2$20 = { class: "flex justify-start gap-2" };
-var _hoisted_3$14 = {
+var _hoisted_1$18 = { class: "p-4 font-semibold flex justify-between gap-2 align-middle border-b border-base-300" };
+var _hoisted_2$14 = { class: "flex justify-start gap-2" };
+var _hoisted_3$11 = {
 	key: 1,
 	class: "scrollable-content"
 };
-var _hoisted_4$13 = { class: "flex items-center gap-5 pb-5 mb-8 border-b border-brand-light-purple/30" };
-var _hoisted_5$10 = { class: "relative shrink-0" };
-var _hoisted_6$8 = ["href"];
-var _hoisted_7$6 = ["src", "alt"];
-var _hoisted_8$6 = { class: "flex flex-col gap-1 min-w-0" };
-var _hoisted_9$6 = { class: "text-xl font-bold tracking-tight text-brand-dark-purple truncate" };
-var _hoisted_10$5 = { class: "flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 font-sans" };
-var _hoisted_11$3 = { class: "font-medium" };
-var _hoisted_12$3 = { class: "font-mono text-slate-800" };
-var _hoisted_13$3 = { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-light-blue text-brand-dark-blue" };
-var _hoisted_14$3 = { class: "flex gap-4 border-b border-brand-light-purple/30 pb-3 text-slate-600" };
+var _hoisted_4$10 = { class: "flex items-center gap-5 pb-5 mb-8 border-b border-brand-light-purple/30" };
+var _hoisted_5$9 = { class: "relative shrink-0" };
+var _hoisted_6$6 = ["href"];
+var _hoisted_7$5 = ["src", "alt"];
+var _hoisted_8$5 = { class: "flex flex-col gap-1 min-w-0" };
+var _hoisted_9$5 = { class: "text-xl font-bold tracking-tight text-brand-dark-purple truncate" };
+var _hoisted_10$4 = { class: "flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 font-sans" };
+var _hoisted_11$2 = { class: "font-medium" };
+var _hoisted_12$2 = { class: "font-mono text-slate-800" };
+var _hoisted_13$2 = { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-light-blue text-brand-dark-blue" };
+var _hoisted_14$2 = { class: "flex gap-4 border-b border-brand-light-purple/30 pb-3 text-slate-600" };
 var _hoisted_15$2 = { class: "flex-1 text-left" };
 var _hoisted_16$2 = { class: "uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1" };
 var _hoisted_17$2 = { class: "text-university-blue font-semibold" };
@@ -72626,7 +72613,7 @@ var ExplainButton_default = /* @__PURE__ */ defineComponent({
 					modalClass: "rounded max-w-3xl",
 					title: unref(mstrings).explain
 				}, {
-					titlebar: withCtx(() => [createBaseVNode("div", _hoisted_1$25, [createBaseVNode("div", _hoisted_2$20, [createVNode(unref(CircleAlert), {
+					titlebar: withCtx(() => [createBaseVNode("div", _hoisted_1$18, [createBaseVNode("div", _hoisted_2$14, [createVNode(unref(CircleAlert), {
 						size: 14,
 						class: "mt-1"
 					}), _cache[2] || (_cache[2] = createBaseVNode("span", null, "Grade aggregation explanation", -1))]), createBaseVNode("div", null, [createBaseVNode("button", {
@@ -72636,8 +72623,8 @@ var ExplainButton_default = /* @__PURE__ */ defineComponent({
 					default: withCtx(() => [loading.value ? (openBlock(), createBlock(UAlert_default, { key: 0 }, {
 						default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).pleasewait), 1)]),
 						_: 1
-					})) : createCommentVNode("", true), !loading.value ? (openBlock(), createElementBlock("div", _hoisted_3$14, [
-						createBaseVNode("div", _hoisted_4$13, [createBaseVNode("div", _hoisted_5$10, [createBaseVNode("a", {
+					})) : createCommentVNode("", true), !loading.value ? (openBlock(), createElementBlock("div", _hoisted_3$11, [
+						createBaseVNode("div", _hoisted_4$10, [createBaseVNode("div", _hoisted_5$9, [createBaseVNode("a", {
 							href: user.value.profileurl,
 							target: "_profile",
 							class: "block w-14 h-14 rounded-full ring-2 ring-university-blue ring-offset-2 ring-offset-white overflow-hidden transition-transform duration-200 hover:scale-105"
@@ -72647,12 +72634,12 @@ var ExplainButton_default = /* @__PURE__ */ defineComponent({
 							class: "w-full h-full object-cover",
 							width: "56",
 							height: "56"
-						}, null, 8, _hoisted_7$6)], 8, _hoisted_6$8)]), createBaseVNode("div", _hoisted_8$6, [createBaseVNode("h2", _hoisted_9$6, toDisplayString(user.value.displayname), 1), createBaseVNode("div", _hoisted_10$5, [
-							createBaseVNode("span", _hoisted_11$3, [createTextVNode(toDisplayString(unref(mstrings).idnumber) + ": ", 1), createBaseVNode("span", _hoisted_12$3, toDisplayString(user.value.idnumber), 1)]),
+						}, null, 8, _hoisted_7$5)], 8, _hoisted_6$6)]), createBaseVNode("div", _hoisted_8$5, [createBaseVNode("h2", _hoisted_9$5, toDisplayString(user.value.displayname), 1), createBaseVNode("div", _hoisted_10$4, [
+							createBaseVNode("span", _hoisted_11$2, [createTextVNode(toDisplayString(unref(mstrings).idnumber) + ": ", 1), createBaseVNode("span", _hoisted_12$2, toDisplayString(user.value.idnumber), 1)]),
 							_cache[3] || (_cache[3] = createBaseVNode("span", { class: "hidden sm:inline text-slate-300" }, "•", -1)),
-							createBaseVNode("span", _hoisted_13$3, toDisplayString(user.value.ugpg), 1)
+							createBaseVNode("span", _hoisted_13$2, toDisplayString(user.value.ugpg), 1)
 						])])]),
-						createBaseVNode("div", _hoisted_14$3, [
+						createBaseVNode("div", _hoisted_14$2, [
 							createBaseVNode("div", _hoisted_15$2, [createBaseVNode("div", _hoisted_16$2, toDisplayString(unref(mstrings).aggregatedgrade), 1), createBaseVNode("div", _hoisted_17$2, [createVNode(GradeColor_default, { grade: user.value.displaygrade }, null, 8, ["grade"])])]),
 							user.value && user.value.regulationname == "original" ? (openBlock(), createElementBlock("div", _hoisted_18$2, [createBaseVNode("div", _hoisted_19$2, toDisplayString(unref(mstrings).completed), 1), createBaseVNode("div", _hoisted_20$1, toDisplayString(user.value.completed) + "%", 1)])) : createCommentVNode("", true),
 							createBaseVNode("div", _hoisted_21$1, [createBaseVNode("div", _hoisted_22, toDisplayString(unref(mstrings).gradetype), 1), createBaseVNode("div", _hoisted_23, toDisplayString(user.value.formattedatype), 1)])
@@ -72700,20 +72687,20 @@ var ExplainButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/OverrideGrade.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$24 = {
+var _hoisted_1$17 = {
 	key: 0,
 	class: "menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm",
 	tabindex: "-1"
 };
-var _hoisted_2$19 = { key: 0 };
-var _hoisted_3$13 = { key: 1 };
-var _hoisted_4$12 = {
+var _hoisted_2$13 = { key: 0 };
+var _hoisted_3$10 = { key: 1 };
+var _hoisted_4$9 = {
 	key: 1,
 	class: "menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm",
 	tabindex: "-1"
 };
-var _hoisted_5$9 = { key: 0 };
-var _hoisted_6$7 = { key: 1 };
+var _hoisted_5$8 = { key: 0 };
+var _hoisted_6$5 = { key: 1 };
 //#endregion
 //#region src/components/Aggregation/OverrideGrade.vue
 var OverrideGrade_default = /* @__PURE__ */ defineComponent({
@@ -72755,8 +72742,8 @@ var OverrideGrade_default = /* @__PURE__ */ defineComponent({
 					})]),
 					_: 1
 				}), createVNode(unref(je), { class: normalizeClass(["border-2 border-base-300 rounded-md absolute z-999 left-1/2 -translate-x-1/2", panelPositionClasses.value]) }, {
-					default: withCtx(({ close }) => [props.categoryid == 0 ? (openBlock(), createElementBlock("ul", _hoisted_1$24, [
-						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_2$19, [createVNode(AddGradeButton_default, {
+					default: withCtx(({ close }) => [props.categoryid == 0 ? (openBlock(), createElementBlock("ul", _hoisted_1$17, [
+						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_2$13, [createVNode(AddGradeButton_default, {
 							itemid: props.itemid,
 							selectedcategoryid: props.selectedcategoryid,
 							userid: props.userid,
@@ -72787,7 +72774,7 @@ var OverrideGrade_default = /* @__PURE__ */ defineComponent({
 							"itemname",
 							"close"
 						])]),
-						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_3$13, [createVNode(HideShowButton_default, {
+						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_3$10, [createVNode(HideShowButton_default, {
 							gradehidden: props.gradehidden,
 							itemid: props.itemid,
 							userid: props.userid,
@@ -72799,8 +72786,8 @@ var OverrideGrade_default = /* @__PURE__ */ defineComponent({
 							"userid",
 							"close"
 						])])) : createCommentVNode("", true)
-					])) : (openBlock(), createElementBlock("ul", _hoisted_4$12, [
-						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_5$9, [createVNode(AddGradeButton_default, {
+					])) : (openBlock(), createElementBlock("ul", _hoisted_4$9, [
+						__props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_5$8, [createVNode(AddGradeButton_default, {
 							itemid: props.itemid,
 							selectedcategoryid: props.selectedcategoryid,
 							categoryid: props.categoryid,
@@ -72833,7 +72820,7 @@ var OverrideGrade_default = /* @__PURE__ */ defineComponent({
 							"itemname",
 							"close"
 						])]),
-						props.showweights && !props.overridden && __props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_6$7, [createVNode(AlterButton_default, {
+						props.showweights && !props.overridden && __props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_6$5, [createVNode(AlterButton_default, {
 							userid: props.userid,
 							itemid: props.itemid,
 							categoryid: props.categoryid,
@@ -72864,21 +72851,21 @@ var OverrideGrade_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/AggregationTableHeader.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$23 = { class: "flex flex-col gap-2" };
-var _hoisted_2$18 = { class: "inline-flex gap-2" };
-var _hoisted_3$12 = { key: 0 };
-var _hoisted_4$11 = { key: 1 };
-var _hoisted_5$8 = { key: 0 };
-var _hoisted_6$6 = {
+var _hoisted_1$16 = { class: "flex flex-col gap-2" };
+var _hoisted_2$12 = { class: "inline-flex gap-2" };
+var _hoisted_3$9 = { key: 0 };
+var _hoisted_4$8 = { key: 1 };
+var _hoisted_5$7 = { key: 0 };
+var _hoisted_6$4 = {
 	key: 0,
 	class: "font-light normal-case py-1"
 };
-var _hoisted_7$5 = { key: 1 };
-var _hoisted_8$5 = {
+var _hoisted_7$4 = { key: 1 };
+var _hoisted_8$4 = {
 	key: 3,
 	class: "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content"
 };
-var _hoisted_9$5 = { key: 4 };
+var _hoisted_9$4 = { key: 4 };
 //#endregion
 //#region src/components/Aggregation/AggregationTableHeader.vue
 var AggregationTableHeader_default = /* @__PURE__ */ defineComponent({
@@ -72902,7 +72889,7 @@ var AggregationTableHeader_default = /* @__PURE__ */ defineComponent({
 			emits("expandclicked");
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$23, [
+			return openBlock(), createElementBlock("div", _hoisted_1$16, [
 				createVNode(UTooltip_default, {
 					text: __props.column.fullname,
 					position: "below",
@@ -72911,11 +72898,11 @@ var AggregationTableHeader_default = /* @__PURE__ */ defineComponent({
 					default: withCtx(() => [createBaseVNode("div", null, [createBaseVNode("span", {
 						onClick: _cache[0] || (_cache[0] = (...args) => toggleSorting.value && toggleSorting.value(...args)),
 						class: "cursor-pointer"
-					}, toDisplayString(__props.column.shortname ?? ""), 1)]), createBaseVNode("div", _hoisted_2$18, [!__props.infocol && __props.column.showweights ? (openBlock(), createElementBlock("div", _hoisted_3$12, toDisplayString(__props.column.weight) + "%", 1)) : createCommentVNode("", true), __props.column.gradetype ? (openBlock(), createElementBlock("div", _hoisted_4$11, [createTextVNode(toDisplayString(__props.column.gradetype) + " ", 1), !__props.column.isscale ? (openBlock(), createElementBlock("span", _hoisted_5$8, "(" + toDisplayString(__props.column.grademax) + ")", 1)) : createCommentVNode("", true)])) : createCommentVNode("", true)])]),
+					}, toDisplayString(__props.column.shortname ?? ""), 1)]), createBaseVNode("div", _hoisted_2$12, [!__props.infocol && __props.column.showweights ? (openBlock(), createElementBlock("div", _hoisted_3$9, toDisplayString(__props.column.weight) + "%", 1)) : createCommentVNode("", true), __props.column.gradetype ? (openBlock(), createElementBlock("div", _hoisted_4$8, [createTextVNode(toDisplayString(__props.column.gradetype) + " ", 1), !__props.column.isscale ? (openBlock(), createElementBlock("span", _hoisted_5$7, "(" + toDisplayString(__props.column.grademax) + ")", 1)) : createCommentVNode("", true)])) : createCommentVNode("", true)])]),
 					_: 1
 				}, 8, ["text"]),
-				__props.column.strategy ? (openBlock(), createElementBlock("div", _hoisted_6$6, [createBaseVNode("i", null, toDisplayString(__props.column.strategy), 1)])) : createCommentVNode("", true),
-				__props.totaltype ? (openBlock(), createElementBlock("div", _hoisted_7$5, " (" + toDisplayString(__props.totaltype) + ") ", 1)) : createCommentVNode("", true),
+				__props.column.strategy ? (openBlock(), createElementBlock("div", _hoisted_6$4, [createBaseVNode("i", null, toDisplayString(__props.column.strategy), 1)])) : createCommentVNode("", true),
+				__props.totaltype ? (openBlock(), createElementBlock("div", _hoisted_7$4, " (" + toDisplayString(__props.totaltype) + ") ", 1)) : createCommentVNode("", true),
 				__props.column.gradeitemid ? (openBlock(), createBlock(InfoButton_default, {
 					key: 2,
 					itemid: __props.column.gradeitemid,
@@ -72923,8 +72910,8 @@ var AggregationTableHeader_default = /* @__PURE__ */ defineComponent({
 					size: "lg",
 					color: "text-warning"
 				}, null, 8, ["itemid", "text"])) : createCommentVNode("", true),
-				__props.column.isresitgradeitem ? (openBlock(), createElementBlock("div", _hoisted_8$5, toDisplayString(unref(mstrings).reassessment), 1)) : createCommentVNode("", true),
-				__props.column.categoryid ? (openBlock(), createElementBlock("div", _hoisted_9$5, [createVNode(UButton_default, {
+				__props.column.isresitgradeitem ? (openBlock(), createElementBlock("div", _hoisted_8$4, toDisplayString(unref(mstrings).reassessment), 1)) : createCommentVNode("", true),
+				__props.column.categoryid ? (openBlock(), createElementBlock("div", _hoisted_9$4, [createVNode(UButton_default, {
 					class: "mt-2",
 					size: "sm",
 					onClick: expand_clicked,
@@ -72942,11 +72929,11 @@ var AggregationTableHeader_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/AggregationGradeCell.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$22 = { class: "inline-flex gap-2 align-middle" };
-var _hoisted_2$17 = { key: 0 };
-var _hoisted_3$11 = { key: 0 };
-var _hoisted_4$10 = { key: 1 };
-var _hoisted_5$7 = { key: 0 };
+var _hoisted_1$15 = { class: "inline-flex gap-2 align-middle" };
+var _hoisted_2$11 = { key: 0 };
+var _hoisted_3$8 = { key: 0 };
+var _hoisted_4$7 = { key: 1 };
+var _hoisted_5$6 = { key: 0 };
 //#endregion
 //#region src/components/Aggregation/AggregationGradeCell.vue
 var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
@@ -73013,7 +73000,7 @@ var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
 		}
 		onMounted(() => {});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$22, [gradeobject.value.available ? (openBlock(), createBlock(OverrideGrade_default, {
+			return openBlock(), createElementBlock("div", _hoisted_1$15, [gradeobject.value.available ? (openBlock(), createBlock(OverrideGrade_default, {
 				key: 0,
 				itemid: __props.column.gradeitemid,
 				categoryid: __props.column.categoryid,
@@ -73046,10 +73033,10 @@ var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
 				text: itemtooltip(gradeobject.value),
 				position: __props.beforehalfway ? "below" : "above"
 			}, {
-				default: withCtx(() => [gradeobject.value.dropped ? (openBlock(), createElementBlock("s", _hoisted_2$17, [__props.user.isadmin ? (openBlock(), createElementBlock("b", _hoisted_3$11, toDisplayString(displaygrade.value), 1)) : (openBlock(), createBlock(GradeColor_default, {
+				default: withCtx(() => [gradeobject.value.dropped ? (openBlock(), createElementBlock("s", _hoisted_2$11, [__props.user.isadmin ? (openBlock(), createElementBlock("b", _hoisted_3$8, toDisplayString(displaygrade.value), 1)) : (openBlock(), createBlock(GradeColor_default, {
 					key: 1,
 					grade: displaygrade.value
-				}, null, 8, ["grade"]))])) : (openBlock(), createElementBlock("span", _hoisted_4$10, [gradeobject.value.isadmin ? (openBlock(), createElementBlock("b", _hoisted_5$7, toDisplayString(displaygrade.value), 1)) : (openBlock(), createBlock(GradeColor_default, {
+				}, null, 8, ["grade"]))])) : (openBlock(), createElementBlock("span", _hoisted_4$7, [gradeobject.value.isadmin ? (openBlock(), createElementBlock("b", _hoisted_5$6, toDisplayString(displaygrade.value), 1)) : (openBlock(), createBlock(GradeColor_default, {
 					key: 1,
 					grade: displaygrade.value
 				}, null, 8, ["grade"]))]))]),
@@ -73064,20 +73051,20 @@ var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/ResitRequired.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$21 = {
+var _hoisted_1$14 = {
 	key: 0,
 	class: "badge badge-success"
 };
-var _hoisted_2$16 = {
+var _hoisted_2$10 = {
 	key: 1,
 	class: "badge badge-secondary badge-soft"
 };
-var _hoisted_3$10 = { key: 1 };
-var _hoisted_4$9 = {
+var _hoisted_3$7 = { key: 1 };
+var _hoisted_4$6 = {
 	key: 0,
 	class: "badge badge-success"
 };
-var _hoisted_5$6 = {
+var _hoisted_5$5 = {
 	key: 1,
 	class: "badge badge-secondary badge-soft"
 };
@@ -73111,7 +73098,7 @@ var ResitRequired_default = /* @__PURE__ */ defineComponent({
 				key: 0,
 				class: "cursor-pointer",
 				onClick: _cache[0] || (_cache[0] = withModifiers(($event) => resit_clicked(__props.user.id, !__props.user.resitrequired), ["prevent"]))
-			}, [__props.user.resitrequired ? (openBlock(), createElementBlock("span", _hoisted_1$21, toDisplayString(unref(mstrings).yes), 1)) : (openBlock(), createElementBlock("span", _hoisted_2$16, toDisplayString(unref(mstrings).no), 1))])) : createCommentVNode("", true), !__props.caneditgrades ? (openBlock(), createElementBlock("span", _hoisted_3$10, [__props.user.resitrequired ? (openBlock(), createElementBlock("span", _hoisted_4$9, toDisplayString(unref(mstrings).yes), 1)) : (openBlock(), createElementBlock("span", _hoisted_5$6, toDisplayString(unref(mstrings).no), 1))])) : createCommentVNode("", true)], 64);
+			}, [__props.user.resitrequired ? (openBlock(), createElementBlock("span", _hoisted_1$14, toDisplayString(unref(mstrings).yes), 1)) : (openBlock(), createElementBlock("span", _hoisted_2$10, toDisplayString(unref(mstrings).no), 1))])) : createCommentVNode("", true), !__props.caneditgrades ? (openBlock(), createElementBlock("span", _hoisted_3$7, [__props.user.resitrequired ? (openBlock(), createElementBlock("span", _hoisted_4$6, toDisplayString(unref(mstrings).yes), 1)) : (openBlock(), createElementBlock("span", _hoisted_5$5, toDisplayString(unref(mstrings).no), 1))])) : createCommentVNode("", true)], 64);
 		};
 	}
 });
@@ -73128,9 +73115,9 @@ var CompletionPercentage_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/TotalCell.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$20 = { class: "inline-flex gap-2" };
-var _hoisted_2$15 = { key: 0 };
-var _hoisted_3$9 = { key: 2 };
+var _hoisted_1$13 = { class: "inline-flex gap-2" };
+var _hoisted_2$9 = { key: 0 };
+var _hoisted_3$6 = { key: 2 };
 //#endregion
 //#region src/components/Aggregation/TotalCell.vue
 var TotalCell_default = /* @__PURE__ */ defineComponent({
@@ -73156,7 +73143,7 @@ var TotalCell_default = /* @__PURE__ */ defineComponent({
 			console.log("CHANGED", userid);
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$20, [
+			return openBlock(), createElementBlock("div", _hoisted_1$13, [
 				createVNode(OverrideGrade_default, {
 					toplevel: __props.toplevel,
 					itemid: __props.gradeitemid,
@@ -73185,18 +73172,18 @@ var TotalCell_default = /* @__PURE__ */ defineComponent({
 					"caneditgrades",
 					"position"
 				]),
-				__props.user.error ? (openBlock(), createElementBlock("span", _hoisted_2$15, toDisplayString(__props.user.error), 1)) : (openBlock(), createBlock(GradeColor_default, {
+				__props.user.error ? (openBlock(), createElementBlock("span", _hoisted_2$9, toDisplayString(__props.user.error), 1)) : (openBlock(), createBlock(GradeColor_default, {
 					key: 1,
 					grade: __props.user.displaygrade
 				}, null, 8, ["grade"])),
-				__props.user.alteredweight ? (openBlock(), createElementBlock("span", _hoisted_3$9, [..._cache[1] || (_cache[1] = [createBaseVNode("span", { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-light-yellow text-university-blue" }, " ALTERED ", -1), createBaseVNode("span", { class: "badge badge-warning mt-1" }, "ALTERED", -1)])])) : createCommentVNode("", true)
+				__props.user.alteredweight ? (openBlock(), createElementBlock("span", _hoisted_3$6, [..._cache[1] || (_cache[1] = [createBaseVNode("span", { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-light-yellow text-university-blue" }, " ALTERED ", -1), createBaseVNode("span", { class: "badge badge-warning mt-1" }, "ALTERED", -1)])])) : createCommentVNode("", true)
 			]);
 		};
 	}
 });
 //#endregion
 //#region src/components/Aggregation/TotalHeader.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$19 = {
+var _hoisted_1$12 = {
 	key: 0,
 	class: "py-1 font-light normal-case"
 };
@@ -73217,7 +73204,7 @@ var TotalHeader_default = /* @__PURE__ */ defineComponent({
 			return openBlock(), createElementBlock("div", null, [createBaseVNode("div", null, [createBaseVNode("span", {
 				onClick: _cache[0] || (_cache[0] = (...args) => toggleSorting.value && toggleSorting.value(...args)),
 				class: "cursor-pointer"
-			}, toDisplayString(__props.shortname), 1)]), __props.strategy ? (openBlock(), createElementBlock("div", _hoisted_1$19, [createBaseVNode("i", null, toDisplayString(__props.strategy), 1)])) : createCommentVNode("", true)]);
+			}, toDisplayString(__props.shortname), 1)]), __props.strategy ? (openBlock(), createElementBlock("div", _hoisted_1$12, [createBaseVNode("i", null, toDisplayString(__props.strategy), 1)])) : createCommentVNode("", true)]);
 		};
 	}
 });
@@ -73252,25 +73239,25 @@ var ReleaseGrade_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/views/AggregationTable.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$18 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
-var _hoisted_2$14 = { class: "p-2" };
-var _hoisted_3$8 = { class: "flex gap-2 justify-start mb-4" };
-var _hoisted_4$8 = {
+var _hoisted_1$11 = { class: "bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm" };
+var _hoisted_2$8 = { class: "p-2" };
+var _hoisted_3$5 = { class: "flex gap-2 justify-start mb-4" };
+var _hoisted_4$5 = {
 	key: 1,
 	class: "mt-2"
 };
-var _hoisted_5$5 = {
+var _hoisted_5$4 = {
 	key: 0,
 	class: "my-3 overflow-visible"
 };
-var _hoisted_6$5 = { class: "text-sm p-2 rounded-lg border border-university-blue/40 bg-university-blue/10 text-university-blue shadow-sm" };
-var _hoisted_7$4 = { class: "flex flex-wrap items-center gap-2" };
-var _hoisted_8$4 = { class: "flex items-center text-university-blue/70" };
-var _hoisted_9$4 = {
+var _hoisted_6$3 = { class: "text-sm p-2 rounded-lg border border-university-blue/40 bg-university-blue/10 text-university-blue shadow-sm" };
+var _hoisted_7$3 = { class: "flex flex-wrap items-center gap-2" };
+var _hoisted_8$3 = { class: "flex items-center text-university-blue/70" };
+var _hoisted_9$3 = {
 	key: 0,
 	class: "text-university-blue/40 select-none"
 };
-var _hoisted_10$4 = ["onClick"];
+var _hoisted_10$3 = ["onClick"];
 //#endregion
 //#region src/views/AggregationTable.vue
 var AggregationTable_default = /* @__PURE__ */ defineComponent({
@@ -73613,7 +73600,7 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 			resolveComponent("EasyDataTable");
 			return openBlock(), createElementBlock(Fragment, null, [
 				createVNode(DebugDisplay_default, { debug: serverdebug.value }, null, 8, ["debug"]),
-				createBaseVNode("div", _hoisted_1$18, [createBaseVNode("div", _hoisted_2$14, [createBaseVNode("div", _hoisted_3$8, [createVNode(LevelOneSelect_default, { onLevelchange: levelOneChange }), level1category.value ? (openBlock(), createBlock(GroupSelect_default, {
+				createBaseVNode("div", _hoisted_1$11, [createBaseVNode("div", _hoisted_2$8, [createBaseVNode("div", _hoisted_3$5, [createVNode(LevelOneSelect_default, { onLevelchange: levelOneChange }), level1category.value ? (openBlock(), createBlock(GroupSelect_default, {
 					key: 0,
 					onGroupselected: groupselected
 				})) : createCommentVNode("", true)]), level1category.value && aggregationsupported.value ? (openBlock(), createBlock(AggregationButtons_default, {
@@ -73649,12 +73636,12 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).aggregationnotsupported), 1)]),
 					_: 1
 				})) : createCommentVNode("", true),
-				level1category.value && aggregationsupported.value ? (openBlock(), createElementBlock("div", _hoisted_4$8, [
-					breadcrumb.value.length > 1 ? (openBlock(), createElementBlock("div", _hoisted_5$5, [createBaseVNode("div", _hoisted_6$5, [createBaseVNode("ul", _hoisted_7$4, [createBaseVNode("li", _hoisted_8$4, [createVNode(unref(FolderOpen), { size: 18 })]), (openBlock(true), createElementBlock(Fragment, null, renderList(breadcrumb.value, (item, index) => {
+				level1category.value && aggregationsupported.value ? (openBlock(), createElementBlock("div", _hoisted_4$5, [
+					breadcrumb.value.length > 1 ? (openBlock(), createElementBlock("div", _hoisted_5$4, [createBaseVNode("div", _hoisted_6$3, [createBaseVNode("ul", _hoisted_7$3, [createBaseVNode("li", _hoisted_8$3, [createVNode(unref(FolderOpen), { size: 18 })]), (openBlock(true), createElementBlock(Fragment, null, renderList(breadcrumb.value, (item, index) => {
 						return openBlock(), createElementBlock("li", {
 							key: item.id,
 							class: "flex items-center gap-2"
-						}, [index > 0 ? (openBlock(), createElementBlock("span", _hoisted_9$4, "/")) : createCommentVNode("", true), createVNode(UTooltip_default, { text: item.fullname }, {
+						}, [index > 0 ? (openBlock(), createElementBlock("span", _hoisted_9$3, "/")) : createCommentVNode("", true), createVNode(UTooltip_default, { text: item.fullname }, {
 							default: withCtx(() => [createBaseVNode("a", {
 								href: "#",
 								onClick: withModifiers(($event) => expand_clicked(item.id), ["prevent"]),
@@ -73662,7 +73649,7 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 									"font-bold text-university-blue": index === breadcrumb.value.length - 1,
 									"text-university-blue/80 hover:text-university-blue": index !== breadcrumb.value.length - 1
 								}])
-							}, toDisplayString(item.shortname), 11, _hoisted_10$4)]),
+							}, toDisplayString(item.shortname), 11, _hoisted_10$3)]),
 							_: 2
 						}, 1032, ["text"])]);
 					}), 128))])])])) : createCommentVNode("", true),
@@ -73694,20 +73681,20 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Conversion/EditMap.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$17 = { class: "bg-base-100 border border-base-300 rounded-md mt-4 p-6" };
-var _hoisted_2$13 = { class: "flex gap-2" };
-var _hoisted_3$7 = { class: "flex" };
-var _hoisted_4$7 = { class: "w-24 font-bold" };
-var _hoisted_5$4 = { class: "w-60 mr-5 font-bold" };
-var _hoisted_6$4 = { class: "w-60 font-bold" };
-var _hoisted_7$3 = { class: "pt-2" };
-var _hoisted_8$3 = { class: "w-24 flex items-center" };
-var _hoisted_9$3 = { class: "w-60 mr-5" };
-var _hoisted_10$3 = { class: "w-60" };
-var _hoisted_11$2 = { key: 0 };
-var _hoisted_12$2 = { class: "flex" };
-var _hoisted_13$2 = { class: "w-24 font-bold" };
-var _hoisted_14$2 = { class: "w-60 mr-5 font-bold" };
+var _hoisted_1$10 = { class: "bg-base-100 border border-base-300 rounded-md mt-4 p-6" };
+var _hoisted_2$7 = { class: "flex gap-2" };
+var _hoisted_3$4 = { class: "flex" };
+var _hoisted_4$4 = { class: "w-24 font-bold" };
+var _hoisted_5$3 = { class: "w-60 mr-5 font-bold" };
+var _hoisted_6$2 = { class: "w-60 font-bold" };
+var _hoisted_7$2 = { class: "pt-2" };
+var _hoisted_8$2 = { class: "w-24 flex items-center" };
+var _hoisted_9$2 = { class: "w-60 mr-5" };
+var _hoisted_10$2 = { class: "w-60" };
+var _hoisted_11$1 = { key: 0 };
+var _hoisted_12$1 = { class: "flex" };
+var _hoisted_13$1 = { class: "w-24 font-bold" };
+var _hoisted_14$1 = { class: "w-60 mr-5 font-bold" };
 var _hoisted_15$1 = { class: "w-60 font-bold" };
 var _hoisted_16$1 = { class: "pt-2" };
 var _hoisted_17$1 = { class: "w-24" };
@@ -73914,7 +73901,7 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 		});
 		return (_ctx, _cache) => {
 			const _component_FormKit = resolveComponent("FormKit");
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", _hoisted_1$17, [loaded.value ? (openBlock(), createBlock(_component_FormKit, {
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", _hoisted_1$10, [loaded.value ? (openBlock(), createBlock(_component_FormKit, {
 				key: 0,
 				type: "form",
 				"submit-label": "Save",
@@ -73922,7 +73909,7 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 				onSubmit: submit_form
 			}, {
 				default: withCtx(() => [
-					createBaseVNode("div", _hoisted_2$13, [
+					createBaseVNode("div", _hoisted_2$7, [
 						createVNode(_component_FormKit, {
 							type: "text",
 							"outer-class": "w-60",
@@ -73996,23 +73983,23 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 						"disabled"
 					]),
 					_cache[5] || (_cache[5] = createBaseVNode("div", { class: "divider" }, null, -1)),
-					createBaseVNode("div", { class: normalizeClass(isScheduleA.value ? "grid grid-cols-2 gap-x-6" : "flex flex-col") }, [createBaseVNode("div", null, [createBaseVNode("div", _hoisted_3$7, [
-						createBaseVNode("div", _hoisted_4$7, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).band), 1)]),
-						createBaseVNode("div", _hoisted_5$4, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).percentage), 1)]),
-						createBaseVNode("div", _hoisted_6$4, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).points), 1)])
+					createBaseVNode("div", { class: normalizeClass(isScheduleA.value ? "grid grid-cols-2 gap-x-6" : "flex flex-col") }, [createBaseVNode("div", null, [createBaseVNode("div", _hoisted_3$4, [
+						createBaseVNode("div", _hoisted_4$4, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).band), 1)]),
+						createBaseVNode("div", _hoisted_5$3, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).percentage), 1)]),
+						createBaseVNode("div", _hoisted_6$2, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).points), 1)])
 					]), (openBlock(true), createElementBlock(Fragment, null, renderList(leftItems.value, (item) => {
 						return openBlock(), createElementBlock("div", {
 							class: "flex",
 							key: item.band
 						}, [
-							createBaseVNode("div", _hoisted_7$3, [createBaseVNode("h3", _hoisted_8$3, [createVNode(GradeColor_default, {
+							createBaseVNode("div", _hoisted_7$2, [createBaseVNode("h3", _hoisted_8$2, [createVNode(GradeColor_default, {
 								grade: item.band,
 								class: "w-10 text-center"
 							}, {
 								default: withCtx(() => [createTextVNode(toDisplayString(item.band), 1)]),
 								_: 2
 							}, 1032, ["grade"])])]),
-							createBaseVNode("div", _hoisted_9$3, [createVNode(_component_FormKit, {
+							createBaseVNode("div", _hoisted_9$2, [createVNode(_component_FormKit, {
 								type: "text",
 								number: "float",
 								"outer-class": "mb-3",
@@ -74029,7 +74016,7 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 								"onInput",
 								"aria-label"
 							])]),
-							createBaseVNode("div", _hoisted_10$3, [createVNode(_component_FormKit, {
+							createBaseVNode("div", _hoisted_10$2, [createVNode(_component_FormKit, {
 								type: "text",
 								number: "float",
 								"outer-class": "mb-3",
@@ -74050,9 +74037,9 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 								"aria-label"
 							])])
 						]);
-					}), 128))]), isScheduleA.value ? (openBlock(), createElementBlock("div", _hoisted_11$2, [createBaseVNode("div", _hoisted_12$2, [
-						createBaseVNode("div", _hoisted_13$2, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).band), 1)]),
-						createBaseVNode("div", _hoisted_14$2, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).percentage), 1)]),
+					}), 128))]), isScheduleA.value ? (openBlock(), createElementBlock("div", _hoisted_11$1, [createBaseVNode("div", _hoisted_12$1, [
+						createBaseVNode("div", _hoisted_13$1, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).band), 1)]),
+						createBaseVNode("div", _hoisted_14$1, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).percentage), 1)]),
 						createBaseVNode("div", _hoisted_15$1, [createBaseVNode("h3", null, toDisplayString(unref(mstrings).points), 1)])
 					]), (openBlock(true), createElementBlock(Fragment, null, renderList(rightItems.value, (item) => {
 						return openBlock(), createElementBlock("div", {
@@ -74120,7 +74107,7 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Conversion/ConversionActionButtons.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$16 = { class: "flex gap-2" };
+var _hoisted_1$9 = { class: "flex gap-2" };
 //#endregion
 //#region src/components/Conversion/ConversionActionButtons.vue
 var ConversionActionButtons_default = /* @__PURE__ */ defineComponent({
@@ -74138,7 +74125,7 @@ var ConversionActionButtons_default = /* @__PURE__ */ defineComponent({
 	setup(__props, { emit: __emit }) {
 		const { mstrings } = storeToRefs(useMstrings());
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$16, [
+			return openBlock(), createElementBlock("div", _hoisted_1$9, [
 				__props.caneditgrades ? (openBlock(), createBlock(UButton_default, {
 					key: 0,
 					variant: "info",
@@ -74181,14 +74168,14 @@ var ConversionActionButtons_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Conversion/ManageMaps.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$15 = { id: "managemaps" };
-var _hoisted_2$12 = { key: 0 };
-var _hoisted_3$6 = {
+var _hoisted_1$8 = { id: "managemaps" };
+var _hoisted_2$6 = { key: 0 };
+var _hoisted_3$3 = {
 	key: 1,
 	class: "mt-4 flex gap-2"
 };
-var _hoisted_4$6 = { key: 1 };
-var _hoisted_5$3 = { class: "flex gap-2" };
+var _hoisted_4$3 = { key: 1 };
+var _hoisted_5$2 = { class: "flex gap-2" };
 //#endregion
 //#region src/components/Conversion/ManageMaps.vue
 var ManageMaps_default = /* @__PURE__ */ defineComponent({
@@ -74401,7 +74388,7 @@ var ManageMaps_default = /* @__PURE__ */ defineComponent({
 			const _component_VueModal = resolveComponent("VueModal");
 			return openBlock(), createElementBlock(Fragment, null, [
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
-				createBaseVNode("div", _hoisted_1$15, [!editmap.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_2$12, [
+				createBaseVNode("div", _hoisted_1$8, [!editmap.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_2$6, [
 					!maps.value.length ? (openBlock(), createBlock(UAlert_default, {
 						key: 0,
 						variant: "warning",
@@ -74415,7 +74402,7 @@ var ManageMaps_default = /* @__PURE__ */ defineComponent({
 						columns,
 						class: "mt-5"
 					}, null, 8, ["data"]),
-					caneditgrades.value ? (openBlock(), createElementBlock("div", _hoisted_3$6, [createVNode(UButton_default, {
+					caneditgrades.value ? (openBlock(), createElementBlock("div", _hoisted_3$3, [createVNode(UButton_default, {
 						variant: "primary",
 						onClick: add_map
 					}, {
@@ -74428,7 +74415,7 @@ var ManageMaps_default = /* @__PURE__ */ defineComponent({
 						default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).importconversionmap), 1)]),
 						_: 1
 					})])) : createCommentVNode("", true)
-				])) : createCommentVNode("", true), editmap.value ? (openBlock(), createElementBlock("div", _hoisted_4$6, [createVNode(EditMap_default, {
+				])) : createCommentVNode("", true), editmap.value ? (openBlock(), createElementBlock("div", _hoisted_4$3, [createVNode(EditMap_default, {
 					mapid: editmapid.value,
 					caneditgrades: caneditgrades.value,
 					onClose: editmap_closed
@@ -74449,7 +74436,7 @@ var ManageMaps_default = /* @__PURE__ */ defineComponent({
 						mimetypes: ["text/json"],
 						accept: "text/json",
 						onOnchange: uploadfilechange
-					}), createBaseVNode("div", _hoisted_5$3, [createVNode(UButton_default, {
+					}), createBaseVNode("div", _hoisted_5$2, [createVNode(UButton_default, {
 						variant: "info",
 						onClick: process_import
 					}, {
@@ -74535,11 +74522,11 @@ var ResetButton_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/views/SettingsPage.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$14 = {
+var _hoisted_1$7 = {
 	key: 0,
 	class: "alert alert-warning"
 };
-var _hoisted_2$11 = { class: "mt-5" };
+var _hoisted_2$5 = { class: "mt-5" };
 //#endregion
 //#region src/views/SettingsPage.vue
 var SettingsPage_default = /* @__PURE__ */ defineComponent({
@@ -74591,7 +74578,7 @@ var SettingsPage_default = /* @__PURE__ */ defineComponent({
 				onSubmit: submit_form,
 				class: "mt-8"
 			}, {
-				default: withCtx(() => [!gradesreleased.value ? (openBlock(), createElementBlock("div", _hoisted_1$14, toDisplayString(unref(mstrings).gradesnotreleased), 1)) : createCommentVNode("", true), createVNode(_component_FormKit, {
+				default: withCtx(() => [!gradesreleased.value ? (openBlock(), createElementBlock("div", _hoisted_1$7, toDisplayString(unref(mstrings).gradesnotreleased), 1)) : createCommentVNode("", true), createVNode(_component_FormKit, {
 					type: "checkbox",
 					label: unref(mstrings).disabledashboard,
 					disabled: !gradesreleased.value,
@@ -74603,13 +74590,13 @@ var SettingsPage_default = /* @__PURE__ */ defineComponent({
 					"modelValue"
 				])]),
 				_: 1
-			}), createBaseVNode("div", _hoisted_2$11, [createVNode(ResetButton_default)])])], 64);
+			}), createBaseVNode("div", _hoisted_2$5, [createVNode(ResetButton_default)])])], 64);
 		};
 	}
 });
 //#endregion
 //#region src/views/AuditPage.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$13 = { class: "my-5" };
+var _hoisted_1$6 = { class: "my-5" };
 //#endregion
 //#region src/views/AuditPage.vue
 var AuditPage_default = /* @__PURE__ */ defineComponent({
@@ -74651,7 +74638,7 @@ var AuditPage_default = /* @__PURE__ */ defineComponent({
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock(Fragment, null, [
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
-				createBaseVNode("div", _hoisted_1$13, [createVNode(UTable_default, {
+				createBaseVNode("div", _hoisted_1$6, [createVNode(UTable_default, {
 					data: items.value,
 					columns,
 					sortable: false,
@@ -74671,12 +74658,12 @@ var AuditPage_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/TabsNav.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$12 = {
+var _hoisted_1$5 = {
 	key: 0,
 	class: "mt-0 w-full",
 	role: "navigation"
 };
-var _hoisted_2$10 = ["id"];
+var _hoisted_2$4 = ["id"];
 //#endregion
 //#region src/components/TabsNav.vue
 var TabsNav_default = /* @__PURE__ */ defineComponent({
@@ -74741,7 +74728,7 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 			});
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), permissionsloaded.value ? (openBlock(), createElementBlock("div", _hoisted_1$12, [createVNode(unref(me$1), { defaultIndex: 1 }, {
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), permissionsloaded.value ? (openBlock(), createElementBlock("div", _hoisted_1$5, [createVNode(unref(me$1), { defaultIndex: 1 }, {
 				default: withCtx(() => [createVNode(unref(pe$1), { class: "flex justify-start space-x-1 bg-base-100 p-1 border border-base-300 rounded-b-md w-full shadow-sm focus:outline-none" }, {
 					default: withCtx(() => [(openBlock(true), createElementBlock(Fragment, null, renderList(filteredtabs.value, (tab) => {
 						return openBlock(), createBlock(unref(xe), null, {
@@ -74754,7 +74741,7 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 							}, [(openBlock(), createBlock(resolveDynamicComponent(tab.icon), {
 								size: 16,
 								class: "mr-1"
-							})), createTextVNode(" " + toDisplayString(tab.label), 1)], 10, _hoisted_2$10)]),
+							})), createTextVNode(" " + toDisplayString(tab.label), 1)], 10, _hoisted_2$4)]),
 							_: 2
 						}, 1024);
 					}), 256))]),
@@ -74775,10 +74762,10 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/SetupAndCheck.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$11 = { class: "table w-full border-separate border-spacing-y-2 border-spacing-x-4" };
-var _hoisted_2$9 = { class: "table-cell whitespace-nowrap font-bold align-middle" };
-var _hoisted_3$5 = { class: "table-cell align-middle text-slate-600" };
-var _hoisted_4$5 = { class: "table-cell align-middle text-right shrink-0" };
+var _hoisted_1$4 = { class: "table w-full border-separate border-spacing-y-2 border-spacing-x-4" };
+var _hoisted_2$3 = { class: "table-cell whitespace-nowrap font-bold align-middle" };
+var _hoisted_3$2 = { class: "table-cell align-middle text-slate-600" };
+var _hoisted_4$2 = { class: "table-cell align-middle text-right shrink-0" };
 //#endregion
 //#region src/components/SetupAndCheck.vue
 var SetupAndCheck_default = /* @__PURE__ */ defineComponent({
@@ -74829,14 +74816,14 @@ var SetupAndCheck_default = /* @__PURE__ */ defineComponent({
 				title: "Setup and checking"
 			}, {
 				default: withCtx(() => [showerrors.value ? (openBlock(), createBlock(UAlert_default, { key: 0 }, {
-					default: withCtx(() => [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "mb-4" }, " A data integrity check has found invalid data in MyGrades. This is probably due to changing the course start date or manipulating Gradebook settings AFTER grades have already been imported. MyGrades cannot continue. ", -1)), createBaseVNode("div", _hoisted_1$11, [(openBlock(true), createElementBlock(Fragment, null, renderList(errors.value, (error) => {
+					default: withCtx(() => [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "mb-4" }, " A data integrity check has found invalid data in MyGrades. This is probably due to changing the course start date or manipulating Gradebook settings AFTER grades have already been imported. MyGrades cannot continue. ", -1)), createBaseVNode("div", _hoisted_1$4, [(openBlock(true), createElementBlock(Fragment, null, renderList(errors.value, (error) => {
 						return openBlock(), createElementBlock("div", {
 							key: error.gradeitemid,
 							class: "table-row items-center"
 						}, [
-							createBaseVNode("div", _hoisted_2$9, toDisplayString(error.itemname), 1),
-							createBaseVNode("div", _hoisted_3$5, toDisplayString(error.error), 1),
-							createBaseVNode("div", _hoisted_4$5, [createVNode(ResetAssessmentButton_default, {
+							createBaseVNode("div", _hoisted_2$3, toDisplayString(error.itemname), 1),
+							createBaseVNode("div", _hoisted_3$2, toDisplayString(error.error), 1),
+							createBaseVNode("div", _hoisted_4$2, [createVNode(ResetAssessmentButton_default, {
 								itemid: error.gradeitemid,
 								small: true,
 								onReset: reload
@@ -74855,7 +74842,7 @@ var SetupAndCheck_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/views/TabMenu.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$10 = {
+var _hoisted_1$3 = {
 	key: 1,
 	id: "tabmenu"
 };
@@ -74888,7 +74875,7 @@ var TabMenu_default = /* @__PURE__ */ defineComponent({
 				}, {
 					default: withCtx(() => [..._cache[0] || (_cache[0] = [createTextVNode(" MyGrades cannot be used in this course as it has too many enrolled participants. ", -1)])]),
 					_: 1
-				})) : (openBlock(), createElementBlock("div", _hoisted_1$10, [createVNode(TabsNav_default)]))
+				})) : (openBlock(), createElementBlock("div", _hoisted_1$3, [createVNode(TabsNav_default)]))
 			], 64);
 		};
 	}
@@ -81900,24 +81887,24 @@ var useAccessibility = defineStore("accessibility", () => {
 });
 //#endregion
 //#region src/components/Common/AccessibilityPanel.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$9 = { key: 0 };
-var _hoisted_2$8 = ["aria-expanded"];
-var _hoisted_3$2 = { class: "fixed inset-0 overflow-hidden" };
-var _hoisted_4$4 = { class: "absolute inset-y-0 right-0 flex max-w-full" };
-var _hoisted_5$2 = { class: "bg-university-blue px-5 py-4 flex items-center gap-3 shrink-0" };
-var _hoisted_6$3 = { class: "bg-white/10 rounded-full p-1.5 shrink-0" };
-var _hoisted_7$2 = { class: "flex-1" };
-var _hoisted_8$2 = { class: "flex-1 overflow-y-auto px-5 py-5 space-y-6" };
-var _hoisted_9$2 = {
+var _hoisted_1$2 = { key: 0 };
+var _hoisted_2$2 = ["aria-expanded"];
+var _hoisted_3$1 = { class: "fixed inset-0 overflow-hidden" };
+var _hoisted_4$1 = { class: "absolute inset-y-0 right-0 flex max-w-full" };
+var _hoisted_5$1 = { class: "bg-university-blue px-5 py-4 flex items-center gap-3 shrink-0" };
+var _hoisted_6$1 = { class: "bg-white/10 rounded-full p-1.5 shrink-0" };
+var _hoisted_7$1 = { class: "flex-1" };
+var _hoisted_8$1 = { class: "flex-1 overflow-y-auto px-5 py-5 space-y-6" };
+var _hoisted_9$1 = {
 	class: "grid grid-cols-2 gap-2",
 	role: "radiogroup",
 	"aria-label": "Display theme"
 };
-var _hoisted_10$2 = ["aria-checked", "onClick"];
-var _hoisted_11$1 = { class: "flex items-center gap-3" };
-var _hoisted_12$1 = ["disabled"];
-var _hoisted_13$1 = { class: "flex-1 text-center" };
-var _hoisted_14$1 = { class: "text-lg font-semibold text-slate-800" };
+var _hoisted_10$1 = ["aria-checked", "onClick"];
+var _hoisted_11 = { class: "flex items-center gap-3" };
+var _hoisted_12 = ["disabled"];
+var _hoisted_13 = { class: "flex-1 text-center" };
+var _hoisted_14 = { class: "text-lg font-semibold text-slate-800" };
 var _hoisted_15 = ["disabled"];
 var _hoisted_16 = { class: "space-y-1" };
 var _hoisted_17 = ["for"];
@@ -82001,14 +81988,14 @@ var AccessibilityPanel_default = /* @__PURE__ */ defineComponent({
 			}
 		];
 		return (_ctx, _cache) => {
-			return enabled.value ? (openBlock(), createElementBlock("div", _hoisted_1$9, [createBaseVNode("button", {
+			return enabled.value ? (openBlock(), createElementBlock("div", _hoisted_1$2, [createBaseVNode("button", {
 				type: "button",
 				class: "a11y-launcher fixed bottom-5 right-5 z-[9998] flex items-center gap-2 rounded-full bg-university-blue px-4 py-3 text-white shadow-lg hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-university-blue/40 transition-all",
 				"aria-expanded": isOpen.value,
 				"aria-haspopup": "dialog",
 				"aria-label": "Accessibility options",
 				onClick: _cache[0] || (_cache[0] = ($event) => isOpen.value = true)
-			}, [createVNode(unref(Accessibility), { size: 22 }), _cache[8] || (_cache[8] = createBaseVNode("span", { class: "hidden sm:inline text-sm font-semibold" }, "Accessibility", -1))], 8, _hoisted_2$8), createVNode(unref(Se), {
+			}, [createVNode(unref(Accessibility), { size: 22 }), _cache[8] || (_cache[8] = createBaseVNode("span", { class: "hidden sm:inline text-sm font-semibold" }, "Accessibility", -1))], 8, _hoisted_2$2), createVNode(unref(Se), {
 				appear: "",
 				show: isOpen.value,
 				as: "template"
@@ -82029,7 +82016,7 @@ var AccessibilityPanel_default = /* @__PURE__ */ defineComponent({
 					}, {
 						default: withCtx(() => [..._cache[9] || (_cache[9] = [createBaseVNode("div", { class: "fixed inset-0 bg-slate-900/40 backdrop-blur-xs" }, null, -1)])]),
 						_: 1
-					}), createBaseVNode("div", _hoisted_3$2, [createBaseVNode("div", _hoisted_4$4, [createVNode(unref(he), {
+					}), createBaseVNode("div", _hoisted_3$1, [createBaseVNode("div", _hoisted_4$1, [createVNode(unref(he), {
 						as: "template",
 						enter: "transform transition ease-out duration-250",
 						"enter-from": "translate-x-full",
@@ -82040,12 +82027,12 @@ var AccessibilityPanel_default = /* @__PURE__ */ defineComponent({
 					}, {
 						default: withCtx(() => [createVNode(unref(Ge$1), { class: "w-screen max-w-sm bg-white shadow-xl flex flex-col h-full" }, {
 							default: withCtx(() => [
-								createBaseVNode("div", _hoisted_5$2, [
-									createBaseVNode("div", _hoisted_6$3, [createVNode(unref(Accessibility), {
+								createBaseVNode("div", _hoisted_5$1, [
+									createBaseVNode("div", _hoisted_6$1, [createVNode(unref(Accessibility), {
 										size: 20,
 										class: "text-white"
 									})]),
-									createBaseVNode("div", _hoisted_7$2, [createVNode(unref(Ve$1), { class: "text-sm font-semibold text-white" }, {
+									createBaseVNode("div", _hoisted_7$1, [createVNode(unref(Ve$1), { class: "text-sm font-semibold text-white" }, {
 										default: withCtx(() => [..._cache[10] || (_cache[10] = [createTextVNode(" Accessibility options ", -1)])]),
 										_: 1
 									}), _cache[11] || (_cache[11] = createBaseVNode("p", { class: "text-xs text-white/70 mt-0.5" }, " Adjust how MyGrades looks to suit your needs ", -1))]),
@@ -82056,8 +82043,8 @@ var AccessibilityPanel_default = /* @__PURE__ */ defineComponent({
 										onClick: _cache[1] || (_cache[1] = ($event) => isOpen.value = false)
 									}, [createVNode(unref(X), { size: 20 })])
 								]),
-								createBaseVNode("div", _hoisted_8$2, [
-									createBaseVNode("fieldset", null, [_cache[12] || (_cache[12] = createBaseVNode("legend", { class: "text-xs font-bold uppercase tracking-wide text-slate-500 mb-3" }, " Display theme ", -1)), createBaseVNode("div", _hoisted_9$2, [(openBlock(), createElementBlock(Fragment, null, renderList(themes, (t) => {
+								createBaseVNode("div", _hoisted_8$1, [
+									createBaseVNode("fieldset", null, [_cache[12] || (_cache[12] = createBaseVNode("legend", { class: "text-xs font-bold uppercase tracking-wide text-slate-500 mb-3" }, " Display theme ", -1)), createBaseVNode("div", _hoisted_9$1, [(openBlock(), createElementBlock(Fragment, null, renderList(themes, (t) => {
 										return createBaseVNode("button", {
 											key: t.id,
 											type: "button",
@@ -82065,17 +82052,17 @@ var AccessibilityPanel_default = /* @__PURE__ */ defineComponent({
 											"aria-checked": unref(settings).theme === t.id,
 											class: normalizeClass(["flex flex-col items-center gap-1.5 rounded-lg border-2 px-3 py-3 text-xs font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-university-blue", unref(settings).theme === t.id ? "border-university-blue bg-university-blue/5 text-university-blue" : "border-slate-200 text-slate-600 hover:border-slate-300"]),
 											onClick: ($event) => unref(setTheme)(t.id)
-										}, [(openBlock(), createBlock(resolveDynamicComponent(t.icon), { size: 20 })), createBaseVNode("span", null, toDisplayString(t.label), 1)], 10, _hoisted_10$2);
+										}, [(openBlock(), createBlock(resolveDynamicComponent(t.icon), { size: 20 })), createBaseVNode("span", null, toDisplayString(t.label), 1)], 10, _hoisted_10$1);
 									}), 64))])]),
-									createBaseVNode("div", null, [_cache[13] || (_cache[13] = createBaseVNode("div", { class: "text-xs font-bold uppercase tracking-wide text-slate-500 mb-3" }, " Text size ", -1)), createBaseVNode("div", _hoisted_11$1, [
+									createBaseVNode("div", null, [_cache[13] || (_cache[13] = createBaseVNode("div", { class: "text-xs font-bold uppercase tracking-wide text-slate-500 mb-3" }, " Text size ", -1)), createBaseVNode("div", _hoisted_11, [
 										createBaseVNode("button", {
 											type: "button",
 											class: "flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-university-blue",
 											"aria-label": "Decrease text size",
 											disabled: unref(settings).fontScale <= unref(MIN_FONT_SCALE),
 											onClick: _cache[2] || (_cache[2] = (...args) => unref(decreaseFont) && unref(decreaseFont)(...args))
-										}, [createVNode(unref(Minus), { size: 18 })], 8, _hoisted_12$1),
-										createBaseVNode("div", _hoisted_13$1, [createBaseVNode("div", _hoisted_14$1, toDisplayString(Math.round(unref(settings).fontScale * 100)) + "% ", 1), createBaseVNode("button", {
+										}, [createVNode(unref(Minus), { size: 18 })], 8, _hoisted_12),
+										createBaseVNode("div", _hoisted_13, [createBaseVNode("div", _hoisted_14, toDisplayString(Math.round(unref(settings).fontScale * 100)) + "% ", 1), createBaseVNode("button", {
 											type: "button",
 											class: "text-xs text-university-blue hover:underline focus:outline-none focus:underline",
 											onClick: _cache[3] || (_cache[3] = (...args) => unref(resetFont) && unref(resetFont)(...args))
@@ -82131,12 +82118,12 @@ var AccessibilityPanel_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/App.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$8 = {
+var _hoisted_1$1 = {
 	key: 0,
 	id: "mygrades_container",
 	class: "px-4 mb-8"
 };
-var _hoisted_2$7 = {
+var _hoisted_2$1 = {
 	key: 1,
 	class: "p-8"
 };
@@ -82157,13 +82144,13 @@ var App_default = /* @__PURE__ */ defineComponent({
 		});
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock(Fragment, null, [
-				canview.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_1$8, [
+				canview.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_1$1, [
 					createVNode(PageHeader_default),
 					createVNode(TabMenu_default),
 					createVNode(PageFooter_default),
 					createVNode(UserTour_default)
 				])) : createCommentVNode("", true),
-				!canview.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_2$7, " You do not have permission to access MyGrades. ")) : createCommentVNode("", true),
+				!canview.value && loaded.value ? (openBlock(), createElementBlock("div", _hoisted_2$1, " You do not have permission to access MyGrades. ")) : createCommentVNode("", true),
 				loaded.value ? (openBlock(), createBlock(AccessibilityPanel_default, { key: 2 })) : createCommentVNode("", true)
 			], 64);
 		};
@@ -86470,13 +86457,13 @@ var decodeWarnings = (warning, next) => {
 };
 //#endregion
 //#region node_modules/@formkit/vue/dist/index.mjs
-var __defProp$1 = Object.defineProperty;
+var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __esm = (fn, res) => function __init() {
 	return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
 var __export = (target, all) => {
-	for (var name in all) __defProp$1(target, name, {
+	for (var name in all) __defProp(target, name, {
 		get: all[name],
 		enumerable: true
 	});
@@ -87521,16 +87508,16 @@ function usePreload() {
 }
 //#endregion
 //#region node_modules/vue-awesome-paginate/dist/index.js
-var _hoisted_1$1 = { key: 0 };
-var _hoisted_2$3 = { key: 1 };
-var _hoisted_3$1 = { key: 2 };
-var _hoisted_4$2 = { key: 3 };
-var _hoisted_5$1 = { key: 4 };
-var _hoisted_6$2 = { key: 5 };
-var _hoisted_7$1 = { key: 6 };
-var _hoisted_8$1 = { key: 7 };
-var _hoisted_9$1 = { key: 8 };
-var _hoisted_10$1 = { key: 9 };
+var _hoisted_1 = { key: 0 };
+var _hoisted_2 = { key: 1 };
+var _hoisted_3 = { key: 2 };
+var _hoisted_4 = { key: 3 };
+var _hoisted_5 = { key: 4 };
+var _hoisted_6 = { key: 5 };
+var _hoisted_7 = { key: 6 };
+var _hoisted_8 = { key: 7 };
+var _hoisted_9 = { key: 8 };
+var _hoisted_10 = { key: 9 };
 var _sfc_main = /* @__PURE__ */ defineComponent({
 	__name: "vue-awesome-paginate",
 	props: {
@@ -87890,7 +87877,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 				id: "componentContainer",
 				class: normalizeClass(__props.paginationContainerClass)
 			}, [
-				__props.showEndingButtons && firstPageButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_1$1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showEndingButtons && firstPageButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? totalPages.value : 1),
 					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => onClickHandler(isRtl.value ? totalPages.value : 1), ["prevent"])),
 					class: normalizeClass([
@@ -87907,7 +87894,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"class",
 					"disabled"
 				]))])) : createCommentVNode("", true),
-				__props.showJumpButtons && startingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_2$3, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showJumpButtons && startingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_2, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? currentPageRef.value + Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value - Math.ceil(__props.maxPagesShown / 2)),
 					onClick: _cache[1] || (_cache[1] = withModifiers(($event) => onClickHandler(isRtl.value ? currentPageRef.value + Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value - Math.ceil(__props.maxPagesShown / 2)), ["prevent"])),
 					class: normalizeClass([
@@ -87925,7 +87912,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"class",
 					"disabled"
 				]))])) : createCommentVNode("", true),
-				!__props.hidePrevNext && backButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_3$1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				!__props.hidePrevNext && backButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_3, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? currentPageRef.value + 1 : currentPageRef.value - 1),
 					onClick: _cache[2] || (_cache[2] = withModifiers(($event) => onClickHandler(isRtl.value ? currentPageRef.value + 1 : currentPageRef.value - 1), ["prevent"])),
 					class: normalizeClass([
@@ -87943,7 +87930,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"class",
 					"disabled"
 				]))])) : createCommentVNode("", true),
-				__props.showBreakpointButtons && firstButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_4$2, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showBreakpointButtons && firstButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_4, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? totalPages.value : 1),
 					onClick: _cache[3] || (_cache[3] = withModifiers(($event) => onClickHandler(isRtl.value ? totalPages.value : 1), ["prevent"])),
 					class: normalizeClass([
@@ -87961,7 +87948,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"class",
 					"disabled"
 				]))])) : createCommentVNode("", true),
-				__props.showBreakpointButtons && startingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_5$1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showBreakpointButtons && startingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_5, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(__props.disableBreakpointButtons ? currentPageRef.value : isRtl.value ? currentPageRef.value + Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value - Math.ceil(__props.maxPagesShown / 2)),
 					onClick: _cache[4] || (_cache[4] = withModifiers(($event) => onClickHandler(__props.disableBreakpointButtons ? currentPageRef.value : isRtl.value ? currentPageRef.value + Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value - Math.ceil(__props.maxPagesShown / 2)), ["prevent"])),
 					disabled: __props.disableBreakpointButtons || __props.disablePagination,
@@ -87999,7 +87986,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 						"disabled"
 					]))]);
 				}), 128)),
-				__props.showBreakpointButtons && endingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_6$2, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showBreakpointButtons && endingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_6, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(__props.disableBreakpointButtons ? currentPageRef.value : isRtl.value ? currentPageRef.value - Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value + Math.ceil(__props.maxPagesShown / 2)),
 					onClick: _cache[5] || (_cache[5] = withModifiers(($event) => onClickHandler(__props.disableBreakpointButtons ? currentPageRef.value : isRtl.value ? currentPageRef.value - Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value + Math.ceil(__props.maxPagesShown / 2)), ["prevent"])),
 					disabled: __props.disableBreakpointButtons || __props.disablePagination,
@@ -88016,7 +88003,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"disabled",
 					"class"
 				]))])) : createCommentVNode("", true),
-				__props.showBreakpointButtons && lastButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_7$1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showBreakpointButtons && lastButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_7, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? 1 : totalPages.value),
 					onClick: _cache[6] || (_cache[6] = withModifiers(($event) => onClickHandler(isRtl.value ? 1 : totalPages.value), ["prevent"])),
 					class: normalizeClass([
@@ -88034,7 +88021,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"class",
 					"disabled"
 				]))])) : createCommentVNode("", true),
-				!__props.hidePrevNext && nextButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_8$1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				!__props.hidePrevNext && nextButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_8, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? currentPageRef.value - 1 : currentPageRef.value + 1),
 					onClick: _cache[7] || (_cache[7] = withModifiers(($event) => onClickHandler(isRtl.value ? currentPageRef.value - 1 : currentPageRef.value + 1), ["prevent"])),
 					class: normalizeClass([
@@ -88052,7 +88039,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"class",
 					"disabled"
 				]))])) : createCommentVNode("", true),
-				__props.showJumpButtons && endingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_9$1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showJumpButtons && endingBreakPointButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_9, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? currentPageRef.value - Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value + Math.ceil(__props.maxPagesShown / 2)),
 					onClick: _cache[8] || (_cache[8] = withModifiers(($event) => onClickHandler(isRtl.value ? currentPageRef.value - Math.ceil(__props.maxPagesShown / 2) : currentPageRef.value + Math.ceil(__props.maxPagesShown / 2)), ["prevent"])),
 					class: normalizeClass([
@@ -88070,7 +88057,7 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 					"class",
 					"disabled"
 				]))])) : createCommentVNode("", true),
-				__props.showEndingButtons && lastPageButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_10$1, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
+				__props.showEndingButtons && lastPageButtonIfCondition.value ? (openBlock(), createElementBlock("li", _hoisted_10, [(openBlock(), createBlock(resolveDynamicComponent(__props.type === "button" ? "button" : "a"), {
 					href: navigationHandler(isRtl.value ? 1 : totalPages.value),
 					onClick: _cache[9] || (_cache[9] = withModifiers(($event) => onClickHandler(isRtl.value ? 1 : totalPages.value), ["prevent"])),
 					class: normalizeClass([
@@ -88094,1363 +88081,6 @@ var _sfc_main = /* @__PURE__ */ defineComponent({
 var VueAwesomePaginatePlugin = { install: (app) => {
 	app.component("VueAwesomePaginate", _sfc_main);
 } };
-//#endregion
-//#region node_modules/vue3-easy-data-table/dist/vue3-easy-data-table.es.js
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, {
-	enumerable: true,
-	configurable: true,
-	writable: true,
-	value
-}) : obj[key] = value;
-var __spreadValues = (a, b) => {
-	for (var prop in b || (b = {})) if (__hasOwnProp.call(b, prop)) __defNormalProp(a, prop, b[prop]);
-	if (__getOwnPropSymbols) {
-		for (var prop of __getOwnPropSymbols(b)) if (__propIsEnum.call(b, prop)) __defNormalProp(a, prop, b[prop]);
-	}
-	return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var _export_sfc = (sfc, props) => {
-	const target = sfc.__vccOpts || sfc;
-	for (const [key, val] of props) target[key] = val;
-	return target;
-};
-var _withScopeId$5 = (n) => (pushScopeId("data-v-e0a0b7f0"), n = n(), popScopeId(), n);
-var _hoisted_1$7 = ["onClick"];
-var _hoisted_2$6 = ["checked"];
-var _hoisted_3$4 = /* @__PURE__ */ _withScopeId$5(() => /* @__PURE__ */ createBaseVNode("label", { for: "checbox" }, null, -1));
-var MultipleSelectCheckBox = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "MultipleSelectCheckBox",
-	props: { status: {
-		type: String,
-		required: true
-	} },
-	emits: ["change"],
-	setup(__props, { emit: emits }) {
-		const props = __props;
-		useCssVars((_ctx) => ({ "51ab8a49": unref(themeColor) }));
-		const isChecked = computed(() => props.status === "allSelected");
-		const toggleChecked = () => {
-			emits("change", !isChecked.value);
-		};
-		const themeColor = inject("themeColor");
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", {
-				class: "easy-checkbox",
-				onClick: withModifiers(toggleChecked, ["stop", "prevent"])
-			}, [createBaseVNode("input", {
-				type: "checkbox",
-				checked: unref(isChecked),
-				class: normalizeClass(__props.status)
-			}, null, 10, _hoisted_2$6), _hoisted_3$4], 8, _hoisted_1$7);
-		};
-	}
-}), [["__scopeId", "data-v-e0a0b7f0"]]);
-var _withScopeId$4 = (n) => (pushScopeId("data-v-7e69a276"), n = n(), popScopeId(), n);
-var _hoisted_1$6 = ["checked"];
-var _hoisted_2$5 = /* @__PURE__ */ _withScopeId$4(() => /* @__PURE__ */ createBaseVNode("label", { for: "checbox" }, null, -1));
-var SingleSelectCheckBox = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "SingleSelectCheckBox",
-	props: { checked: {
-		type: Boolean,
-		required: true
-	} },
-	emits: ["change"],
-	setup(__props, { emit: emits }) {
-		useCssVars((_ctx) => ({ "fdaf7e9e": unref(themeColor) }));
-		const themeColor = inject("themeColor");
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", {
-				class: "easy-checkbox",
-				onClick: _cache[0] || (_cache[0] = withModifiers(($event) => emits("change"), ["stop", "prevent"]))
-			}, [createBaseVNode("input", {
-				type: "checkbox",
-				checked: __props.checked
-			}, null, 8, _hoisted_1$6), _hoisted_2$5]);
-		};
-	}
-}), [["__scopeId", "data-v-7e69a276"]]);
-var _withScopeId$3 = (n) => (pushScopeId("data-v-4ca5de3a"), n = n(), popScopeId(), n);
-var _hoisted_1$5 = { class: "easy-data-table__rows-selector" };
-var _hoisted_2$4 = { class: "rows-input" };
-var _hoisted_3$3 = /* @__PURE__ */ _withScopeId$3(() => /* @__PURE__ */ createBaseVNode("div", { class: "triangle" }, null, -1));
-var _hoisted_4$3 = ["onClick"];
-var RowsSelector = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "RowsSelector",
-	props: {
-		modelValue: {
-			type: Number,
-			required: true
-		},
-		rowsItems: {
-			type: Array,
-			required: true
-		}
-	},
-	emits: ["update:modelValue"],
-	setup(__props, { emit: emits }) {
-		const props = __props;
-		useCssVars((_ctx) => ({ "1b889342": unref(themeColor) }));
-		const showList = /* @__PURE__ */ ref(false);
-		const showInsideOfTable = /* @__PURE__ */ ref(false);
-		const dataTable = inject("dataTable");
-		watch$1(showList, (val) => {
-			if (val && dataTable) if (window.innerHeight - (dataTable.value.getBoundingClientRect().height + dataTable.value.getBoundingClientRect().top) <= 100) showInsideOfTable.value = true;
-			else showInsideOfTable.value = false;
-		});
-		const rowsComputed = computed({
-			get: () => props.modelValue,
-			set: (value) => {
-				emits("update:modelValue", value);
-			}
-		});
-		const changeSelectedRows = (value) => {
-			rowsComputed.value = value;
-			showList.value = false;
-		};
-		const isDescendant = (child, className) => {
-			let node = child.parentNode;
-			while (node != null) {
-				if (node.classList && node.classList.contains(className)) return true;
-				node = node.parentNode;
-			}
-			return false;
-		};
-		const closeRowsSelector = (e) => {
-			if (!isDescendant(e.target, "easy-data-table__rows-selector")) showList.value = false;
-		};
-		onMounted(() => {
-			document.addEventListener("click", closeRowsSelector);
-		});
-		onBeforeUnmount(() => {
-			document.removeEventListener("click", closeRowsSelector);
-		});
-		const themeColor = inject("themeColor");
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$5, [createBaseVNode("div", {
-				class: "rows-input__wrapper",
-				onClick: _cache[0] || (_cache[0] = ($event) => showList.value = !showList.value)
-			}, [createBaseVNode("div", _hoisted_2$4, toDisplayString(unref(rowsComputed)), 1), _hoisted_3$3]), createBaseVNode("ul", { class: normalizeClass(["select-items", {
-				show: showList.value,
-				inside: showInsideOfTable.value
-			}]) }, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.rowsItems, (item) => {
-				return openBlock(), createElementBlock("li", {
-					key: item,
-					class: normalizeClass({ selected: item === unref(rowsComputed) }),
-					onClick: ($event) => changeSelectedRows(item)
-				}, toDisplayString(item), 11, _hoisted_4$3);
-			}), 128))], 2)]);
-		};
-	}
-}), [["__scopeId", "data-v-4ca5de3a"]]);
-var _withScopeId$2 = (n) => (pushScopeId("data-v-1fa3a520"), n = n(), popScopeId(), n);
-var _hoisted_1$4 = { class: "lds-ring" };
-var _hoisted_6$1 = [
-	/* @__PURE__ */ _withScopeId$2(() => /* @__PURE__ */ createBaseVNode("div", null, null, -1)),
-	/* @__PURE__ */ _withScopeId$2(() => /* @__PURE__ */ createBaseVNode("div", null, null, -1)),
-	/* @__PURE__ */ _withScopeId$2(() => /* @__PURE__ */ createBaseVNode("div", null, null, -1)),
-	/* @__PURE__ */ _withScopeId$2(() => /* @__PURE__ */ createBaseVNode("div", null, null, -1))
-];
-var Loading = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "Loading",
-	setup(__props) {
-		useCssVars((_ctx) => ({ "26774109": unref(themeColor) }));
-		const themeColor = inject("themeColor");
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$4, _hoisted_6$1);
-		};
-	}
-}), [["__scopeId", "data-v-1fa3a520"]]);
-var _hoisted_1$3 = { class: "loader-line" };
-var LoadingLine = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "LoadingLine",
-	setup(__props) {
-		useCssVars((_ctx) => ({ "0d327f57": unref(themeColor) }));
-		const themeColor = inject("themeColor");
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$3);
-		};
-	}
-}), [["__scopeId", "data-v-7d281cac"]]);
-var _hoisted_1$2 = { class: "buttons-pagination" };
-var _hoisted_2$2 = ["onClick"];
-var ButtonsPagination = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "ButtonsPagination",
-	props: {
-		maxPaginationNumber: {
-			type: Number,
-			required: true
-		},
-		currentPaginationNumber: {
-			type: Number,
-			required: true
-		}
-	},
-	emits: ["updatePage"],
-	setup(__props, { emit: emits }) {
-		const props = __props;
-		useCssVars((_ctx) => ({ "40dd4f07": unref(themeColor) }));
-		const totalVisible = 7;
-		const changePage = (item) => {
-			if (item.type === "button" && !item.active) emits("updatePage", item.page);
-		};
-		const paginationItemsForRender = computed(() => {
-			const paginationItems = [];
-			if (props.maxPaginationNumber <= totalVisible) for (let i = 1; i <= props.maxPaginationNumber; i += 1) paginationItems.push({
-				type: "button",
-				page: i,
-				active: i === props.currentPaginationNumber,
-				activePrev: i + 1 === props.currentPaginationNumber
-			});
-			else if ([
-				1,
-				2,
-				props.maxPaginationNumber,
-				props.maxPaginationNumber - 1
-			].includes(props.currentPaginationNumber)) for (let i = 1; i <= totalVisible; i += 1) if (i <= 3) paginationItems.push({
-				type: "button",
-				page: i,
-				active: i === props.currentPaginationNumber,
-				activePrev: i + 1 === props.currentPaginationNumber
-			});
-			else if (i === 4) paginationItems.push({ type: "omission" });
-			else {
-				const page = props.maxPaginationNumber - (totalVisible - i);
-				paginationItems.push({
-					type: "button",
-					page,
-					active: page === props.currentPaginationNumber,
-					activePrev: page + 1 === props.currentPaginationNumber
-				});
-			}
-			else if ([3, 4].includes(props.currentPaginationNumber)) for (let i = 1; i <= totalVisible; i += 1) if (i <= 5) paginationItems.push({
-				type: "button",
-				page: i,
-				active: i === props.currentPaginationNumber,
-				activePrev: i + 1 === props.currentPaginationNumber
-			});
-			else if (i === 6) paginationItems.push({ type: "omission" });
-			else paginationItems.push({
-				type: "button",
-				page: props.maxPaginationNumber,
-				active: props.maxPaginationNumber === props.currentPaginationNumber,
-				activePrev: i + 1 === props.currentPaginationNumber
-			});
-			else if ([props.maxPaginationNumber - 2, props.maxPaginationNumber - 3].includes(props.currentPaginationNumber)) for (let i = 1; i <= totalVisible; i += 1) if (i === 1) paginationItems.push({
-				type: "button",
-				page: 1,
-				active: props.currentPaginationNumber === 1,
-				activePrev: i + 1 === props.currentPaginationNumber
-			});
-			else if (i === 2) paginationItems.push({ type: "omission" });
-			else {
-				const page = props.maxPaginationNumber - (totalVisible - i);
-				paginationItems.push({
-					type: "button",
-					page,
-					active: page === props.currentPaginationNumber,
-					activePrev: page + 1 === props.currentPaginationNumber
-				});
-			}
-			else for (let i = 1; i <= totalVisible; i += 1) if (i === 1) paginationItems.push({
-				type: "button",
-				page: 1,
-				active: props.currentPaginationNumber === 1,
-				activePrev: i + 1 === props.currentPaginationNumber
-			});
-			else if (i === 2 || i === 6) paginationItems.push({ type: "omission" });
-			else if (i === 7) paginationItems.push({
-				type: "button",
-				page: props.maxPaginationNumber,
-				active: props.maxPaginationNumber === props.currentPaginationNumber,
-				activePrev: i + 1 === props.currentPaginationNumber
-			});
-			else {
-				const diff = 4 - i;
-				const page = props.currentPaginationNumber - diff;
-				paginationItems.push({
-					type: "button",
-					page,
-					active: page === props.currentPaginationNumber,
-					activePrev: page + 1 === props.currentPaginationNumber
-				});
-			}
-			return paginationItems;
-		});
-		const themeColor = inject("themeColor");
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$2, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(paginationItemsForRender), (item, i) => {
-				return openBlock(), createElementBlock("div", {
-					key: i,
-					class: normalizeClass(["item", {
-						button: item.type === "button",
-						active: item.type === "button" && item.active,
-						"active-prev": item.type === "button" && item.activePrev,
-						omission: item.type === "omission"
-					}]),
-					onClick: ($event) => changePage(item)
-				}, toDisplayString(item.type === "button" ? item.page : "..."), 11, _hoisted_2$2);
-			}), 128))]);
-		};
-	}
-}), [["__scopeId", "data-v-4c681fa2"]]);
-var _withScopeId$1 = (n) => (pushScopeId("data-v-c9da5286"), n = n(), popScopeId(), n);
-var _hoisted_2$1 = [/* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("span", { class: "arrow arrow-right" }, null, -1))];
-var _hoisted_4$1 = [/* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("span", { class: "arrow arrow-left" }, null, -1))];
-var PaginationArrows = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "PaginationArrows",
-	props: {
-		isFirstPage: {
-			type: Boolean,
-			required: false
-		},
-		isLastPage: {
-			type: Boolean,
-			required: false
-		}
-	},
-	emits: ["clickPrevPage", "clickNextPage"],
-	setup(__props, { emit: emits }) {
-		const slots = useSlots();
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [
-				createBaseVNode("div", {
-					class: normalizeClass(["previous-page__click-button", { "first-page": __props.isFirstPage }]),
-					onClick: _cache[0] || (_cache[0] = ($event) => emits("clickPrevPage"))
-				}, _hoisted_2$1, 2),
-				unref(slots).buttonsPagination ? renderSlot(_ctx.$slots, "buttonsPagination", { key: 0 }, void 0, true) : createCommentVNode("", true),
-				createBaseVNode("div", {
-					class: normalizeClass(["next-page__click-button", { "last-page": __props.isLastPage }]),
-					onClick: _cache[1] || (_cache[1] = ($event) => emits("clickNextPage"))
-				}, _hoisted_4$1, 2)
-			], 64);
-		};
-	}
-}), [["__scopeId", "data-v-c9da5286"]]);
-function useClickRow(clickEventType, isMultipleSelectable, showIndex, emits) {
-	const clickRow = (item, clickType, $event) => {
-		if (clickEventType.value !== clickType) return;
-		const clickRowArgument = __spreadValues({}, item);
-		if (isMultipleSelectable.value) {
-			const { checkbox } = item;
-			delete clickRowArgument.checkbox;
-			clickRowArgument.isSelected = checkbox;
-		}
-		if (showIndex.value) {
-			const { index } = item;
-			delete clickRowArgument.index;
-			clickRowArgument.indexInCurrentPage = index;
-		}
-		emits("clickRow", clickRowArgument, $event);
-	};
-	return { clickRow };
-}
-function useExpandableRow(items, prevPageEndIndex, emits) {
-	const expandingItemIndexList = /* @__PURE__ */ ref([]);
-	const updateExpandingItemIndexList = (expandingItemIndex, expandingItem, event) => {
-		event.stopPropagation();
-		const index = expandingItemIndexList.value.indexOf(expandingItemIndex);
-		if (index !== -1) expandingItemIndexList.value.splice(index, 1);
-		else {
-			const currentPageExpandIndex = items.value.findIndex((item) => JSON.stringify(item) === JSON.stringify(expandingItem));
-			emits("expandRow", prevPageEndIndex.value + currentPageExpandIndex, expandingItem);
-			expandingItemIndexList.value.push(prevPageEndIndex.value + currentPageExpandIndex);
-		}
-	};
-	const clearExpandingItemIndexList = () => {
-		expandingItemIndexList.value = [];
-	};
-	return {
-		expandingItemIndexList,
-		updateExpandingItemIndexList,
-		clearExpandingItemIndexList
-	};
-}
-function useFixedColumn(headersForRender) {
-	const fixedHeaders = computed(() => headersForRender.value.filter((header) => header.fixed));
-	return {
-		fixedHeaders,
-		lastFixedColumn: computed(() => {
-			if (!fixedHeaders.value.length) return "";
-			return fixedHeaders.value[fixedHeaders.value.length - 1].value;
-		}),
-		fixedColumnsInfos: computed(() => {
-			if (!fixedHeaders.value.length) return [];
-			const fixedHeadersWidthArr = fixedHeaders.value.map((header) => {
-				var _a;
-				return (_a = header.width) != null ? _a : 100;
-			});
-			return fixedHeaders.value.map((header, index) => {
-				var _a, _b;
-				return {
-					value: header.value,
-					fixed: (_a = header.fixed) != null ? _a : true,
-					width: (_b = header.width) != null ? _b : 100,
-					distance: index === 0 ? 0 : fixedHeadersWidthArr.reduce((previous, current, i) => {
-						let distance = previous;
-						if (i < index) distance += current;
-						return distance;
-					})
-				};
-			});
-		})
-	};
-}
-function useHeaders(showIndexSymbol, checkboxColumnWidth, expandColumnWidth, fixedCheckbox, fixedExpand, fixedIndex, headers, ifHasExpandSlot, indexColumnWidth, isMultipleSelectable, isServerSideMode, mustSort, serverOptionsComputed, showIndex, sortBy, sortType, multiSort, updateServerOptionsSort, emits) {
-	const hasFixedColumnsFromUser = computed(() => headers.value.findIndex((header) => header.fixed) !== -1);
-	const fixedHeadersFromUser = computed(() => {
-		if (hasFixedColumnsFromUser.value) return headers.value.filter((header) => header.fixed);
-		return [];
-	});
-	const unFixedHeaders = computed(() => headers.value.filter((header) => !header.fixed));
-	const generateClientSortOptions = (sortByValue, sortTypeValue) => {
-		if (Array.isArray(sortByValue) && Array.isArray(sortTypeValue)) return {
-			sortBy: sortByValue,
-			sortDesc: sortTypeValue.map((val) => val === "desc")
-		};
-		if (sortByValue !== "") return {
-			sortBy: sortBy.value,
-			sortDesc: sortType.value === "desc"
-		};
-		return null;
-	};
-	const clientSortOptions = /* @__PURE__ */ ref(generateClientSortOptions(sortBy.value, sortType.value));
-	const headersForRender = computed(() => {
-		var _a;
-		const headersSorting = [...fixedHeadersFromUser.value, ...unFixedHeaders.value].map((header) => {
-			const headerSorting = Object.assign(header);
-			if (headerSorting.sortable) headerSorting.sortType = "none";
-			if (serverOptionsComputed.value) {
-				if (Array.isArray(serverOptionsComputed.value.sortBy) && Array.isArray(serverOptionsComputed.value.sortType) && serverOptionsComputed.value.sortBy.includes(headerSorting.value)) {
-					const index = serverOptionsComputed.value.sortBy.indexOf(headerSorting.value);
-					headerSorting.sortType = serverOptionsComputed.value.sortType[index];
-				} else if (headerSorting.value === serverOptionsComputed.value.sortBy && serverOptionsComputed.value.sortType) headerSorting.sortType = serverOptionsComputed.value.sortType;
-			}
-			if (clientSortOptions.value && Array.isArray(clientSortOptions.value.sortBy) && Array.isArray(clientSortOptions.value.sortDesc) && clientSortOptions.value.sortBy.includes(headerSorting.value)) {
-				const index = clientSortOptions.value.sortBy.indexOf(headerSorting.value);
-				headerSorting.sortType = clientSortOptions.value.sortDesc[index] ? "desc" : "asc";
-			} else if (clientSortOptions.value && headerSorting.value === clientSortOptions.value.sortBy) headerSorting.sortType = clientSortOptions.value.sortDesc ? "desc" : "asc";
-			return headerSorting;
-		});
-		let headersWithExpand = [];
-		if (!ifHasExpandSlot.value) headersWithExpand = headersSorting;
-		else headersWithExpand = [fixedExpand.value || hasFixedColumnsFromUser.value ? {
-			text: "",
-			value: "expand",
-			fixed: true,
-			width: expandColumnWidth.value
-		} : {
-			text: "",
-			value: "expand"
-		}, ...headersSorting];
-		let headersWithIndex = [];
-		if (!showIndex.value) headersWithIndex = headersWithExpand;
-		else headersWithIndex = [fixedIndex.value || hasFixedColumnsFromUser.value ? {
-			text: showIndexSymbol.value,
-			value: "index",
-			fixed: true,
-			width: indexColumnWidth.value
-		} : {
-			text: showIndexSymbol.value,
-			value: "index"
-		}, ...headersWithExpand];
-		let headersWithCheckbox = [];
-		if (!isMultipleSelectable.value) headersWithCheckbox = headersWithIndex;
-		else headersWithCheckbox = [fixedCheckbox.value || hasFixedColumnsFromUser.value ? {
-			text: "checkbox",
-			value: "checkbox",
-			fixed: true,
-			width: (_a = checkboxColumnWidth.value) != null ? _a : 36
-		} : {
-			text: "checkbox",
-			value: "checkbox"
-		}, ...headersWithIndex];
-		return headersWithCheckbox;
-	});
-	const headerColumns = computed(() => headersForRender.value.map((header) => header.value));
-	const updateSortField = (newSortBy, oldSortType) => {
-		let newSortType = null;
-		if (oldSortType === "none") newSortType = "asc";
-		else if (oldSortType === "asc") newSortType = "desc";
-		else newSortType = mustSort.value ? "asc" : null;
-		if (isServerSideMode.value) updateServerOptionsSort(newSortBy, newSortType);
-		if (clientSortOptions.value && Array.isArray(clientSortOptions.value.sortBy) && Array.isArray(clientSortOptions.value.sortDesc)) {
-			const index = clientSortOptions.value.sortBy.indexOf(newSortBy);
-			if (index === -1) {
-				if (newSortType !== null) {
-					clientSortOptions.value.sortBy.push(newSortBy);
-					clientSortOptions.value.sortDesc.push(newSortType === "desc");
-				}
-			} else if (newSortType === null) {
-				clientSortOptions.value.sortDesc.splice(index, 1);
-				clientSortOptions.value.sortBy.splice(index, 1);
-			} else clientSortOptions.value.sortDesc[index] = newSortType === "desc";
-		} else if (newSortType === null) clientSortOptions.value = null;
-		else clientSortOptions.value = {
-			sortBy: newSortBy,
-			sortDesc: newSortType === "desc"
-		};
-		emits("updateSort", {
-			sortType: newSortType,
-			sortBy: newSortBy
-		});
-	};
-	const isMultiSorting = (headerText) => {
-		if (serverOptionsComputed.value) {
-			if (Array.isArray(serverOptionsComputed.value.sortBy)) return serverOptionsComputed.value.sortBy.includes(headerText);
-		}
-		if (clientSortOptions.value && Array.isArray(clientSortOptions.value.sortBy)) return clientSortOptions.value.sortBy.includes(headerText);
-		return false;
-	};
-	const getMultiSortNumber = (headerText) => {
-		if (serverOptionsComputed.value) {
-			if (Array.isArray(serverOptionsComputed.value.sortBy)) return serverOptionsComputed.value.sortBy.indexOf(headerText) + 1;
-		}
-		if (clientSortOptions.value && Array.isArray(clientSortOptions.value.sortBy)) return clientSortOptions.value.sortBy.indexOf(headerText) + 1;
-		return false;
-	};
-	return {
-		clientSortOptions,
-		headerColumns,
-		headersForRender,
-		updateSortField,
-		isMultiSorting,
-		getMultiSortNumber
-	};
-}
-function usePageItems(currentPaginationNumber, isMultipleSelectable, isServerSideMode, items, rowsPerPageRef, selectItemsComputed, showIndex, totalItems, totalItemsLength) {
-	const currentPageFirstIndex = computed(() => (currentPaginationNumber.value - 1) * rowsPerPageRef.value + 1);
-	const currentPageLastIndex = computed(() => {
-		if (isServerSideMode.value) return Math.min(totalItemsLength.value, currentPaginationNumber.value * rowsPerPageRef.value);
-		return Math.min(totalItems.value.length, currentPaginationNumber.value * rowsPerPageRef.value);
-	});
-	const itemsInPage = computed(() => {
-		if (isServerSideMode.value) return items.value;
-		return totalItems.value.slice(currentPageFirstIndex.value - 1, currentPageLastIndex.value);
-	});
-	const itemsWithIndex = computed(() => {
-		if (showIndex.value) return itemsInPage.value.map((item, index) => __spreadValues({ index: currentPageFirstIndex.value + index }, item));
-		return itemsInPage.value;
-	});
-	const multipleSelectStatus = computed(() => {
-		if (selectItemsComputed.value.length === 0) return "noneSelected";
-		if (selectItemsComputed.value.every((itemSelected) => {
-			if (totalItems.value.findIndex((item) => JSON.stringify(itemSelected) === JSON.stringify(item)) !== -1) return false;
-			return true;
-		})) return "noneSelected";
-		if (selectItemsComputed.value.length === totalItems.value.length) return selectItemsComputed.value.every((itemSelected) => {
-			if (totalItems.value.findIndex((item) => JSON.stringify(itemSelected) === JSON.stringify(item)) === -1) return false;
-			return true;
-		}) ? "allSelected" : "partSelected";
-		return "partSelected";
-	});
-	return {
-		currentPageFirstIndex,
-		currentPageLastIndex,
-		multipleSelectStatus,
-		pageItems: computed(() => {
-			if (!isMultipleSelectable.value) return itemsWithIndex.value;
-			if (multipleSelectStatus.value === "allSelected") return itemsWithIndex.value.map((item) => __spreadValues({ checkbox: true }, item));
-			if (multipleSelectStatus.value === "noneSelected") return itemsWithIndex.value.map((item) => __spreadValues({ checkbox: false }, item));
-			return itemsWithIndex.value.map((item) => {
-				return __spreadValues({ checkbox: selectItemsComputed.value.findIndex((selectItem) => {
-					const itemDeepCloned = __spreadValues({}, item);
-					delete itemDeepCloned.index;
-					return JSON.stringify(selectItem) === JSON.stringify(itemDeepCloned);
-				}) !== -1 }, item);
-			});
-		})
-	};
-}
-function usePagination(currentPage, isServerSideMode, loading, totalItemsLength, rowsPerPage, serverOptions, updateServerOptionsPage) {
-	const currentPaginationNumber = /* @__PURE__ */ ref(serverOptions.value ? serverOptions.value.page : currentPage.value);
-	const maxPaginationNumber = computed(() => Math.ceil(totalItemsLength.value / rowsPerPage.value));
-	const isLastPage = computed(() => maxPaginationNumber.value === 0 || currentPaginationNumber.value === maxPaginationNumber.value);
-	const isFirstPage = computed(() => currentPaginationNumber.value === 1);
-	const nextPage = () => {
-		if (totalItemsLength.value === 0) return;
-		if (isLastPage.value) return;
-		if (loading.value) return;
-		if (isServerSideMode.value) updateServerOptionsPage(currentPaginationNumber.value + 1);
-		else currentPaginationNumber.value += 1;
-	};
-	const prevPage = () => {
-		if (totalItemsLength.value === 0) return;
-		if (isFirstPage.value) return;
-		if (loading.value) return;
-		if (isServerSideMode.value) updateServerOptionsPage(currentPaginationNumber.value - 1);
-		else currentPaginationNumber.value -= 1;
-	};
-	const updatePage = (page) => {
-		if (loading.value) return;
-		if (isServerSideMode.value) updateServerOptionsPage(page);
-		else currentPaginationNumber.value = page;
-	};
-	const updateCurrentPaginationNumber = (page) => {
-		currentPaginationNumber.value = page;
-	};
-	return {
-		currentPaginationNumber,
-		maxPaginationNumber,
-		isLastPage,
-		isFirstPage,
-		nextPage,
-		prevPage,
-		updatePage,
-		updateCurrentPaginationNumber
-	};
-}
-function useRows(isServerSideMode, rowsItems, serverOptions, rowsPerPage) {
-	const rowsItemsComputed = computed(() => {
-		if (!isServerSideMode.value && rowsItems.value.findIndex((item) => item === rowsPerPage.value) === -1) return [rowsPerPage.value, ...rowsItems.value];
-		return rowsItems.value;
-	});
-	const rowsPerPageRef = /* @__PURE__ */ ref(serverOptions.value ? serverOptions.value.rowsPerPage : rowsPerPage.value);
-	const updateRowsPerPage = (option) => {
-		rowsPerPageRef.value = option;
-	};
-	return {
-		rowsItemsComputed,
-		rowsPerPageRef,
-		updateRowsPerPage
-	};
-}
-function useServerOptions(serverOptions, multiSort, emits) {
-	const serverOptionsComputed = computed({
-		get: () => {
-			if (serverOptions.value) {
-				const { page, rowsPerPage, sortBy, sortType } = serverOptions.value;
-				return {
-					page,
-					rowsPerPage,
-					sortBy: sortBy != null ? sortBy : null,
-					sortType: sortType != null ? sortType : null
-				};
-			}
-			return null;
-		},
-		set: (value) => {
-			emits("update:serverOptions", value);
-		}
-	});
-	const updateServerOptionsPage = (page) => {
-		if (serverOptionsComputed.value) serverOptionsComputed.value = __spreadProps(__spreadValues({}, serverOptionsComputed.value), { page });
-	};
-	const updateServerOptionsRowsPerPage = (rowsPerPage) => {
-		if (serverOptionsComputed.value) serverOptionsComputed.value = __spreadProps(__spreadValues({}, serverOptionsComputed.value), {
-			page: 1,
-			rowsPerPage
-		});
-	};
-	const updateServerOptionsSort = (newSortBy, newSortType) => {
-		if (serverOptionsComputed.value) if (multiSort.value && Array.isArray(serverOptionsComputed.value.sortBy) && Array.isArray(serverOptionsComputed.value.sortType)) {
-			const index = serverOptionsComputed.value.sortBy.findIndex((val) => val === newSortBy);
-			if (index === -1 && newSortType !== null) {
-				serverOptionsComputed.value.sortBy.push(newSortBy);
-				serverOptionsComputed.value.sortType.push(newSortType);
-			}
-			if (newSortType === null) {
-				serverOptionsComputed.value.sortBy.splice(index, 1);
-				serverOptionsComputed.value.sortType.splice(index, 1);
-			} else serverOptionsComputed.value.sortType[index] = newSortType;
-		} else serverOptionsComputed.value = __spreadProps(__spreadValues({}, serverOptionsComputed.value), {
-			sortBy: newSortType !== null ? newSortBy : null,
-			sortType: newSortType
-		});
-	};
-	return {
-		serverOptionsComputed,
-		updateServerOptionsPage,
-		updateServerOptionsSort,
-		updateServerOptionsRowsPerPage
-	};
-}
-function getItemValue(column, item) {
-	var _a;
-	if (column.includes(".")) {
-		const keys = column.split(".");
-		const { length } = keys;
-		let content;
-		let i = 0;
-		while (i < length) {
-			if (i === 0) content = item[keys[0]];
-			else if (content && typeof content === "object") content = content[keys[i]];
-			else {
-				content = "";
-				break;
-			}
-			i += 1;
-		}
-		return content != null ? content : "";
-	}
-	return (_a = item[column]) != null ? _a : "";
-}
-function generateColumnContent(column, item) {
-	const content = getItemValue(column, item);
-	return Array.isArray(content) ? content.join(",") : content;
-}
-function useTotalItems(clientSortOptions, filterOptions, isServerSideMode, items, itemsSelected, searchField, searchValue, serverItemsLength, multiSort, emits) {
-	const generateSearchingTarget = (item) => {
-		if (typeof searchField.value === "string" && searchField.value !== "") return getItemValue(searchField.value, item);
-		if (Array.isArray(searchField.value)) {
-			let searchString = "";
-			searchField.value.forEach((field) => {
-				searchString += getItemValue(field, item);
-			});
-			return searchString;
-		}
-		return Object.values(item).join(" ");
-	};
-	const itemsSearching = computed(() => {
-		if (!isServerSideMode.value && searchValue.value !== "") {
-			const regex = new RegExp(searchValue.value, "i");
-			return items.value.filter((item) => regex.test(generateSearchingTarget(item)));
-		}
-		return items.value;
-	});
-	const itemsFiltering = computed(() => {
-		let itemsFiltered = [...itemsSearching.value];
-		if (filterOptions.value) {
-			filterOptions.value.forEach((option) => {
-				itemsFiltered = itemsFiltered.filter((item) => {
-					const { field, comparison, criteria } = option;
-					if (typeof comparison === "function") return comparison(getItemValue(field, item), criteria);
-					const itemValue = getItemValue(field, item);
-					switch (comparison) {
-						case "=": return itemValue === criteria;
-						case "!=": return itemValue !== criteria;
-						case ">": return itemValue > criteria;
-						case "<": return itemValue < criteria;
-						case "<=": return itemValue <= criteria;
-						case ">=": return itemValue >= criteria;
-						case "between": return itemValue >= Math.min(...criteria) && itemValue <= Math.max(...criteria);
-						case "in": return criteria.includes(itemValue);
-						default: return itemValue === criteria;
-					}
-				});
-			});
-			return itemsFiltered;
-		}
-		return itemsSearching.value;
-	});
-	watch$1(itemsFiltering, (newVal) => {
-		if (filterOptions.value) emits("updateFilter", newVal);
-	}, {
-		immediate: true,
-		deep: true
-	});
-	function recursionMuiltSort(sortByArr, sortDescArr, itemsToSort, index) {
-		const sortBy = sortByArr[index];
-		const sortDesc = sortDescArr[index];
-		return (index === 0 ? itemsToSort : recursionMuiltSort(sortByArr, sortDescArr, itemsToSort, index - 1)).sort((a, b) => {
-			let isAllSame = true;
-			for (let i = 0; i < index; i += 1) if (getItemValue(sortByArr[i], a) !== getItemValue(sortByArr[i], b)) {
-				isAllSame = false;
-				break;
-			}
-			if (isAllSame) {
-				if (getItemValue(sortBy, a) < getItemValue(sortBy, b)) return sortDesc ? 1 : -1;
-				if (getItemValue(sortBy, a) > getItemValue(sortBy, b)) return sortDesc ? -1 : 1;
-				return 0;
-			}
-			return 0;
-		});
-	}
-	const totalItems = computed(() => {
-		if (isServerSideMode.value) return items.value;
-		if (clientSortOptions.value === null) return itemsFiltering.value;
-		const { sortBy, sortDesc } = clientSortOptions.value;
-		const itemsFilteringSorted = [...itemsFiltering.value];
-		if (multiSort && Array.isArray(sortBy) && Array.isArray(sortDesc)) {
-			if (sortBy.length === 0) return itemsFilteringSorted;
-			return recursionMuiltSort(sortBy, sortDesc, itemsFilteringSorted, sortBy.length - 1);
-		}
-		return itemsFilteringSorted.sort((a, b) => {
-			if (getItemValue(sortBy, a) < getItemValue(sortBy, b)) return sortDesc ? 1 : -1;
-			if (getItemValue(sortBy, a) > getItemValue(sortBy, b)) return sortDesc ? -1 : 1;
-			return 0;
-		});
-	});
-	const totalItemsLength = computed(() => isServerSideMode.value ? serverItemsLength.value : totalItems.value.length);
-	const selectItemsComputed = computed({
-		get: () => {
-			var _a;
-			return (_a = itemsSelected.value) != null ? _a : [];
-		},
-		set: (value) => {
-			emits("update:itemsSelected", value);
-		}
-	});
-	const toggleSelectAll = (isChecked) => {
-		selectItemsComputed.value = isChecked ? totalItems.value : [];
-		if (isChecked) emits("selectAll");
-	};
-	const toggleSelectItem = (item) => {
-		const isAlreadyChecked = item.checkbox;
-		delete item.checkbox;
-		delete item.index;
-		if (!isAlreadyChecked) {
-			const selectItemsArr = selectItemsComputed.value;
-			selectItemsArr.unshift(item);
-			selectItemsComputed.value = selectItemsArr;
-			emits("selectRow", item);
-		} else {
-			selectItemsComputed.value = selectItemsComputed.value.filter((selectedItem) => JSON.stringify(selectedItem) !== JSON.stringify(item));
-			emits("deselectRow", item);
-		}
-	};
-	return {
-		totalItems,
-		selectItemsComputed,
-		totalItemsLength,
-		toggleSelectAll,
-		toggleSelectItem
-	};
-}
-var propsWithDefault = {
-	alternating: {
-		type: Boolean,
-		default: false
-	},
-	buttonsPagination: {
-		type: Boolean,
-		default: false
-	},
-	checkboxColumnWidth: {
-		type: Number,
-		default: null
-	},
-	currentPage: {
-		type: Number,
-		default: 1
-	},
-	emptyMessage: {
-		type: String,
-		default: "No Available Data"
-	},
-	expandColumnWidth: {
-		type: Number,
-		default: 36
-	},
-	filterOptions: {
-		type: Array,
-		default: null
-	},
-	fixedExpand: {
-		type: Boolean,
-		default: false
-	},
-	fixedHeader: {
-		type: Boolean,
-		default: true
-	},
-	fixedCheckbox: {
-		type: Boolean,
-		default: false
-	},
-	fixedIndex: {
-		type: Boolean,
-		default: false
-	},
-	headerTextDirection: {
-		type: String,
-		default: "left"
-	},
-	bodyTextDirection: {
-		type: String,
-		default: "left"
-	},
-	hideFooter: {
-		type: Boolean,
-		default: false
-	},
-	hideRowsPerPage: {
-		type: Boolean,
-		default: false
-	},
-	hideHeader: {
-		type: Boolean,
-		default: false
-	},
-	indexColumnWidth: {
-		type: Number,
-		default: 60
-	},
-	itemsSelected: {
-		type: Array,
-		default: null
-	},
-	loading: {
-		type: Boolean,
-		default: false
-	},
-	rowsPerPage: {
-		type: Number,
-		default: 25
-	},
-	rowsItems: {
-		type: Array,
-		default: () => [
-			25,
-			50,
-			100
-		]
-	},
-	rowsPerPageMessage: {
-		type: String,
-		default: "rows per page:"
-	},
-	searchField: {
-		type: [String, Array],
-		default: ""
-	},
-	searchValue: {
-		type: String,
-		default: ""
-	},
-	serverOptions: {
-		type: Object,
-		default: null
-	},
-	serverItemsLength: {
-		type: Number,
-		default: 0
-	},
-	showIndex: {
-		type: Boolean,
-		default: false
-	},
-	sortBy: {
-		type: [String, Array],
-		default: ""
-	},
-	sortType: {
-		type: [String, Array],
-		default: "asc"
-	},
-	multiSort: {
-		type: Boolean,
-		default: false
-	},
-	tableMinHeight: {
-		type: Number,
-		default: 180
-	},
-	tableHeight: {
-		type: Number,
-		default: null
-	},
-	themeColor: {
-		type: String,
-		default: "#42b883"
-	},
-	tableClassName: {
-		type: String,
-		default: ""
-	},
-	headerClassName: {
-		type: String,
-		default: ""
-	},
-	headerItemClassName: {
-		type: [Function, String],
-		default: ""
-	},
-	bodyRowClassName: {
-		type: [Function, String],
-		default: ""
-	},
-	bodyExpandRowClassName: {
-		type: [Function, String],
-		default: ""
-	},
-	bodyItemClassName: {
-		type: [Function, String],
-		default: ""
-	},
-	noHover: {
-		type: Boolean,
-		default: false
-	},
-	borderCell: {
-		type: Boolean,
-		default: false
-	},
-	mustSort: {
-		type: Boolean,
-		default: false
-	},
-	rowsOfPageSeparatorMessage: {
-		type: String,
-		default: "of"
-	},
-	clickEventType: {
-		type: String,
-		default: "single"
-	},
-	clickRowToExpand: {
-		type: Boolean,
-		default: false
-	},
-	tableNodeId: {
-		type: String,
-		default: ""
-	},
-	showIndexSymbol: {
-		type: String,
-		default: "#"
-	},
-	preventContextMenuRow: {
-		type: Boolean,
-		default: true
-	}
-};
-var _withScopeId = (n) => (pushScopeId("data-v-32683533"), n = n(), popScopeId(), n);
-var _hoisted_1 = ["id"];
-var _hoisted_2 = ["onClick"];
-var _hoisted_3 = {
-	key: 3,
-	class: "header-text"
-};
-var _hoisted_4 = {
-	key: 5,
-	class: "multi-sort__number"
-};
-var _hoisted_5 = [
-	"onClick",
-	"onDblclick",
-	"onContextmenu"
-];
-var _hoisted_6 = ["onClick"];
-var _hoisted_7 = ["colspan"];
-var _hoisted_8 = {
-	key: 0,
-	class: "vue3-easy-data-table__loading"
-};
-var _hoisted_9 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("div", { class: "vue3-easy-data-table__loading-mask" }, null, -1));
-var _hoisted_10 = { class: "loading-entity" };
-var _hoisted_11 = {
-	key: 1,
-	class: "vue3-easy-data-table__message"
-};
-var _hoisted_12 = {
-	key: 0,
-	class: "vue3-easy-data-table__footer"
-};
-var _hoisted_13 = {
-	key: 0,
-	class: "pagination__rows-per-page"
-};
-var _hoisted_14 = { class: "pagination__items-index" };
-var DataTable = /* @__PURE__ */ _export_sfc(/* @__PURE__ */ defineComponent({
-	__name: "DataTable",
-	props: __spreadProps(__spreadValues({}, propsWithDefault), {
-		items: {
-			type: Array,
-			required: true
-		},
-		headers: {
-			type: Array,
-			required: true
-		}
-	}),
-	emits: [
-		"clickRow",
-		"contextmenuRow",
-		"selectRow",
-		"deselectRow",
-		"expandRow",
-		"updateSort",
-		"updateFilter",
-		"update:itemsSelected",
-		"update:serverOptions",
-		"updatePageItems",
-		"updateTotalItems",
-		"selectAll"
-	],
-	setup(__props, { expose, emit: emits }) {
-		const props = __props;
-		useCssVars((_ctx) => ({
-			"da0d4328": unref(tableMinHeightPx),
-			"3037e504": unref(tableHeightPx)
-		}));
-		const { tableNodeId, clickEventType, bodyTextDirection, checkboxColumnWidth, currentPage, expandColumnWidth, filterOptions, fixedCheckbox, fixedExpand, fixedHeader, fixedIndex, headers, headerTextDirection, indexColumnWidth, items, itemsSelected, loading, mustSort, multiSort, rowsItems, rowsPerPage, searchField, searchValue, serverItemsLength, serverOptions, showIndex, sortBy, sortType, tableHeight, tableMinHeight, themeColor, rowsOfPageSeparatorMessage, showIndexSymbol, preventContextMenuRow } = /* @__PURE__ */ toRefs(props);
-		const tableHeightPx = computed(() => tableHeight.value ? `${tableHeight.value}px` : null);
-		const tableMinHeightPx = computed(() => `${tableMinHeight.value}px`);
-		provide("themeColor", themeColor.value);
-		const slots = useSlots();
-		const ifHasPaginationSlot = computed(() => !!slots.pagination);
-		const ifHasLoadingSlot = computed(() => !!slots.loading);
-		const ifHasExpandSlot = computed(() => !!slots.expand);
-		const ifHasBodySlot = computed(() => !!slots.body);
-		const dataTable = /* @__PURE__ */ ref();
-		const tableBody = /* @__PURE__ */ ref();
-		provide("dataTable", dataTable);
-		const showShadow = /* @__PURE__ */ ref(false);
-		onMounted(() => {
-			tableBody.value.addEventListener("scroll", () => {
-				showShadow.value = tableBody.value.scrollLeft > 0;
-			});
-		});
-		const isMultipleSelectable = computed(() => itemsSelected.value !== null);
-		const isServerSideMode = computed(() => serverOptions.value !== null);
-		const { serverOptionsComputed, updateServerOptionsPage, updateServerOptionsSort, updateServerOptionsRowsPerPage } = useServerOptions(serverOptions, multiSort, emits);
-		const { clientSortOptions, headerColumns, headersForRender, updateSortField, isMultiSorting, getMultiSortNumber } = useHeaders(showIndexSymbol, checkboxColumnWidth, expandColumnWidth, fixedCheckbox, fixedExpand, fixedIndex, headers, ifHasExpandSlot, indexColumnWidth, isMultipleSelectable, isServerSideMode, mustSort, serverOptionsComputed, showIndex, sortBy, sortType, multiSort, updateServerOptionsSort, emits);
-		const { rowsItemsComputed, rowsPerPageRef, updateRowsPerPage } = useRows(isServerSideMode, rowsItems, serverOptions, rowsPerPage);
-		const { totalItems, selectItemsComputed, totalItemsLength, toggleSelectAll, toggleSelectItem } = useTotalItems(clientSortOptions, filterOptions, isServerSideMode, items, itemsSelected, searchField, searchValue, serverItemsLength, multiSort, emits);
-		const { currentPaginationNumber, maxPaginationNumber, isLastPage, isFirstPage, nextPage, prevPage, updatePage, updateCurrentPaginationNumber } = usePagination(currentPage, isServerSideMode, loading, totalItemsLength, rowsPerPageRef, serverOptions, updateServerOptionsPage);
-		const { currentPageFirstIndex, currentPageLastIndex, multipleSelectStatus, pageItems } = usePageItems(currentPaginationNumber, isMultipleSelectable, isServerSideMode, items, rowsPerPageRef, selectItemsComputed, showIndex, totalItems, totalItemsLength);
-		const prevPageEndIndex = computed(() => {
-			if (currentPaginationNumber.value === 0) return 0;
-			return (currentPaginationNumber.value - 1) * rowsPerPageRef.value;
-		});
-		const { expandingItemIndexList, updateExpandingItemIndexList, clearExpandingItemIndexList } = useExpandableRow(pageItems, prevPageEndIndex, emits);
-		const { fixedHeaders, lastFixedColumn, fixedColumnsInfos } = useFixedColumn(headersForRender);
-		const { clickRow } = useClickRow(clickEventType, isMultipleSelectable, showIndex, emits);
-		const contextMenuRow = (item, $event) => {
-			if (preventContextMenuRow.value) $event.preventDefault();
-			emits("contextmenuRow", item, $event);
-		};
-		const getColStyle = (header) => {
-			var _a;
-			const width = (_a = header.width) != null ? _a : fixedHeaders.value.length ? 100 : null;
-			if (width) return `width: ${width}px; min-width: ${width}px;`;
-		};
-		const getFixedDistance = (column, type = "th") => {
-			if (!fixedHeaders.value.length) return void 0;
-			const columInfo = fixedColumnsInfos.value.find((info) => info.value === column);
-			if (columInfo) return `left: ${columInfo.distance}px;z-index: ${type === "th" ? 3 : 1};position: sticky;`;
-		};
-		watch$1(loading, (newVal, oldVal) => {
-			if (serverOptionsComputed.value) {
-				if (newVal === false && oldVal === true) {
-					updateCurrentPaginationNumber(serverOptionsComputed.value.page);
-					clearExpandingItemIndexList();
-				}
-			}
-		});
-		watch$1(rowsPerPageRef, (value) => {
-			if (!isServerSideMode.value) updatePage(1);
-			else updateServerOptionsRowsPerPage(value);
-		});
-		watch$1([searchValue, filterOptions], () => {
-			if (!isServerSideMode.value) updatePage(1);
-		});
-		watch$1([
-			currentPaginationNumber,
-			clientSortOptions,
-			searchField,
-			searchValue,
-			filterOptions
-		], () => {
-			clearExpandingItemIndexList();
-		}, { deep: true });
-		watch$1(pageItems, (value) => {
-			emits("updatePageItems", value);
-		}, { deep: true });
-		watch$1(totalItems, (value) => {
-			emits("updateTotalItems", value);
-		}, { deep: true });
-		expose({
-			currentPageFirstIndex,
-			currentPageLastIndex,
-			clientItemsLength: totalItemsLength,
-			maxPaginationNumber,
-			currentPaginationNumber,
-			isLastPage,
-			isFirstPage,
-			nextPage,
-			prevPage,
-			updatePage,
-			rowsPerPageOptions: rowsItemsComputed,
-			rowsPerPageActiveOption: rowsPerPageRef,
-			updateRowsPerPageActiveOption: updateRowsPerPage
-		});
-		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", {
-				ref_key: "dataTable",
-				ref: dataTable,
-				class: normalizeClass(["vue3-easy-data-table", [_ctx.tableClassName]])
-			}, [createBaseVNode("div", {
-				ref_key: "tableBody",
-				ref: tableBody,
-				class: normalizeClass(["vue3-easy-data-table__main", {
-					"fixed-header": unref(fixedHeader),
-					"fixed-height": unref(tableHeight),
-					"show-shadow": showShadow.value,
-					"table-fixed": unref(fixedHeaders).length,
-					"hoverable": !_ctx.noHover,
-					"border-cell": _ctx.borderCell
-				}])
-			}, [
-				createBaseVNode("table", { id: unref(tableNodeId) }, [
-					createBaseVNode("colgroup", null, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(headersForRender), (header, index) => {
-						return openBlock(), createElementBlock("col", {
-							key: index,
-							style: normalizeStyle(getColStyle(header))
-						}, null, 4);
-					}), 128))]),
-					unref(slots)["customize-headers"] ? renderSlot(_ctx.$slots, "customize-headers", { key: 0 }, void 0, true) : unref(headersForRender).length && !_ctx.hideHeader ? (openBlock(), createElementBlock("thead", {
-						key: 1,
-						class: normalizeClass(["vue3-easy-data-table__header", [_ctx.headerClassName]])
-					}, [createBaseVNode("tr", null, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(headersForRender), (header, index) => {
-						return openBlock(), createElementBlock("th", {
-							key: index,
-							class: normalizeClass([{
-								sortable: header.sortable,
-								"none": header.sortable && header.sortType === "none",
-								"desc": header.sortable && header.sortType === "desc",
-								"asc": header.sortable && header.sortType === "asc",
-								"shadow": header.value === unref(lastFixedColumn)
-							}, typeof _ctx.headerItemClassName === "string" ? _ctx.headerItemClassName : _ctx.headerItemClassName(header, index + 1)]),
-							style: normalizeStyle(getFixedDistance(header.value)),
-							onClick: withModifiers(($event) => header.sortable && header.sortType ? unref(updateSortField)(header.value, header.sortType) : null, ["stop"])
-						}, [header.text === "checkbox" ? (openBlock(), createBlock(MultipleSelectCheckBox, {
-							key: unref(multipleSelectStatus),
-							status: unref(multipleSelectStatus),
-							onChange: unref(toggleSelectAll)
-						}, null, 8, ["status", "onChange"])) : (openBlock(), createElementBlock("span", {
-							key: 1,
-							class: normalizeClass(["header", `direction-${unref(headerTextDirection)}`])
-						}, [
-							unref(slots)[`header-${header.value}`] ? renderSlot(_ctx.$slots, `header-${header.value}`, normalizeProps(mergeProps$1({ key: 0 }, header)), void 0, true) : unref(slots)[`header-${header.value.toLowerCase()}`] ? renderSlot(_ctx.$slots, `header-${header.value.toLowerCase()}`, normalizeProps(mergeProps$1({ key: 1 }, header)), void 0, true) : unref(slots)["header"] ? renderSlot(_ctx.$slots, "header", normalizeProps(mergeProps$1({ key: 2 }, header)), void 0, true) : (openBlock(), createElementBlock("span", _hoisted_3, toDisplayString(header.text), 1)),
-							header.sortable ? (openBlock(), createElementBlock("i", {
-								key: header.sortType ? header.sortType : "none",
-								class: normalizeClass(["sortType-icon", { "desc": header.sortType === "desc" }])
-							}, null, 2)) : createCommentVNode("", true),
-							unref(multiSort) && unref(isMultiSorting)(header.value) ? (openBlock(), createElementBlock("span", _hoisted_4, toDisplayString(unref(getMultiSortNumber)(header.value)), 1)) : createCommentVNode("", true)
-						], 2))], 14, _hoisted_2);
-					}), 128))])], 2)) : createCommentVNode("", true),
-					unref(ifHasBodySlot) ? renderSlot(_ctx.$slots, "body", normalizeProps(mergeProps$1({ key: 2 }, unref(pageItems))), void 0, true) : unref(headerColumns).length ? (openBlock(), createElementBlock("tbody", {
-						key: 3,
-						class: normalizeClass(["vue3-easy-data-table__body", { "row-alternation": _ctx.alternating }])
-					}, [
-						renderSlot(_ctx.$slots, "body-prepend", normalizeProps(guardReactiveProps({
-							items: unref(pageItems),
-							pagination: {
-								isFirstPage: unref(isFirstPage),
-								isLastPage: unref(isLastPage),
-								currentPaginationNumber: unref(currentPaginationNumber),
-								maxPaginationNumber: unref(maxPaginationNumber),
-								nextPage: unref(nextPage),
-								prevPage: unref(prevPage)
-							},
-							headers: unref(headersForRender)
-						})), void 0, true),
-						(openBlock(true), createElementBlock(Fragment, null, renderList(unref(pageItems), (item, index) => {
-							return openBlock(), createElementBlock(Fragment, { key: index }, [createBaseVNode("tr", {
-								class: normalizeClass([{ "even-row": (index + 1) % 2 === 0 }, typeof _ctx.bodyRowClassName === "string" ? _ctx.bodyRowClassName : _ctx.bodyRowClassName(item, index + 1)]),
-								onClick: ($event) => {
-									unref(clickRow)(item, "single", $event);
-									_ctx.clickRowToExpand && unref(updateExpandingItemIndexList)(index + unref(prevPageEndIndex), item, $event);
-								},
-								onDblclick: ($event) => {
-									unref(clickRow)(item, "double", $event);
-								},
-								onContextmenu: ($event) => {
-									contextMenuRow(item, $event);
-								}
-							}, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(headerColumns), (column, i) => {
-								return openBlock(), createElementBlock("td", {
-									key: i,
-									style: normalizeStyle(getFixedDistance(column, "td")),
-									class: normalizeClass([
-										{
-											"shadow": column === unref(lastFixedColumn),
-											"can-expand": column === "expand"
-										},
-										typeof _ctx.bodyItemClassName === "string" ? _ctx.bodyItemClassName : _ctx.bodyItemClassName(column, index + 1),
-										`direction-${unref(bodyTextDirection)}`
-									]),
-									onClick: ($event) => column === "expand" ? unref(updateExpandingItemIndexList)(index + unref(prevPageEndIndex), item, $event) : null
-								}, [unref(slots)[`item-${column}`] ? renderSlot(_ctx.$slots, `item-${column}`, normalizeProps(mergeProps$1({ key: 0 }, item)), void 0, true) : unref(slots)[`item-${column.toLowerCase()}`] ? renderSlot(_ctx.$slots, `item-${column.toLowerCase()}`, normalizeProps(mergeProps$1({ key: 1 }, item)), void 0, true) : column === "expand" ? (openBlock(), createElementBlock("i", {
-									key: 2,
-									class: normalizeClass(["expand-icon", { "expanding": unref(expandingItemIndexList).includes(unref(prevPageEndIndex) + index) }])
-								}, null, 2)) : column === "checkbox" ? (openBlock(), createBlock(SingleSelectCheckBox, {
-									key: 3,
-									checked: item[column],
-									onChange: ($event) => unref(toggleSelectItem)(item)
-								}, null, 8, ["checked", "onChange"])) : unref(slots)["item"] ? renderSlot(_ctx.$slots, "item", normalizeProps(mergeProps$1({ key: 4 }, {
-									column,
-									item
-								})), void 0, true) : (openBlock(), createElementBlock(Fragment, { key: 5 }, [createTextVNode(toDisplayString(unref(generateColumnContent)(column, item)), 1)], 64))], 14, _hoisted_6);
-							}), 128))], 42, _hoisted_5), unref(ifHasExpandSlot) && unref(expandingItemIndexList).includes(index + unref(prevPageEndIndex)) ? (openBlock(), createElementBlock("tr", {
-								key: 0,
-								class: normalizeClass([{ "even-row": (index + 1) % 2 === 0 }, typeof _ctx.bodyExpandRowClassName === "string" ? _ctx.bodyExpandRowClassName : _ctx.bodyExpandRowClassName(item, index + 1)])
-							}, [createBaseVNode("td", {
-								colspan: unref(headersForRender).length,
-								class: "expand"
-							}, [item.expandLoading ? (openBlock(), createBlock(LoadingLine, {
-								key: 0,
-								class: "expand-loading"
-							})) : createCommentVNode("", true), renderSlot(_ctx.$slots, "expand", normalizeProps(guardReactiveProps(item)), void 0, true)], 8, _hoisted_7)], 2)) : createCommentVNode("", true)], 64);
-						}), 128)),
-						renderSlot(_ctx.$slots, "body-append", normalizeProps(guardReactiveProps({
-							items: unref(pageItems),
-							pagination: {
-								isFirstPage: unref(isFirstPage),
-								isLastPage: unref(isLastPage),
-								currentPaginationNumber: unref(currentPaginationNumber),
-								maxPaginationNumber: unref(maxPaginationNumber),
-								nextPage: unref(nextPage),
-								prevPage: unref(prevPage),
-								updatePage: unref(updatePage)
-							},
-							headers: unref(headersForRender)
-						})), void 0, true)
-					], 2)) : createCommentVNode("", true)
-				], 8, _hoisted_1),
-				unref(loading) ? (openBlock(), createElementBlock("div", _hoisted_8, [_hoisted_9, createBaseVNode("div", _hoisted_10, [unref(ifHasLoadingSlot) ? renderSlot(_ctx.$slots, "loading", { key: 0 }, void 0, true) : (openBlock(), createBlock(Loading, { key: 1 }))])])) : createCommentVNode("", true),
-				!unref(pageItems).length && !unref(loading) ? (openBlock(), createElementBlock("div", _hoisted_11, [renderSlot(_ctx.$slots, "empty-message", {}, () => [createTextVNode(toDisplayString(_ctx.emptyMessage), 1)], true)])) : createCommentVNode("", true)
-			], 2), !_ctx.hideFooter ? (openBlock(), createElementBlock("div", _hoisted_12, [
-				!_ctx.hideRowsPerPage ? (openBlock(), createElementBlock("div", _hoisted_13, [createTextVNode(toDisplayString(_ctx.rowsPerPageMessage) + " ", 1), createVNode(RowsSelector, {
-					modelValue: unref(rowsPerPageRef),
-					"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => /* @__PURE__ */ isRef(rowsPerPageRef) ? rowsPerPageRef.value = $event : null),
-					"rows-items": unref(rowsItemsComputed)
-				}, null, 8, ["modelValue", "rows-items"])])) : createCommentVNode("", true),
-				createBaseVNode("div", _hoisted_14, toDisplayString(`${unref(currentPageFirstIndex)}\u2013${unref(currentPageLastIndex)}`) + " " + toDisplayString(unref(rowsOfPageSeparatorMessage)) + " " + toDisplayString(unref(totalItemsLength)), 1),
-				unref(ifHasPaginationSlot) ? renderSlot(_ctx.$slots, "pagination", normalizeProps(mergeProps$1({ key: 1 }, {
-					isFirstPage: unref(isFirstPage),
-					isLastPage: unref(isLastPage),
-					currentPaginationNumber: unref(currentPaginationNumber),
-					maxPaginationNumber: unref(maxPaginationNumber),
-					nextPage: unref(nextPage),
-					prevPage: unref(prevPage)
-				})), void 0, true) : (openBlock(), createBlock(PaginationArrows, {
-					key: 2,
-					"is-first-page": unref(isFirstPage),
-					"is-last-page": unref(isLastPage),
-					onClickNextPage: unref(nextPage),
-					onClickPrevPage: unref(prevPage)
-				}, createSlots({ _: 2 }, [_ctx.buttonsPagination ? {
-					name: "buttonsPagination",
-					fn: withCtx(() => [createVNode(ButtonsPagination, {
-						"current-pagination-number": unref(currentPaginationNumber),
-						"max-pagination-number": unref(maxPaginationNumber),
-						onUpdatePage: unref(updatePage)
-					}, null, 8, [
-						"current-pagination-number",
-						"max-pagination-number",
-						"onUpdatePage"
-					])]),
-					key: "0"
-				} : void 0]), 1032, [
-					"is-first-page",
-					"is-last-page",
-					"onClickNextPage",
-					"onClickPrevPage"
-				]))
-			])) : createCommentVNode("", true)], 2);
-		};
-	}
-}), [["__scopeId", "data-v-32683533"]]);
-if (typeof window !== "undefined" && window.Vue) window.Vue.createApp({}).component("Vue3EasyDataTable", DataTable);
 //#endregion
 //#region node_modules/@kouts/vue-modal/dist/vue-modal.es.js
 var O = (e, t) => {
@@ -89746,7 +88376,6 @@ app.use(pinia);
 app.use(src_default, toastoptions);
 app.use(plugin, defaultConfig(config));
 app.use(VueAwesomePaginatePlugin);
-app.component("EasyDataTable", DataTable);
 app.component("VueModal", N);
 var mstringstore = useMstrings();
 moodleFetch("local_gugrades_get_all_strings", {}).then((result) => {

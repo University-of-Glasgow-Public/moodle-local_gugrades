@@ -21,7 +21,7 @@ import 'daisyui/themes.css';
 import "vue-awesome-paginate/dist/style.css";
 
 // @ts-ignore
-import Vue3EasyDataTable from 'vue3-easy-data-table';
+//import Vue3EasyDataTable from 'vue3-easy-data-table';
 // @ts-ignore
 import { Modal } from '@kouts/vue-modal';
 
@@ -45,7 +45,7 @@ app.use(pinia);
 app.use(Toast, toastoptions);
 app.use(plugin, defaultConfig(customConfig));
 app.use(VueAwesomePaginate);
-app.component('EasyDataTable', Vue3EasyDataTable);
+//app.component('EasyDataTable', Vue3EasyDataTable);
 app.component('VueModal', Modal);
 
 // 3. Fetch strings and block mounting until they are loaded safely
