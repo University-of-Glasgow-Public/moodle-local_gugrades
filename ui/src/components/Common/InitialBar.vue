@@ -8,10 +8,10 @@
         <!-- ALL button -->
         <div class="flex">
             <button
-                class="px-2 btn border rounded font-mono"
+                class="px-3 py-1.5 rounded-md font-mono text-sm font-semibold border transition-colors duration-150 cursor-pointer"
                 :class="{
-                    'btn-primary': selected?.toLowerCase() === 'all',
-                    'btn-outline btn-secondary': selected?.toLowerCase() !== 'all'
+                    'bg-university-blue text-white border-university-blue hover:bg-university-blue/90': selected?.toLowerCase() === 'all',
+                    'bg-transparent text-brand-dark-purple border-brand-dark-purple hover:bg-brand-dark-purple hover:text-white': selected?.toLowerCase() !== 'all'
                 }"
                 @click="letterclicked('ALL')"
             >
@@ -24,10 +24,10 @@
             <button
                 v-for="letter in lettersFirstHalf"
                 :key="letter"
-                class="px-1 btn border rounded font-mono"
+                class="px-2 py-1.5 rounded-md font-mono text-sm font-semibold border transition-colors duration-150 cursor-pointer"
                 :class="{
-                    'btn-primary': selected?.toLowerCase() === letter.toLowerCase(),
-                    'btn-outline btn-secondary': selected?.toLowerCase() !== letter.toLowerCase()
+                    'bg-university-blue text-white border-university-blue hover:bg-university-blue/90': selected?.toLowerCase() === letter.toLowerCase(),
+                    'bg-transparent text-brand-dark-purple border-brand-dark-purple hover:bg-brand-dark-purple hover:text-white': selected?.toLowerCase() !== letter.toLowerCase()
                 }"
                 @click="letterclicked(letter)"
             >
@@ -40,10 +40,10 @@
             <button
                 v-for="letter in lettersSecondHalf"
                 :key="letter"
-                class="px-1 btn border rounded font-mono"
+                class="px-2 py-1.5 rounded-md font-mono text-sm font-semibold border transition-colors duration-150 cursor-pointer"
                 :class="{
-                    'btn-primary': selected?.toLowerCase() === letter.toLowerCase(),
-                    'btn-outline btn-secondary': selected?.toLowerCase() !== letter.toLowerCase()
+                    'bg-university-blue text-white border-university-blue hover:bg-university-blue/90': selected?.toLowerCase() === letter.toLowerCase(),
+                    'bg-transparent text-brand-dark-purple border-brand-dark-purple hover:bg-brand-dark-purple hover:text-white': selected?.toLowerCase() !== letter.toLowerCase()
                 }"
                 @click="letterclicked(letter)"
             >

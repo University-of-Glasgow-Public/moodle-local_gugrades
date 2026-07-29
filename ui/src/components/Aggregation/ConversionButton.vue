@@ -20,11 +20,30 @@
             <div v-if="!selection">
                 <Ulert v-if="nomaps && loaded" class="mb-4" variant="warning">{{ mstrings.nomaps }}</Ulert>
 
-                <EasyDataTable class="mb-2" v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true">
-                    <template #item-select="item">
-                        <input type="radio" :value="item.id" v-model="mapid"/>
-                    </template>
-                </EasyDataTable>
+                <table v-if="!nomaps && loaded" class="mb-2 w-full text-left border-collapse text-sm">
+                    <thead class="bg-university-blue text-white uppercase text-xs tracking-wider">
+                        <tr>
+                            <th v-for="header in headers" :key="header.value" class="px-4 py-2 font-semibold">
+                                {{ header.text }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-brand-light-purple/20">
+                        <tr v-for="item in maps" :key="item.id" class="hover:bg-brand-light-purple/10 transition-colors">
+                            <td v-for="header in headers" :key="header.value" class="px-4 py-2">
+                                <input 
+                                    v-if="header.value === 'select'" 
+                                    type="radio" 
+                                    :value="item.id" 
+                                    v-model="mapid"
+                                />
+                                <template v-else>
+                                    {{ (item as any)[header.value] }}
+                                </template>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <div class="flex gap-2">
                     <UButton variant="primary" @click="save_clicked" :disabled="mapid == 0">{{ mstrings.save }}</UButton>
@@ -56,7 +75,6 @@
     import UAlert from '../Common/UAlert.vue';
     import UButton from '../Common/UButton.vue';
     import MenuButton from '../Common/MenuButton.vue';
-    import type { Header } from "vue3-easy-data-table";
     import type { IMap } from '@/js/Interfaces';
 
     const maps = ref< IMap[] >([]);

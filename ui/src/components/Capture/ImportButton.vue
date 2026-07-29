@@ -18,7 +18,7 @@
             <p v-else v-html="mstrings['importdryrunzero']"></p>
             <p v-if="dryruncount > 0" class="text-[56px]/17 font-light">{{ dryruncount }}</p>
 
-            <div class="divider"></div>
+            <Divider />
 
             <div class="mt-2 pt-2">
                 <UButton v-if="dryruncount > 0" variant="primary" @click="importgrades()">{{ mstrings.yesimport }}</UButton>
@@ -29,7 +29,6 @@
         <div v-if="!loading && !showdryrun">
 
             <!-- already imported warning-->
-            <!--<div class="alert alert-soft alert-vertical sm:alert-horizontal mb-4">-->
             <UAlert variant="neutral" class="mb-4">
                 <div v-if="is_importgrades">
                     {{ mstrings.gradesimported }}
@@ -60,7 +59,7 @@
                         </FormKit>
                     </div>
 
-                    <div class="divider"></div>
+                    <Divider />
                 </div>
 
                 <!-- NS fill options -->
@@ -76,7 +75,7 @@
                 <!-- If there are existing grades then show all the options for importing extra grades -->
                 <div v-if="is_importgrades">
 
-                    <div class="divider"></div>
+                    <Divider />
 
                     <FormKit
                         type="radio"
@@ -86,7 +85,7 @@
                         v-model="importadditional"
                         >
                     </FormKit>
-                    <div class="divider"></div>
+                    <Divider />
                     <FormKit
                         type="select"
                         :label="mstrings['reasonforadditionalimport']"
@@ -107,9 +106,9 @@
                 </div>
             </FormKit>
 
-            <div v-if="recursiveavailable && (recursiveselect=='recursive') && !recursivematch" class="mt-2 alert alert-warning">
+            <UAlert v-if="recursiveavailable && (recursiveselect=='recursive') && !recursivematch" variant="warning" class="mt-2">
                 {{ mstrings['importnomatch'] }}
-            </div>
+            </UAlert>
 
             <div class="divider"></div>
 
@@ -132,6 +131,7 @@
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
+    import Divider from '../Common/Divider.vue';
     import type { IGradetype, IFormkitOption } from '@/js/Interfaces';
 
     interface IFormkitOptions {

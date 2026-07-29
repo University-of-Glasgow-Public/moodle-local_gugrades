@@ -182,8 +182,6 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
-    import TwButton from '../Tailwind/TwButton.vue';
     import UButton from '../Common/UButton.vue';
     import UAlert from '../Common/UAlert.vue';
     import type { IGradetype } from '@/js/Interfaces';

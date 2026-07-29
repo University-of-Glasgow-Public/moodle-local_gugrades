@@ -188,13 +188,10 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import type { IConversionMap } from '@/js/Interfaces';
     import type { FormKitNode } from '@formkit/core';
-    import TwButton from '../Tailwind/TwButton.vue';
     import UButton from '../Common/UButton.vue';
     import { gradecolors } from '@/js/GradeColors';
-    import { Circle } from '@lucide/vue';
     import HelpButton from '../Common/HelpButton.vue';
-import GradeColor from '../Common/GradeColor.vue';
-import ImportButton from '../Capture/ImportButton.vue';
+    import GradeColor from '../Common/GradeColor.vue';
 
     interface IBandItem {
         band: string;

@@ -6,7 +6,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <TwAlert v-if="notsetup">{{ mstrings.notoplevel }}</TwAlert>
+        <UAlert v-if="notsetup">{{ mstrings.notoplevel }}</UAlert>
         <div>
             <div class="text-sm font-bold mb-1 opacity-70">CATEGORY</div>
             <select
@@ -32,7 +32,7 @@
     import { useLeve1Store } from '@/stores/level1';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import UAlert from './UAlert.vue';
 
     const level1categories = ref< ICategories[] >([]);
     const categoryid = ref(0);

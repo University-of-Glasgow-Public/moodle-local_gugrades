@@ -1,14 +1,14 @@
 <template>
-    <TwAlert color="error" class="mt-1">
+    <UAlert variant="error" class="mt-1">
         <p><b><span v-html="mstrings.configerror"></span>:</b></p>
         <p v-html="errormessage"></p>
-    </TwAlert>
+    </UAlert>
 </template>
 
 <script setup lang="ts">
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import UAlert from './Common/UAlert.vue';
 
     const props = defineProps({
         errormessage: String,

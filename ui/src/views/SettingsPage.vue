@@ -4,9 +4,9 @@
     <div>
         <FormKit type="form" @submit="submit_form" class="mt-8">
 
-            <div v-if="!gradesreleased" class="alert alert-warning">
+            <UAlert v-if="!gradesreleased" variant="warning" class="my-2">
                 {{ mstrings.gradesnotreleased }}
-            </div>
+            </UAlert>
 
             <FormKit
                 type="checkbox"
@@ -33,6 +33,7 @@
     import ResetButton from '@/components/Settings/ResetButton.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo';
+    import UAlert from '@/components/Common/UAlert.vue';
     import type { ISetting } from '@/js/Interfaces';
 
     const disabledashboard = ref(false);

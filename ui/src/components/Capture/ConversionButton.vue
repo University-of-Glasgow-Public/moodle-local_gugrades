@@ -10,9 +10,11 @@
         <PleaseWait v-if="waiting"></PleaseWait>
 
         <div v-if="showmismatch">
-            <TwAlert class="mb-3">{{ mstrings['conversionmismatch'] }}</TwAlert>
-            <TwButton color="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['yes'] }}</TwButton>
-            <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
+            <UAlert class="mb-3">{{ mstrings['conversionmismatch'] }}</UAlert>
+            <div class="inline-flex gap-2 mt-2">
+                <UButton variant="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['yes'] }}</UButton>
+                <UButton variant="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
+            </div>
         </div>
 
 
@@ -27,33 +29,53 @@
             <div v-if="!selection">
 
                 <!-- if there are no grades then don't try to convert -->
-                <TwAlert v-if="!anygrades">
+                <UAlert v-if="!anygrades">
                     {{ mstrings['nogradestoconvert'] }}
-                    <TwButton @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
-                </TwAlert>
+                    <UButton @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
+                </UAlert>
 
                 <div v-if="anygrades">
-                    <TwAlert v-if="nomaps && loaded">{{ mstrings['nomaps'] }}</TwAlert>
-                    <TwAlert v-else>{{ mstrings['noimportafterconversion'] }}</TwAlert>
+                    <UAlert v-if="nomaps && loaded">{{ mstrings['nomaps'] }}</UAlert>
+                    <UAlert v-else>{{ mstrings['noimportafterconversion'] }}</UAlert>
 
-                    <EasyDataTable v-if="!nomaps && loaded" :items="maps" :headers="headers" :hide-footer="true" class="my-4">
-                        <template #item-select="item">
-                            <input type="radio" :value="item.id" v-model="mapid"/>
-                        </template>
-                    </EasyDataTable>
+                    <table v-if="!nomaps && loaded" class="my-4 w-full text-left border-collapse text-sm">
+                        <thead class="bg-university-blue text-white uppercase text-xs tracking-wider">
+                            <tr>
+                                <th v-for="header in headers" :key="header.value" class="px-4 py-2 font-semibold">
+                                    {{ header.text }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-brand-light-purple/20">
+                            <tr v-for="item in maps" :key="item.id" class="hover:bg-brand-light-purple/10 transition-colors">
+                                <td v-for="header in headers" :key="header.value" class="px-4 py-2">
+                                    <input v-if="header.value === 'select'" 
+                                        type="radio" 
+                                        :value="item.id" 
+                                        v-model="mapid"
+                                    />
+                                    <template v-else>
+                                        {{ (item as any)[header.value] }}
+                                    </template>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                    <div>
-                        <TwButton color="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['save'] }}</TwButton>
-                        <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
+                    <div class="inline-flex gap-2 mt-2">
+                        <UButton variant="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['save'] }}</UButton>
+                        <UButton variant="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
                     </div>
                 </div>
             </div>
 
             <!-- if a map is selected then show warning message and option to remove -->
             <div v-if="selection">
-                <TwAlert class="mb-3">{{ mstrings['conversionremovewarning'] }}</TwAlert>
-                <TwButton color="danger" @click="remove_clicked">{{ mstrings['remove'] }}</TwButton>
-                <TwButton color="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</TwButton>
+                <UAlert class="mb-3">{{ mstrings['conversionremovewarning'] }}</UAlert>
+                <div class="inline-flex gap-2 mt-2">
+                    <UButton variant="error" @click="remove_clicked">{{ mstrings['remove'] }}</UButton>
+                    <UButton variant="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
+                </div>
             </div>
         </div>
     </VueModal>
@@ -66,8 +88,8 @@
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useMstrings } from '@/stores/mstrings.js';
-    import TwButton from '../Tailwind/TwButton.vue';
-    import TwAlert from '../Tailwind/TwAlert.vue';
+    import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
     import MenuButton from '../Common/MenuButton.vue';
     import { moodleFetch } from '@/js/moodlefetch';
     import type { IMap, IGradeitem } from '@/js/Interfaces';

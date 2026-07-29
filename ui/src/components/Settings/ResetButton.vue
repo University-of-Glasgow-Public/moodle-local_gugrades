@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <TwButton v-if="hascapability" color="error" class="mr-1" @click="showconfirm = true">{{ mstrings.resetcourse }}</TwButton>
+    <UButton v-if="hascapability" variant="error" class="mr-1" @click="showconfirm = true">{{ mstrings.resetcourse }}</UButton>
 
     <ConfirmModal :show="showconfirm" :message="mstrings.resetcourseconfirm" @confirm="confirmdelete"></ConfirmModal>
 </template>
@@ -14,7 +14,7 @@
     import ConfirmModal from '@/components/Common/ConfirmModal.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useToast } from "vue-toastification";
-    import TwButton from '../Tailwind/TwButton.vue';
+    import UButton from '../Common/UButton.vue';
 
     const hascapability = ref(false);
     const showconfirm = ref(false);

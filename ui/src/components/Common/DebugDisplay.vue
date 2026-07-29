@@ -1,6 +1,6 @@
 <template>
     <VueModal v-model="showdebugmodal" :enableClose="false" modalClass="rounded max-w-3xl" title="A serious error has occurred">
-        <TwAlert class="my-4" color="error">A serious error has occurred and MyGrades cannot continue.</TwAlert>
+        <UAlert class="my-4" variant="error">A serious error has occurred and MyGrades cannot continue.</UAlert>
         <ul>
             <li>
                 CourseID: <pre>{{ moodlecourseid }}</pre>
@@ -9,19 +9,20 @@
                 {{ index }}: <pre>{{ item }}</pre>
             </li>
         </ul>
-        <TwAlert class="my-4">
+        <UAlert class="my-4">
             <b>Please copy all of this data and send to IT Services / Help Desk for attention</b><br />
             You can then continue.
-        </TwAlert>
+        </UAlert>
         <div class="mt-2 text-center">
-            <a class="btn btn-primary" href="javascript:window.location.reload(true)">Close and continue</a>
+            <UButton variant="primary" @click="reload_clicked">Close and continue</UButton>
         </div>
     </VueModal>
 </template>
 
 <script setup lang="ts">
     import {computed} from 'vue';
-    import TwAlert from '@/components/Tailwind/TwAlert.vue';
+    import UAlert from './UAlert.vue';
+    import UButton from './UButton.vue';
 
     const props = defineProps({
         debug: {
@@ -53,6 +54,10 @@
     const showdebugmodal = computed(() => {
         return Object.keys(props.debug).length !== 0
     });
+
+    function reload_clicked() {
+        window.location.reload()
+    }
 </script>
 
 <style>

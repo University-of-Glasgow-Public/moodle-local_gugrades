@@ -27,16 +27,6 @@
 </template>
 
 <script setup lang="ts">
-/**
- * UAlert — drop-in replacement for DaisyUI's `alert` usage pattern,
- * built on the same brand-derived tints/accents as UButton and the
- * EasyDataTable theme.
- *
- * <UAlert variant="success">Grades published.</UAlert>
- * <UAlert variant="error" title="Save failed" dismissible>
- *   Check the ID number format and try again.
- * </UAlert>
- */
 import { ref, computed } from 'vue'
 
 type AlertVariant = 'neutral' | 'info' | 'success' | 'warning' | 'error'

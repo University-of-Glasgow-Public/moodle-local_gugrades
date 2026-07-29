@@ -35,17 +35,36 @@
             <!-- Test-run / confirm page -->
             <div v-if="pagestate == 'showtestrun'">
                 <p><b>{{ mstrings['csvtestrun'] }}</b></p>
-                <EasyDataTable :headers="headers" :items="lines10">
-                    <template #item-gradevalue="item">
-                        <span v-if="item.grade">{{ item.gradevalue }}</span>
-                    </template>
-                    <template #item-error="item">
-                        <i v-if="item.state < 0" class="text-red-500 fa fa-times" aria-hidden="true"></i>
-                        <i v-if="item.state > 0" class="text-green-500 fa fa-check" aria-hidden="true"></i>
-                        <i v-if="item.state == 0" class="text-yellow-500 fa fa-info" aria-hidden="true"></i>
-                        {{ item.error }}
-                    </template>
-                </EasyDataTable>
+
+                <table class="my-4 w-full text-left border-collapse text-sm">
+                    <thead class="bg-university-blue text-white uppercase text-xs tracking-wider">
+                        <tr>
+                            <th v-for="header in headers" :key="header.value" class="px-4 py-2 font-semibold">
+                                {{ header.text }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-brand-light-purple/20">
+                        <tr v-for="item in lines10" :key="(item as any).id" class="hover:bg-brand-light-purple/10 transition-colors">
+                            <td v-for="header in headers" :key="header.value" class="px-4 py-2">
+                                <template v-if="header.value === 'gradevalue'">
+                                    <span v-if="(item as any).grade">{{ (item as any).gradevalue }}</span>
+                                </template>
+                                <template v-else-if="header.value === 'error'">
+                                    <i v-if="(item as any).state < 0" class="text-red-500 fa fa-times" aria-hidden="true"></i>
+                                    <i v-if="(item as any).state > 0" class="text-green-500 fa fa-check" aria-hidden="true"></i>
+                                    <i v-if="(item as any).state == 0" class="text-yellow-500 fa fa-info" aria-hidden="true"></i>
+                                    {{ (item as any).error }}
+                                </template>
+                                <template v-else>
+                                    {{ (item as any)[header.value] }}
+                                </template>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
                 <p v-if="errorcount" class="text-red-500 mt-1">{{ mstrings['lineswitherrors'] }}: {{ errorcount }}:</p>
                 <ul class="text-red-500">
                     <li v-for="error in errorlist" v-key="error.error">
@@ -100,7 +119,6 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import MenuButton from '../Common/MenuButton.vue';
     import type { IErrorList, IGradetype } from '@/js/Interfaces';
-    import { FileUp } from '@lucide/vue';
 
     interface IHeader {
         text: string;
