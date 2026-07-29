@@ -3,6 +3,7 @@
     ref="tourManager"
     :steps="toursteps"
     :auto-start="false" 
+    :allow-skip="true"
     @complete="onTourComplete"
     @skip="onTourComplete"
   />
@@ -23,9 +24,12 @@
         textColor: 'var(--color-brand-dark-purple)',
         buttonBackgroundColor: 'var(--color-university-blue)',
         buttonTextColor: '#ffffff',
-        borderRadius: '0.75rem', // Match rounded-xl
-        padding: '1.25rem',      // Match p-5
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' // Match shadow-2xl
+        skipBackgroundColor: 'transparent',           // likely name — verify against actual typing
+        skipButtonColor: 'var(--color-brand-dark-purple)', // dark text so it's visible against your white tooltip background
+        skipButtonHoverColor: 'var(--color-brand-dark-blue)',
+        borderRadius: '0.75rem',
+        padding: '1.25rem',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
     };
 
     onMounted(() => {

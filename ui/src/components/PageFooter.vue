@@ -10,7 +10,7 @@
         <div aria-hidden="true">•</div>
         <div><a href="#" @click.prevent="reset_tour">Reset user tour on this page</a></div>
         <div aria-hidden="true">•</div>
-        <div><a :href="mstrings.lisuurl">Help with this page</a></div>
+        <div id="helpwithpage"><a :href="mstrings.lisuurl">Help with this page</a></div>
     </div>
     <div class="mt-4 px-10 flex justify-center-safe gap-8 text-sm text-brand-light-purple">
         The University of Glasgow is a registered Scottish charity: Registration Number SC004401

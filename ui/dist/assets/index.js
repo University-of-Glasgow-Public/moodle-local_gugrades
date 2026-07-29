@@ -59342,7 +59342,7 @@ var _hoisted_1$69 = { class: "w-full mt-4 grid grid-cols-3 items-center justify-
 var _hoisted_2$51 = { class: "flex items-start gap-3 max-w-xs md:max-w-sm" };
 var _hoisted_3$40 = ["href"];
 var _hoisted_4$34 = { class: "flex flex-col min-w-0 space-y-1" };
-var _hoisted_5$30 = ["href", "title"];
+var _hoisted_5$31 = ["href", "title"];
 var _hoisted_6$25 = { class: "text-xs text-brand-dark-purple/60 font-medium" };
 var _hoisted_7$19 = { class: "font-mono text-brand-dark-purple/80" };
 var _hoisted_8$18 = { class: "pt-0.5" };
@@ -59378,7 +59378,7 @@ var PageHeader_default = /* @__PURE__ */ defineComponent({
 						href: url.value,
 						class: "text-sm font-semibold text-university-blue hover:underline truncate block",
 						title: fullname.value
-					}, " Back to " + toDisplayString(fullname.value), 9, _hoisted_5$30),
+					}, " Back to " + toDisplayString(fullname.value), 9, _hoisted_5$31),
 					createBaseVNode("p", _hoisted_6$25, [_cache[0] || (_cache[0] = createTextVNode(" Start date: ", -1)), createBaseVNode("span", _hoisted_7$19, toDisplayString(startdate.value), 1)]),
 					createBaseVNode("div", _hoisted_8$18, [createBaseVNode("span", _hoisted_9$14, toDisplayString(specialcategory.value), 1)])
 				])]),
@@ -59873,7 +59873,8 @@ var useMstrings = defineStore("mstringstore", () => {
 var _hoisted_1$68 = { class: "mt-8 px-10 flex justify-center-safe gap-4 text-sm text-brand-light-purple" };
 var _hoisted_2$50 = ["href"];
 var _hoisted_3$39 = ["href"];
-var _hoisted_4$33 = ["href"];
+var _hoisted_4$33 = { id: "helpwithpage" };
+var _hoisted_5$30 = ["href"];
 //#endregion
 //#region src/components/PageFooter.vue
 var PageFooter_default = /* @__PURE__ */ defineComponent({
@@ -59906,7 +59907,7 @@ var PageFooter_default = /* @__PURE__ */ defineComponent({
 					onClick: withModifiers(reset_tour, ["prevent"])
 				}, "Reset user tour on this page")]),
 				_cache[6] || (_cache[6] = createBaseVNode("div", { "aria-hidden": "true" }, "•", -1)),
-				createBaseVNode("div", null, [createBaseVNode("a", { href: unref(mstrings).lisuurl }, "Help with this page", 8, _hoisted_4$33)])
+				createBaseVNode("div", _hoisted_4$33, [createBaseVNode("a", { href: unref(mstrings).lisuurl }, "Help with this page", 8, _hoisted_5$30)])
 			]), _cache[7] || (_cache[7] = createBaseVNode("div", { class: "mt-4 px-10 flex justify-center-safe gap-8 text-sm text-brand-light-purple" }, " The University of Glasgow is a registered Scottish charity: Registration Number SC004401 ", -1))], 64);
 		};
 	}
@@ -83213,6 +83214,9 @@ var UserTour_default = /* @__PURE__ */ defineComponent({
 			textColor: "var(--color-brand-dark-purple)",
 			buttonBackgroundColor: "var(--color-university-blue)",
 			buttonTextColor: "#ffffff",
+			skipBackgroundColor: "transparent",
+			skipButtonColor: "var(--color-brand-dark-purple)",
+			skipButtonHoverColor: "var(--color-brand-dark-blue)",
 			borderRadius: "0.75rem",
 			padding: "1.25rem",
 			boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
@@ -83246,6 +83250,7 @@ var UserTour_default = /* @__PURE__ */ defineComponent({
 				ref: tourManager,
 				steps: toursteps.value,
 				"auto-start": false,
+				"allow-skip": true,
 				onComplete: onTourComplete,
 				onSkip: onTourComplete
 			}, null, 8, ["steps"]);

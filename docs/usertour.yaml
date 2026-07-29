@@ -57,8 +57,8 @@
   content: This is where you will find audit logs. You can download the logs as a CSV.
   direction: bottom
 -
-  id: settingspage
-  target: "#settingspage"
-  title: Settings
+  id: helppage
+  target: "#helpwithpage"
+  title: Additional help
   content: Learning Innovation Support Unit (LISU) visual guides, short videos, step-by-step guides, and MyGrades Checklists. Find answers to often asked questions and much more.
   direction: bottom
