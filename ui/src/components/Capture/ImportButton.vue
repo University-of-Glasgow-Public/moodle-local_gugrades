@@ -193,14 +193,6 @@
     ];
 
     /**
-     * What kind of alert do you get?
-     */
-    const importclass = computed(() => ({
-        'alert-error' : is_importgrades.value,
-        'alert-info' : !is_importgrades.value,
-    }));
-
-    /**
      * Options for NS/NS0 dropdown
      */
     const nsoptions = computed(() => {

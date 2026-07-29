@@ -8,7 +8,7 @@
             {{ item.itemname }}
         </td>
         <td class="resit_select px-2" >
-            <span v-if="item.id == resititemid" class="badge badge-pill badge-success">{{ mstrings['resitselected'] }}</span>
+            <UBadge v-if="item.id == resititemid" variant="success">{{ mstrings['resitselected'] }}</UBadge>
         </td>
         <td>&nbsp;</td> <!-- holder for strategy -->
         <td>
@@ -34,7 +34,7 @@
                 </b>
             </td>
             <td class="resit_select px-2" >
-                <span v-if="category.category.itemid == resititemid" class="badge badge-pill badge-success">{{ mstrings['resitselected'] }}</span>
+                <UBadge v-if="category.category.itemid == resititemid" variant="success">{{ mstrings['resitselected'] }}</UBadge>
             </td>
             <td>
                 {{ category.category.strategy }}
@@ -55,6 +55,7 @@
     import ResitCheckbox from '@/components/Configure/ResitCheckbox.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
+    import UBadge from '../Common/UBadge.vue';
 
     /**
      * resitconfig = enable display of resit radio boxes etc.

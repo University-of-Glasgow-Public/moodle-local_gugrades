@@ -25,7 +25,7 @@
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-light-yellow text-university-blue">
                 ALTERED
             </span>
-            <span class="badge badge-warning mt-1">ALTERED</span>
+            <UBadge variant="warning" class="mt-1">ALTERED</UBadge>
         </span>
     </div>
 </template>
@@ -33,6 +33,7 @@
 <script setup lang="ts">
     import GradeColor from '../Common/GradeColor.vue';
     import OverrideGrade from './OverrideGrade.vue';
+    import UBadge from '../Common/UBadge.vue';
 
     interface IProps {
         user: Record<string, any>;

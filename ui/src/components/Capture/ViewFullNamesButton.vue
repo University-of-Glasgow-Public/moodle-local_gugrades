@@ -1,11 +1,11 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <button @click="toggle_view" class="btn btn-outline btn-secondary mr-2 btn-sm">
+    <UButton @click="toggle_view" variant="secondary" appearance="outline" size="sm" class="mr-2">
         <Binoculars :size="18" />
         <span v-if="!togglereveal">{{ mstrings.viewfullnames }}</span>
         <span v-if="togglereveal">{{ mstrings.hidefullnames }}</span>
-    </button>
+    </UButton>
 </template>
 
 <script setup lang="ts">
@@ -15,6 +15,7 @@
     import { useMstrings } from '@/stores/mstrings.js';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { Binoculars } from '@lucide/vue';
+    import UButton from '../Common/UButton.vue';
 
     const hascapability = ref(false);
     const togglereveal = ref(false);

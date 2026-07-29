@@ -43,6 +43,32 @@
   */
   --color-brand-table-stripe: color-mix(in srgb, var(--color-brand-light-purple) 5%, transparent);
   --color-brand-table-hover: color-mix(in srgb, var(--color-brand-light-purple) 15%, transparent);
+
+  --color-primary: var(--color-university-blue);
+  --color-primary-content: white;
+
+  --color-secondary: var(--color-brand-dark-purple);
+  --color-secondary-content: white;
+
+  --color-success: var(--color-brand-light-green);
+  --color-success-content: var(--color-university-blue);
+
+  --color-warning: var(--color-brand-light-yellow);
+  --color-warning-content: var(--color-university-blue);
+
+  --color-error: var(--color-brand-dark-red);
+  --color-error-content: white;
+
+  --color-info: var(--color-brand-dark-blue);
+  --color-info-content: white;
+
+  --color-neutral: #6b7280; /* or a brand-appropriate gray if you have one */
+  --color-neutral-content: white;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #f3f4f6;
+  --color-base-300: #e5e7eb;
+  --color-base-content: var(--color-university-blue);
 }
 
 /* 

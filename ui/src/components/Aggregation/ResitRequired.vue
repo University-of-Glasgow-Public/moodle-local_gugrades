@@ -1,11 +1,11 @@
 <template>
     <a v-if="caneditgrades" class="cursor-pointer" @click.prevent="resit_clicked(user.id, !user.resitrequired)">
-        <span v-if="user.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
-        <span v-else class="badge badge-secondary badge-soft">{{ mstrings.no }}</span>
+        <UBadge v-if="user.resitrequired" variant="success">{{ mstrings.yes }}</UBadge>
+        <UBadge v-else variant="secondary">{{ mstrings.no }}</UBadge>
     </a>
     <span v-if="!caneditgrades">
-        <span v-if="user.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
-        <span v-else class="badge badge-secondary badge-soft">{{ mstrings.no }}</span>
+        <UBadge v-if="user.resitrequired" variant="success">{{ mstrings.yes }}</UBadge>
+        <UBadge v-else variant="secondary">{{ mstrings.no }}</UBadge>
     </span>
 </template>
 
@@ -13,6 +13,7 @@
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
+    import UBadge from '../Common/UBadge.vue';
 
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );

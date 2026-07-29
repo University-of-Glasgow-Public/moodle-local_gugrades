@@ -77,6 +77,11 @@
     import MenuButton from '../Common/MenuButton.vue';
     import type { IMap } from '@/js/Interfaces';
 
+    interface IHeader {
+        text: string;
+        value: string;
+    }
+
     const maps = ref< IMap[] >([]);
     const nomaps = ref(true);
     const loaded = ref(false);
@@ -91,7 +96,7 @@
 
     const toast = useToast();
 
-    const headers = ref< Header[] >([
+    const headers = ref< IHeader[] >([
         {text: mstringstore.getMstring('select'), value: 'select'},
         {text: mstringstore.getMstring('name'), value: 'name'},
         {text: mstringstore.getMstring('scale'), value: 'scale'},

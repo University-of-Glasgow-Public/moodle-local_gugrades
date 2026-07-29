@@ -64,12 +64,12 @@
 
               <!-- Footer -->
               <div class="px-5 py-3 border-t border-base-200 flex justify-end">
-                <button
+                <UButton
                   @click="emits('closed')"
-                  class="btn btn-primary btn-sm"
+                  variant="primary" size="sm"
                 >
                   Close
-                </button>
+                </UButton>
               </div>
 
             </DialogPanel>
@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
     import { ref } from 'vue';
+    import UButton from '../Common/UButton.vue';
     import {
       Dialog,
       DialogPanel,

@@ -49,13 +49,17 @@
     import { useFileDialog } from '@vueuse/core';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import TwDropzone from '../Tailwind/TwDropzone.vue';
-    import type { Header } from "vue3-easy-data-table";
     import UTable from '../Common/UTable.vue';
     import UButton from '../Common/UButton.vue';
     import UAlert from '../Common/UAlert.vue';
     import ConversionActionButtons from './ConversionActionButtons.vue';
     import { createColumnHelper } from '@tanstack/vue-table';
     import type { IMap } from '@/js/Interfaces.ts';
+
+    interface IHeader {
+        text: string;
+        value: string;
+    }
 
     const maps = ref([]);
     const editmap = ref(false);
@@ -68,7 +72,7 @@
     const { mstrings } = storeToRefs( mstringstore );
     const debug = ref({});
     const toast = useToast();
-    const headers = ref< Header[] >([]);
+    const headers = ref< IHeader[] >([]);
     const caneditgrades = ref(false);
     const file = ref<File | null>(null);
 

@@ -14,7 +14,7 @@
                     <span>Grade aggregation explanation</span>
                 </div>
                 <div>
-                    <button class="btn btn-outline btn-sm" @click="closemodal"><X :size="18"/></button>
+                    <UButton appearance="outline" size="sm" @click="closemodal"><X :size="18"/></UButton>
                 </div>
             </div>
         </template>
@@ -105,7 +105,6 @@
                             <div class="font-bold"><GradeColor :grade="field.display" size="text-lg"/></div>
                         </div>
                         
-                        <!-- Replaced badge-error with your brand red colors -->
                         <div class="flex flex-wrap gap-1.5 pt-0.5">
                             <div v-if="!field.available" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.notavailable }}</div>
                             <div v-if="field.dropped" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.dropped }}</div>

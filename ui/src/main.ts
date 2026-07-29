@@ -13,11 +13,9 @@ import '../src/assets/MyGrades.css';
 import '../src/assets/accessibility.css';
 import { bootstrapAccessibility } from './stores/accessibility';
 import type { IMoodleString } from './js/Interfaces';
-import VueAwesomePaginate from 'vue-awesome-paginate';
+//import VueAwesomePaginate from 'vue-awesome-paginate';
 
-import 'daisyui/daisyui.css';
-import 'daisyui/themes.css';
-import "vue-awesome-paginate/dist/style.css";
+//import "vue-awesome-paginate/dist/style.css";
 
 // @ts-ignore
 import { Modal } from '@kouts/vue-modal';
@@ -41,7 +39,7 @@ const app = createApp(App);
 app.use(pinia);
 app.use(Toast, toastoptions);
 app.use(plugin, defaultConfig(customConfig));
-app.use(VueAwesomePaginate);
+//app.use(VueAwesomePaginate);
 app.component('VueModal', Modal);
 
 // 3. Fetch strings and block mounting until they are loaded safely

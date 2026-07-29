@@ -17,10 +17,10 @@
             <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
 
             <div v-if="(showresitoption || engineering) && caneditgrades &&!newregs" class="my-2">
-                <button v-if="!configuringresits" type="button" class="btn btn-accent btn-outline" @click="click_configure">{{ mstrings['configurereassessments'] }}</button>
+                <UButton v-if="!configuringresits" variant="accent" @click="click_configure">{{ mstrings['configurereassessments'] }}</UButton>
                 <div v-else>
-                    <div class="alert alert-primary mb-2" v-html="mstrings['resit_help']"></div>
-                    <button type="button" class="btn btn-success btn-outline" @click="click_finish">{{ mstrings['finish'] }}</button>
+                    <UAlert v-html="mstrings['resit_help']"></UAlert>
+                    <UButton variant="success" @click="click_finish">{{ mstrings['finish'] }}</UButton>
                 </div>
             </div>
         </div>
@@ -63,6 +63,7 @@
     import CategoryConfig from '@/components/Configure/CategoryConfig.vue';
     import type { ICategoryCategory } from '@/js/Interfaces.js';
     import UAlert from '@/components/Common/UAlert.vue';
+    import UButton from '@/components/Common/UButton.vue';
 
     const categoryid = ref(0);
     const activitytree = ref<ICategoryCategory>();
