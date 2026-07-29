@@ -1,6 +1,6 @@
 <template>
     <!-- keep all this info together and vertically aligned -->
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col">
         <UTooltip :text="column.fullname" position="below" class="block">
             <div>
                 <span @click="toggleSorting" class="cursor-pointer">{{ column.shortname ?? '' }}</span>

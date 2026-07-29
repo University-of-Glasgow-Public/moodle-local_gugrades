@@ -73663,7 +73663,7 @@ var AggregationButtons_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/AggregationTableHeader.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$19 = { class: "flex flex-col gap-2" };
+var _hoisted_1$19 = { class: "flex flex-col" };
 var _hoisted_2$13 = { class: "inline-flex gap-2" };
 var _hoisted_3$10 = { key: 0 };
 var _hoisted_4$9 = { key: 1 };
