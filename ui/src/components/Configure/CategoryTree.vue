@@ -8,14 +8,14 @@
             <div class="flex items-center py-2 border-b border-brand-light-purple/10 text-sm text-slate-700">
                 
                 <!-- COLUMN 1: Tree Spacing Indents & Category Name -->
-                <div class="flex-1 flex items-center min-w-0 pr-4">
+                <div class="flex-1 flex items-center pr-4">
                     <div 
                         v-for="i in props.depth - 1" 
                         :key="i" 
                         class="w-6 shrink-0 h-5 border-l-2 border-brand-light-purple/80"
                     ></div>
                     
-                    <span class="truncate font-medium text-slate-800">
+                    <span class="font-medium text-slate-800">
                         {{ category.category.fullname }}
                     </span>
                 </div>

@@ -1,7 +1,7 @@
 <template>
     <div class="bg-slate-100 border border-slate-300 rounded-md mt-4 p-6">
         <UAlert variant="info" class="mb-5">{{ mstrings.changessaved }}</UAlert>
-        <div class="max-w-2xl">
+        <div class="w-fit min-w-[28rem]">
             <div class="flex items-center text-xs font-bold uppercase tracking-wider text-brand-dark-purple/70 pb-3 border-b border-brand-light-purple/20">
                 <!-- COLUMN 1 HEADER: Matches row w-6/12 or w-9/12 boundaries -->
                 <div class="flex-1 pr-4">
