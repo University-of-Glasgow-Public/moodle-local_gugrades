@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a  @click.prefent="add_grade()">
+    <a  @click.prefent="add_grade()" class="cursor-pointer">
         {{ buttontitle }}
     </a>
 

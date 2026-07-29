@@ -67760,7 +67760,10 @@ var HistoryButton_default = /* @__PURE__ */ defineComponent({
 			const _component_VueModal = resolveComponent("VueModal");
 			return openBlock(), createElementBlock(Fragment, null, [
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
-				createBaseVNode("a", { onClick: _cache[0] || (_cache[0] = withModifiers(($event) => read_history(), ["prevent"])) }, toDisplayString(unref(mstrings).history), 1),
+				createBaseVNode("a", {
+					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => read_history(), ["prevent"])),
+					class: "cursor-pointer"
+				}, toDisplayString(unref(mstrings).history), 1),
 				createVNode(_component_VueModal, {
 					modelValue: showhistorymodal.value,
 					"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => showhistorymodal.value = $event),
@@ -67829,7 +67832,10 @@ var ImportUserGradeButton_default = /* @__PURE__ */ defineComponent({
 			if (props.close) props.close();
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("a", { onClick: _cache[0] || (_cache[0] = withModifiers(($event) => import_grade(), ["prevent"])) }, toDisplayString(unref(mstrings).importusergrade), 1)], 64);
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("a", {
+				onClick: _cache[0] || (_cache[0] = withModifiers(($event) => import_grade(), ["prevent"])),
+				class: "cursor-pointer"
+			}, toDisplayString(unref(mstrings).importusergrade), 1)], 64);
 		};
 	}
 });
@@ -68060,7 +68066,10 @@ var AddGradeButton_default = /* @__PURE__ */ defineComponent({
 			const _component_VueModal = resolveComponent("VueModal");
 			return openBlock(), createElementBlock(Fragment, null, [
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
-				createBaseVNode("a", { onClick: _cache[0] || (_cache[0] = ($event) => add_grade()) }, toDisplayString(buttontitle.value), 1),
+				createBaseVNode("a", {
+					onClick: _cache[0] || (_cache[0] = ($event) => add_grade()),
+					class: "cursor-pointer"
+				}, toDisplayString(buttontitle.value), 1),
 				createVNode(_component_VueModal, {
 					modelValue: showaddgrademodal.value,
 					"onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => showaddgrademodal.value = $event),
@@ -68295,7 +68304,7 @@ var HideShowButton_default = /* @__PURE__ */ defineComponent({
 //#endregion
 //#region src/components/Capture/CaptureMenu.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$51 = {
-	class: "menu dropdown-content bg-slate-100 text-university-blue rounded-box z-999 w-52 p-2 shadow-sm",
+	class: "bg-slate-100 text-university-blue rounded-lg z-999 w-52 p-2 shadow-sm flex flex-col gap-0.5",
 	tabindex: "-1"
 };
 var _hoisted_2$36 = { key: 0 };

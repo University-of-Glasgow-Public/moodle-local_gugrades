@@ -1,6 +1,6 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
-    <a @click.prevent="read_history()">{{ mstrings.history }}</a>
+    <a @click.prevent="read_history()" class="cursor-pointer">{{ mstrings.history }}</a>
 
     <VueModal v-model="showhistorymodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.gradehistory">
         <div>
