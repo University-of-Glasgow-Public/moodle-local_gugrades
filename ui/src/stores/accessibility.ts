@@ -48,19 +48,15 @@ const defaults: IA11ySettings = {
 };
 
 /**
- * daisyui data-theme to apply for each accessibility profile. The rest of the
- * visual treatment is handled by CSS classes in accessibility.css.
+ * Optional data-theme hint kept for any leftover semantic colour utilities
+ * (base-100, primary, etc.) defined in MyGrades.css. DaisyUI itself has been
+ * removed; these values are harmless no-ops for components that don't read them.
  */
-const daisyThemeFor: Record<A11yTheme, string> = {
-    default: 'corporate',
+const dataThemeFor: Record<A11yTheme, string> = {
+    default: 'light',
     contrast: 'light',
-    // The dark profile darkens everything via an invert() filter (see
-    // accessibility.css), so it deliberately keeps a LIGHT daisyui base.
-    // Using the real 'dark' daisyui theme here would double up: token based
-    // colours (e.g. dialog heading text) would be lightened by the theme and
-    // then re-darkened by the filter, ending up dark-on-dark and unreadable.
-    dark: 'corporate',
-    reading: 'corporate',
+    dark: 'light',
+    reading: 'light',
 };
 
 function clampScale(value: number): number {
@@ -145,8 +141,9 @@ export function mapHillheadToSettings(
 export function applySettings(settings: IA11ySettings): void {
     const root = document.documentElement;
 
-    // daisyui theme (affects components using daisyui semantic colours).
-    root.setAttribute('data-theme', daisyThemeFor[settings.theme] ?? 'corporate');
+    // Keep a light semantic base so the invert-based dark profile darkens
+    // everything uniformly (see accessibility.css).
+    root.setAttribute('data-theme', dataThemeFor[settings.theme] ?? 'light');
 
     // Accessibility profile / toggles as classes.
     root.classList.remove(

@@ -5,25 +5,24 @@
    accessibility Pinia store (see stores/accessibility.ts). They are
    intentionally implemented with container level filters and root font
    scaling so they transform the WHOLE app reliably, even for components
-   that use hardcoded brand/slate colours rather than daisyui tokens.
+   that use hardcoded brand/slate colours.
 
-   IMPORTANT: modal dialogs (add grade, history, etc.) are rendered with
-   @kouts/vue-modal, which teleports its markup to <body> (outside
-   #mygrades_container). Every rule below therefore also targets the
-   modal wrapper (.vm-wrapper) so the chosen theme applies to dialogs too.
+   IMPORTANT: several overlays teleport to <body> (outside
+   #mygrades_container):
+     - @kouts/vue-modal  → .vm-wrapper
+     - HeadlessUI Dialog → [role="dialog"] (Help, HeadlessModal, etc.)
+   Every theme rule therefore also targets those wrappers. The
+   accessibility panel itself (.a11y-panel) is deliberately excluded so
+   it stays readable in every theme.
    ============================================================ */
 
-/* Root variable set by the store; kept here as a sane fallback. */
+/* Shared selectors for surfaces that should receive the theme filter. */
 :root {
     --a11y-font-scale: 1;
 }
 
 /* ------------------------------------------------------------
    Accessibility "themes" (visual profiles).
-   The app content lives inside #mygrades_container, and modals are
-   teleported to body inside .vm-wrapper, so we filter those wrappers
-   rather than the whole document (keeps the floating accessibility
-   button/panel itself readable).
    ------------------------------------------------------------ */
 
 /* High contrast: boost contrast and saturation, force strong text. */
@@ -33,28 +32,23 @@ html.a11y-theme-contrast .vm-wrapper {
 }
 
 html.a11y-theme-contrast #mygrades_container a,
-html.a11y-theme-contrast .vm-wrapper a {
+html.a11y-theme-contrast .vm-wrapper a,
+html.a11y-theme-contrast [role="dialog"]:not(.a11y-panel) a {
     text-decoration: underline;
 }
 
-/* The page background (and default text colour) is applied by daisyui to
-   <html> itself, which sits OUTSIDE #mygrades_container and so is never
-   touched by the invert filter below. Because the dark profile keeps a light
-   daisyui base (so the filter can darken the app uniformly), we must darken
-   this page chrome explicitly here, otherwise the area around the app and any
-   gaps between sections stay light. */
+/* Page chrome sits OUTSIDE the inverted containers, so darken it
+   explicitly. Without this the gaps around the app stay light. */
 html.a11y-theme-dark {
     --root-bg: #14171c;
     background-color: #14171c !important;
     color-scheme: dark;
 }
 
-/* Dark: a robust dark mode via inversion that works regardless of a
-   component's own colours. Images/logos are re-inverted so they look
-   normal. */
 html.a11y-theme-dark #mygrades_container,
 html.a11y-theme-dark .vm-wrapper {
     filter: invert(1) hue-rotate(180deg);
+    color: #1e293b;
 }
 
 html.a11y-theme-dark #mygrades_container img,
@@ -68,12 +62,148 @@ html.a11y-theme-dark .vm-wrapper [data-a11y-keep-color] {
     filter: invert(1) hue-rotate(180deg);
 }
 
-/* Give the tab bar a distinctly darker panel in dark mode. Because the
-   container is inverted, a LIGHT pre-invert colour renders as a dark one,
-   so we deliberately set light values here to produce a dark slate bar. */
+
+html.a11y-theme-dark #mygrades_container [class*="text-university-blue"],
+html.a11y-theme-dark #mygrades_container [class*="text-slate-7"],
+html.a11y-theme-dark #mygrades_container [class*="text-slate-8"],
+html.a11y-theme-dark #mygrades_container [class*="text-slate-9"],
+html.a11y-theme-dark #mygrades_container [class~="text-base-content"],
+html.a11y-theme-dark #mygrades_container [class~="text-neutral"],
+html.a11y-theme-dark #mygrades_container [class~="text-black"],
+html.a11y-theme-dark #mygrades_container [class~="text-gray-900"],
+html.a11y-theme-dark #mygrades_container [class~="text-gray-800"],
+html.a11y-theme-dark #mygrades_container [class~="text-gray-700"],
+html.a11y-theme-dark .vm-wrapper [class*="text-university-blue"],
+html.a11y-theme-dark .vm-wrapper [class*="text-slate-7"],
+html.a11y-theme-dark .vm-wrapper [class*="text-slate-8"],
+html.a11y-theme-dark .vm-wrapper [class*="text-slate-9"],
+html.a11y-theme-dark .vm-wrapper [class~="text-base-content"],
+html.a11y-theme-dark .vm-wrapper [class~="text-neutral"],
+html.a11y-theme-dark .vm-wrapper [class~="text-black"] {
+    color: #1e293b !important;
+}
+
+/* Native selects (CATEGORY / ACTIVITY pickers) often keep OS colours;
+   force them so the closed control inverts cleanly. */
+html.a11y-theme-dark #mygrades_container select,
+html.a11y-theme-dark #mygrades_container option {
+    color: #1e293b !important;
+    background-color: #ffffff !important;
+}
+
+/* Bold / heading-like text with no colour class (ConfigTree category
+   names, ActivityTree folders, CATEGORY/ACTIVITY labels). */
+html.a11y-theme-dark #mygrades_container b,
+html.a11y-theme-dark #mygrades_container strong,
+html.a11y-theme-dark #mygrades_container h1,
+html.a11y-theme-dark #mygrades_container h2,
+html.a11y-theme-dark #mygrades_container h3,
+html.a11y-theme-dark #mygrades_container h4,
+html.a11y-theme-dark #mygrades_container label,
+html.a11y-theme-dark .vm-wrapper b,
+html.a11y-theme-dark .vm-wrapper strong,
+html.a11y-theme-dark .vm-wrapper h1,
+html.a11y-theme-dark .vm-wrapper h2,
+html.a11y-theme-dark .vm-wrapper h3,
+html.a11y-theme-dark .vm-wrapper h4 {
+    color: #1e293b;
+}
+
+html.a11y-theme-dark #mygrades_container [class~="bg-university-blue"],
+html.a11y-theme-dark #mygrades_container [class~="bg-primary"],
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-blue"],
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-purple"],
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-green"],
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-red"],
+html.a11y-theme-dark .vm-wrapper [class~="bg-university-blue"],
+html.a11y-theme-dark .vm-wrapper [class~="bg-primary"],
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-blue"],
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-purple"],
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-green"],
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-red"] {
+    background-color: #d8dde4 !important;
+    color: #0f172a !important;
+    border-color: #c5cad3 !important;
+}
+
+html.a11y-theme-dark #mygrades_container [class~="bg-university-blue"] *,
+html.a11y-theme-dark #mygrades_container [class~="bg-primary"] *,
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-blue"] *,
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-purple"] *,
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-green"] *,
+html.a11y-theme-dark #mygrades_container [class~="bg-brand-dark-red"] *,
+html.a11y-theme-dark .vm-wrapper [class~="bg-university-blue"] *,
+html.a11y-theme-dark .vm-wrapper [class~="bg-primary"] *,
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-blue"] *,
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-purple"] *,
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-green"] *,
+html.a11y-theme-dark .vm-wrapper [class~="bg-brand-dark-red"] * {
+    color: #0f172a !important;
+}
+
+/* Table headers that use the brand blue fill. */
+html.a11y-theme-dark #mygrades_container thead,
+html.a11y-theme-dark .vm-wrapper thead {
+    background-color: #d8dde4 !important;
+    color: #0f172a !important;
+}
+
+html.a11y-theme-dark #mygrades_container thead th,
+html.a11y-theme-dark .vm-wrapper thead th {
+    color: #0f172a !important;
+}
+
+/* VueModal title bar has no explicit colour; force a dark post-invert strip
+   with light title text. */
+html.a11y-theme-dark .vm-wrapper .vm-titlebar {
+    background-color: #d8dde4 !important;
+    border-bottom-color: #c5cad3 !important;
+    color: #0f172a !important;
+}
+
+html.a11y-theme-dark .vm-wrapper .vm-title {
+    color: #0f172a !important;
+    font-weight: 600;
+}
+
+/* Tab bar: light pre-invert → dark post-invert panel. */
 html.a11y-theme-dark #mygrades_container [role="tablist"] {
-    background-color: #d5dae1; /* renders as ~#2a2f36 after inversion */
-    border-color: #c2c8d0; /* renders as a subtle darker edge */
+    background-color: #d5dae1;
+    border-color: #c2c8d0;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-base-100"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-white"] {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-primary"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-university-blue"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-brand-dark-blue"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-brand-dark-purple"] {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-primary"] *,
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-university-blue"] *,
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-brand-dark-blue"] *,
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-brand-dark-purple"] *,
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="text-primary-content"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="text-white"] {
+    color: #f8fafc !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="text-base-content"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class*="text-slate-"] {
+    color: #e2e8f0 !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="border-base-200"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class*="border-slate-"] {
+    border-color: #475569 !important;
 }
 
 /* Reading mode: warm, low glare background to reduce eye strain. */
@@ -91,7 +221,9 @@ html.a11y-theme-reading .vm-wrapper {
 html.a11y-dyslexia #mygrades_container,
 html.a11y-dyslexia #mygrades_container *,
 html.a11y-dyslexia .vm-wrapper,
-html.a11y-dyslexia .vm-wrapper * {
+html.a11y-dyslexia .vm-wrapper *,
+html.a11y-dyslexia [role="dialog"]:not(.a11y-panel),
+html.a11y-dyslexia [role="dialog"]:not(.a11y-panel) * {
     font-family:
         'Comic Sans MS', 'Trebuchet MS', 'Verdana', 'Atkinson Hyperlegible',
         'OpenDyslexic', sans-serif !important;
@@ -111,20 +243,28 @@ html.a11y-line-spacing .vm-wrapper li,
 html.a11y-line-spacing .vm-wrapper td,
 html.a11y-line-spacing .vm-wrapper th,
 html.a11y-line-spacing .vm-wrapper span,
-html.a11y-line-spacing .vm-wrapper div {
+html.a11y-line-spacing .vm-wrapper div,
+html.a11y-line-spacing [role="dialog"]:not(.a11y-panel) p,
+html.a11y-line-spacing [role="dialog"]:not(.a11y-panel) li,
+html.a11y-line-spacing [role="dialog"]:not(.a11y-panel) td,
+html.a11y-line-spacing [role="dialog"]:not(.a11y-panel) th,
+html.a11y-line-spacing [role="dialog"]:not(.a11y-panel) span,
+html.a11y-line-spacing [role="dialog"]:not(.a11y-panel) div {
     line-height: 1.8 !important;
 }
 
 /* Wider letter/word spacing. */
 html.a11y-letter-spacing #mygrades_container,
-html.a11y-letter-spacing .vm-wrapper {
+html.a11y-letter-spacing .vm-wrapper,
+html.a11y-letter-spacing [role="dialog"]:not(.a11y-panel) {
     letter-spacing: 0.08em !important;
     word-spacing: 0.18em !important;
 }
 
 /* Always show links clearly. */
 html.a11y-highlight-links #mygrades_container a,
-html.a11y-highlight-links .vm-wrapper a {
+html.a11y-highlight-links .vm-wrapper a,
+html.a11y-highlight-links [role="dialog"]:not(.a11y-panel) a {
     text-decoration: underline !important;
     text-underline-offset: 2px;
     font-weight: 600;
@@ -136,7 +276,10 @@ html.a11y-reduce-motion #mygrades_container *::before,
 html.a11y-reduce-motion #mygrades_container *::after,
 html.a11y-reduce-motion .vm-wrapper *,
 html.a11y-reduce-motion .vm-wrapper *::before,
-html.a11y-reduce-motion .vm-wrapper *::after {
+html.a11y-reduce-motion .vm-wrapper *::after,
+html.a11y-reduce-motion [role="dialog"]:not(.a11y-panel) *,
+html.a11y-reduce-motion [role="dialog"]:not(.a11y-panel) *::before,
+html.a11y-reduce-motion [role="dialog"]:not(.a11y-panel) *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
@@ -149,8 +292,10 @@ html.a11y-reduce-motion .vm-wrapper *::after {
    ------------------------------------------------------------ */
 html.a11y-theme-contrast #mygrades_container :focus-visible,
 html.a11y-theme-contrast .vm-wrapper :focus-visible,
+html.a11y-theme-contrast [role="dialog"]:not(.a11y-panel) :focus-visible,
 html.a11y-theme-dark #mygrades_container :focus-visible,
-html.a11y-theme-dark .vm-wrapper :focus-visible {
+html.a11y-theme-dark .vm-wrapper :focus-visible,
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) :focus-visible {
     outline: 3px solid currentColor !important;
     outline-offset: 2px !important;
 }
@@ -169,7 +314,9 @@ html.a11y-theme-dark .vm-wrapper :focus-visible {
 html.a11y-active #mygrades_container [class*="text-brand-dark-purple"],
 html.a11y-active #mygrades_container [class*="text-brand-light-purple"],
 html.a11y-active .vm-wrapper [class*="text-brand-dark-purple"],
-html.a11y-active .vm-wrapper [class*="text-brand-light-purple"] {
+html.a11y-active .vm-wrapper [class*="text-brand-light-purple"],
+html.a11y-active [role="dialog"]:not(.a11y-panel) [class*="text-brand-dark-purple"],
+html.a11y-active [role="dialog"]:not(.a11y-panel) [class*="text-brand-light-purple"] {
     color: #241a33 !important; /* dark aubergine: ~16:1 contrast on white */
 }
 
