@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import 'vue3-easy-data-table/dist/style.css';
 import { plugin, defaultConfig } from '@formkit/vue';
 import { createPinia } from 'pinia';
 import { usePopulateTrees } from './js/setuptrees';
@@ -20,8 +19,6 @@ import 'daisyui/daisyui.css';
 import 'daisyui/themes.css';
 import "vue-awesome-paginate/dist/style.css";
 
-// @ts-ignore
-//import Vue3EasyDataTable from 'vue3-easy-data-table';
 // @ts-ignore
 import { Modal } from '@kouts/vue-modal';
 
@@ -45,7 +42,6 @@ app.use(pinia);
 app.use(Toast, toastoptions);
 app.use(plugin, defaultConfig(customConfig));
 app.use(VueAwesomePaginate);
-//app.component('EasyDataTable', Vue3EasyDataTable);
 app.component('VueModal', Modal);
 
 // 3. Fetch strings and block mounting until they are loaded safely

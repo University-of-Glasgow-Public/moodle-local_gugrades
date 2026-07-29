@@ -82,169 +82,6 @@
             :initial-sort="[{ id: 'displayname', desc: false }]" 
             class="my-8"
         />
-
-        <EasyDataTable
-            v-if="!loading && false"
-            alternating
-            buttons-pagination
-            :current-page="currentpage"
-            sort-by="displayname"
-            sort-type="asc"
-            table-class-name="uofg-table"
-            header-text-direction="center"
-            :body-item-class-name="table_item_class"
-            :header-item-class-name="header_item_class"
-            :items="users"
-            :headers="headers"
-            :filter-options="table_filter"
-            :rows-items="[25,50,100,250]"
-            @update-page-items="pagination_change"
-        >
-
-            <!-- additional information in header cells -->
-            <template #header="header">
-                <div v-if="header.value == 'back'">
-                    <UButton @click="expand_clicked(backid)">
-                        <ArrowBigLeft :size="18" /> Back
-                    </UButton>
-                </div>
-                <div v-else class="aggregation-header flex gap-x-2">
-                    <div>
-                        <UTooltip :text="header.fullname">
-                            <div>
-                                <!-- column title -->
-                                <InfoButton v-if="header.gradeitemid" :itemid="header.gradeitemid" :text="header.text" size="lg" color="text-warning"></InfoButton>
-                                <span v-else>{{ header.text }}</span>
-                            </div>
-                            <div v-if="!header.infocol && showweights">{{ header.weight }}%</div>
-                            <div v-if="header.gradetype">{{ header.gradetype }} <span v-if="!header.isscale">({{ header.grademax }})</span></div>
-                            <div v-if="header.resititem" class="badge badge-success">{{ mstrings.reassessment}}</div>
-                        </UTooltip>
-                        <div class="py-1" v-if="header.strategy">
-                            <i>{{ header.strategy }}</i>
-                        </div>
-                        <div v-if="header.atype">
-                            ({{ formattedatype }})
-                        </div>
-                    </div>
-                </div>
-                <div v-if="header.categoryid">
-                    <UButton class="ml-2" size="sm" @click="expand_clicked(header.categoryid)" aria-label="Drill down into grade category.">
-                        <ArrowBigRight :size="18" :stroke-width="1" />
-                    </UButton>
-                </div>
-            </template>
-
-            <!-- all items (yes this is complicated) -->
-            <!-- point is to iterate over field names to maniuplate data in individual field items -->
-            <template v-for="header in headers" v-slot:[header.slot]="item">
-
-                <div class="inline-flex items-center gap-1">
-
-                    <!-- strikethrough if data is dropped -->
-                    <!-- bold if admin -->
-                    <!-- there HAS to be an easier way -->
-                    <UTooltip :class="itemclasses(item[header.value])" :text="itemtooltip(item[header.value])">
-                        <s v-if="item[header.value].dropped">
-                            <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                            <GradeColor v-else :grade="item[header.value].data"></GradeColor>
-                            <!-- <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span> -->
-                        </s>
-                        <span v-else>
-                            <b v-if="item[header.value].isadmin">{{ item[header.value].data }}</b>
-                            <GradeColor v-else :grade="item[header.value].data"></GradeColor>
-                            <!-- <span v-else :class="gradecolorclass(item[header.value].data)">{{ item[header.value].data }}</span> -->
-                        </span>
-                    </UTooltip>
-
-                    <!-- add/override grade -->
-                    <OverrideGrade
-                        v-if="item[header.value].available"
-                        :itemid = "header.gradeitemid"
-                        :categoryid = "header.categoryid"
-                        :selectedcategoryid = "level1category"
-                        :userid = "item.id"
-                        :gradehidden = "item[header.value].hidden"
-                        :overridden = "item[header.value].overridden"
-                        :itemname = "header.fullname"
-                        :name = "item.displayname"
-                        :showweights = "header.showweights"
-                        :released = "header.released"
-                        :caneditgrades = "caneditgrades"
-                        @gradeadded = "grade_changed(item.id)"
-                    ></OverrideGrade>
-                </div>
-            </template>
-
-            <!-- User picture column -->
-            <template #item-slotuserpicture="item">
-                <a :href="item.profileurl" class="avatar">
-                    <img :src="item.pictureurl" :alt="item.displayname" class="rounded-full" width="35" height="35"/>
-                </a>
-            </template>
-
-            <!-- Resit required -->
-            <template #item-resitrequired="item">
-                <a v-if="caneditgrades" class="cursor-pointer" @click.prevent="resit_clicked(item.id, !item.resitrequired)">
-                    <span v-if="item.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="badge badge-secondary badge-soft">{{ mstrings.no }}</span>
-                </a>
-                <span v-if="!caneditgrades">
-                    <span v-if="item.resitrequired" class="badge badge-success">{{ mstrings.yes }}</span>
-                    <span v-else class="badge badge-secondary badge-soft">{{ mstrings.no }}</span>
-                </span>
-            </template>
-
-            <!-- Completion -->
-            <template #item-completed="item">
-                {{ item.completed }}%
-            </template>
-
-            <!-- Releasegrade -->
-            <template #item-releasegrade="item">
-                <div v-if="!toplevel">
-                    <GradeColor :grade="item.releasegrade"></GradeColor>
-                    <!--<span :class="gradecolorclass(item.releasegrade)">{{ item.releasegrade }}</span> -->
-                    <span v-if="item.mismatch">
-                        <br />
-                        <span class="badge badge-error mt-1">MISMATCH</span>
-                    </span>
-                </div>
-            </template>
-
-            <!-- Total -->
-            <template #item-total="item">
-                <div class="inline-flex items-center gap-1">
-                    <div>
-                        <span v-if="item.error">{{ item.error }}</span>
-                        <GradeColor v-else :grade="item.displaygrade"></GradeColor>
-                        <span v-if="item.alteredweight">
-                            <br />
-                            <span class="badge badge-warning mt-1">ALTERED</span>
-                         </span>
-                    </div>
-                    <div>
-                        <!-- add/override for total grade -->
-                        <OverrideGrade
-                            :toplevel="toplevel"
-                            :itemid = "gradeitemid"
-                            :selectedcategoryid = "level1category"
-                            :categoryid = "categoryid"
-                            :userid = "item.id"
-                            :gradehidden = "false"
-                            :overridden = "item.overridden"
-                            :itemname = "item.itemname"
-                            :name = "item.displayname"
-                            :showweights = "showweights"
-                            :released = "false"
-                            :caneditgrades = "caneditgrades"
-                            @gradeadded = "grade_changed(item.id)"
-                        ></OverrideGrade>
-                    </div>
-                </div>
-            </template>
-
-        </EasyDataTable>
     </div>
 </template>
 
@@ -255,22 +92,17 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import LevelOneSelect from '@/components/Common/LevelOneSelect.vue';
     import GroupSelect from '@/components/Common/GroupSelect.vue';
-    import InfoButton from '@/components/Common/InfoButton.vue';
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import AggregationButtons from '@/components/Aggregation/AggregationButtons.vue';
-    import OverrideGrade from '@/components/Aggregation/OverrideGrade.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { ArrowBigRight, ArrowBigLeft, FolderOpen } from '@lucide/vue';
     import type { IBreadcrumb, IColumn, IUser, IUserField, IWarning, IError } from '@/js/Interfaces';
-    import type { Header, Item } from "vue3-easy-data-table";
     import UAlert from '@/components/Common/UAlert.vue';
     import UTooltip from '@/components/Common/UTooltip.vue';
     import AggregationTableHeader from '@/components/Aggregation/AggregationTableHeader.vue';
     import AggregationGradeCell from '@/components/Aggregation/AggregationGradeCell.vue';
     import AlertsBlock from '@/components/Common/AlertsBlock.vue';
-    import GradeColor from '@/components/Common/GradeColor.vue';
     import { useFilter } from '@/stores/filter';
-    import UButton from '@/components/Common/UButton.vue';
     import UTable from '@/components/Common/UTable.vue';
     import { createColumnHelper, type ColumnFiltersState } from '@tanstack/vue-table';
     import ResitRequired from '@/components/Aggregation/ResitRequired.vue';
@@ -558,74 +390,6 @@
     });
 
     /**
-     * Table name filter
-     */
-    const table_filter = computed(() => {
-        const options = [];
-
-        if (firstname.value != 'all') {
-            options.push({
-                field: 'firstinitial',
-                comparison: '=',
-                criteria: firstname.value,
-            });
-        }
-
-        if (lastname.value != 'all') {
-            options.push({
-                field: 'lastinitial',
-                comparison: '=',
-                criteria: lastname.value,
-            });
-        }
-
-        return options.length ? options : null;
-    });
-
-    /**
-     * Page changed by pagination
-     */
-    function page_changed(newpage: number) {
-        currentpage.value = newpage;
-        datatablekey.value++;
-    }
-
-    /**
-     * Number of pages changed
-     */
-    function pagination_change(rows: any) {
-        rowsperpage.value = rows.length;
-        currentpage.value = 1;
-        datatablekey.value++;
-    }
-
-    /**
-     * Work out border classes for item
-     */
-    function itemclasses(item: IUserField) {
-        if (item.overridden) {
-            return ['border-2', 'border-solid', 'border-red-600', 'rounded-lg', 'p-1.5'];
-        }
-        if (item.hidden) {
-            return ['border-2', 'border-solid', 'border-brand-light-yellow', 'rounded-lg', 'p-1.5'];
-        }
-        return [];
-    }
-
-    /**
-     * Get tooltip text for bordered items
-     */
-    function itemtooltip(item: IUserField) {
-        if (item.overridden) {
-            return mstringstore.getMstring('tooltipoverridden');
-        }
-        if (item.hidden) {
-            return mstringstore.getMstring('tooltiphidden');
-        }
-        return '';
-    }
-
-    /**
      * Capture change to top level category dropdown
      * @param {*} level
      */
@@ -650,51 +414,6 @@
 
         // Don't fire during initial setup.
         table_update();
-    }
-
-    /**
-     * Get class name for table items
-     */
-     function table_item_class(column: string) {
-
-        // Hide name initial columns
-        if ((column == 'firstinitial') || (column == 'lastinitial')) {
-            return 'hidden';
-        }
-        if (column != 'displayname') {
-            return '!text-center';
-        }
-    }
-
-    /**
-     * Get class name for header items
-     */
-     function header_item_class(header: IAggregationHeader) {
-        if ((header.value == 'firstinitial') || (header.value == 'lastinitial')) {
-            return 'hidden';
-        }
-    }
-
-    /**
-     * Resit required 'pill' clicked
-     */
-    function resit_clicked(userid: number, required: boolean) {
-
-        moodleFetch(
-            'local_gugrades_resit_required',
-            {
-                userid: userid,
-                required: required,
-            }
-        )
-        .then(() => {
-            user_update(userid);
-
-        })
-        .catch((error) => {
-            window.console.error(error);
-            serverdebug.value = error;
-        });
     }
 
     /**
