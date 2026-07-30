@@ -7,7 +7,7 @@
                 <Tab v-for="tab in filteredtabs" v-slot="{ selected }">
                     <a
                         :id="tab.id"
-                        class="tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center"
+                        class="tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center cursor-pointer"
                         :class="{
                             'text-university-blue border-b-2 border-university-blue': selected,
                             'text-brand-dark-purple/80 hover:bg-brand-light-purple/10 hover:text-brand-dark-purple': !selected,

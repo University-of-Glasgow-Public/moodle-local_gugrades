@@ -67670,6 +67670,10 @@ var GradeColor_default = /* @__PURE__ */ defineComponent({
 	props: {
 		grade: {},
 		size: {},
+		strikethrough: {
+			type: Boolean,
+			default: false
+		},
 		otherclasses: { default: () => [] }
 	},
 	setup(__props) {
@@ -67690,6 +67694,7 @@ var GradeColor_default = /* @__PURE__ */ defineComponent({
 				colorclass.push(classes.bg);
 				colorclass.push(classes.text);
 			}
+			if (props.strikethrough) colorclass.push("line-through");
 			return colorclass;
 		}
 		return (_ctx, _cache) => {
@@ -74498,7 +74503,8 @@ var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
 			}, {
 				default: withCtx(() => [gradeobject.value.dropped ? (openBlock(), createElementBlock("s", _hoisted_2$8, [__props.user.isadmin ? (openBlock(), createElementBlock("b", _hoisted_3$6, toDisplayString(displaygrade.value), 1)) : (openBlock(), createBlock(GradeColor_default, {
 					key: 1,
-					grade: displaygrade.value
+					grade: displaygrade.value,
+					strikethrough: true
 				}, null, 8, ["grade"]))])) : (openBlock(), createElementBlock("span", _hoisted_4$5, [gradeobject.value.isadmin ? (openBlock(), createElementBlock("b", _hoisted_5$4, toDisplayString(displaygrade.value), 1)) : (openBlock(), createBlock(GradeColor_default, {
 					key: 1,
 					grade: displaygrade.value
@@ -76216,7 +76222,7 @@ var TabsNav_default = /* @__PURE__ */ defineComponent({
 						return openBlock(), createBlock(unref(xe), null, {
 							default: withCtx(({ selected }) => [createBaseVNode("a", {
 								id: tab.id,
-								class: normalizeClass(["tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center", {
+								class: normalizeClass(["tab px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center cursor-pointer", {
 									"text-university-blue border-b-2 border-university-blue": selected,
 									"text-brand-dark-purple/80 hover:bg-brand-light-purple/10 hover:text-brand-dark-purple": !selected
 								}])

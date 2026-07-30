@@ -24,7 +24,7 @@
         <UTooltip :class="itemclasses(gradeobject)" :text="itemtooltip(gradeobject)" :position="beforehalfway ? 'below' : 'above'">
             <s v-if="gradeobject.dropped">
                 <b v-if="user.isadmin">{{ displaygrade }}</b>
-                <GradeColor v-else :grade="displaygrade"></GradeColor>
+                <GradeColor v-else :grade="displaygrade" :strikethrough="true"></GradeColor>
             </s>
             <span v-else>
                 <b v-if="gradeobject.isadmin">{{ displaygrade }}</b>

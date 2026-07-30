@@ -14,15 +14,18 @@
 
 <script setup lang="ts">
     import { gradecolors } from '@/js/GradeColors';
+import { Strikethrough } from '@lucide/vue';
 
     const props = withDefaults(
     defineProps<{
         grade: string;
         size?: string;
+        strikethrough?: boolean,
         otherclasses?: string[];
     }>(),
         {
             otherclasses: () => [],
+            strikethrough: false,
         }
     );
 
@@ -46,6 +49,10 @@
             colorclass.push('min-w-10');
             colorclass.push(classes.bg);
             colorclass.push(classes.text);
+        }
+
+        if (props.strikethrough) {
+            colorclass.push('line-through');
         }
 
         return colorclass;
