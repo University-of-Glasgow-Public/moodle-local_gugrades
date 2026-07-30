@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div class="bg-base-100 border border-base-300 rounded-md mt-4 p-6">
-        <FormKit v-if="loaded" type="form" submit-label="Save" :disabled="!caneditgrades" @submit="submit_form">
+        <FormKit v-if="loaded" type="form" submit-label="Save" :actions="caneditgrades" :disabled="!caneditgrades" @submit="submit_form">
 
             <div class="flex gap-2">
 
@@ -172,7 +172,7 @@
         </FormKit>
 
         <div class="flex justify-start mt-2">
-            <UButton variant="warning" @click="cancel_button">{{ mstrings.cancel }}</UButton>
+            <UButton variant="warning" @click="cancel_button">{{ caneditgrades ? mstrings.cancel : mstrings.return }}</UButton>
         </div>
 
     </div>

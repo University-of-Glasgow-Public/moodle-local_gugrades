@@ -73949,6 +73949,7 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 				key: 0,
 				type: "form",
 				"submit-label": "Save",
+				actions: __props.caneditgrades,
 				disabled: !__props.caneditgrades,
 				onSubmit: submit_form
 			}, {
@@ -74139,11 +74140,11 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 					!ordervalidated.value ? (openBlock(), createElementBlock("div", _hoisted_20, toDisplayString(unref(mstrings).mapnotinorder), 1)) : createCommentVNode("", true)
 				]),
 				_: 1
-			}, 8, ["disabled"])) : createCommentVNode("", true), createBaseVNode("div", _hoisted_21, [createVNode(UButton_default, {
+			}, 8, ["actions", "disabled"])) : createCommentVNode("", true), createBaseVNode("div", _hoisted_21, [createVNode(UButton_default, {
 				variant: "warning",
 				onClick: cancel_button
 			}, {
-				default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).cancel), 1)]),
+				default: withCtx(() => [createTextVNode(toDisplayString(__props.caneditgrades ? unref(mstrings).cancel : unref(mstrings).return), 1)]),
 				_: 1
 			})])])], 64);
 		};
