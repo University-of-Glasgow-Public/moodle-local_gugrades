@@ -59,7 +59,6 @@
             <div class="flex gap-4 border-b border-brand-light-purple/30 pb-3 text-slate-600">
                 <div class="flex-1 text-left">
                     <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.aggregatedgrade }}</div>
-                    <!-- Replaced text-info with your custom brand accent -->
                     <div class="text-university-blue font-semibold"><GradeColor :grade="user!.displaygrade"/></div>
                 </div>
                 <div v-if="user && user.regulationname == 'original'" class="flex-1 pl-4 border-l border-brand-light-purple/30">
@@ -97,12 +96,11 @@
             <div class="mb-6 border-b border-brand-light-purple/30 pb-6">
                 <div class="uppercase text-xs font-bold tracking-wider text-brand-dark-purple mt-4 mb-3">{{ mstrings.grades }}</div>
                 
-                <!-- Replaced bg-warning/20 and text-warning-content with your light/dark yellow theme -->
                 <div v-for="field in user!.fields" class="bg-brand-light-yellow/50 text-slate-800 rounded-lg border border-brand-light-yellow/50 shadow-sm mb-3 px-4 py-2.5">
                     <div class="border-brand-light-yellow/40 border-b pb-2">
                         <div class="flex justify-between items-center pb-1.5">
                             <div class="font-semibold text-brand-dark-purple">{{ field.fullname }}</div>
-                            <div class="font-bold"><GradeColor :grade="field.display" size="text-lg"/></div>
+                            <div class="font-bold"><GradeColor :grade="field.display" :strikethrough="field.dropped"  size="text-lg"/></div>
                         </div>
                         
                         <div class="flex flex-wrap gap-1.5 pt-0.5">

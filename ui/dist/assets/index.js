@@ -74200,8 +74200,9 @@ var ExplainButton_default = /* @__PURE__ */ defineComponent({
 						createBaseVNode("div", _hoisted_34, [createBaseVNode("div", _hoisted_35, toDisplayString(unref(mstrings).grades), 1), (openBlock(true), createElementBlock(Fragment, null, renderList(user.value.fields, (field) => {
 							return openBlock(), createElementBlock("div", _hoisted_36, [createBaseVNode("div", _hoisted_37, [createBaseVNode("div", _hoisted_38, [createBaseVNode("div", _hoisted_39, toDisplayString(field.fullname), 1), createBaseVNode("div", _hoisted_40, [createVNode(GradeColor_default, {
 								grade: field.display,
+								strikethrough: field.dropped,
 								size: "text-lg"
-							}, null, 8, ["grade"])])]), createBaseVNode("div", _hoisted_41, [
+							}, null, 8, ["grade", "strikethrough"])])]), createBaseVNode("div", _hoisted_41, [
 								!field.available ? (openBlock(), createElementBlock("div", _hoisted_42, toDisplayString(unref(mstrings).notavailable), 1)) : createCommentVNode("", true),
 								field.dropped ? (openBlock(), createElementBlock("div", _hoisted_43, toDisplayString(unref(mstrings).dropped), 1)) : createCommentVNode("", true),
 								field.hidden ? (openBlock(), createElementBlock("div", _hoisted_44, toDisplayString(unref(mstrings).hidden), 1)) : createCommentVNode("", true),
