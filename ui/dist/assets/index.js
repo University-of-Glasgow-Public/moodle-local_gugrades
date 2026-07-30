@@ -73734,7 +73734,7 @@ var AggregationTableHeader_default = /* @__PURE__ */ defineComponent({
 				}, null, 8, ["itemid", "text"])) : createCommentVNode("", true),
 				__props.column.isresitgradeitem ? (openBlock(), createElementBlock("div", _hoisted_8$4, toDisplayString(unref(mstrings).reassessment), 1)) : createCommentVNode("", true),
 				__props.column.categoryid ? (openBlock(), createElementBlock("div", _hoisted_9$4, [createVNode(UButton_default, {
-					class: "mt-2",
+					class: "mt-2 cursor-pointer",
 					size: "sm",
 					onClick: expand_clicked,
 					"aria-label": "Drill down into grade category."
@@ -74696,7 +74696,10 @@ var BackButton_default = /* @__PURE__ */ defineComponent({
 			emits("backclick");
 		}
 		return (_ctx, _cache) => {
-			return openBlock(), createBlock(UButton_default, { onClick: backclicked }, {
+			return openBlock(), createBlock(UButton_default, {
+				onClick: backclicked,
+				class: "cursor-pointer"
+			}, {
 				default: withCtx(() => [createVNode(unref(ArrowBigLeft), { size: 18 }), _cache[0] || (_cache[0] = createTextVNode(" Back ", -1))]),
 				_: 1
 			});

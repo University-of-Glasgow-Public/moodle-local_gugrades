@@ -1,5 +1,5 @@
 <template>
-    <UButton @click="backclicked">
+    <UButton @click="backclicked" class="cursor-pointer">
         <ArrowBigLeft :size="18" /> Back
     </UButton>
 </template>

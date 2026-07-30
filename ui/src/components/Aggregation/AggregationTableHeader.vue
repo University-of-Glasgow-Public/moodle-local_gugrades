@@ -21,7 +21,7 @@
         <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
 
         <div v-if="column.categoryid">
-            <UButton class="mt-2" size="sm" @click="expand_clicked" aria-label="Drill down into grade category.">
+            <UButton class="mt-2 cursor-pointer" size="sm" @click="expand_clicked" aria-label="Drill down into grade category.">
                 <ArrowBigRight :size="18" :stroke-width="1" />
             </UButton>
         </div>
