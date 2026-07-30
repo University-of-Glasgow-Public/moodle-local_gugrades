@@ -473,6 +473,7 @@
      * See above - watching edit cell written count in order to
      * upgrade the main table
      */
+    /*
      watchDebounced(
         editgradecount,
         () => {
@@ -485,6 +486,7 @@
         },
         { debounce: 500, maxWait: 1000 },
     );
+    */
 
     /**
      * Are we in "edit a cell" mode?

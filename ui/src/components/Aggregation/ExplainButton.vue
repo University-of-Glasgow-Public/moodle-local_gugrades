@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a class="dropdown-item" href="#" @click.prevent="explain()">
+    <a class="block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10" href="#" @click.prevent="explain()">
         {{ mstrings.explain }}
     </a>
 

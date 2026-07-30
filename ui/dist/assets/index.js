@@ -67763,7 +67763,7 @@ var HistoryButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
 				createBaseVNode("a", {
 					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => read_history(), ["prevent"])),
-					class: "cursor-pointer"
+					class: "block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10"
 				}, toDisplayString(unref(mstrings).history), 1),
 				createVNode(_component_VueModal, {
 					modelValue: showhistorymodal.value,
@@ -67835,7 +67835,7 @@ var ImportUserGradeButton_default = /* @__PURE__ */ defineComponent({
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("a", {
 				onClick: _cache[0] || (_cache[0] = withModifiers(($event) => import_grade(), ["prevent"])),
-				class: "cursor-pointer"
+				class: "block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10"
 			}, toDisplayString(unref(mstrings).importusergrade), 1)], 64);
 		};
 	}
@@ -68069,7 +68069,7 @@ var AddGradeButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
 				createBaseVNode("a", {
 					onClick: _cache[0] || (_cache[0] = ($event) => add_grade()),
-					class: "cursor-pointer"
+					class: "block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10"
 				}, toDisplayString(buttontitle.value), 1),
 				createVNode(_component_VueModal, {
 					modelValue: showaddgrademodal.value,
@@ -68288,13 +68288,13 @@ var HideShowButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
 				props.gradehidden ? (openBlock(), createElementBlock("a", {
 					key: 0,
-					class: "dropdown-item",
+					class: "block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10",
 					href: "#",
 					onClick: _cache[0] || (_cache[0] = ($event) => showhide("show"))
 				}, toDisplayString(unref(mstrings).show), 1)) : createCommentVNode("", true),
 				!props.gradehidden ? (openBlock(), createElementBlock("a", {
 					key: 1,
-					class: "dropdown-item",
+					class: "block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10",
 					href: "#",
 					onClick: _cache[1] || (_cache[1] = ($event) => showhide("hide"))
 				}, toDisplayString(unref(mstrings).hide), 1)) : createCommentVNode("", true)
@@ -68305,7 +68305,7 @@ var HideShowButton_default = /* @__PURE__ */ defineComponent({
 //#endregion
 //#region src/components/Capture/CaptureMenu.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$51 = {
-	class: "bg-slate-100 text-university-blue rounded-lg z-999 w-52 p-2 shadow-sm flex flex-col gap-0.5",
+	class: "bg-white text-university-blue w-52 py-1 divide-y divide-slate-100",
 	tabindex: "-1"
 };
 var _hoisted_2$36 = { key: 0 };
@@ -68346,7 +68346,7 @@ var CaptureMenu_default = /* @__PURE__ */ defineComponent({
 						tabindex: "0"
 					})]),
 					_: 1
-				}), createVNode(unref(je$1), { class: "border-2 border-slate-200 rounded-md absolute z-999 left-0 top-0 ml-6 -mt-12" }, {
+				}), createVNode(unref(je$1), { class: "border border-slate-200 rounded-lg shadow-lg absolute z-999 left-0 top-0 ml-6 -mt-12 overflow-hidden" }, {
 					default: withCtx(({ close }) => [createBaseVNode("ul", _hoisted_1$51, [
 						props.awaitingcapture && !props.converted && __props.caneditgrades ? (openBlock(), createElementBlock("li", _hoisted_2$36, [createVNode(ImportUserGradeButton_default, {
 							itemid: props.itemid,
@@ -72376,9 +72376,7 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 		const revealnames = /* @__PURE__ */ ref(false);
 		const collapsed = /* @__PURE__ */ ref(false);
 		const editcolumn = /* @__PURE__ */ ref("");
-		const editgradecount = /* @__PURE__ */ ref(0);
 		const editcolumnid = /* @__PURE__ */ ref(0);
-		const editsaving = /* @__PURE__ */ ref(false);
 		const showconversion = /* @__PURE__ */ ref(false);
 		const showcsvimport = /* @__PURE__ */ ref(true);
 		const debug = /* @__PURE__ */ ref({});
@@ -72622,14 +72620,6 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 		* See above - watching edit cell written count in order to
 		* upgrade the main table
 		*/
-		watchDebounced(editgradecount, () => {
-			editcolumn.value = "";
-			editsaving.value = false;
-			reload_page();
-		}, {
-			debounce: 500,
-			maxWait: 1e3
-		});
 		/**
 		* Are we in "edit a cell" mode?
 		* Stuff doesn't appear, if so, and 'Save' button appears.
@@ -73902,7 +73892,10 @@ var AlterButton_default = /* @__PURE__ */ defineComponent({
 			const _component_VueModal = resolveComponent("VueModal");
 			return openBlock(), createElementBlock(Fragment, null, [
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
-				createBaseVNode("a", { onClick: _cache[0] || (_cache[0] = withModifiers(($event) => alter_weights(), ["prevent"])) }, toDisplayString(unref(mstrings).altertitle), 1),
+				createBaseVNode("a", {
+					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => alter_weights(), ["prevent"])),
+					class: "block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10"
+				}, toDisplayString(unref(mstrings).altertitle), 1),
 				createVNode(_component_VueModal, {
 					modelValue: showaltermodal.value,
 					"onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => showaltermodal.value = $event),
@@ -74146,7 +74139,7 @@ var ExplainButton_default = /* @__PURE__ */ defineComponent({
 			return openBlock(), createElementBlock(Fragment, null, [
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
 				createBaseVNode("a", {
-					class: "dropdown-item",
+					class: "block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10",
 					href: "#",
 					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => explain(), ["prevent"]))
 				}, toDisplayString(unref(mstrings).explain), 1),

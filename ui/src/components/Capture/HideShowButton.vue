@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
-    <a v-if="props.gradehidden" class="dropdown-item" href="#" @click="showhide('show')">{{ mstrings.show }}</a>
-    <a v-if="!props.gradehidden" class="dropdown-item" href="#" @click="showhide('hide')">{{ mstrings.hide }}</a>
+    <a v-if="props.gradehidden" class="block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10" href="#" @click="showhide('show')">{{ mstrings.show }}</a>
+    <a v-if="!props.gradehidden" class="block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10" href="#" @click="showhide('hide')">{{ mstrings.hide }}</a>
 </template>
 
 <script setup lang="ts">

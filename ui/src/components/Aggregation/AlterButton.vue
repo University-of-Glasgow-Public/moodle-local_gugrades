@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a @click.prevent="alter_weights()">
+    <a @click.prevent="alter_weights()" class="block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10">
         {{ mstrings.altertitle }}
     </a>
 

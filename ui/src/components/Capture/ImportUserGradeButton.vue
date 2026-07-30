@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a @click.prevent="import_grade()" class="cursor-pointer">{{ mstrings.importusergrade }}</a>
+    <a @click.prevent="import_grade()" class="block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10">{{ mstrings.importusergrade }}</a>
 </template>
 
 <script setup lang="ts">

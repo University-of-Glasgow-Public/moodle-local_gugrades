@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <a  @click.prefent="add_grade()" class="cursor-pointer">
+    <a  @click.prefent="add_grade()" class="block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10">
         {{ buttontitle }}
     </a>
 
