@@ -70990,9 +70990,9 @@ var InfoButton_default = /* @__PURE__ */ defineComponent({
 				}, 8, ["text"])) : createCommentVNode("", true),
 				createBaseVNode("i", null, [props.text ? (openBlock(), createElementBlock("a", {
 					key: 0,
-					class: "text-white cursor-pointer normal-case font-light inline-flex",
+					class: "mt-1 text-white cursor-pointer hover:bg-brand-light-blue normal-case font-light inline-flex",
 					onClick: info_clicked
-				}, [createVNode(unref(Info), { size: 14 }), _cache[1] || (_cache[1] = createTextVNode(" info", -1))])) : createCommentVNode("", true)]),
+				}, [createVNode(unref(Info), { size: 14 }), _cache[1] || (_cache[1] = createTextVNode("\xA0info", -1))])) : createCommentVNode("", true)]),
 				createVNode(HeadlessModal_default, {
 					isopen: showinfomodal.value,
 					onClosed: _cache[0] || (_cache[0] = ($event) => showinfomodal.value = false)

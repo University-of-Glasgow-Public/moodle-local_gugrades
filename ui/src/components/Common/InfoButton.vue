@@ -9,7 +9,7 @@
     </UTooltip>
 
     <!-- info link -->
-    <i><a v-if="props.text" class="text-white cursor-pointer normal-case font-light inline-flex" @click="info_clicked"><Info :size="14" /> info</a></i>
+    <i><a v-if="props.text" class="mt-1 text-white cursor-pointer hover:bg-brand-light-blue normal-case font-light inline-flex" @click="info_clicked"><Info :size="14" />&nbsp;info</a></i>
 
     <HeadlessModal :isopen="showinfomodal" @closed="showinfomodal = false">
         <template #title>
