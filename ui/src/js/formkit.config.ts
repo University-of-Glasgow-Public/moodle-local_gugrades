@@ -57,7 +57,7 @@ const config = {
         inner: '$reset inline-flex items-center shrink-0'
       },
       select: {
-        input: '$reset w-full max-w-full pl-3 pr-10 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue bg-no-repeat truncate appearance-none',
+        input: "$reset w-full max-w-full pl-3 pr-10 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue bg-no-repeat truncate appearance-none bg-[right_0.75rem_center] bg-[length:16px] bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%236b7280%22%20stroke-width=%222%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')]",
       },
       text: {
         input: '$reset w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue',
