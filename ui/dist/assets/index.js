@@ -71942,7 +71942,7 @@ var NoteButton_default = /* @__PURE__ */ defineComponent({
 //#endregion
 //#region src/components/Capture/BulkEditCell.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$28 = {
-	class: "flex justify-center",
+	class: "flex justify-start",
 	style: { "min-width": "250px" }
 };
 //#endregion

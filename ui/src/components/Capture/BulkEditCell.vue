@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-center" style="min-width: 250px;">
+    <div class="flex justify-start" style="min-width: 250px;">
         <FormKit
             type="select"
             name="admingrades"
