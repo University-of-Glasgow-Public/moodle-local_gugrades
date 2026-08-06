@@ -73,6 +73,15 @@ class check_integrity extends external_api {
                     'error' => new external_value(PARAM_TEXT, 'Error condition'),
                 ])
             ),
+            'reassessmentnotices' => new external_multiple_structure(
+                new external_single_structure([
+                    'itemname' => new external_value(PARAM_TEXT, 'Category name'),
+                    'message' => new external_value(PARAM_TEXT, 'Notice message'),
+                ]),
+                'Categories where reassessment was automatically removed',
+                VALUE_DEFAULT,
+                []
+            ),
         ]);
     }
 }

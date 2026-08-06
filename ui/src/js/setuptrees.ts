@@ -13,7 +13,7 @@ export function usePopulateTrees() {
     const populate = () => {
 
         // Get all the level 1 categories.
-        moodleFetch(
+        return moodleFetch(
             'local_gugrades_get_levelonecategories',
             {}
         )
@@ -43,10 +43,10 @@ export function usePopulateTrees() {
                 );
             });
 
-            Promise.all(promises).then(() => {
+            return Promise.all(promises).then(() => {
                 activitytree.ready = true;
                 console.log('Activity trees preloaded');
-            })
+            });
         })
         .catch(error => {
             console.error(error);

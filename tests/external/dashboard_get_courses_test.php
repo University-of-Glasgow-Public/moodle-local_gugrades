@@ -99,14 +99,15 @@ final class dashboard_get_courses_test extends \local_gugrades\external\gugrades
         ]);
 
         // Create courses with end date in the 'past'.
+        // Use fixed dates so the startdateafter filter remains predictable over time.
         $pastcourse1 = $this->getDataGenerator()->create_course([
             'fullname' => 'Past Course One',
-            'startdate' => time() - (2 * $oneyear),
-            'enddate' => time() - $oneyear,
+            'startdate' => strtotime('2020-01-01'),
+            'enddate' => strtotime('2023-06-01'),
         ]);
         $pastcourse2 = $this->getDataGenerator()->create_course([
             'fullname' => 'Past Course Two',
-            'startdate' => time() - (2 * $oneyear),
+            'startdate' => strtotime('2020-06-01'),
             'enddate' => time() - (30 * 86400), // Last possible day!
         ]);
 

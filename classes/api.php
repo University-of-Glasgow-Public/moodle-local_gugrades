@@ -3067,6 +3067,10 @@ class api {
      */
     public static function check_integrity(int $courseid) {
 
+        // Remove invalid reassessment configuration for old regs only.
+        // Does not modify erroritems or run for from2026 courses.
+        $reassessmentnotices = \local_gugrades\grades::check_integrity_reassessment_structure($courseid);
+
         // grademax=22 check new regs
         $errors = \local_gugrades\grades::check_integrity_grademax22_newregs($courseid);
 
@@ -3079,6 +3083,9 @@ class api {
         // Check for range / points/scale mismatch
         $errors = array_merge($errors, \local_gugrades\grades::check_integrity_range($courseid));
 
-        return ['erroritems' => $errors];
+        return [
+            'erroritems' => $errors,
+            'reassessmentnotices' => $reassessmentnotices,
+        ];
     }
 }

@@ -411,6 +411,18 @@ class grades {
     }
 
     /**
+     * Count grade items and child categories in a grade category.
+     * @param int $gradecategoryid
+     * @return int
+     */
+    public static function count_resit_category_children(int $gradecategoryid): int {
+        global $DB;
+
+        return $DB->count_records('grade_items', ['categoryid' => $gradecategoryid])
+            + $DB->count_records('grade_categories', ['parent' => $gradecategoryid]);
+    }
+
+    /**
      * Check if grade category is a candidate for being a resit category
      * MGU-1351
      * Must have two and only two 'children'
@@ -2336,5 +2348,43 @@ class grades {
         }
 
         return $errors;
+    }
+
+    /**
+     * Remove reassessment flags from categories with an invalid structure (old regs only).
+     * Reassessment requires exactly two children in the category.
+     * New regs courses use local_gugrades_flag and are not modified here.
+     * @param int $courseid
+     * @return array List of notices describing categories that were updated
+     */
+    public static function check_integrity_reassessment_structure(int $courseid) {
+        global $DB;
+
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        if ($regulation->shortname() != 'original') {
+            return [];
+        }
+
+        if (!$resits = $DB->get_records('local_gugrades_resit', ['courseid' => $courseid])) {
+            return [];
+        }
+
+        $notices = [];
+
+        foreach ($resits as $resit) {
+            if (self::count_resit_category_children($resit->gradecategoryid) == 2) {
+                continue;
+            }
+
+            $category = $DB->get_record('grade_categories', ['id' => $resit->gradecategoryid], '*', MUST_EXIST);
+            $DB->delete_records('local_gugrades_resit', ['gradecategoryid' => $resit->gradecategoryid]);
+
+            $notices[] = [
+                'itemname' => $category->fullname,
+                'message' => get_string('integrity_reassessment_removed', 'local_gugrades', $category->fullname),
+            ];
+        }
+
+        return $notices;
     }
 }

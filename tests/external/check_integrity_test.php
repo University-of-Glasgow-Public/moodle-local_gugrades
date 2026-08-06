@@ -109,8 +109,10 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
             $errors
         );
 
-        $this->assertCount(1, $errors);
+        // Assign 22 is flagged by both the grademax=22 new-regs check and the range/points check.
+        $this->assertCount(2, $errors['erroritems']);
         $this->assertEquals('Assign 22', $errors['erroritems'][0]['itemname']);
+        $this->assertEquals('Assign 22', $errors['erroritems'][1]['itemname']);
     }
 
     /**
@@ -309,6 +311,127 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
         $this->assertCount(1, $errors['erroritems']);
         $this->assertEquals('Second item 1', $errors['erroritems'][0]['itemname']);
+    }
+
+    /**
+     * Reassessment structure cleanup must not run for new regs courses.
+     *
+     * @covers \local_gugrades\external\check_integrity::execute
+     */
+    public function test_reassessment_structure_skipped_for_new_regs(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+
+        $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
+        $course->startdate = strtotime('2027-01-01');
+        $DB->update_record('course', $course);
+
+        $resitcat = $this->create_resit_test_category('Resit skip new regs');
+        save_resit_item::execute($this->course->id, $resitcat['resititemid'], true);
+
+        $extra = $this->getDataGenerator()->create_grade_item(
+            ['courseid' => $this->course->id, 'itemname' => 'Extra assignment']
+        );
+        $this->move_gradeitem_to_category($extra->id, $resitcat['categoryid']);
+
+        $result = check_integrity::execute($this->course->id);
+        $result = external_api::clean_returnvalue(
+            check_integrity::execute_returns(),
+            $result
+        );
+
+        $this->assertCount(0, $result['reassessmentnotices']);
+        $this->assertTrue($DB->record_exists('local_gugrades_resit', ['gradecategoryid' => $resitcat['categoryid']]));
+    }
+
+    /**
+     * Reassessment notices must not interfere with other integrity errors.
+     *
+     * @covers \local_gugrades\external\check_integrity::execute
+     */
+    public function test_reassessment_notices_do_not_suppress_other_integrity_errors(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+
+        $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
+        $course->startdate = strtotime('2026-01-01');
+        $DB->update_record('course', $course);
+
+        $resitcat = $this->create_resit_test_category('Resit notice category');
+        save_resit_item::execute($this->course->id, $resitcat['resititemid'], true);
+
+        $nothing = write_additional_grade::execute(
+            courseid: $this->course->id,
+            gradeitemid: $resitcat['firstitemid'],
+            userid: $this->student->id,
+            reason: 'SECOND',
+            other: '',
+            admingrade: '',
+            scale: 0,
+            grade: 100,
+            notes: 'Test notes'
+        );
+        $nothing = external_api::clean_returnvalue(
+            write_additional_grade::execute_returns(),
+            $nothing
+        );
+
+        $extra = $this->getDataGenerator()->create_grade_item(
+            ['courseid' => $this->course->id, 'itemname' => 'Extra assignment']
+        );
+        $this->move_gradeitem_to_category($extra->id, $resitcat['categoryid']);
+
+        $grade = $DB->get_record('grade_items', ['id' => $resitcat['firstitemid']], '*', MUST_EXIST);
+        $grade->grademax = 50;
+        $DB->update_record('grade_items', $grade);
+
+        $this->assertNotEquals(2, \local_gugrades\grades::count_resit_category_children($resitcat['categoryid']));
+
+        $result = check_integrity::execute($this->course->id);
+        $result = external_api::clean_returnvalue(
+            check_integrity::execute_returns(),
+            $result
+        );
+
+        $this->assertCount(1, $result['reassessmentnotices']);
+        $this->assertCount(1, $result['erroritems']);
+        $this->assertEquals('Resit notice category', $result['reassessmentnotices'][0]['itemname']);
+        $this->assertEquals('Resit first sitting', $result['erroritems'][0]['itemname']);
+        $this->assertFalse($DB->record_exists('local_gugrades_resit', ['gradecategoryid' => $resitcat['categoryid']]));
+    }
+
+    /**
+     * Create a grade category with two items suitable for reassessment tests.
+     *
+     * @param string $categoryname
+     * @return array
+     */
+    protected function create_resit_test_category(string $categoryname): array {
+        $category = $this->getDataGenerator()->create_grade_category([
+            'courseid' => $this->course->id,
+            'fullname' => $categoryname,
+            'parent' => $this->gradecatsumm->id,
+        ]);
+
+        $firstitem = $this->getDataGenerator()->create_grade_item([
+            'courseid' => $this->course->id,
+            'itemname' => 'Resit first sitting',
+        ]);
+        $this->move_gradeitem_to_category($firstitem->id, $category->id);
+
+        $resititem = $this->getDataGenerator()->create_grade_item([
+            'courseid' => $this->course->id,
+            'itemname' => 'Resit second sitting',
+        ]);
+        $this->move_gradeitem_to_category($resititem->id, $category->id);
+
+        return [
+            'categoryid' => $category->id,
+            'firstitemid' => $firstitem->id,
+            'resititemid' => $resititem->id,
+        ];
     }
 
 }
