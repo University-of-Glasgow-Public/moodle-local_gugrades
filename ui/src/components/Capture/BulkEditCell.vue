@@ -11,12 +11,11 @@
             v-if="!usescale"
             outer-class="w-42 pl-0"
             type="text"
-            number="float"
             :validation="gradevalidation"
             validation-visibility="live"
             maxlength="8"
             name="grade"
-            v-model="grade"
+            v-model="gradeDisplay"
             :disabled="admingrade != 'GRADE'"
         ></FormKit>
         <FormKit
@@ -36,7 +35,7 @@
     import { ref, onMounted, computed, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import type { IMenuItem, IMenuIntItem, ICaptureUser, ICaptureGrade } from '@/js/Interfaces';
+    import type { IMenuItem, IMenuIntItem, ICaptureGrade } from '@/js/Interfaces';
 
     interface IBulkEditStore {
         admingrade: string;
@@ -69,6 +68,14 @@
             admingrade: newAdminGrade,
             grade: newGrade,
         });
+    });
+
+    // Make sure the grade edit box (if points) only shows valid numbers.
+    const gradeDisplay = computed({
+        get: () => grade.value === -1 ? '' : grade.value,
+        set: (value) => {
+            grade.value = value === '' ? -1 : Number(value);
+        }
     });
 
     /**

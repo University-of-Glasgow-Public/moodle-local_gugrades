@@ -71975,6 +71975,12 @@ var BulkEditCell_default = /* @__PURE__ */ defineComponent({
 				grade: newGrade
 			});
 		});
+		const gradeDisplay = computed({
+			get: () => grade.value === -1 ? "" : grade.value,
+			set: (value) => {
+				grade.value = value === "" ? -1 : Number(value);
+			}
+		});
 		/**
 		* validation depends on grademax
 		*/
@@ -72014,13 +72020,12 @@ var BulkEditCell_default = /* @__PURE__ */ defineComponent({
 					key: 0,
 					"outer-class": "w-42 pl-0",
 					type: "text",
-					number: "float",
 					validation: gradevalidation.value,
 					"validation-visibility": "live",
 					maxlength: "8",
 					name: "grade",
-					modelValue: grade.value,
-					"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => grade.value = $event),
+					modelValue: gradeDisplay.value,
+					"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => gradeDisplay.value = $event),
 					disabled: admingrade.value != "GRADE"
 				}, null, 8, [
 					"validation",
