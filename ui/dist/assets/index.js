@@ -70575,6 +70575,15 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 			});
 		}
 		/**
+		* Check for 'schedulea' or 'scheduleb' and display correctly
+		* MGU-1539
+		*/
+		function format_schedule(name) {
+			if (name == "schedulea") return "GGS1";
+			else if (name == "scheduleb") return "GGS2";
+			else return "error";
+		}
+		/**
 		* Get currently selected map (if any)
 		*/
 		function get_selected() {
@@ -70739,7 +70748,7 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 											type: "radio",
 											value: item.id,
 											"onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => mapid.value = $event)
-										}, null, 8, _hoisted_10$7)), [[vModelRadio, mapid.value]]) : (openBlock(), createElementBlock(Fragment, { key: 1 }, [createTextVNode(toDisplayString(item[header.value]), 1)], 64))]);
+										}, null, 8, _hoisted_10$7)), [[vModelRadio, mapid.value]]) : (openBlock(), createElementBlock(Fragment, { key: 1 }, [createTextVNode(toDisplayString(format_schedule(item[header.value])), 1)], 64))]);
 									}), 128))]);
 								}), 128))])])) : createCommentVNode("", true),
 								createBaseVNode("div", _hoisted_11$5, [createVNode(UButton_default, {

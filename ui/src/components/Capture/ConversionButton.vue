@@ -55,7 +55,7 @@
                                         v-model="mapid"
                                     />
                                     <template v-else>
-                                        {{ (item as any)[header.value] }}
+                                        {{ format_schedule((item as any)[header.value]) }}
                                     </template>
                                 </td>
                             </tr>
@@ -147,6 +147,20 @@
             showselectmodal.value = false;
             debug.value = error;
         });
+    }
+
+    /**
+     * Check for 'schedulea' or 'scheduleb' and display correctly
+     * MGU-1539
+     */
+    function format_schedule(name: string): string {
+        if (name == 'schedulea') {
+            return 'GGS1';
+        } else if (name == 'scheduleb') {
+            return 'GGS2';
+        } else {
+            return 'error';
+        }
     }
 
     /**
