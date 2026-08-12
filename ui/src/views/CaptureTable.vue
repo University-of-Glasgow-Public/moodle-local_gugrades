@@ -84,7 +84,6 @@
     import { useLogo } from '@/js/monochromelogo.js';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
-    import { watchDebounced } from '@vueuse/core';
     import type { IEmitItemData, ICaptureColumn, ICaptureUser, ICaptureGrade, ICaptureCellForm } from '@/js/Interfaces';
     import NoteButton from '@/components/Common/NoteButton.vue';
     import { useFilter } from '@/stores/filter';
@@ -123,9 +122,7 @@
     const revealnames = ref(false);
     const collapsed = ref(false);
     const editcolumn = ref('');
-    const editgradecount = ref(0);
     const editcolumnid = ref(0);
-    const editsaving = ref(false);
     const showconversion = ref(false);
     const showcsvimport = ref(true);
     const debug = ref({});
@@ -133,7 +130,7 @@
     const caneditgrades = ref(false);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
-    const {monochrome, updateLogo} = useLogo();
+    const { updateLogo } = useLogo();
     const filterstore = useFilter();
     const { firstname, lastname } = storeToRefs( filterstore );
     const capturecellform = ref< ICaptureCellForm | null >(null);
@@ -239,7 +236,7 @@
                         converted: converted.value,
                         caneditgrades: caneditgrades.value,
                         onGradeadded: () => get_user_data(user.id),
-                    })
+                    });
                 }
             }
         }));
