@@ -2376,8 +2376,13 @@ class grades {
                 continue;
             }
 
-            $category = $DB->get_record('grade_categories', ['id' => $resit->gradecategoryid], '*', MUST_EXIST);
+            $category = $DB->get_record('grade_categories', ['id' => $resit->gradecategoryid]);
             $DB->delete_records('local_gugrades_resit', ['gradecategoryid' => $resit->gradecategoryid]);
+
+            // Category may have been deleted from the gradebook leaving an orphaned resit record.
+            if (!$category) {
+                continue;
+            }
 
             $notices[] = [
                 'itemname' => $category->fullname,
