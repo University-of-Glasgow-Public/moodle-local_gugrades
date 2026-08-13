@@ -151,6 +151,7 @@
 
     /**
      * Check for 'schedulea' or 'scheduleb' and display correctly
+     * Otherwise just return original string
      * MGU-1539
      */
     function format_schedule(name: string): string {
@@ -159,7 +160,7 @@
         } else if (name == 'scheduleb') {
             return 'GGS2';
         } else {
-            return 'error';
+            return name;
         }
     }
 

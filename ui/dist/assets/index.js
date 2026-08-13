@@ -70576,12 +70576,13 @@ var ConversionButton_default$1 = /* @__PURE__ */ defineComponent({
 		}
 		/**
 		* Check for 'schedulea' or 'scheduleb' and display correctly
+		* Otherwise just return original string
 		* MGU-1539
 		*/
 		function format_schedule(name) {
 			if (name == "schedulea") return "GGS1";
 			else if (name == "scheduleb") return "GGS2";
-			else return "error";
+			else return name;
 		}
 		/**
 		* Get currently selected map (if any)
