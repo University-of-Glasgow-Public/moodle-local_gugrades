@@ -23,7 +23,7 @@
                 <!-- COLUMN 2: Reassessment Toggle Switch -->
                 <div class="w-52 shrink-0 flex items-center justify-start pr-2">
                     <Switch 
-                        :label="mstrings.reassessment + '?'"
+                        :label="mstrings.yes"
                         @change="reassess_change($event, category.category.id)"
                         :disabled="props.disablereassess || disabledByChildrenIds.includes(Number(category.category.id))"
                         :active="reassesscats.includes(Number(category.category.id))"
@@ -31,11 +31,11 @@
                 </div>
 
                 <!-- COLUMN 3: Optional Engineering Toggle Switch -->
-                <div v-if="props.engineering" class="w-52 shrink-0 flex items-center justify-start pr-2">
+                <div v-if="props.engineering" class="w-72 shrink-0 flex items-center justify-start pr-2">
                     <Switch
                         v-if="props.depth === 1" 
                         @change="eng_change($event, category.category.id)" 
-                        :label="mstrings.exam + '?'"
+                        :label="mstrings.isthisfinalexam"
                         :active="engineeringcats.some(id => id == category.category.id)"
                     />
                 </div>
@@ -89,25 +89,33 @@
 
     /**
      * Engineering Change
+     * Only one category can be the final exam at a time.
      */
     function eng_change(state: boolean | string, categoryid: number) {
         const isEnabled = state === 'on' || state === true;
+        const id = Number(categoryid);
+
+        // Ignore stale off events from other switches when selection already moved.
+        if (!isEnabled && !engineeringcats.value.includes(id)) {
+            return;
+        }
+
+        engineeringcats.value = isEnabled ? [id] : [];
 
         moodleFetch('local_gugrades_read_flags', {})
         .then((result: any) => {
             let currentFlags: any[] = result?.flags || [];
-            currentFlags = currentFlags.filter(f => !(Number(f.gradecategoryid) === Number(categoryid) && f.engexam));
+            currentFlags = currentFlags.filter(f => !f.engexam);
 
             if (isEnabled) {
                 currentFlags.push({
-                    gradecategoryid: categoryid,
+                    gradecategoryid: id,
                     gradeitemid: 0,
                     engexam: true,
                     resit: false
                 });
             }
 
-            engineeringcats.value = currentFlags.filter(f => f.engexam).map(f => Number(f.gradecategoryid));
             return moodleFetch('local_gugrades_write_flags', { flags: currentFlags as IFlag[] });
         })
         .catch(console.error);

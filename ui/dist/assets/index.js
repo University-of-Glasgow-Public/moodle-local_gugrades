@@ -63052,11 +63052,19 @@ var Switch_default = /* @__PURE__ */ defineComponent({
 	setup(__props, { emit: __emit }) {
 		const props = __props;
 		const model = /* @__PURE__ */ ref(false);
+		let syncingFromProp = false;
 		const emit = __emit;
 		watch$1(() => props.active, (newVal) => {
-			model.value = newVal;
-		});
+			const next = !!newVal;
+			if (model.value === next) return;
+			syncingFromProp = true;
+			model.value = next;
+		}, { immediate: true });
 		watch$1(model, (val) => {
+			if (syncingFromProp) {
+				syncingFromProp = false;
+				return;
+			}
 			emit("change", val ? "on" : "off");
 		});
 		return (_ctx, _cache) => {
@@ -63107,7 +63115,7 @@ var _hoisted_4$31 = { class: "font-medium text-slate-800" };
 var _hoisted_5$29 = { class: "w-52 shrink-0 flex items-center justify-start pr-2" };
 var _hoisted_6$24 = {
 	key: 0,
-	class: "w-52 shrink-0 flex items-center justify-start pr-2"
+	class: "w-72 shrink-0 flex items-center justify-start pr-2"
 };
 //#endregion
 //#region src/components/Configure/CategoryTree.vue
@@ -63130,19 +63138,22 @@ var CategoryTree_default = /* @__PURE__ */ defineComponent({
 		const disabledByChildrenIds = /* @__PURE__ */ ref([]);
 		/**
 		* Engineering Change
+		* Only one category can be the final exam at a time.
 		*/
 		function eng_change(state, categoryid) {
 			const isEnabled = state === "on" || state === true;
+			const id = Number(categoryid);
+			if (!isEnabled && !engineeringcats.value.includes(id)) return;
+			engineeringcats.value = isEnabled ? [id] : [];
 			moodleFetch("local_gugrades_read_flags", {}).then((result) => {
 				let currentFlags = result?.flags || [];
-				currentFlags = currentFlags.filter((f) => !(Number(f.gradecategoryid) === Number(categoryid) && f.engexam));
+				currentFlags = currentFlags.filter((f) => !f.engexam);
 				if (isEnabled) currentFlags.push({
-					gradecategoryid: categoryid,
+					gradecategoryid: id,
 					gradeitemid: 0,
 					engexam: true,
 					resit: false
 				});
-				engineeringcats.value = currentFlags.filter((f) => f.engexam).map((f) => Number(f.gradecategoryid));
 				return moodleFetch("local_gugrades_write_flags", { flags: currentFlags });
 			}).catch(console.error);
 		}
@@ -63227,7 +63238,7 @@ var CategoryTree_default = /* @__PURE__ */ defineComponent({
 						});
 					}), 128)), createBaseVNode("span", _hoisted_4$31, toDisplayString(category.category.fullname), 1)]),
 					createBaseVNode("div", _hoisted_5$29, [createVNode(Switch_default, {
-						label: unref(mstrings).reassessment + "?",
+						label: unref(mstrings).yes,
 						onChange: ($event) => reassess_change($event, category.category.id),
 						disabled: props.disablereassess || disabledByChildrenIds.value.includes(Number(category.category.id)),
 						active: reassesscats.value.includes(Number(category.category.id))
@@ -63240,7 +63251,7 @@ var CategoryTree_default = /* @__PURE__ */ defineComponent({
 					props.engineering ? (openBlock(), createElementBlock("div", _hoisted_6$24, [props.depth === 1 ? (openBlock(), createBlock(Switch_default, {
 						key: 0,
 						onChange: ($event) => eng_change($event, category.category.id),
-						label: unref(mstrings).exam + "?",
+						label: unref(mstrings).isthisfinalexam,
 						active: engineeringcats.value.some((id) => id == category.category.id)
 					}, null, 8, [
 						"onChange",
@@ -63275,7 +63286,7 @@ var _hoisted_4$30 = { class: "flex-1 pr-4" };
 var _hoisted_5$28 = { class: "w-52 shrink-0 pr-2" };
 var _hoisted_6$23 = {
 	key: 0,
-	class: "w-52 shrink-0 pr-2"
+	class: "w-72 shrink-0 pr-2"
 };
 //#endregion
 //#region src/components/Configure/CategoryConfig.vue
@@ -63289,21 +63300,32 @@ var CategoryConfig_default = /* @__PURE__ */ defineComponent({
 	setup(__props) {
 		const { mstrings } = storeToRefs(useMstrings());
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", _hoisted_1$61, [createVNode(UAlert_default, {
-				variant: "info",
-				class: "mb-5"
-			}, {
-				default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).changessaved), 1)]),
-				_: 1
-			}), createBaseVNode("div", _hoisted_2$44, [createBaseVNode("div", _hoisted_3$36, [
-				createBaseVNode("div", _hoisted_4$30, toDisplayString(unref(mstrings).gradecategory), 1),
-				createBaseVNode("div", _hoisted_5$28, toDisplayString(unref(mstrings).reassessment), 1),
-				__props.engineering ? (openBlock(), createElementBlock("div", _hoisted_6$23, " Final exam / classwork (Engineering) ")) : createCommentVNode("", true)
-			]), createVNode(CategoryTree_default, {
-				depth: 1,
-				nodes: __props.nodes,
-				engineering: __props.engineering
-			}, null, 8, ["nodes", "engineering"])])]);
+			return openBlock(), createElementBlock("div", _hoisted_1$61, [
+				__props.engineering ? (openBlock(), createBlock(UAlert_default, {
+					key: 0,
+					variant: "info",
+					class: "mb-5"
+				}, {
+					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).engineeringexamhelp), 1)]),
+					_: 1
+				})) : createCommentVNode("", true),
+				createVNode(UAlert_default, {
+					variant: "info",
+					class: "mb-5"
+				}, {
+					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).changessaved), 1)]),
+					_: 1
+				}),
+				createBaseVNode("div", _hoisted_2$44, [createBaseVNode("div", _hoisted_3$36, [
+					createBaseVNode("div", _hoisted_4$30, toDisplayString(unref(mstrings).gradecategory), 1),
+					createBaseVNode("div", _hoisted_5$28, toDisplayString(unref(mstrings).containsreassessment), 1),
+					__props.engineering ? (openBlock(), createElementBlock("div", _hoisted_6$23, " Final exam (engineering) ")) : createCommentVNode("", true)
+				]), createVNode(CategoryTree_default, {
+					depth: 1,
+					nodes: __props.nodes,
+					engineering: __props.engineering
+				}, null, 8, ["nodes", "engineering"])])
+			]);
 		};
 	}
 });

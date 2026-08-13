@@ -66,6 +66,7 @@
     // One line defines the prop, the internal ref, and the parent update sync emit
     //const model = defineModel<boolean>({ default: false });
     const model = ref(false);
+    let syncingFromProp = false;
 
     const emit = defineEmits<{
         change: [value: 'on' | 'off']
@@ -74,12 +75,22 @@
     watch(
         () => props.active,
         (newVal) => {
-            model.value = newVal;
-        }
+            const next = !!newVal;
+            if (model.value === next) {
+                return;
+            }
+            syncingFromProp = true;
+            model.value = next;
+        },
+        { immediate: true }
     );
 
     // Use a simple watch to fire your legacy backend 'on'/'off' change event
     watch(model, (val) => {
-        emit('change', val ? 'on' : 'off')
+        if (syncingFromProp) {
+            syncingFromProp = false;
+            return;
+        }
+        emit('change', val ? 'on' : 'off');
     });
 </script>
