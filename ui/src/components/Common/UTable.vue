@@ -11,14 +11,17 @@
             <th 
               v-for="header in headerGroup.headers" 
               :key="header.id" 
-              class="font-semibold transition-all duration-150 align-middle"
-              :class="[
-                dense ? 'px-3 py-1.5 text-xs' : 'px-6 py-2.5',
-                header.column.getCanSort() ? 'cursor-pointer hover:bg-white/10' : ''
-              ]"
-              @click="header.column.getToggleSortingHandler()?.($event)"
+              class="font-semibold align-middle p-0"
+              :class="dense ? 'text-xs' : ''"
             >
-              <div class="inline-flex items-center gap-1.5 w-max">          
+              <div
+                class="inline-flex items-center gap-1.5 w-full h-full transition-colors duration-150"
+                :class="[
+                  dense ? 'px-3 py-1.5' : 'px-6 py-2.5',
+                  header.column.getCanSort() ? 'cursor-pointer hover:bg-white/10' : ''
+                ]"
+                @click="header.column.getToggleSortingHandler()?.($event)"
+              >          
                 <FlexRender 
                   :render="header.column.columnDef.header" 
                   :props="header.getContext()" 
@@ -27,7 +30,7 @@
                 <span v-else-if="header.column.getIsSorted() === 'desc'">🔽</span>
                 <span v-else-if="header.column.getCanSort()" class="opacity-30">↕️</span>
               </div>
-            </th>
+            </th> 
           </tr>
         </thead>
 

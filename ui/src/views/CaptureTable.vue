@@ -427,6 +427,7 @@
         currentpage.value = 1;
         revealnames.value = false;
         editcolumn.value = '';
+        editcolumnid.value = 0;
     });
 
     /**
@@ -448,6 +449,7 @@
         converted.value = false;
         released.value = false;
         loaded.value = false;
+        editcolumnid.value = 0;
     }
 
     /**

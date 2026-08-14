@@ -41,7 +41,9 @@
     });
 
     const isbulkedit = computed(() => {
-        return props.editcolumnid == props.column.id;
+
+        // FIRST column may legitimately be unpopulated.
+        return props.editcolumnid == props.column.id && (props.column.gradetype != 'FIRST');
     });
 
     /**
@@ -63,6 +65,6 @@
     });
 
     onMounted(() => {
-    })
+    });
 
 </script>
