@@ -15,7 +15,7 @@
                     Start date: <span class="font-mono text-brand-dark-purple/80">{{ startdate }}</span>
                 </p>
                 
-                <div class="pt-0.5">
+                <div v-if="specialcategory" class="pt-0.5">
                     <span class="inline-block text-[11px] font-bold tracking-wider uppercase bg-brand-dark-pink/10 text-brand-dark-pink px-2 py-0.5 rounded border border-brand-dark-pink/20 shadow-inner">
                         {{ specialcategory }}
                     </span>

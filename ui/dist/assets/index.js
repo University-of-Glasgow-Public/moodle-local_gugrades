@@ -59345,7 +59345,10 @@ var _hoisted_4$35 = { class: "flex flex-col min-w-0 space-y-1" };
 var _hoisted_5$33 = ["href", "title"];
 var _hoisted_6$27 = { class: "text-xs text-brand-dark-purple/60 font-medium" };
 var _hoisted_7$21 = { class: "font-mono text-brand-dark-purple/80" };
-var _hoisted_8$18 = { class: "pt-0.5" };
+var _hoisted_8$18 = {
+	key: 0,
+	class: "pt-0.5"
+};
 var _hoisted_9$14 = { class: "inline-block text-[11px] font-bold tracking-wider uppercase bg-brand-dark-pink/10 text-brand-dark-pink px-2 py-0.5 rounded border border-brand-dark-pink/20 shadow-inner" };
 var _hoisted_10$13 = { class: "flex justify-center shrink-0" };
 //#endregion
@@ -59380,7 +59383,7 @@ var PageHeader_default = /* @__PURE__ */ defineComponent({
 						title: fullname.value
 					}, " Back to " + toDisplayString(fullname.value), 9, _hoisted_5$33),
 					createBaseVNode("p", _hoisted_6$27, [_cache[0] || (_cache[0] = createTextVNode(" Start date: ", -1)), createBaseVNode("span", _hoisted_7$21, toDisplayString(startdate.value), 1)]),
-					createBaseVNode("div", _hoisted_8$18, [createBaseVNode("span", _hoisted_9$14, toDisplayString(specialcategory.value), 1)])
+					specialcategory.value ? (openBlock(), createElementBlock("div", _hoisted_8$18, [createBaseVNode("span", _hoisted_9$14, toDisplayString(specialcategory.value), 1)])) : createCommentVNode("", true)
 				])]),
 				createBaseVNode("div", _hoisted_10$13, [createVNode(GreyLogo_default)]),
 				_cache[1] || (_cache[1] = createBaseVNode("div", { class: "hidden md:block" }, null, -1))
