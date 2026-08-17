@@ -298,6 +298,7 @@
                         shortname: mstringstore.getMstring('coursetotal'),
                         strategy: strategy.value,
                         headercontext: context,
+                        formattedatype: formattedatype.value,
                     });
                 },
                 cell: ({row, table}) => {
@@ -327,6 +328,7 @@
                         shortname: mstringstore.getMstring('subcattotal'),
                         strategy: strategy.value,
                         headercontext: context,
+                        formattedatype: formattedatype.value,
                     });
                 },
                 cell: ({row, table}) => {

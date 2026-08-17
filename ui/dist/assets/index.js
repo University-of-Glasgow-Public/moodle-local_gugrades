@@ -75027,6 +75027,7 @@ var TotalHeader_default = /* @__PURE__ */ defineComponent({
 	props: {
 		shortname: {},
 		strategy: {},
+		formattedatype: {},
 		headercontext: {}
 	},
 	setup(__props) {
@@ -75034,10 +75035,14 @@ var TotalHeader_default = /* @__PURE__ */ defineComponent({
 		const { mstrings } = storeToRefs(useMstrings());
 		const toggleSorting = computed(() => props.headercontext.column.getToggleSortingHandler());
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock("div", null, [createBaseVNode("div", null, [createBaseVNode("span", {
-				onClick: _cache[0] || (_cache[0] = (...args) => toggleSorting.value && toggleSorting.value(...args)),
-				class: "cursor-pointer"
-			}, toDisplayString(__props.shortname), 1)]), __props.strategy ? (openBlock(), createElementBlock("div", _hoisted_1$13, [createBaseVNode("i", null, toDisplayString(__props.strategy), 1)])) : createCommentVNode("", true)]);
+			return openBlock(), createElementBlock("div", null, [
+				createBaseVNode("div", null, [createBaseVNode("span", {
+					onClick: _cache[0] || (_cache[0] = (...args) => toggleSorting.value && toggleSorting.value(...args)),
+					class: "cursor-pointer"
+				}, toDisplayString(__props.shortname), 1)]),
+				createBaseVNode("div", null, toDisplayString(__props.formattedatype), 1),
+				__props.strategy ? (openBlock(), createElementBlock("div", _hoisted_1$13, [createBaseVNode("i", null, toDisplayString(__props.strategy), 1)])) : createCommentVNode("", true)
+			]);
 		};
 	}
 });
@@ -75208,7 +75213,8 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 						return h$1(TotalHeader_default, {
 							shortname: mstringstore.getMstring("coursetotal"),
 							strategy: strategy.value,
-							headercontext: context
+							headercontext: context,
+							formattedatype: formattedatype.value
 						});
 					},
 					cell: ({ row, table }) => {
@@ -75233,7 +75239,8 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 					return h$1(TotalHeader_default, {
 						shortname: mstringstore.getMstring("subcattotal"),
 						strategy: strategy.value,
-						headercontext: context
+						headercontext: context,
+						formattedatype: formattedatype.value
 					});
 				},
 				cell: ({ row, table }) => {

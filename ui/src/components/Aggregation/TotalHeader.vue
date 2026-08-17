@@ -4,6 +4,10 @@
             <span @click="toggleSorting" class="cursor-pointer">{{ shortname  }}</span>
         </div>
 
+        <div>
+            {{ formattedatype }}
+        </div>
+
         <div class="py-1 font-light normal-case" v-if="strategy">
             <i>{{ strategy }}</i>
         </div>
@@ -19,6 +23,7 @@
     interface iProps {
         shortname: string;
         strategy: string;
+        formattedatype: string;
         headercontext: HeaderContext<any, any>;
     }
 
