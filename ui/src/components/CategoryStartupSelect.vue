@@ -36,7 +36,6 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import UAlert from '@/components/Common/UAlert.vue';
     import UModal from './Common/UModal.vue';
-    import { RadioGroup, RadioGroupOption } from '@headlessui/vue';
 
     const level1categories = ref< ICategories[] >([]);
     const notsetup = ref(false);
