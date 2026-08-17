@@ -1,11 +1,11 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <UModal v-model="displaymodal" title="Select initial top level category">
+    <UModal v-model="displaymodal" :showheaderclose="false"  title="Select initial top level category">
         <UAlert v-if="notsetup">{{ mstrings.notoplevel }}</UAlert>
 
         <template v-else>
-            <UAlert>
+            <UAlert class="mb-4">
                 {{ mstrings.categoryselect }}
             </UAlert>
 

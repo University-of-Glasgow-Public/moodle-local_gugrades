@@ -40,6 +40,7 @@
                     <p v-if="subtitle" class="text-xs text-white/70 mt-0.5">{{ subtitle }}</p>
                   </div>
                   <button
+                    v-if="showheaderclose"
                     @click="close"
                     class="text-white/60 hover:text-white transition-colors cursor-pointer"
                     aria-label="Close"
@@ -88,10 +89,11 @@
     withDefaults(
         defineProps<{
             modelValue: boolean;
+            showheaderclose?: boolean;
             title?: string;
             subtitle?: string;
         }>(),
-        { title: '', subtitle: '' }
+        { showheaderclose: true, title: '', subtitle: '' }
     );
 
     const emit = defineEmits<{
