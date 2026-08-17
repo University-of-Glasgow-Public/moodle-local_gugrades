@@ -102,7 +102,7 @@ final class mgu_1446_one_item_test extends \local_gugrades\external\gugrades_agg
         );
 
         $fred = $page['users'][0];
-        $this->assertEquals('D1:11', $fred['displaygrade']);
+        $this->assertEquals('D1', $fred['displaygrade']);
 
         // Make Question 1 NS.
         $question1 = $this->get_gradeitemid('Question 1');
