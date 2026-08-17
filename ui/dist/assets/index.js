@@ -83708,7 +83708,7 @@ var UModal_default = /* @__PURE__ */ defineComponent({
 				default: withCtx(() => [createVNode(unref(Ye$1), {
 					as: "div",
 					class: "relative z-50",
-					onClose: close
+					onClose: () => {}
 				}, {
 					default: withCtx(() => [createVNode(unref(he), {
 						as: "template",

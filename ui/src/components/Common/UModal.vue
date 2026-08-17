@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot appear :show="modelValue" as="template">
-    <Dialog as="div" class="relative z-50" @close="close">
+    <Dialog as="div" class="relative z-50" @close="() => {}">
 
       <!-- Backdrop -->
       <TransitionChild
