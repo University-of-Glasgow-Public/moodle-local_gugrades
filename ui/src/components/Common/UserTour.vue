@@ -19,6 +19,8 @@
     const tourManager = ref<InstanceType<typeof TourGuideManager> | null>(null);
     const toursteps = ref<TourGuideStep[]>([]);
 
+    const emits = defineEmits(['finished']);
+
     const tooltip = {
         backgroundColor: '#ffffff',
         textColor: 'var(--color-brand-dark-purple)',
@@ -50,10 +52,13 @@
                 setTimeout(() => {
                     tourManager.value?.startTourGuide();
                 }, 500); 
+            } else {
+                emits('finished');
             }
         })
         .catch((error) => {
             console.error(error);
+            emits('finished');
         });
 
     });
@@ -62,6 +67,9 @@
         moodleFetch('local_gugrades_set_tour_state', {enabled: false})
         .catch((error) => {
             console.error(error);
-        });
+        })
+        .finally(() => {
+            emits('finished');
+        })
     };
 </script>

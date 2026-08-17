@@ -15,7 +15,6 @@
                     Start date: <span class="font-mono text-brand-dark-purple/80">{{ startdate }}</span>
                 </p>
                 
-                <!-- 2. SPECIAL CATEGORY: Highlighted cleanly in your Dark Pink brand color -->
                 <div class="pt-0.5">
                     <span class="inline-block text-[11px] font-bold tracking-wider uppercase bg-brand-dark-pink/10 text-brand-dark-pink px-2 py-0.5 rounded border border-brand-dark-pink/20 shadow-inner">
                         {{ specialcategory }}
@@ -28,7 +27,7 @@
             <GreyLogo />
         </div>
 
-        <!-- This empty block ensures the layout math centers the middle logo perfectly -->
+        <!-- empty block ensures the layout math centers the middle logo -->
         <div class="hidden md:block"></div>
 
     </div>

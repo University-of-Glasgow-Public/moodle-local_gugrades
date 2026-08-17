@@ -13,5 +13,5 @@
 </template>
 
 <script setup lang="ts">
-import { HelpCircle } from '@lucide/vue';
+    import { HelpCircle } from '@lucide/vue';
 </script>

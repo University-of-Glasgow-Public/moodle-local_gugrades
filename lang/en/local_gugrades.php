@@ -84,6 +84,7 @@ $string['categoryerror'] = 'WARNING: There may be a discrepancy between the calc
 $string['categorynothighest'] = 'Aggregation strategy is NOT set to Highest grade when there is a reassessment. Consider if that is correct.';
 $string['categoryoverridden'] = 'Category is overridden';
 $string['categoryremoveoverride'] = 'Category grade is overridden. Click \'Remove\' button to revert.';
+$string['categoryselect'] = 'Select the top level category (e.g Summative) that you will be starting to work with. You can change it later in the CATEGORY dropdown if you have more than one.';
 $string['changedgradetype'] = 'Some grade types have been changed in the Gradebook since grades were imported into MyGrades. This must be corrected in Gradebook. Please check settings for following grade items:';
 $string['changessaved'] = 'Changes are saved automatically';
 $string['checkall'] = 'Check all';

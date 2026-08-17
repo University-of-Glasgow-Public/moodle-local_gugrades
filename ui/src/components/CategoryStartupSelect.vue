@@ -1,0 +1,101 @@
+<template>
+    <DebugDisplay :debug="debug"></DebugDisplay>
+
+    <UModal v-model="displaymodal" title="Select initial top level category">
+        <UAlert v-if="notsetup">{{ mstrings.notoplevel }}</UAlert>
+
+        <template v-else>
+            <UAlert>
+                {{ mstrings.categoryselect }}
+            </UAlert>
+
+            <RadioGroup v-model="selected">
+                <div class="flex flex-col gap-2">
+                    <RadioGroupOption
+                        v-for="category in level1categories"
+                        :key="category.id"
+                        :value="category.id"
+                        v-slot="{ active }"
+                    >
+                    <div
+                        class="cursor-pointer rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 transition-colors"
+                        :class="active ? 'border-brand-dark-blue bg-brand-dark-blue/5' : 'hover:bg-slate-50'"
+                    >
+                        {{ category.fullname }}
+                    </div>
+                    </RadioGroupOption>
+                </div>
+            </RadioGroup>
+        </template>
+        <template #footer>&nbsp;</template>
+    </UModal>
+</template>
+
+<script setup lang="ts">
+    import { ref, onMounted, watch } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import DebugDisplay from '@/components/Common/DebugDisplay.vue';
+    import type { ICategories } from '@/js/Interfaces';
+    import { useLeve1Store } from '@/stores/level1';
+    import { useMstrings } from '@/stores/mstrings.js';
+    import { moodleFetch } from '@/js/moodlefetch';
+    import UAlert from '@/components/Common/UAlert.vue';
+    import UModal from './Common/UModal.vue';
+    import { RadioGroup, RadioGroupOption } from '@headlessui/vue';
+
+    const level1categories = ref< ICategories[] >([]);
+    const selected = ref(0);
+    const notsetup = ref(false);
+    const itemerror = ref(false);
+    const debug = ref({});
+    const displaymodal = ref(false);
+    const level1store = useLeve1Store();
+    const mstringstore = useMstrings();
+    const { mstrings } = storeToRefs( mstringstore );
+
+    const emits = defineEmits(['finished']);
+
+    // Get the top level categories
+    function getLevelOne() {
+        moodleFetch(
+            'local_gugrades_get_levelonecategories',
+            {}
+        )
+        .then((result: any) => {
+
+            level1categories.value = result.categories;
+            notsetup.value = level1categories.value.length == 0;
+
+            // if there's only one then might as well select it.
+            if ((level1categories.value.length == 1) && (0 in level1categories.value) && !itemerror.value && !notsetup.value) {
+                const onlycategoryid = level1categories.value[0].id;
+                level1store.categoryid = onlycategoryid;
+                displaymodal.value = false;
+                emits('finished');
+            } else {
+
+                // Ok - if there's more than one we can display the modal now
+                displaymodal.value = true;
+            }
+        })
+        .catch((error) => {
+            window.console.error(error);
+            debug.value = error;
+        })
+    }
+
+    watch(selected, (category) => {
+        if (category) {
+            console.log(category);
+            level1store.categoryid = category;
+            displaymodal.value = false;
+
+            emits('finished');
+        }
+    });
+
+    onMounted(() => {
+        itemerror.value = false;
+        getLevelOne();
+    });
+</script>
