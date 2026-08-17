@@ -1,9 +1,4 @@
 <template>
-    <!-- 
-      1. Use an array to merge classes safely.
-      2. 'inline-flex items-center justify-center' is perfect, but we use a fixed 
-         width 'w-[36px]' (or w-9) instead of min-w to force an exact box shape.
-    -->
     <span 
         :class="[gradecolorclass(grade), otherclasses]" 
         class="inline-flex items-center justify-center h-6 text-start text-nowrap px-1"
@@ -14,7 +9,6 @@
 
 <script setup lang="ts">
     import { gradecolors } from '@/js/GradeColors';
-import { Strikethrough } from '@lucide/vue';
 
     const props = withDefaults(
     defineProps<{

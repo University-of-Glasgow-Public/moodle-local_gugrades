@@ -21,7 +21,7 @@
 
         <!-- strikethrough if data is dropped -->
         <!-- bold if admin -->
-        <UTooltip :class="itemclasses(gradeobject)" :text="itemtooltip(gradeobject)" :position="beforehalfway ? 'below' : 'above'">
+        <UTooltip :class="itemclasses(gradeobject)" class="p-0.5" :text="itemtooltip(gradeobject)" :position="beforehalfway ? 'below' : 'above'">
             <s v-if="gradeobject.dropped">
                 <b v-if="user.isadmin">{{ displaygrade }}</b>
                 <GradeColor v-else :grade="displaygrade" :strikethrough="true"></GradeColor>
@@ -91,10 +91,10 @@
      */
     function itemclasses(item: IUserField) {
         if (item.overridden) {
-            return ['border-2', 'border-solid', 'border-red-600', 'rounded-lg', 'p-1.5'];
+            return ['border-2', 'border-solid', 'border-red-600', 'rounded-lg'];
         }
         if (item.hidden) {
-            return ['border-2', 'border-solid', 'border-brand-light-yellow', 'rounded-lg', 'p-1.5'];
+            return ['border-2', 'border-solid', 'border-brand-light-yellow', 'rounded-lg'];
         }
         return [];
     }

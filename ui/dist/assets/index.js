@@ -74800,15 +74800,13 @@ var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
 				"border-2",
 				"border-solid",
 				"border-red-600",
-				"rounded-lg",
-				"p-1.5"
+				"rounded-lg"
 			];
 			if (item.hidden) return [
 				"border-2",
 				"border-solid",
 				"border-brand-light-yellow",
-				"rounded-lg",
-				"p-1.5"
+				"rounded-lg"
 			];
 			return [];
 		}
@@ -74850,7 +74848,7 @@ var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
 				"caneditgrades",
 				"position"
 			])) : createCommentVNode("", true), createVNode(UTooltip_default, {
-				class: normalizeClass(itemclasses(gradeobject.value)),
+				class: normalizeClass([itemclasses(gradeobject.value), "p-0.5"]),
 				text: itemtooltip(gradeobject.value),
 				position: __props.beforehalfway ? "below" : "above"
 			}, {
