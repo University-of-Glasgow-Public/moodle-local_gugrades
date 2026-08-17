@@ -169,7 +169,7 @@
     const tablecolumns = computed(() => {
         const cols = [];
 
-        if (!usershidden.value) {
+        if (!usershidden.value || revealnames.value) {
 
             // First initial (column hidden)
             cols.push(columnHelper.accessor('firstinitial', {
@@ -501,6 +501,10 @@
      */
     function viewfullnames(toggleview: boolean) {
         revealnames.value = toggleview;
+        if (!toggleview) {
+            firstname.value = 'all';
+            lastname.value = 'all';
+        }
         reload_page();
     }
 

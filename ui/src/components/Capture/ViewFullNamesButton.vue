@@ -3,8 +3,8 @@
 
     <UButton @click="toggle_view" variant="secondary" appearance="outline" size="sm" class="mr-2">
         <Binoculars :size="18" />
-        <span v-if="!togglereveal">{{ mstrings.viewfullnames }}</span>
-        <span v-if="togglereveal">{{ mstrings.hidefullnames }}</span>
+        <span v-if="!props.revealnames">{{ mstrings.viewfullnames }}</span>
+        <span v-if="props.revealnames">{{ mstrings.hidefullnames }}</span>
     </UButton>
 </template>
 
@@ -18,19 +18,24 @@
     import UButton from '../Common/UButton.vue';
 
     const hascapability = ref(false);
-    const togglereveal = ref(false);
     const debug = ref({});
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
+    const props = defineProps({
+        revealnames: {
+            type: Boolean,
+            default: false,
+        },
+    });
+
     const emit = defineEmits(['viewfullnames']);
 
     /**
-     * Export data to file
+     * Toggle revealing student names for anonymous assignments.
      */
     function toggle_view() {
-        togglereveal.value = !togglereveal.value;
-        emit('viewfullnames', togglereveal.value);
+        emit('viewfullnames', !props.revealnames);
     }
 
     /**
