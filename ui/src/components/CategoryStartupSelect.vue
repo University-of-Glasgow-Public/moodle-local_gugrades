@@ -9,23 +9,18 @@
                 {{ mstrings.categoryselect }}
             </UAlert>
 
-            <RadioGroup v-model="selected">
-                <div class="flex flex-col gap-2">
-                    <RadioGroupOption
-                        v-for="category in level1categories"
-                        :key="category.id"
-                        :value="category.id"
-                        v-slot="{ active }"
-                    >
-                    <div
-                        class="cursor-pointer rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 transition-colors"
-                        :class="active ? 'border-brand-dark-blue bg-brand-dark-blue/5' : 'hover:bg-slate-50'"
-                    >
-                        {{ category.fullname }}
-                    </div>
-                    </RadioGroupOption>
-                </div>
-            </RadioGroup>
+            <div class="flex flex-col gap-2" role="radiogroup" aria-label="Select initial top level category">
+                <button
+                    v-for="category in level1categories"
+                    :key="category.id"
+                    type="button"
+                    role="radio"
+                    @click="choose(category.id)"
+                    class="cursor-pointer rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 text-left transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-brand-dark-blue/30 focus:outline-none"
+                >
+                    {{ category.fullname }}
+                </button>
+            </div>
         </template>
         <template #footer>&nbsp;</template>
     </UModal>
@@ -44,7 +39,6 @@
     import { RadioGroup, RadioGroupOption } from '@headlessui/vue';
 
     const level1categories = ref< ICategories[] >([]);
-    const selected = ref(0);
     const notsetup = ref(false);
     const itemerror = ref(false);
     const debug = ref({});
@@ -84,14 +78,14 @@
         })
     }
 
-    watch(selected, (category) => {
-        if (category) {
-            level1store.categoryid = category;
+    function choose(id: number) {
+        if (id) {
+            level1store.categoryid = id;
             displaymodal.value = false;
-
-            emits('finished');
         }
-    });
+
+        emits('finished');
+    }
 
     onMounted(() => {
         itemerror.value = false;
