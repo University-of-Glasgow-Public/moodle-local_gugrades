@@ -1,0 +1,49 @@
+[
+
+    {
+        "name": "Summative",
+        "category": true,
+        "weight": 1.0,
+        "children": [
+            {
+                "name": "Single category",
+                "category": true,
+                "weight": 0.8,
+                "aggregation": "max",
+                "grademax": 100,
+                "children": [
+                    {
+                        "name": "Item1",
+                        "category": false,
+                        "type": "points",
+                        "grademax": 60,
+                        "weight": 1.0
+                    }
+                ]
+            },
+            {
+                "name": "Normal category",
+                "category": true,
+                "weight": 0.8,
+                "aggregation": "mean",
+                "grademax": 100,
+                "children": [
+                    {
+                        "name": "ItemA",
+                        "category": false,
+                        "type": "points",
+                        "grademax": 60,
+                        "weight": 1.0
+                    },
+                    {
+                        "name": "ItemB",
+                        "category": false,
+                        "type": "points",
+                        "grademax": 25,
+                        "weight": 1.0
+                    }
+                ]
+            }
+        ]
+    }
+]

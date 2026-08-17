@@ -104,7 +104,6 @@
      */
     function grade_changed(userid: number) {
         emits('gradeadded', userid);
-        console.log('CHANGED', userid);
     }
 
     onMounted(() => {

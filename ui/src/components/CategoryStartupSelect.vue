@@ -86,7 +86,6 @@
 
     watch(selected, (category) => {
         if (category) {
-            console.log(category);
             level1store.categoryid = category;
             displaymodal.value = false;
 

@@ -150,11 +150,12 @@ class aggregate {
         $items = $this->availability($items, $userid);
 
         // MGU-1446. If only one grade then that's the aggregated result (whatever it is)
+        // MGU-1511. But ONLY if an admin grade. Normal grades still need to be converted to percentage. 
         if (($level > 1) && (count($items) == 1)) {
             $item = reset($items);
 
             // Just let it drop through if grademissing
-            if (!$item->grademissing) {
+            if (!$item->grademissing && $item->admingrade) {
                 if ($item->admingrade) {
                     $explain = get_string('explain_onegrade_admin', 'local_gugrades');
                     return [0, 0, $item->admingrade, $item->displaygrade, 0, '', $explain, false];

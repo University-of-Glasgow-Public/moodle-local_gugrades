@@ -74815,7 +74815,6 @@ var AggregationGradeCell_default = /* @__PURE__ */ defineComponent({
 		*/
 		function grade_changed(userid) {
 			emits("gradeadded", userid);
-			console.log("CHANGED", userid);
 		}
 		onMounted(() => {});
 		return (_ctx, _cache) => {
@@ -83791,7 +83790,6 @@ var CategoryStartupSelect_default = /* @__PURE__ */ defineComponent({
 		}
 		watch$1(selected, (category) => {
 			if (category) {
-				console.log(category);
 				level1store.categoryid = category;
 				displaymodal.value = false;
 				emits("finished");
