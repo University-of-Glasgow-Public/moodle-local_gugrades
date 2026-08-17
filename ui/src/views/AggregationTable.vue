@@ -259,6 +259,19 @@
                         beforehalfway: isBeforeHalfway,
                         onGradeadded: (userid) => grade_changed(userid),
                     });
+                },
+                filterFn: (row, columnId, filterValue) => {
+                    // 1. Access the raw row data object directly
+                    const user = row.original; 
+                    
+                    // 2. Safely extract the raw value you want to search
+                    // Replace '.grade' with whatever property contains the typed text (e.g., user.score, user[column.fieldname])
+                    const rawValue = user[column.fieldname]?.data ?? ''; 
+                    
+                    // 3. Perform a case-insensitive search match
+                    return String(rawValue)
+                        .toLowerCase()
+                        .includes(String(filterValue).toLowerCase());
                 }
             }));
         });
@@ -267,6 +280,7 @@
 
             // Resit required
             cols.push(columnHelper.accessor('resitrequired', {
+                enableColumnFilter: false,
                 header: mstringstore.getMstring('resitrequired'),
                 cell: ({row}) => {
                     const user = row.original;
@@ -281,6 +295,7 @@
             // Completion.
             if (completionused.value) {
                 cols.push(columnHelper.accessor('completed', {
+                    enableColumnFilter: false,
                     header: mstringstore.getMstring('completed'),
                     cell: ({row}) => {
                         const user = row.original;

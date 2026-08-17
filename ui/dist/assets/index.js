@@ -67388,17 +67388,18 @@ var _hoisted_8$16 = {
 	key: 2,
 	class: "opacity-30"
 };
-var _hoisted_9$13 = { class: "divide-y divide-brand-light-purple/20 text-brand-dark-purple" };
-var _hoisted_10$12 = { class: "flex items-center gap-1 select-none text-brand-dark-purple/70" };
-var _hoisted_11$10 = { class: "text-university-blue font-bold" };
+var _hoisted_9$13 = ["value", "onInput"];
+var _hoisted_10$12 = { class: "divide-y divide-brand-light-purple/20 text-brand-dark-purple" };
+var _hoisted_11$10 = { class: "flex items-center gap-1 select-none text-brand-dark-purple/70" };
 var _hoisted_12$9 = { class: "text-university-blue font-bold" };
-var _hoisted_13$9 = { class: "flex items-center gap-1.5" };
-var _hoisted_14$8 = ["disabled"];
+var _hoisted_13$9 = { class: "text-university-blue font-bold" };
+var _hoisted_14$8 = { class: "flex items-center gap-1.5" };
 var _hoisted_15$6 = ["disabled"];
 var _hoisted_16$6 = ["disabled"];
 var _hoisted_17$6 = ["disabled"];
-var _hoisted_18$6 = ["value"];
+var _hoisted_18$6 = ["disabled"];
 var _hoisted_19$5 = ["value"];
+var _hoisted_20$4 = ["value"];
 //#endregion
 //#region src/components/Common/UTable.vue
 var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ */ defineComponent({
@@ -67416,11 +67417,16 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 		sortable: {
 			type: Boolean,
 			default: true
+		},
+		filterable: {
+			type: Boolean,
+			default: true
 		}
 	},
 	setup(__props) {
 		const props = __props;
 		const sorting = /* @__PURE__ */ ref(props.initialSort);
+		const columnFilters = /* @__PURE__ */ ref(props.filters);
 		const table = useVueTable({
 			get data() {
 				return props.data;
@@ -67430,7 +67436,7 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 			},
 			state: {
 				get columnFilters() {
-					return props.filters;
+					return columnFilters.value;
 				},
 				get columnVisibility() {
 					return props.visibility;
@@ -67441,6 +67447,9 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 			},
 			onSortingChange: (updater) => {
 				sorting.value = typeof updater === "function" ? updater(sorting.value) : updater;
+			},
+			onColumnFiltersChange: (updater) => {
+				columnFilters.value = typeof updater === "function" ? updater(columnFilters.value) : updater;
 			},
 			enableSorting: props.sortable,
 			getCoreRowModel: getCoreRowModel(),
@@ -67461,6 +67470,9 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 				data: newData
 			}));
 		}, { deep: true });
+		watch$1(() => props.filters, (newFilters) => {
+			columnFilters.value = newFilters;
+		});
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock("div", _hoisted_1$56, [createBaseVNode("div", _hoisted_2$41, [createBaseVNode("table", _hoisted_3$31, [createBaseVNode("thead", _hoisted_4$28, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getHeaderGroups(), (headerGroup) => {
 				return openBlock(), createElementBlock("tr", { key: headerGroup.id }, [(openBlock(true), createElementBlock(Fragment, null, renderList(headerGroup.headers, (header) => {
@@ -67475,7 +67487,25 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 						props: header.getContext()
 					}, null, 8, ["render", "props"]), header.column.getIsSorted() === "asc" ? (openBlock(), createElementBlock("span", _hoisted_6$22, "🔼")) : header.column.getIsSorted() === "desc" ? (openBlock(), createElementBlock("span", _hoisted_7$19, "🔽")) : header.column.getCanSort() ? (openBlock(), createElementBlock("span", _hoisted_8$16, "↕️")) : createCommentVNode("", true)], 10, _hoisted_5$26)], 2);
 				}), 128))]);
-			}), 128))]), createBaseVNode("tbody", _hoisted_9$13, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getRowModel().rows, (row) => {
+			}), 128)), __props.filterable ? (openBlock(true), createElementBlock(Fragment, { key: 0 }, renderList(unref(table).getHeaderGroups(), (headerGroup) => {
+				return openBlock(), createElementBlock("tr", {
+					key: `filter-${headerGroup.id}`,
+					class: "bg-university-blue/90"
+				}, [(openBlock(true), createElementBlock(Fragment, null, renderList(headerGroup.headers, (header) => {
+					return openBlock(), createElementBlock("th", {
+						key: `filter-${header.id}`,
+						class: "font-normal p-1"
+					}, [header.column.getCanFilter() ? (openBlock(), createElementBlock("input", {
+						key: 0,
+						type: "text",
+						value: header.column.getFilterValue() ?? "",
+						onInput: ($event) => header.column.setFilterValue($event.target.value),
+						placeholder: "Filter...",
+						class: "w-full rounded-sm border border-white/30 bg-white/10 text-white placeholder-white/50 text-xs px-2 py-1 focus:outline-none focus:border-white/60",
+						onClick: _cache[0] || (_cache[0] = withModifiers(() => {}, ["stop"]))
+					}, null, 40, _hoisted_9$13)) : createCommentVNode("", true)]);
+				}), 128))]);
+			}), 128)) : createCommentVNode("", true)]), createBaseVNode("tbody", _hoisted_10$12, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(table).getRowModel().rows, (row) => {
 				return openBlock(), createElementBlock("tr", {
 					key: row.id,
 					class: "transition-colors duration-150 ease-in-out hover:text-university-blue"
@@ -67488,38 +67518,38 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 						props: cell.getContext()
 					}, null, 8, ["render", "props"])], 2);
 				}), 128))]);
-			}), 128))])])]), createBaseVNode("div", { class: normalizeClass(["flex items-center justify-between text-sm text-brand-dark-purple font-medium", __props.dense ? "px-1 gap-2 text-xs" : "px-2"]) }, [createBaseVNode("div", _hoisted_10$12, [
-				_cache[5] || (_cache[5] = createBaseVNode("span", null, "Showing page", -1)),
-				createBaseVNode("strong", _hoisted_11$10, toDisplayString(unref(table).getState().pagination.pageIndex + 1), 1),
-				_cache[6] || (_cache[6] = createBaseVNode("span", null, "of", -1)),
-				createBaseVNode("strong", _hoisted_12$9, toDisplayString(unref(table).getPageCount()), 1)
-			]), createBaseVNode("div", _hoisted_13$9, [
+			}), 128))])])]), createBaseVNode("div", { class: normalizeClass(["flex items-center justify-between text-sm text-brand-dark-purple font-medium", __props.dense ? "px-1 gap-2 text-xs" : "px-2"]) }, [createBaseVNode("div", _hoisted_11$10, [
+				_cache[6] || (_cache[6] = createBaseVNode("span", null, "Showing page", -1)),
+				createBaseVNode("strong", _hoisted_12$9, toDisplayString(unref(table).getState().pagination.pageIndex + 1), 1),
+				_cache[7] || (_cache[7] = createBaseVNode("span", null, "of", -1)),
+				createBaseVNode("strong", _hoisted_13$9, toDisplayString(unref(table).getPageCount()), 1)
+			]), createBaseVNode("div", _hoisted_14$8, [
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-bold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-xs" : "px-3 py-1.5"]),
 					disabled: !unref(table).getCanPreviousPage(),
-					onClick: _cache[0] || (_cache[0] = ($event) => unref(table).setPageIndex(0)),
+					onClick: _cache[1] || (_cache[1] = ($event) => unref(table).setPageIndex(0)),
 					"aria-label": "First page"
-				}, " « ", 10, _hoisted_14$8),
+				}, " « ", 10, _hoisted_15$6),
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-semibold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-[11px]" : "px-3 py-1.5 text-xs"]),
 					disabled: !unref(table).getCanPreviousPage(),
-					onClick: _cache[1] || (_cache[1] = ($event) => unref(table).previousPage())
-				}, " ‹ Previous ", 10, _hoisted_15$6),
+					onClick: _cache[2] || (_cache[2] = ($event) => unref(table).previousPage())
+				}, " ‹ Previous ", 10, _hoisted_16$6),
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-semibold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-[11px]" : "px-3 py-1.5 text-xs"]),
 					disabled: !unref(table).getCanNextPage(),
-					onClick: _cache[2] || (_cache[2] = ($event) => unref(table).nextPage())
-				}, " Next › ", 10, _hoisted_16$6),
+					onClick: _cache[3] || (_cache[3] = ($event) => unref(table).nextPage())
+				}, " Next › ", 10, _hoisted_17$6),
 				createBaseVNode("button", {
 					class: normalizeClass(["border border-brand-light-purple/30 rounded-lg bg-white font-bold text-university-blue shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-brand-light-purple/10 transition-colors cursor-pointer", __props.dense ? "px-2 py-1 text-xs" : "px-3 py-1.5"]),
 					disabled: !unref(table).getCanNextPage(),
-					onClick: _cache[3] || (_cache[3] = ($event) => unref(table).setPageIndex(unref(table).getPageCount() - 1)),
+					onClick: _cache[4] || (_cache[4] = ($event) => unref(table).setPageIndex(unref(table).getPageCount() - 1)),
 					"aria-label": "Last page"
-				}, " » ", 10, _hoisted_17$6),
+				}, " » ", 10, _hoisted_18$6),
 				createBaseVNode("select", {
 					class: normalizeClass(["ml-2 bg-white text-brand-dark-purple border border-brand-light-purple/30 rounded-lg shadow-sm focus:outline-none focus:border-university-blue font-semibold cursor-pointer", __props.dense ? "px-1.5 py-1 text-[11px]" : "px-2.5 py-1.5 text-xs"]),
 					value: unref(table).getState().pagination.pageSize,
-					onChange: _cache[4] || (_cache[4] = (e) => unref(table).setPageSize(Number(e.target.value))),
+					onChange: _cache[5] || (_cache[5] = (e) => unref(table).setPageSize(Number(e.target.value))),
 					"aria-label": "Select row page size count"
 				}, [(openBlock(), createElementBlock(Fragment, null, renderList([
 					25,
@@ -67531,12 +67561,12 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 					return createBaseVNode("option", {
 						key: size,
 						value: size
-					}, " Show " + toDisplayString(size), 9, _hoisted_19$5);
-				}), 64))], 42, _hoisted_18$6)
+					}, " Show " + toDisplayString(size), 9, _hoisted_20$4);
+				}), 64))], 42, _hoisted_19$5)
 			])], 2)]);
 		};
 	}
-}), [["__scopeId", "data-v-b63b3b91"]]);
+}), [["__scopeId", "data-v-c3b7c937"]]);
 //#endregion
 //#region src/js/GradeColors.ts
 var gradecolors = {
@@ -67815,6 +67845,7 @@ var HistoryButton_default = /* @__PURE__ */ defineComponent({
 							data: grades.value,
 							columns,
 							dense: true,
+							filterable: false,
 							class: "mt-3"
 						}, null, 8, ["data"]),
 						createBaseVNode("div", _hoisted_2$40, [createVNode(UButton_default, {
@@ -74887,11 +74918,16 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 							beforehalfway: isBeforeHalfway,
 							onGradeadded: (userid) => grade_changed(userid)
 						});
+					},
+					filterFn: (row, columnId, filterValue) => {
+						const rawValue = row.original[column.fieldname]?.data ?? "";
+						return String(rawValue).toLowerCase().includes(String(filterValue).toLowerCase());
 					}
 				}));
 			});
 			if (toplevel.value) {
 				cols.push(columnHelper.accessor("resitrequired", {
+					enableColumnFilter: false,
 					header: mstringstore.getMstring("resitrequired"),
 					cell: ({ row }) => {
 						const user = row.original;
@@ -74903,6 +74939,7 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 					}
 				}));
 				if (completionused.value) cols.push(columnHelper.accessor("completed", {
+					enableColumnFilter: false,
 					header: mstringstore.getMstring("completed"),
 					cell: ({ row }) => {
 						const user = row.original;
@@ -75943,6 +75980,7 @@ var ManageMaps_default = /* @__PURE__ */ defineComponent({
 					createVNode(UTable_default, {
 						data: maps.value,
 						columns,
+						filterable: false,
 						class: "mt-5"
 					}, null, 8, ["data"]),
 					caneditgrades.value ? (openBlock(), createElementBlock("div", _hoisted_3$3, [createVNode(UButton_default, {

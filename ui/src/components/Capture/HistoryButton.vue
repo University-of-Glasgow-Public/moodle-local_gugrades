@@ -13,7 +13,7 @@
         <UAlert v-if="grades.length == 0">{{ mstrings.nohistory }}</UAlert>
 
 
-        <UTable :data="grades" :columns="columns" :dense="true" class="mt-3"></UTable>
+        <UTable :data="grades" :columns="columns" :dense="true" :filterable="false" class="mt-3"></UTable>
 
         <div class="flex justify-end mt-5">
             <UButton variant="warning" @click="closemodal">{{ mstrings.close }}</UButton>

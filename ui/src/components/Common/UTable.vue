@@ -32,6 +32,27 @@
               </div>
             </th> 
           </tr>
+
+          <!-- FILTER ROW -->
+          <template v-if="filterable">
+            <tr v-for="headerGroup in table.getHeaderGroups()" :key="`filter-${headerGroup.id}`" class="bg-university-blue/90">
+              <th 
+                v-for="header in headerGroup.headers" 
+                :key="`filter-${header.id}`"
+                class="font-normal p-1"
+              >
+                <input
+                  v-if="header.column.getCanFilter()"
+                  type="text"
+                  :value="(header.column.getFilterValue() as string) ?? ''"
+                  @input="header.column.setFilterValue(($event.target as HTMLInputElement).value)"
+                  placeholder="Filter..."
+                  class="w-full rounded-sm border border-white/30 bg-white/10 text-white placeholder-white/50 text-xs px-2 py-1 focus:outline-none focus:border-white/60"
+                  @click.stop
+                />
+              </th>
+            </tr>
+          </template>
         </thead>
 
         <!-- BODY ROWS GROUP -->
@@ -41,12 +62,6 @@
             :key="row.id"
             class="transition-colors duration-150 ease-in-out hover:text-university-blue"
           >
-            <!-- 
-              INDIVIDUAL BODY CELLS:
-              - Restored native <td> element.
-              - Changed whitespace rules to 'whitespace-normal break-words' to wrap dates neatly.
-              - Standardized condensed row height padding limits to 'py-2'.
-            -->
             <td 
               v-for="cell in row.getVisibleCells()" 
               :key="cell.id" 
@@ -162,6 +177,7 @@
         visibility?: VisibilityState;
         initialSort?: SortingState;
         sortable?: boolean;
+        filterable?: boolean;
     }
 
     const props = withDefaults(defineProps<BaseTableProps>(), {
@@ -169,11 +185,13 @@
         filters: () => [],
         visibility: () => ({}),
         initialSort: () => [],
-        sortable: true 
+        sortable: true,
+        filterable: true,
     });
 
     // This allows users to click and change sorting later if needed
     const sorting = ref<SortingState>(props.initialSort);
+    const columnFilters = ref<ColumnFiltersState>(props.filters);
 
     const table = useVueTable({
         get data() { return props.data },
@@ -181,13 +199,16 @@
         
         // 2. ADD THE ACTIVE STATE GETTERS
         state: {
-            get columnFilters() { return props.filters },
+            get columnFilters() { return columnFilters.value },
             get columnVisibility() { return props.visibility },
             get sorting() { return sorting.value }
         },
 
         onSortingChange: (updater) => {
             sorting.value = typeof updater === 'function' ? updater(sorting.value) : updater
+        },
+        onColumnFiltersChange: (updater) => {
+            columnFilters.value = typeof updater === 'function' ? updater(columnFilters.value) : updater
         },
 
         enableSorting: props.sortable,
@@ -220,6 +241,13 @@
         },
         { deep: true } // Tells Vue to scan deep properties inside the rows
     )
+
+    watch(
+        () => props.filters,
+        (newFilters) => {
+            columnFilters.value = newFilters;
+        }
+    );
 </script>
 
 <style scoped>
