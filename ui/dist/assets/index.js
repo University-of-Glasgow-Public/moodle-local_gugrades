@@ -74970,6 +74970,10 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 							beforehalfway: isBeforeHalfway,
 							onGradeadded: (userid) => grade_changed(userid)
 						});
+					},
+					filterFn: (row, columnId, filterValue) => {
+						const rawValue = row.original.displaygrade ?? "";
+						return String(rawValue).toLowerCase().includes(String(filterValue).toLowerCase());
 					}
 				}));
 			} else cols.push(columnHelper.accessor("total", {

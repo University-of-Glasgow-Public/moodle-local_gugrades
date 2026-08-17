@@ -261,14 +261,8 @@
                     });
                 },
                 filterFn: (row, columnId, filterValue) => {
-                    // 1. Access the raw row data object directly
                     const user = row.original; 
-                    
-                    // 2. Safely extract the raw value you want to search
-                    // Replace '.grade' with whatever property contains the typed text (e.g., user.score, user[column.fieldname])
                     const rawValue = user[column.fieldname]?.data ?? ''; 
-                    
-                    // 3. Perform a case-insensitive search match
                     return String(rawValue)
                         .toLowerCase()
                         .includes(String(filterValue).toLowerCase());
@@ -332,6 +326,13 @@
                         beforehalfway: isBeforeHalfway,
                         onGradeadded: (userid) => grade_changed(userid),
                     });
+                },
+                filterFn: (row, columnId, filterValue) => {
+                    const user = row.original; 
+                    const rawValue = user.displaygrade ?? ''; 
+                    return String(rawValue)
+                        .toLowerCase()
+                        .includes(String(filterValue).toLowerCase());
                 }
             }));
         } else {
