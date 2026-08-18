@@ -61237,12 +61237,12 @@ var LevelOneSelect_default = /* @__PURE__ */ defineComponent({
 			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", null, [notsetup.value ? (openBlock(), createBlock(UAlert_default, { key: 0 }, {
 				default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).notoplevel), 1)]),
 				_: 1
-			})) : createCommentVNode("", true), createBaseVNode("div", null, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "text-sm font-bold mb-1 opacity-70" }, "CATEGORY", -1)), !notsetup.value && !itemerror.value ? withDirectives((openBlock(), createElementBlock("select", {
+			})) : createCommentVNode("", true), createBaseVNode("div", null, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "a11y-picker-label text-sm font-bold mb-1 opacity-70" }, "CATEGORY", -1)), !notsetup.value && !itemerror.value ? withDirectives((openBlock(), createElementBlock("select", {
 				key: 0,
 				id: "level1select",
 				"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => categoryid.value = $event),
 				onChange: handleUserSelection,
-				class: "appearance-none px-3 py-2 pr-8 rounded-md bg-white text-brand-dark-purple border border-slate-300 w-80 shadow-md focus:outline-none focus:border-university-blue bg-no-repeat",
+				class: "a11y-picker-select appearance-none px-3 py-2 pr-8 rounded-md bg-white text-brand-dark-purple border border-slate-300 w-80 shadow-md focus:outline-none focus:border-university-blue bg-no-repeat",
 				style: {
 					"background-image": "url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E')",
 					"background-position": "right 0.75rem center",
@@ -62165,7 +62165,7 @@ var _hoisted_3$34 = {
 	key: 1,
 	class: "space-y-2 w-full text-xs"
 };
-var _hoisted_4$29 = { class: "flex items-center justify-between border-b border-slate-200 pb-1 mb-1" };
+var _hoisted_4$29 = { class: "a11y-picker-header flex items-center justify-between border-b border-slate-200 pb-1 mb-1" };
 var _hoisted_5$27 = { class: "text-xs font-semibold" };
 var ActivitySelect_vue_vue_type_script_setup_true_lang_default = /*@__PURE__*/ defineComponent({
 	__name: "ActivitySelect",
@@ -62244,9 +62244,9 @@ var ActivitySelect_vue_vue_type_script_setup_true_lang_default = /*@__PURE__*/ d
 			getActivity();
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", null, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "text-sm font-bold mb-1 opacity-70" }, "ACTIVITY", -1)), loaded.value ? (openBlock(), createElementBlock("div", {
+			return openBlock(), createElementBlock(Fragment, null, [createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]), createBaseVNode("div", null, [_cache[1] || (_cache[1] = createBaseVNode("div", { class: "a11y-picker-label text-sm font-bold mb-1 opacity-70" }, "ACTIVITY", -1)), loaded.value ? (openBlock(), createElementBlock("div", {
 				key: 0,
-				class: normalizeClass(["border border-slate-300 bg-white text-neutral px-3 rounded-md w-120 shadow-md transition-all duration-200 h-10 flex flex-col justify-center", { "border-primary ring-1 ring-primary !h-auto py-3": !collapsed.value }])
+				class: normalizeClass(["a11y-picker-panel border border-slate-300 bg-white text-neutral px-3 rounded-md w-120 shadow-md transition-all duration-200 h-10 flex flex-col justify-center", { "border-primary ring-1 ring-primary !h-auto py-3": !collapsed.value }])
 			}, [collapsed.value ? (openBlock(), createElementBlock("div", {
 				key: 0,
 				onClick: open_selection,
@@ -62279,7 +62279,7 @@ var _plugin_vue_export_helper_default = (sfc, props) => {
 };
 //#endregion
 //#region src/components/Capture/ActivitySelect.vue
-var ActivitySelect_default = /*#__PURE__*/ _plugin_vue_export_helper_default(ActivitySelect_vue_vue_type_script_setup_true_lang_default, [["__scopeId", "data-v-dccd18c8"]]);
+var ActivitySelect_default = /*#__PURE__*/ _plugin_vue_export_helper_default(ActivitySelect_vue_vue_type_script_setup_true_lang_default, [["__scopeId", "data-v-0d8c3b2c"]]);
 //#endregion
 //#region src/components/Common/GroupSelect.vue?vue&type=script&setup=true&lang.ts
 var _hoisted_1$59 = { key: 0 };
