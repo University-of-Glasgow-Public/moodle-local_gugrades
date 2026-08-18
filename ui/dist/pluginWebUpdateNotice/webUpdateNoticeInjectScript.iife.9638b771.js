@@ -15,5 +15,5 @@
     </div>`}v.innerHTML=y,document.querySelector(`.plugin-web-update-notice-anchor`).appendChild(v),h()}catch(e){console.error(`[pluginWebUpdateNotice] Failed to show notification`,e)}}return e.__checkUpdateSetup__=f,e})({});
   window.__checkUpdateSetup__({"checkInterval":300000,"hiddenDismissButton":true,"notificationProps":{"title":"System Update","description":"A new version of MyGrades is available.","buttonText":"Refresh Now"},"injectFileBase":"./"});
       ;const logFn = function Q(e,t){console.log(`version: %c${e}`,`color: #1677ff`),console.log(`release time: %c${new Date(t).toLocaleString()}`,`color: #1677ff`)}
-      ;logFn('1d34c33', 1787044404157)
+      ;logFn('1d34c33', 1787043935863)
     

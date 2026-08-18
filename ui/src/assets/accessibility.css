@@ -172,6 +172,38 @@ html.a11y-theme-dark #mygrades_container [role="tablist"] {
     border-color: #c2c8d0;
 }
 
+/* Top-level category / activity picker controls. These are white boxes with
+   dark text in the normal UI, so give them explicit pre-invert colours to
+   render as dark, readable surfaces in dark mode. */
+html.a11y-theme-dark #mygrades_container .a11y-picker-label,
+html.a11y-theme-dark .vm-wrapper .a11y-picker-label {
+    color: #334155 !important;
+}
+
+html.a11y-theme-dark #mygrades_container .a11y-picker-panel,
+html.a11y-theme-dark .vm-wrapper .a11y-picker-panel,
+html.a11y-theme-dark #mygrades_container .a11y-picker-select,
+html.a11y-theme-dark .vm-wrapper .a11y-picker-select {
+    background-color: #f3f6f9 !important;
+    border-color: #c5cad3 !important;
+    color: #0f172a !important;
+}
+
+html.a11y-theme-dark #mygrades_container .a11y-picker-header,
+html.a11y-theme-dark .vm-wrapper .a11y-picker-header {
+    border-bottom-color: #c5cad3 !important;
+    color: #0f172a !important;
+}
+
+html.a11y-theme-dark #mygrades_container .a11y-picker-panel b,
+html.a11y-theme-dark #mygrades_container .a11y-picker-panel a,
+html.a11y-theme-dark #mygrades_container .a11y-picker-panel i,
+html.a11y-theme-dark .vm-wrapper .a11y-picker-panel b,
+html.a11y-theme-dark .vm-wrapper .a11y-picker-panel a,
+html.a11y-theme-dark .vm-wrapper .a11y-picker-panel i {
+    color: #0f172a !important;
+}
+
 /* Filter row in UTable: use a lighter pre-invert slate so the rendered
    dark-mode row becomes a darker, calmer strip than the main header. */
 html.a11y-theme-dark #mygrades_container thead tr[class*="bg-university-blue/90"] {
@@ -252,6 +284,38 @@ html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="bg-slate-10
     background-color: #334155 !important;
     color: #e2e8f0 !important;
     border-color: #64748b !important;
+}
+
+/* Alert boxes (`UAlert` uses role="alert"`). Give them calmer, higher
+   contrast surfaces and readable text in dark mode. For inverted areas we
+   use light pre-invert colours so they render as dark alerts on screen. */
+html.a11y-theme-dark #mygrades_container [role="alert"],
+html.a11y-theme-dark .vm-wrapper [role="alert"] {
+    background-color: #edf2f7 !important;
+    color: #0f172a !important;
+    border-color: #c5cad3 !important;
+}
+
+html.a11y-theme-dark #mygrades_container [role="alert"] *,
+html.a11y-theme-dark .vm-wrapper [role="alert"] * {
+    color: #0f172a !important;
+}
+
+html.a11y-theme-dark #mygrades_container [role="alert"] button,
+html.a11y-theme-dark .vm-wrapper [role="alert"] button {
+    color: #334155 !important;
+}
+
+/* HeadlessUI dialogs are not inverted, so give alerts true dark surfaces. */
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [role="alert"] {
+    background-color: #1f2937 !important;
+    color: #e5eef7 !important;
+    border-color: #4b5563 !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [role="alert"] *,
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [role="alert"] button {
+    color: #e5eef7 !important;
 }
 
 /* Reading mode: warm, low glare background to reduce eye strain. */

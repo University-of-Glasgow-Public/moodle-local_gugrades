@@ -2,11 +2,11 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div>
-        <div class="text-sm font-bold mb-1 opacity-70">ACTIVITY</div>
+        <div class="a11y-picker-label text-sm font-bold mb-1 opacity-70">ACTIVITY</div>
         
         <div 
             v-if="loaded"
-            class="border border-slate-300 bg-white text-neutral px-3 rounded-md w-120 shadow-md transition-all duration-200 h-10 flex flex-col justify-center"
+            class="a11y-picker-panel border border-slate-300 bg-white text-neutral px-3 rounded-md w-120 shadow-md transition-all duration-200 h-10 flex flex-col justify-center"
             :class="{ 'border-primary ring-1 ring-primary !h-auto py-3': !collapsed }"
         >
             <!-- Collapsed State: Fills the exact 32px height cleanly -->
@@ -21,7 +21,7 @@
             
             <!-- Expanded State -->
             <div v-else class="space-y-2 w-full text-xs">
-                <div class="flex items-center justify-between border-b border-slate-200 pb-1 mb-1">
+                <div class="a11y-picker-header flex items-center justify-between border-b border-slate-200 pb-1 mb-1">
                     <b class="text-xs font-semibold">{{ categoryname }}</b>
                 </div>
                 <ActivityTree v-if="!treeerror" :nodes="activitytree" @activityselected="activity_selected" :depth="1"></ActivityTree>
