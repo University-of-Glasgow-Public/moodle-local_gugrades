@@ -434,7 +434,6 @@ $string['resetsuccess'] = 'MyGrades has been reset for this course.';
 $string['resit_help'] = 'For any pair of grade items that represent a first sitting and a reassessment, check all reassessments and click Finish.';
 $string['resitrequired'] = 'Reassessment required';
 $string['resitselected'] = 'Reassessment selected';
-$string['return'] = 'Return';
 $string['revert'] = 'Revert changes';
 $string['rulesdefault'] = 'Standard rules';
 $string['save'] = 'Save changes';

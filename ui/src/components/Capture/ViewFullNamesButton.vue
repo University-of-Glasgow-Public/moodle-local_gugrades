@@ -1,11 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <UButton @click="toggle_view" variant="secondary" appearance="outline" size="sm" class="mr-2">
-        <Binoculars :size="18" />
+    <MenuButton @click="toggle_view" iconName="Binoculars">
         <span v-if="!props.revealnames">{{ mstrings.viewfullnames }}</span>
         <span v-if="props.revealnames">{{ mstrings.hidefullnames }}</span>
-    </UButton>
+    </MenuButton>
 </template>
 
 <script setup lang="ts">
@@ -14,8 +13,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useMstrings } from '@/stores/mstrings.js';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
-    import { Binoculars } from '@lucide/vue';
-    import UButton from '../Common/UButton.vue';
+    import MenuButton from '../Common/MenuButton.vue';
 
     const hascapability = ref(false);
     const debug = ref({});
