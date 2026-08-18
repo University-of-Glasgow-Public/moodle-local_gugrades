@@ -172,6 +172,26 @@ html.a11y-theme-dark #mygrades_container [role="tablist"] {
     border-color: #c2c8d0;
 }
 
+/* Filter row in UTable: use a lighter pre-invert slate so the rendered
+   dark-mode row becomes a darker, calmer strip than the main header. */
+html.a11y-theme-dark #mygrades_container thead tr[class*="bg-university-blue/90"] {
+    background-color: #c5ccd5 !important;
+}
+
+html.a11y-theme-dark #mygrades_container thead tr[class*="bg-university-blue/90"] th {
+    color: #0f172a !important;
+}
+
+html.a11y-theme-dark #mygrades_container thead tr[class*="bg-university-blue/90"] input {
+    background-color: rgba(255, 255, 255, 0.78) !important;
+    border-color: #b6bec9 !important;
+    color: #0f172a !important;
+}
+
+html.a11y-theme-dark #mygrades_container thead tr[class*="bg-university-blue/90"] input::placeholder {
+    color: #475569 !important;
+}
+
 html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-base-100"],
 html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="bg-white"] {
     background-color: #1e293b !important;
@@ -204,6 +224,34 @@ html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class*="text-slate-"] {
 html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class~="border-base-200"],
 html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) [class*="border-slate-"] {
     border-color: #475569 !important;
+}
+
+/* Name-filter modal controls. */
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="text-brand-dark-purple"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="border-brand-dark-purple"] {
+    color: #e2e8f0 !important;
+    border-color: #94a3b8 !important;
+    background-color: transparent !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="text-brand-dark-purple"]:hover,
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="border-brand-dark-purple"]:hover {
+    background-color: #475569 !important;
+    color: #f8fafc !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="bg-university-blue"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="bg-brand-dark-purple"] {
+    background-color: #475569 !important;
+    color: #f8fafc !important;
+    border-color: #64748b !important;
+}
+
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="bg-white"],
+html.a11y-theme-dark [role="dialog"]:not(.a11y-panel) button[class*="bg-slate-100"] {
+    background-color: #334155 !important;
+    color: #e2e8f0 !important;
+    border-color: #64748b !important;
 }
 
 /* Reading mode: warm, low glare background to reduce eye strain. */
