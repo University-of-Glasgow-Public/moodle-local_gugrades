@@ -1,6 +1,6 @@
 <template>
     <div class="bg-slate-100 border border-slate-300 rounded-md mt-4 p-6">
-        <UAlert v-if="engineering" variant="info" class="mb-5">{{ mstrings.engineeringexamhelp }}</UAlert>
+        <UAlert v-if="engineering" variant="info" class="mb-5"><span v-html="mstrings.engineeringexamhelp"></span></UAlert>
         <UAlert variant="info" class="mb-5">{{ mstrings.changessaved }}</UAlert>
         <div class="w-fit min-w-[28rem]">
             <div class="flex items-center text-xs font-bold uppercase tracking-wider text-brand-dark-purple/70 pb-3 border-b border-brand-light-purple/20">
