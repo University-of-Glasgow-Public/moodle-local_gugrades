@@ -15,9 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define function check_integrity
- * @package    local_gug6
- * @author     Howard Miller
+ * Define function reset_user_grades
+ * @package    local_gugrades
+ * @copyright  2026
+ * @author     Michael Clark
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -25,14 +26,13 @@ namespace local_gugrades\external;
 
 use core_external\external_api;
 use core_external\external_function_parameters;
-use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 
 /**
- * Define function check_integrity
+ * Define function reset user MyGrades data
  */
-class check_integrity extends external_api {
+class reset_user_grades extends external_api {
     /**
      * Define function parameters
      * @return external_function_parameters
@@ -40,50 +40,38 @@ class check_integrity extends external_api {
     public static function execute_parameters() {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course id'),
+            'userid' => new external_value(PARAM_INT, 'User id'),
         ]);
     }
 
     /**
      * Execute function
      * @param int $courseid
+     * @param int $userid
      * @return array
      */
-    public static function execute($courseid) {
-
+    public static function execute($courseid, $userid) {
         \local_gugrades\development::increase_debugging();
 
-        // Security.
-        $params = self::validate_parameters(self::execute_parameters(), ['courseid' => $courseid]);
+        self::validate_parameters(self::execute_parameters(), [
+            'courseid' => $courseid,
+            'userid' => $userid,
+        ]);
         $context = \context_course::instance($courseid);
         self::validate_context($context);
+        require_capability('local/gugrades:resetcourse', $context);
 
-        return \local_gugrades\api::check_integrity($courseid);
+        \local_gugrades\api::reset_user_grades($courseid, $userid);
+        \local_gugrades\audit::write($courseid, $userid, 0, 'Removed user MyGrades data.');
+
+        return [];
     }
 
     /**
-     * Define function result
+     * Define result
      * @return external_single_structure
      */
     public static function execute_returns() {
-        return new external_single_structure([
-            'erroritems' => new external_multiple_structure(
-                new external_single_structure([
-                    'gradeitemid' => new external_value(PARAM_INT, 'Grade item id'),
-                    'itemname' => new external_value(PARAM_TEXT, 'Grade item name'),
-                    'error' => new external_value(PARAM_TEXT, 'Error condition'),
-                    'errortype' => new external_value(PARAM_ALPHANUMEXT, 'Error type', VALUE_DEFAULT, ''),
-                    'userid' => new external_value(PARAM_INT, 'User id', VALUE_DEFAULT, 0),
-                ])
-            ),
-            'reassessmentnotices' => new external_multiple_structure(
-                new external_single_structure([
-                    'itemname' => new external_value(PARAM_TEXT, 'Category name'),
-                    'message' => new external_value(PARAM_TEXT, 'Notice message'),
-                ]),
-                'Categories where reassessment was automatically removed',
-                VALUE_DEFAULT,
-                []
-            ),
-        ]);
+        return new external_single_structure([]);
     }
 }

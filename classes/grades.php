@@ -1547,6 +1547,25 @@ class grades {
     }
 
     /**
+     * Delete all MyGrades data for a user in a course.
+     * @param int $courseid
+     * @param int $userid
+     */
+    public static function delete_user_data(int $courseid, int $userid) {
+        global $DB;
+
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $courseid, 'userid' => $userid]);
+        $DB->delete_records('local_gugrades_hidden', ['courseid' => $courseid, 'userid' => $userid]);
+        $DB->delete_records('local_gugrades_resitrequired', ['courseid' => $courseid, 'userid' => $userid]);
+        $DB->delete_records('local_gugrades_notes', ['courseid' => $courseid, 'userid' => $userid]);
+        $DB->delete_records('local_gugrades_altered_weight', ['courseid' => $courseid, 'userid' => $userid]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $courseid, 'userid' => $userid]);
+        $DB->delete_records('local_gugrades_audit', ['courseid' => $courseid, 'userid' => $userid]);
+
+        \local_gugrades\aggregation::invalidate_cache($courseid);
+    }
+
+    /**
      * Delete all data for gradeitemid
      * TODO: Don't forget to add anything new that we add in db.
      * @param int $courseid
@@ -2345,6 +2364,83 @@ class grades {
                     ];              
                 }
             }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Check for current MyGrades data belonging to users who are no longer enrolled.
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity_unenrolled_users(int $courseid) {
+        global $DB;
+
+        $userids = $DB->get_fieldset_sql(
+            'SELECT DISTINCT userid
+               FROM {local_gugrades_grade}
+              WHERE courseid = :courseid
+                AND iscurrent = 1',
+            ['courseid' => $courseid]
+        );
+        if (!$userids) {
+            return [];
+        }
+
+        $context = \context_course::instance($courseid);
+        $enrolledusers = \local_gugrades\users::get_gradeable_users($context);
+        $enrolledids = array_map(function ($user) {
+            return (int) $user->id;
+        }, $enrolledusers);
+
+        $errors = [];
+        foreach ($userids as $userid) {
+            if (in_array((int) $userid, $enrolledids, true)) {
+                continue;
+            }
+
+            $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
+            $errors[] = [
+                'gradeitemid' => 0,
+                'itemname' => $user ? fullname($user) : 'User ' . $userid,
+                'error' => get_string('integrity_unenrolled_user', 'local_gugrades'),
+                'errortype' => 'unenrolled_user',
+                'userid' => (int) $userid,
+            ];
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Check for current MyGrades data linked to grade items that no longer exist in the course.
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity_removed_gradeitems(int $courseid) {
+        global $DB;
+
+        $sql = 'SELECT DISTINCT gr.gradeitemid
+                  FROM {local_gugrades_grade} gr
+             LEFT JOIN {grade_items} gi ON gi.id = gr.gradeitemid
+                 WHERE gr.courseid = :courseid
+                   AND gr.iscurrent = 1
+                   AND (gi.id IS NULL OR gi.courseid <> gr.courseid)';
+        $gradeitemids = $DB->get_fieldset_sql($sql, ['courseid' => $courseid]);
+        if (!$gradeitemids) {
+            return [];
+        }
+
+        $errors = [];
+        foreach ($gradeitemids as $gradeitemid) {
+            $errors[] = [
+                'gradeitemid' => (int) $gradeitemid,
+                'itemname' => get_string('integrity_removed_gradeitem_name', 'local_gugrades', $gradeitemid),
+                'error' => get_string('integrity_removed_gradeitem', 'local_gugrades'),
+                'errortype' => 'removed_gradeitem',
+                'userid' => 0,
+            ];
         }
 
         return $errors;

@@ -1890,13 +1890,18 @@ class api {
      * @param int $gradeitemid
      */
     public static function reset_grade_item(int $courseid, int $gradeitemid) {
-        $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
-        if ($gradeitem->courseid != $courseid) {
+        global $DB;
+
+        $gradeitem = $DB->get_record('grade_items', ['id' => $gradeitemid]);
+        if ($gradeitem && (int) $gradeitem->courseid !== $courseid) {
             throw new \moodle_exception('Grade item does not belong to this course');
         }
 
         // Keep parent category before deletion so we can recalculate.
-        $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
+        $gradecategoryid = null;
+        if ($gradeitem) {
+            $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
+        }
 
         \local_gugrades\grades::delete_grade_item($courseid, $gradeitemid);
 
@@ -1904,7 +1909,21 @@ class api {
         self::reset_all_caches();
         self::reset_bulk_data($courseid);
 
-        self::recalculate($courseid, $gradecategoryid);
+        if ($gradecategoryid) {
+            self::recalculate($courseid, $gradecategoryid);
+        }
+    }
+
+    /**
+     * Delete all MyGrades data for a user in a course.
+     * @param int $courseid
+     * @param int $userid
+     */
+    public static function reset_user_grades(int $courseid, int $userid) {
+        \local_gugrades\grades::delete_user_data($courseid, $userid);
+
+        self::reset_all_caches();
+        self::reset_bulk_data($courseid);
     }
 
     /**
@@ -3082,6 +3101,12 @@ class api {
 
         // Check for range / points/scale mismatch
         $errors = array_merge($errors, \local_gugrades\grades::check_integrity_range($courseid));
+
+        // Check for MyGrades data linked to users who are no longer enrolled.
+        $errors = array_merge($errors, \local_gugrades\grades::check_integrity_unenrolled_users($courseid));
+
+        // Check for MyGrades data linked to grade items removed from the course.
+        $errors = array_merge($errors, \local_gugrades\grades::check_integrity_removed_gradeitems($courseid));
 
         return [
             'erroritems' => $errors,

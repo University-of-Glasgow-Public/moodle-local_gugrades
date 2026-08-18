@@ -8,11 +8,31 @@
                 date or manipulating Gradebook settings AFTER grades have already been imported. MyGrades cannot continue.
             </div>
             <div class="table w-full border-separate border-spacing-y-2 border-spacing-x-4">
-                <div v-for="error in errors" :key="error.gradeitemid" class="table-row items-center">
+                <div v-for="error in errors" :key="errorKey(error)" class="table-row items-center">
                     <div class="table-cell whitespace-nowrap font-bold align-middle">{{ error.itemname }}</div>
                     <div class="table-cell align-middle text-slate-600">{{ error.error }}</div>
-                    <div class="table-cell align-middle text-right shrink-0">
-                        <ResetAssessmentButton :itemid="error.gradeitemid" :small="true" @reset="reload" />
+                    <div class="table-cell align-middle text-right w-44">
+                        <ResetUserGradesButton
+                            v-if="error.errortype === 'unenrolled_user' && error.userid"
+                            :userid="error.userid"
+                            :small="true"
+                            @reset="reload"
+                        />
+                        <ResetAssessmentButton
+                            v-else-if="error.gradeitemid"
+                            :itemid="error.gradeitemid"
+                            :small="true"
+                            @reset="reload"
+                        />
+                    </div>
+                </div>
+                <div v-if="courseurl" class="table-row">
+                    <div class="table-cell"></div>
+                    <div class="table-cell"></div>
+                    <div class="table-cell align-middle text-right w-44">
+                        <MenuButton :href="courseurl" :wide="true" iconName="MoveLeft">
+                            {{ returnToCourseLabel }}
+                        </MenuButton>
                     </div>
                 </div>
             </div>
@@ -45,12 +65,16 @@
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import { usePopulateTrees } from '@/js/setuptrees.ts';
     import ResetAssessmentButton from './Capture/ResetAssessmentButton.vue';
+    import ResetUserGradesButton from './Capture/ResetUserGradesButton.vue';
+    import MenuButton from './Common/MenuButton.vue';
     import { useToast } from 'vue-toastification';
 
     interface iError {
         gradeitemid: number;
         itemname: string;
         error: string;
+        errortype?: string;
+        userid?: number;
     }
 
     interface iNotice {
@@ -71,6 +95,7 @@
     const shownotices = ref(false);
     const isSettingUp = ref(true);
     const setupFinished = ref(false);
+    const courseurl = ref('');
 
     const showModalOpen = computed(() => !setupFinished.value && (isSettingUp.value || showerrors.value || shownotices.value));
 
@@ -87,6 +112,8 @@
     );
 
     const continueLabel = computed(() => mstrings.value.integritycontinue || 'Continue');
+
+    const returnToCourseLabel = computed(() => mstrings.value.integrity_return_to_course || 'Return to course');
 
     function showReassessmentNotices() {
         notices.value.forEach((notice) => {
@@ -112,7 +139,11 @@
         try {
             treestore.ready = false;
 
-            const result: any = await moodleFetch('local_gugrades_check_integrity', {});
+            const [result, courseinfo]: any[] = await Promise.all([
+                moodleFetch('local_gugrades_check_integrity', {}),
+                moodleFetch('local_gugrades_get_course_info', {}),
+            ]);
+            courseurl.value = courseinfo.url || '';
             errors.value = result.erroritems || [];
             notices.value = result.reassessmentnotices || [];
 
@@ -142,5 +173,12 @@
 
     function reload() {
         window.location.reload();
+    }
+
+    function errorKey(error: iError) {
+        if (error.errortype === 'unenrolled_user') {
+            return `user-${error.userid}`;
+        }
+        return `item-${error.gradeitemid}-${error.errortype || 'default'}`;
     }
 </script>

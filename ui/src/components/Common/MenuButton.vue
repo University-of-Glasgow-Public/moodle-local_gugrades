@@ -1,10 +1,15 @@
 <!-- MenuButton.vue -->
 <template>
-  <button 
-    @click="emit('click', $event)" 
-    :disabled="disabled" 
-    class="inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed w-36 shadow-sm font-semibold text-xs gap-2 transition-all duration-150"
-    type="button"
+  <component
+    :is="props.href ? 'a' : 'button'"
+    :href="props.href || undefined"
+    :type="props.href ? undefined : 'button'"
+    :disabled="props.href ? undefined : disabled"
+    @click="emit('click', $event)"
+    :class="[
+      'inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed shadow-sm font-semibold text-xs gap-2 transition-all duration-150 no-underline',
+      props.wide ? 'w-full min-w-36' : 'w-36'
+    ]"
   >
     <!-- Dynamic Component injector rendering the type-safe Lucide component -->
     <component 
@@ -14,10 +19,10 @@
       :class="props.warning ? '!text-brand-dark-pink' : ''"
     />
     
-    <span class="truncate">
+    <span :class="props.wide ? 'whitespace-nowrap' : 'truncate'">
       <slot></slot>
     </span>
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -33,10 +38,13 @@
       iconName: LucideIconName;
       disabled?: boolean;
       warning?: boolean;
+      wide?: boolean;
+      href?: string;
     }
 
     const props = withDefaults(defineProps<Props>(), {
-    disabled: false
+      disabled: false,
+      wide: false,
     });
 
     // 3. Define type-safe Emits
