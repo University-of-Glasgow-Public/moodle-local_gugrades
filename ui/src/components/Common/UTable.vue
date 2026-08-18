@@ -11,7 +11,7 @@
             <th 
               v-for="header in headerGroup.headers" 
               :key="header.id" 
-              class="font-semibold align-middle p-0"
+              class="font-semibold align-middle h-full p-0"
               :class="dense ? 'text-xs' : ''"
             >
               <div

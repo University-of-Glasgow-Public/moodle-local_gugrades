@@ -1,32 +1,38 @@
 <template>
-    <!-- keep all this info together and vertically aligned -->
-    <div class="flex flex-col">
-        <UTooltip :text="column.fullname" position="below" class="block">
-            <div>
-                <span @click="toggleSorting" class="cursor-pointer">{{ column.shortname ?? '' }}</span>
+    <!-- 1. Added h-full to fill the header cell height -->
+    <div class="flex flex-col h-full">
+        
+        <!-- 2. Wrapped upper content in flex-grow to push the bottom elements down -->
+        <div class="flex-grow">
+            <UTooltip :text="column.fullname" position="below" class="block">
+                <div>
+                    <span @click="toggleSorting" class="cursor-pointer">{{ column.shortname ?? '' }}</span>
+                </div>
+                <div class="inline-flex gap-2">
+                    <div v-if="!infocol && column.showweights">{{ column.weight }}%</div>
+                    <div v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></div>
+                </div>
+            </UTooltip>
+            <div class="font-light normal-case py-1" v-if="column.strategy">
+                <i>{{ column.strategy }}</i>
             </div>
-            <div class="inline-flex gap-2">
-                <div v-if="!infocol && column.showweights">{{ column.weight }}%</div>
-                <div v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></div>
+            <div v-if="totaltype">
+                ({{ totaltype }})
             </div>
-        </UTooltip>
-        <div class="font-light normal-case py-1" v-if="column.strategy">
-            <i>{{ column.strategy }}</i>
-        </div>
-        <div v-if="totaltype">
-            ({{ totaltype }})
-        </div>
-        <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.shortname ?? ''" size="lg" color="text-warning"></InfoButton>
+            <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.shortname ?? ''" size="lg" color="text-warning"></InfoButton>
 
-        <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
+            <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
+        </div>
 
-        <div v-if="column.categoryid">
-            <UButton class="mt-2 cursor-pointer" size="sm" @click="expand_clicked" aria-label="Drill down into grade category.">
+        <!-- 3. Added mt-auto to guarantee this stays at the bottom -->
+        <div v-if="column.categoryid" class="mt-auto">
+            <UButton class="mt-2 cursor-pointer" size="xs" @click="expand_clicked" aria-label="Drill down into grade category.">
                 <ArrowBigRight :size="18" :stroke-width="1" />
             </UButton>
         </div>
     </div>
 </template>
+
 
 <script setup lang="ts">
     import { computed } from 'vue';
