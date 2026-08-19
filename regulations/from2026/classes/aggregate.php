@@ -561,15 +561,28 @@ class aggregate {
      */
     public function pre_process_items(array $items, bool $isweighted, int $level) {
 
+        // MGU-1500. If total weights of GOODCAUSE_NR at L1 is LESS THAN 10% then drop them
+        // If 10% or higher then result is GOODCAUSE_NR
+        if ($level == 1) {
+
+            // Calculate total weight
+            $eccweight = 0;
+            foreach ($items as $item) {
+                $weight = $isweighted ? $item->weight * 100 : 100 / count($items);
+                if ($item->admingrade == 'GOODCAUSE_NR') {
+                    $eccweight += $weight;
+                }
+            }
+        }
+
         // Drop any GOODCAUSE_NR.
         // UNLESS, level 1, any are weight>10% in which case grade is ECC. (MGU-1387, rule 4)
         $newitems = [];
         foreach ($items as $item) {
-            $weight = $isweighted ? $item->weight * 100 : 100 / count($items);
             if ($item->admingrade != 'GOODCAUSE_NR') {
                 $newitems[] = $item;
             } else {
-                if (($level == 1) && ($weight > 10)) {
+                if (($level == 1) && ($eccweight >= 10)) {
                     return ['GOODCAUSE_NR', []];
                 }
                 $this->mv0found = true;

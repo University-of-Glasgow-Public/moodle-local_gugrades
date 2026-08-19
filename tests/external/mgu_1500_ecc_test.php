@@ -126,24 +126,25 @@ final class mgu_1500_ecc_test extends \local_gugrades\external\gugrades_aggregat
         );
 
         $fred = $page['users'][0];
-        var_dump($fred);
-    }
+        $this->assertEquals('D3 (9.47368)', $fred['displaygrade']);
 
-    /**
-     * Test top-level aggregation, Schedule A/B mix.
-     * Test no data
-     *
-     * @covers \local_gugrades\external\get_aggregation_page::execute
-     */
-    public function xtest_empty(): void {
-
-        // Make sure that we're a teacher.
-        $this->setUser($this->teacher);
-
-        // Import grades only for one student (so far).
-        $userlist = [
-            $this->student->id,
-        ];
+        // Now add ECC to Item 4
+        $item4id = $this->get_gradeitemid('Item 4');
+        $nothing = write_additional_grade::execute(
+            courseid:       $this->course->id,
+            gradeitemid:    $item4id,
+            userid:         $this->student->id,
+            reason:         'SECOND',
+            other:          '',
+            admingrade:     'GOODCAUSE_NR',
+            scale:          0,
+            grade:          0,
+            notes:          'Test notes'
+        );
+        $nothing = external_api::clean_returnvalue(
+            write_additional_grade::execute_returns(),
+            $nothing
+        );
 
         // Get aggregation page for above.
         $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, false);
@@ -152,12 +153,37 @@ final class mgu_1500_ecc_test extends \local_gugrades\external\gugrades_aggregat
             $page
         );
 
-        $this->assertTrue($page['toplevel']);
-        $this->assertEquals('A', $page['atype']);
         $fred = $page['users'][0];
-        $this->assertEquals(0, $fred['completed']);
-        $this->assertEquals("Grades missing", $fred['displaygrade']);
+        $this->assertEquals('D2 (9.63636)', $fred['displaygrade']);
+
+        // Now add ECC to Item 3
+        // This pushes us over ECC weights 10%
+        $item3id = $this->get_gradeitemid('Item 3');
+        $nothing = write_additional_grade::execute(
+            courseid:       $this->course->id,
+            gradeitemid:    $item3id,
+            userid:         $this->student->id,
+            reason:         'SECOND',
+            other:          '',
+            admingrade:     'GOODCAUSE_NR',
+            scale:          0,
+            grade:          0,
+            notes:          'Test notes'
+        );
+        $nothing = external_api::clean_returnvalue(
+            write_additional_grade::execute_returns(),
+            $nothing
+        );
+
+        // Get aggregation page for above.
+        $page = get_aggregation_page::execute($this->course->id, $this->gradecatsummative->id, '', '', 0, false);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertEquals('ECC', $fred['displaygrade']);
     }
 
-    
 }
