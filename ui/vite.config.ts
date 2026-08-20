@@ -59,9 +59,9 @@ export default defineConfig({
       }
     }
   },
-  optimizeDeps: {
-    exclude: ['vue3-easy-data-table'],
-    include: ['daisyui'],
-  },
+  //optimizeDeps: {
+  //  exclude: ['vue3-easy-data-table'],
+  //  include: ['daisyui'],
+  //},
   base: './'
 })

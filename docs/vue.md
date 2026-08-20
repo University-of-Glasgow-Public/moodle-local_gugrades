@@ -28,7 +28,33 @@ by 'echoing' a script statement. A shameless bodge.
 
 ## Accessing Moodle resources
 
-See [amd.md](./amd.md) for full description
+Although completely vanilla Moodle web services are used. A custom client (js/moodlefetch.ts) has been coded in the Vue application which accesses a custom endpoint (ajax.php) in the Moodle
+plugin. This is because it's difficult to access the standard Moodle 'FetchMany' client from the Vue.application.
+
+## Styling
+
+The Vue application uses entirely TailwindCSS version 4 for styling. This has a Vue plugin and is part of the build step. There is some additional custom CSS in src/assets/MyGrades.css. In particular, the 
+variables for the University theme are defined here. These colours are used throughout the application. Note that Tailwind 4 does not have a config file (a lot of documentation refers to a config file)
+
+## Vite settings
+
+The vite build settings are in vite.config.ts. There are quite a lot of settings in here. Most of it is fairly obvious or documented elsewhere. The native build behaviour is to minify and compress
+the outputted javascript but this is bad for debugging. This tends to be switched off but will increase loading time in production. 
+
+## Vue packages
+
+We use quite a few third party packages for various features. Here are some of the more interesting ones (and why)
+
+* [Formkit](https://formkit.com/) is used for all the HTML forms. Provides validation and so on
+* [HeadlessUI](https://headlessui.com/) an extension for Tailwind that provides highly accessible unstyled components
+* [VueModal](https://github.com/kouts/vue-modal) modal popup
+* [Lucide for Vue](https://lucide.dev/guide/vue/) icon library
+* [Web update notification](https://github.com/GreatAuk/plugin-web-update-notification) detects a new version of the Vue app and notifies user
+* [TailwindCSS](https://tailwindcss.com/) CSS library
+* [Tanstack Table](https://tanstack.com/table/latest) Headless data tables. Used for all tables.
+* [VueUse](https://vueuse.org/) Lots of things, but we only use it for some file handling functions
+* [KY](https://github.com/sindresorhus/ky) REST client.
+* [v-tour-guide](https://github.com/whytepeter/v-tour-guide) Used for initial user tour
 
 ## References
 

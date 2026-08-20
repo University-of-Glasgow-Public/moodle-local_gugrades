@@ -44,7 +44,7 @@ var __exportAll = (all, no_symbols) => {
 //#endregion
 //#region node_modules/@vue/shared/dist/shared.esm-bundler.js
 /**
-* @vue/shared v3.5.40
+* @vue/shared v3.5.41
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -240,7 +240,7 @@ function normalizeCssVarValue(value) {
 //#endregion
 //#region node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js
 /**
-* @vue/reactivity v3.5.40
+* @vue/reactivity v3.5.41
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -267,12 +267,14 @@ var EffectScope = class {
 		this._isPaused = false;
 		this._warnOnRun = true;
 		this.__v_skip = true;
-		if (!detached && activeEffectScope) if (activeEffectScope.active) {
-			this.parent = activeEffectScope;
-			this.index = (activeEffectScope.scopes || (activeEffectScope.scopes = [])).push(this) - 1;
-		} else {
-			this._active = false;
-			this._warnOnRun = false;
+		if (!detached && activeEffectScope) {
+			if (activeEffectScope.active) {
+				this.parent = activeEffectScope;
+				this.index = (activeEffectScope.scopes || (activeEffectScope.scopes = [])).push(this) - 1;
+			} else {
+				this._active = false;
+				this._warnOnRun = false;
+			}
 		}
 	}
 	get active() {
@@ -406,8 +408,10 @@ var ReactiveEffect = class {
 		*/
 		this.cleanup = void 0;
 		this.scheduler = void 0;
-		if (activeEffectScope) if (activeEffectScope.active) activeEffectScope.effects.push(this);
-		else this.flags &= -2;
+		if (activeEffectScope) {
+			if (activeEffectScope.active) activeEffectScope.effects.push(this);
+			else this.flags &= -2;
+		}
 	}
 	pause() {
 		this.flags |= 64;
@@ -773,9 +777,7 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
 						if (isMap$1(target)) run(depsMap.get(MAP_KEY_ITERATE_KEY));
 					}
 					break;
-				case "set":
-					if (isMap$1(target)) run(depsMap.get(ITERATE_KEY));
-					break;
+				case "set": if (isMap$1(target)) run(depsMap.get(ITERATE_KEY));
 			}
 		}
 	}
@@ -1014,10 +1016,12 @@ var MutableReactiveHandler = class extends BaseReactiveHandler {
 				oldValue = /* @__PURE__ */ toRaw(oldValue);
 				value = /* @__PURE__ */ toRaw(value);
 			}
-			if (!isArrayWithIntegerKey && /* @__PURE__ */ isRef(oldValue) && !/* @__PURE__ */ isRef(value)) if (isOldValueReadonly) return true;
-			else {
-				oldValue.value = value;
-				return true;
+			if (!isArrayWithIntegerKey && /* @__PURE__ */ isRef(oldValue) && !/* @__PURE__ */ isRef(value)) {
+				if (isOldValueReadonly) return true;
+				else {
+					oldValue.value = value;
+					return true;
+				}
 			}
 		}
 		const hadKey = isArrayWithIntegerKey ? Number(key) < target.length : hasOwn$1(target, key);
@@ -1511,25 +1515,26 @@ function watch$2(source, cb, options = EMPTY_OBJ) {
 			else if (/* @__PURE__ */ isReactive(s)) return reactiveGetter(s);
 			else if (isFunction$2(s)) return call ? call(s, 2) : s();
 		});
-	} else if (isFunction$2(source)) if (cb) getter = call ? () => call(source, 2) : source;
-	else getter = () => {
-		if (cleanup) {
-			pauseTracking();
-			try {
-				cleanup();
-			} finally {
-				resetTracking();
+	} else if (isFunction$2(source)) {
+		if (cb) getter = call ? () => call(source, 2) : source;
+		else getter = () => {
+			if (cleanup) {
+				pauseTracking();
+				try {
+					cleanup();
+				} finally {
+					resetTracking();
+				}
 			}
-		}
-		const currentEffect = activeWatcher;
-		activeWatcher = effect;
-		try {
-			return call ? call(source, 3, [boundCleanup]) : source(boundCleanup);
-		} finally {
-			activeWatcher = currentEffect;
-		}
-	};
-	else getter = NOOP;
+			const currentEffect = activeWatcher;
+			activeWatcher = effect;
+			try {
+				return call ? call(source, 3, [boundCleanup]) : source(boundCleanup);
+			} finally {
+				activeWatcher = currentEffect;
+			}
+		};
+	} else getter = NOOP;
 	if (cb && deep) {
 		const baseGetter = getter;
 		const depth = deep === true ? Infinity : deep;
@@ -1583,9 +1588,10 @@ function watch$2(source, cb, options = EMPTY_OBJ) {
 			cleanupMap.delete(effect);
 		}
 	};
-	if (cb) if (immediate) job(true);
-	else oldValue = effect.run();
-	else if (scheduler) scheduler(job.bind(null, true), true);
+	if (cb) {
+		if (immediate) job(true);
+		else oldValue = effect.run();
+	} else if (scheduler) scheduler(job.bind(null, true), true);
 	else effect.run();
 	watchHandle.pause = effect.pause.bind(effect);
 	watchHandle.resume = effect.resume.bind(effect);
@@ -1612,7 +1618,7 @@ function traverse(value, depth = Infinity, seen) {
 //#endregion
 //#region node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js
 /**
-* @vue/runtime-core v3.5.40
+* @vue/runtime-core v3.5.41
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -1711,7 +1717,7 @@ function queuePostFlushCb(cb) {
 			pendingPostFlushCbs.push(cb);
 			cb.flags |= 1;
 		}
-	} else pendingPostFlushCbs.push(...cb);
+	} else for (let i = 0; i < cb.length; i++) pendingPostFlushCbs.push(cb[i]);
 	queueFlush();
 }
 function flushPreFlushCbs(instance, seen, i = flushIndex + 1) {
@@ -1732,7 +1738,7 @@ function flushPostFlushCbs(seen) {
 		const deduped = [...new Set(pendingPostFlushCbs)].sort((a, b) => getId$1(a) - getId$1(b));
 		pendingPostFlushCbs.length = 0;
 		if (activePostFlushCbs) {
-			activePostFlushCbs.push(...deduped);
+			for (let i = 0; i < deduped.length; i++) activePostFlushCbs.push(deduped[i]);
 			return;
 		}
 		activePostFlushCbs = deduped;
@@ -1953,9 +1959,10 @@ var isTargetSVG = (target) => typeof SVGElement !== "undefined" && target instan
 var isTargetMathML = (target) => typeof MathMLElement === "function" && target instanceof MathMLElement;
 var resolveTarget = (props, select) => {
 	const targetSelector = props && props.to;
-	if (isString$1(targetSelector)) if (!select) return null;
-	else return select(targetSelector);
-	else return targetSelector;
+	if (isString$1(targetSelector)) {
+		if (!select) return null;
+		else return select(targetSelector);
+	} else return targetSelector;
 };
 var TeleportImpl = {
 	name: "Teleport",
@@ -2098,15 +2105,17 @@ function hydrateTeleport(node, vnode, parentComponent, parentSuspense, slotScope
 	const disabled = isTeleportDisabled(vnode.props);
 	if (target) {
 		const targetNode = target._lpa || target.firstChild;
-		if (vnode.shapeFlag & 16) if (disabled) {
-			hydrateDisabledTeleport(node, vnode);
-			hydrateAnchor(target, targetNode);
-			if (!vnode.targetAnchor) prepareAnchor(target, vnode, createText, insert, parentNode(node) === target ? node : null);
-		} else {
-			vnode.anchor = nextSibling(node);
-			hydrateAnchor(target, targetNode);
-			if (!vnode.targetAnchor) prepareAnchor(target, vnode, createText, insert);
-			hydrateChildren(targetNode && nextSibling(targetNode), vnode, target, parentComponent, parentSuspense, slotScopeIds, optimized);
+		if (vnode.shapeFlag & 16) {
+			if (disabled) {
+				hydrateDisabledTeleport(node, vnode);
+				hydrateAnchor(target, targetNode);
+				if (!vnode.targetAnchor) prepareAnchor(target, vnode, createText, insert, parentNode(node) === target ? node : null);
+			} else {
+				vnode.anchor = nextSibling(node);
+				hydrateAnchor(target, targetNode);
+				if (!vnode.targetAnchor) prepareAnchor(target, vnode, createText, insert);
+				hydrateChildren(targetNode && nextSibling(targetNode), vnode, target, parentComponent, parentSuspense, slotScopeIds, optimized);
+			}
 		}
 		updateCssVars(vnode, disabled);
 	} else if (disabled) {
@@ -2276,8 +2285,10 @@ function resolveTransitionHooks(vnode, props, state, instance, postClone) {
 		persisted,
 		beforeEnter(el) {
 			let hook = onBeforeEnter;
-			if (!state.isMounted) if (appear) hook = onBeforeAppear || onBeforeEnter;
-			else return;
+			if (!state.isMounted) {
+				if (appear) hook = onBeforeAppear || onBeforeEnter;
+				else return;
+			}
 			if (el[leaveCbKey]) el[leaveCbKey](true);
 			const leavingVNode = leavingVNodesCache[key];
 			if (leavingVNode && isSameVNodeType(vnode, leavingVNode) && leavingVNode.el[leaveCbKey]) leavingVNode.el[leaveCbKey]();
@@ -2288,11 +2299,13 @@ function resolveTransitionHooks(vnode, props, state, instance, postClone) {
 			let hook = onEnter;
 			let afterHook = onAfterEnter;
 			let cancelHook = onEnterCancelled;
-			if (!state.isMounted) if (appear) {
-				hook = onAppear || onEnter;
-				afterHook = onAfterAppear || onAfterEnter;
-				cancelHook = onAppearCancelled || onEnterCancelled;
-			} else return;
+			if (!state.isMounted) {
+				if (appear) {
+					hook = onAppear || onEnter;
+					afterHook = onAfterAppear || onAfterEnter;
+					cancelHook = onAppearCancelled || onEnterCancelled;
+				} else return;
+			}
 			let called = false;
 			el[enterCbKey$1] = (cancelled) => {
 				if (called) return;
@@ -2356,7 +2369,8 @@ function getInnerChild$1(vnode) {
 function setTransitionHooks(vnode, hooks) {
 	if (vnode.shapeFlag & 6 && vnode.component) {
 		vnode.transition = hooks;
-		setTransitionHooks(vnode.component.subTree, hooks);
+		const subTree = vnode.component.subTree;
+		setTransitionHooks(isTeleport(subTree.type) ? getInnerChild$1(subTree) || subTree : subTree, hooks);
 	} else if (vnode.shapeFlag & 128) {
 		vnode.ssContent.transition = hooks.clone(vnode.ssContent);
 		vnode.ssFallback.transition = hooks.clone(vnode.ssFallback);
@@ -2441,15 +2455,16 @@ function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
 				if (rawRef.f) {
 					const existing = _isString ? canSetSetupRef(ref) ? setupState[ref] : refs[ref] : canSetRef(ref) || !rawRef.k ? ref.value : refs[rawRef.k];
 					if (isUnmount) isArray(existing) && remove(existing, refValue);
-					else if (!isArray(existing)) if (_isString) {
-						refs[ref] = [refValue];
-						if (canSetSetupRef(ref)) setupState[ref] = refs[ref];
-					} else {
-						const newVal = [refValue];
-						if (canSetRef(ref, rawRef.k)) ref.value = newVal;
-						if (rawRef.k) refs[rawRef.k] = newVal;
-					}
-					else if (!existing.includes(refValue)) existing.push(refValue);
+					else if (!isArray(existing)) {
+						if (_isString) {
+							refs[ref] = [refValue];
+							if (canSetSetupRef(ref)) setupState[ref] = refs[ref];
+						} else {
+							const newVal = [refValue];
+							if (canSetRef(ref, rawRef.k)) ref.value = newVal;
+							if (rawRef.k) refs[rawRef.k] = newVal;
+						}
+					} else if (!existing.includes(refValue)) existing.push(refValue);
 				} else if (_isString) {
 					refs[ref] = value;
 					if (canSetSetupRef(ref)) setupState[ref] = value;
@@ -2592,16 +2607,17 @@ function renderList(source, renderItem, cache, index) {
 	} else if (typeof source === "number") {
 		ret = new Array(source);
 		for (let i = 0; i < source; i++) ret[i] = renderItem(i + 1, i, void 0, cached && cached[i]);
-	} else if (isObject$4(source)) if (source[Symbol.iterator]) ret = Array.from(source, (item, i) => renderItem(item, i, void 0, cached && cached[i]));
-	else {
-		const keys = Object.keys(source);
-		ret = new Array(keys.length);
-		for (let i = 0, l = keys.length; i < l; i++) {
-			const key = keys[i];
-			ret[i] = renderItem(source[key], key, i, cached && cached[i]);
+	} else if (isObject$4(source)) {
+		if (source[Symbol.iterator]) ret = Array.from(source, (item, i) => renderItem(item, i, void 0, cached && cached[i]));
+		else {
+			const keys = Object.keys(source);
+			ret = new Array(keys.length);
+			for (let i = 0, l = keys.length; i < l; i++) {
+				const key = keys[i];
+				ret[i] = renderItem(source[key], key, i, cached && cached[i]);
+			}
 		}
-	}
-	else ret = [];
+	} else ret = [];
 	if (cache) cache[index] = ret;
 	return ret;
 }
@@ -2617,7 +2633,8 @@ function createSlots(slots, dynamicSlots) {
 	}
 	return slots;
 }
-function renderSlot(slots, name, props = {}, fallback, noSlotted, branchKey) {
+function renderSlot(slots, name, props, fallback, noSlotted, branchKey) {
+	if (props == null) props = {};
 	if (currentRenderingInstance.ce || currentRenderingInstance.parent && isAsyncWrapper(currentRenderingInstance.parent) && currentRenderingInstance.parent.ce) {
 		const slotProps = branchKey != null && props.key == null ? extend$2({}, props, { key: branchKey }) : props;
 		const hasProps = Object.keys(slotProps).length > 0;
@@ -2822,9 +2839,10 @@ function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) 
 	for (const key in injectOptions) {
 		const opt = injectOptions[key];
 		let injected;
-		if (isObject$4(opt)) if ("default" in opt) injected = inject(opt.from || key, opt.default, true);
-		else injected = inject(opt.from || key);
-		else injected = inject(opt);
+		if (isObject$4(opt)) {
+			if ("default" in opt) injected = inject(opt.from || key, opt.default, true);
+			else injected = inject(opt.from || key);
+		} else injected = inject(opt);
 		if (/* @__PURE__ */ isRef(injected)) Object.defineProperty(ctx, key, {
 			enumerable: true,
 			configurable: true,
@@ -2843,10 +2861,12 @@ function createWatcher(raw, ctx, publicThis, key) {
 		const handler = ctx[raw];
 		if (isFunction$2(handler)) watch$1(getter, handler);
 	} else if (isFunction$2(raw)) watch$1(getter, raw.bind(publicThis));
-	else if (isObject$4(raw)) if (isArray(raw)) raw.forEach((r) => createWatcher(r, ctx, publicThis, key));
-	else {
-		const handler = isFunction$2(raw.handler) ? raw.handler.bind(publicThis) : ctx[raw.handler];
-		if (isFunction$2(handler)) watch$1(getter, handler, raw);
+	else if (isObject$4(raw)) {
+		if (isArray(raw)) raw.forEach((r) => createWatcher(r, ctx, publicThis, key));
+		else {
+			const handler = isFunction$2(raw.handler) ? raw.handler.bind(publicThis) : ctx[raw.handler];
+			if (isFunction$2(handler)) watch$1(getter, handler, raw);
+		}
 	}
 }
 function resolveMergedOptions(instance) {
@@ -3146,7 +3166,7 @@ function renderComponentRoot(instance) {
 		root = cloneVNode(root, null, false, true);
 		root.dirs = root.dirs ? root.dirs.concat(vnode.dirs) : vnode.dirs;
 	}
-	if (vnode.transition) setTransitionHooks(root, vnode.transition);
+	if (vnode.transition) setTransitionHooks(isTeleport(root.type) ? getInnerChild$1(root) || root : root, vnode.transition);
 	result = root;
 	setCurrentRenderingInstance(prev);
 	return result;
@@ -3244,16 +3264,17 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
 				let key = propsToUpdate[i];
 				if (isEmitListener(instance.emitsOptions, key)) continue;
 				const value = rawProps[key];
-				if (options) if (hasOwn$1(attrs, key)) {
-					if (value !== attrs[key]) {
-						attrs[key] = value;
-						hasAttrsChanged = true;
+				if (options) {
+					if (hasOwn$1(attrs, key)) {
+						if (value !== attrs[key]) {
+							attrs[key] = value;
+							hasAttrsChanged = true;
+						}
+					} else {
+						const camelizedKey = camelize$1(key);
+						props[camelizedKey] = resolvePropValue(options, rawCurrentProps, camelizedKey, value, instance, false);
 					}
-				} else {
-					const camelizedKey = camelize$1(key);
-					props[camelizedKey] = resolvePropValue(options, rawCurrentProps, camelizedKey, value, instance, false);
-				}
-				else if (value !== attrs[key]) {
+				} else if (value !== attrs[key]) {
 					attrs[key] = value;
 					hasAttrsChanged = true;
 				}
@@ -3262,9 +3283,11 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
 	} else {
 		if (setFullProps(instance, rawProps, props, attrs)) hasAttrsChanged = true;
 		let kebabKey;
-		for (const key in rawCurrentProps) if (!rawProps || !hasOwn$1(rawProps, key) && ((kebabKey = hyphenate$1(key)) === key || !hasOwn$1(rawProps, kebabKey))) if (options) {
-			if (rawPrevProps && (rawPrevProps[key] !== void 0 || rawPrevProps[kebabKey] !== void 0)) props[key] = resolvePropValue(options, rawCurrentProps, key, void 0, instance, true);
-		} else delete props[key];
+		for (const key in rawCurrentProps) if (!rawProps || !hasOwn$1(rawProps, key) && ((kebabKey = hyphenate$1(key)) === key || !hasOwn$1(rawProps, kebabKey))) {
+			if (options) {
+				if (rawPrevProps && (rawPrevProps[key] !== void 0 || rawPrevProps[kebabKey] !== void 0)) props[key] = resolvePropValue(options, rawCurrentProps, key, void 0, instance, true);
+			} else delete props[key];
+		}
 		if (attrs !== rawCurrentProps) {
 			for (const key in attrs) if (!rawProps || !hasOwn$1(rawProps, key) && true) {
 				delete attrs[key];
@@ -3282,9 +3305,10 @@ function setFullProps(instance, rawProps, props, attrs) {
 		if (isReservedProp(key)) continue;
 		const value = rawProps[key];
 		let camelKey;
-		if (options && hasOwn$1(options, camelKey = camelize$1(key))) if (!needCastKeys || !needCastKeys.includes(camelKey)) props[camelKey] = value;
-		else (rawCastValues || (rawCastValues = {}))[camelKey] = value;
-		else if (!isEmitListener(instance.emitsOptions, key)) {
+		if (options && hasOwn$1(options, camelKey = camelize$1(key))) {
+			if (!needCastKeys || !needCastKeys.includes(camelKey)) props[camelKey] = value;
+			else (rawCastValues || (rawCastValues = {}))[camelKey] = value;
+		} else if (!isEmitListener(instance.emitsOptions, key)) {
 			if (!(key in attrs) || value !== attrs[key]) {
 				attrs[key] = value;
 				hasAttrsChanged = true;
@@ -3428,9 +3452,10 @@ var updateSlots = (instance, children, optimized) => {
 	let deletionComparisonTarget = EMPTY_OBJ;
 	if (vnode.shapeFlag & 32) {
 		const type = children._;
-		if (type) if (optimized && type === 1) needDeletionCheck = false;
-		else assignSlots(slots, children, optimized);
-		else {
+		if (type) {
+			if (optimized && type === 1) needDeletionCheck = false;
+			else assignSlots(slots, children, optimized);
+		} else {
 			needDeletionCheck = !children.$stable;
 			normalizeObjectSlots(children, slots);
 		}
@@ -3656,9 +3681,10 @@ function baseCreateRenderer(options, createHydrationFns) {
 	};
 	const processComponent = (n1, n2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
 		n2.slotScopeIds = slotScopeIds;
-		if (n1 == null) if (n2.shapeFlag & 512) parentComponent.ctx.activate(n2, container, anchor, namespace, optimized);
-		else mountComponent(n2, container, anchor, parentComponent, parentSuspense, namespace, optimized);
-		else updateComponent(n1, n2, optimized);
+		if (n1 == null) {
+			if (n2.shapeFlag & 512) parentComponent.ctx.activate(n2, container, anchor, namespace, optimized);
+			else mountComponent(n2, container, anchor, parentComponent, parentSuspense, namespace, optimized);
+		} else updateComponent(n1, n2, optimized);
 	};
 	const mountComponent = (initialVNode, container, anchor, parentComponent, parentSuspense, namespace, optimized) => {
 		const instance = initialVNode.component = createComponentInstance(initialVNode, parentComponent, parentSuspense);
@@ -3675,14 +3701,15 @@ function baseCreateRenderer(options, createHydrationFns) {
 	};
 	const updateComponent = (n1, n2, optimized) => {
 		const instance = n2.component = n1.component;
-		if (shouldUpdateComponent(n1, n2, optimized)) if (instance.asyncDep && !instance.asyncResolved) {
-			updateComponentPreRender(instance, n2, optimized);
-			return;
+		if (shouldUpdateComponent(n1, n2, optimized)) {
+			if (instance.asyncDep && !instance.asyncResolved) {
+				updateComponentPreRender(instance, n2, optimized);
+				return;
+			} else {
+				instance.next = n2;
+				instance.update();
+			}
 		} else {
-			instance.next = n2;
-			instance.update();
-		}
-		else {
 			n2.el = n1.el;
 			instance.vnode = n2;
 		}
@@ -3795,9 +3822,10 @@ function baseCreateRenderer(options, createHydrationFns) {
 		if (shapeFlag & 8) {
 			if (prevShapeFlag & 16) unmountChildren(c1, parentComponent, parentSuspense);
 			if (c2 !== c1) hostSetElementText(container, c2);
-		} else if (prevShapeFlag & 16) if (shapeFlag & 16) patchKeyedChildren(c1, c2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized);
-		else unmountChildren(c1, parentComponent, parentSuspense, true);
-		else {
+		} else if (prevShapeFlag & 16) {
+			if (shapeFlag & 16) patchKeyedChildren(c1, c2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized);
+			else unmountChildren(c1, parentComponent, parentSuspense, true);
+		} else {
 			if (prevShapeFlag & 8) hostSetElementText(container, "");
 			if (shapeFlag & 16) mountChildren(c2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized);
 		}
@@ -3893,8 +3921,10 @@ function baseCreateRenderer(options, createHydrationFns) {
 				const anchorVNode = c2[nextIndex + 1];
 				const anchor = nextIndex + 1 < l2 ? anchorVNode.el || resolveAsyncComponentPlaceholder(anchorVNode) : parentAnchor;
 				if (newIndexToOldIndexMap[i] === 0) patch(null, nextChild, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized);
-				else if (moved) if (j < 0 || i !== increasingNewIndexSequence[j]) move(nextChild, container, anchor, 2);
-				else j--;
+				else if (moved) {
+					if (j < 0 || i !== increasingNewIndexSequence[j]) move(nextChild, container, anchor, 2);
+					else j--;
+				}
 			}
 		}
 	};
@@ -3922,31 +3952,33 @@ function baseCreateRenderer(options, createHydrationFns) {
 			moveStaticNode(vnode, container, anchor);
 			return;
 		}
-		if (moveType !== 2 && shapeFlag & 1 && transition) if (moveType === 0) if (transition.persisted && !el[leaveCbKey]) hostInsert(el, container, anchor);
-		else {
-			transition.beforeEnter(el);
-			hostInsert(el, container, anchor);
-			queuePostRenderEffect(() => transition.enter(el), parentSuspense);
-		}
-		else {
-			const { leave, delayLeave, afterLeave } = transition;
-			const remove2 = () => {
-				if (vnode.ctx.isUnmounted) hostRemove(el);
-				else hostInsert(el, container, anchor);
-			};
-			const performLeave = () => {
-				const wasLeaving = el._isLeaving || !!el[leaveCbKey];
-				if (el._isLeaving) el[leaveCbKey](true);
-				if (transition.persisted && !wasLeaving) remove2();
-				else leave(el, () => {
-					remove2();
-					afterLeave && afterLeave();
-				});
-			};
-			if (delayLeave) delayLeave(el, remove2, performLeave);
-			else performLeave();
-		}
-		else hostInsert(el, container, anchor);
+		if (moveType !== 2 && shapeFlag & 1 && transition) {
+			if (moveType === 0) {
+				if (transition.persisted && !el[leaveCbKey]) hostInsert(el, container, anchor);
+				else {
+					transition.beforeEnter(el);
+					hostInsert(el, container, anchor);
+					queuePostRenderEffect(() => transition.enter(el), parentSuspense);
+				}
+			} else {
+				const { leave, delayLeave, afterLeave } = transition;
+				const remove2 = () => {
+					if (vnode.ctx.isUnmounted) hostRemove(el);
+					else hostInsert(el, container, anchor);
+				};
+				const performLeave = () => {
+					const wasLeaving = el._isLeaving || !!el[leaveCbKey];
+					if (el._isLeaving) el[leaveCbKey](true);
+					if (transition.persisted && !wasLeaving) remove2();
+					else leave(el, () => {
+						remove2();
+						afterLeave && afterLeave();
+					});
+				};
+				if (delayLeave) delayLeave(el, remove2, performLeave);
+				else performLeave();
+			}
+		} else hostInsert(el, container, anchor);
 	};
 	const unmount = (vnode, parentComponent, parentSuspense, doRemove = false, optimized = false) => {
 		const { type, props, ref, children, dynamicChildren, shapeFlag, patchFlag, dirs, cacheIndex, memo } = vnode;
@@ -4149,8 +4181,10 @@ function getSequence(arr) {
 }
 function locateNonHydratedAsyncRoot(instance) {
 	const subComponent = instance.subTree.component;
-	if (subComponent) if (subComponent.asyncDep && !subComponent.asyncResolved) return subComponent;
-	else return locateNonHydratedAsyncRoot(subComponent);
+	if (subComponent) {
+		if (subComponent.asyncDep && !subComponent.asyncResolved) return subComponent;
+		else return locateNonHydratedAsyncRoot(subComponent);
+	}
 }
 function invalidateMount(hooks) {
 	if (hooks) for (let i = 0; i < hooks.length; i++) hooks[i].flags |= 8;
@@ -4163,9 +4197,10 @@ function resolveAsyncComponentPlaceholder(anchorVnode) {
 }
 var isSuspense = (type) => type.__isSuspense;
 function queueEffectWithSuspense(fn, suspense) {
-	if (suspense && suspense.pendingBranch) if (isArray(fn)) suspense.effects.push(...fn);
-	else suspense.effects.push(fn);
-	else queuePostFlushCb(fn);
+	if (suspense && suspense.pendingBranch) {
+		if (isArray(fn)) suspense.effects.push(...fn);
+		else suspense.effects.push(fn);
+	} else queuePostFlushCb(fn);
 }
 var Fragment = /* @__PURE__ */ Symbol.for("v-fgt");
 var Text = /* @__PURE__ */ Symbol.for("v-txt");
@@ -4256,8 +4291,10 @@ function _createVNode(type, props = null, children = null, patchFlag = 0, dynami
 	if (isVNode(type)) {
 		const cloned = cloneVNode(type, props, true);
 		if (children) normalizeChildren(cloned, children);
-		if (isBlockTreeEnabled > 0 && !isBlockNode && currentBlock) if (cloned.shapeFlag & 6) currentBlock[currentBlock.indexOf(type)] = cloned;
-		else currentBlock.push(cloned);
+		if (isBlockTreeEnabled > 0 && !isBlockNode && currentBlock) {
+			if (cloned.shapeFlag & 6) currentBlock[currentBlock.indexOf(type)] = cloned;
+			else currentBlock.push(cloned);
+		}
 		cloned.patchFlag = -2;
 		return cloned;
 	}
@@ -4335,25 +4372,28 @@ function normalizeChildren(vnode, children) {
 	const { shapeFlag } = vnode;
 	if (children == null) children = null;
 	else if (isArray(children)) type = 16;
-	else if (typeof children === "object") if (shapeFlag & 65) {
-		const slot = children.default;
-		if (slot) {
-			slot._c && (slot._d = false);
-			normalizeChildren(vnode, slot());
-			slot._c && (slot._d = true);
+	else if (typeof children === "object") {
+		if (shapeFlag & 65) {
+			const slot = children.default;
+			if (slot) {
+				slot._c && (slot._d = false);
+				normalizeChildren(vnode, slot());
+				slot._c && (slot._d = true);
+			}
+			return;
+		} else {
+			type = 32;
+			const slotFlag = children._;
+			if (!slotFlag && !isInternalObject(children)) children._ctx = currentRenderingInstance;
+			else if (slotFlag === 3 && currentRenderingInstance) {
+				if (currentRenderingInstance.slots._ === 1) children._ = 1;
+				else {
+					children._ = 2;
+					vnode.patchFlag |= 1024;
+				}
+			}
 		}
-		return;
-	} else {
-		type = 32;
-		const slotFlag = children._;
-		if (!slotFlag && !isInternalObject(children)) children._ctx = currentRenderingInstance;
-		else if (slotFlag === 3 && currentRenderingInstance) if (currentRenderingInstance.slots._ === 1) children._ = 1;
-		else {
-			children._ = 2;
-			vnode.patchFlag |= 1024;
-		}
-	}
-	else if (isFunction$2(children)) {
+	} else if (isFunction$2(children)) {
 		if (shapeFlag & 65) {
 			normalizeChildren(vnode, { default: children });
 			return;
@@ -4529,7 +4569,12 @@ function setupStatefulComponent(instance, isSSR) {
 		if (isAsyncSetup) {
 			setupResult.then(unsetCurrentInstance, unsetCurrentInstance);
 			if (isSSR) return setupResult.then((resolvedResult) => {
-				handleSetupResult(instance, resolvedResult, isSSR);
+				setInSSRSetupState(true);
+				try {
+					handleSetupResult(instance, resolvedResult, isSSR);
+				} finally {
+					setInSSRSetupState(false);
+				}
 			}).catch((e) => {
 				handleError(e, instance, 0);
 			});
@@ -4538,9 +4583,10 @@ function setupStatefulComponent(instance, isSSR) {
 	} else finishComponentSetup(instance, isSSR);
 }
 function handleSetupResult(instance, setupResult, isSSR) {
-	if (isFunction$2(setupResult)) if (instance.type.__ssrInlineRender) instance.ssrRender = setupResult;
-	else instance.render = setupResult;
-	else if (isObject$4(setupResult)) instance.setupState = proxyRefs(setupResult);
+	if (isFunction$2(setupResult)) {
+		if (instance.type.__ssrInlineRender) instance.ssrRender = setupResult;
+		else instance.render = setupResult;
+	} else if (isObject$4(setupResult)) instance.setupState = proxyRefs(setupResult);
 	finishComponentSetup(instance, isSSR);
 }
 var compile$1;
@@ -4613,11 +4659,12 @@ function h$1(type, propsOrChildren, children) {
 	try {
 		setBlockTracking(-1);
 		const l = arguments.length;
-		if (l === 2) if (isObject$4(propsOrChildren) && !isArray(propsOrChildren)) {
-			if (isVNode(propsOrChildren)) return createVNode(type, null, [propsOrChildren]);
-			return createVNode(type, propsOrChildren);
-		} else return createVNode(type, null, propsOrChildren);
-		else {
+		if (l === 2) {
+			if (isObject$4(propsOrChildren) && !isArray(propsOrChildren)) {
+				if (isVNode(propsOrChildren)) return createVNode(type, null, [propsOrChildren]);
+				return createVNode(type, propsOrChildren);
+			} else return createVNode(type, null, propsOrChildren);
+		} else {
 			if (l > 3) children = Array.prototype.slice.call(arguments, 2);
 			else if (l === 3 && isVNode(children)) children = [children];
 			return createVNode(type, propsOrChildren, children);
@@ -4626,11 +4673,11 @@ function h$1(type, propsOrChildren, children) {
 		setBlockTracking(1);
 	}
 }
-var version = "3.5.40";
+var version = "3.5.41";
 //#endregion
 //#region node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js
 /**
-* @vue/runtime-dom v3.5.40
+* @vue/runtime-dom v3.5.41
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -4929,14 +4976,15 @@ var vShow = {
 	},
 	updated(el, { value, oldValue }, { transition }) {
 		if (!value === !oldValue) return;
-		if (transition) if (value) {
-			transition.beforeEnter(el);
-			setDisplay(el, true);
-			transition.enter(el);
-		} else transition.leave(el, () => {
-			setDisplay(el, false);
-		});
-		else setDisplay(el, value);
+		if (transition) {
+			if (value) {
+				transition.beforeEnter(el);
+				setDisplay(el, true);
+				transition.enter(el);
+			} else transition.leave(el, () => {
+				setDisplay(el, false);
+			});
+		} else setDisplay(el, value);
 	},
 	beforeUnmount(el, { value }) {
 		setDisplay(el, value);
@@ -5007,11 +5055,13 @@ function patchStyle(el, prev, next) {
 	const isCssString = isString$1(next);
 	let hasControlledDisplay = false;
 	if (next && !isCssString) {
-		if (prev) if (!isString$1(prev)) {
-			for (const key in prev) if (next[key] == null) setStyle(style, key, "");
-		} else for (const prevStyle of prev.split(";")) {
-			const key = prevStyle.slice(0, prevStyle.indexOf(":")).trim();
-			if (next[key] == null) setStyle(style, key, "");
+		if (prev) {
+			if (!isString$1(prev)) {
+				for (const key in prev) if (next[key] == null) setStyle(style, key, "");
+			} else for (const prevStyle of prev.split(";")) {
+				const key = prevStyle.slice(0, prevStyle.indexOf(":")).trim();
+				if (next[key] == null) setStyle(style, key, "");
+			}
 		}
 		for (const key in next) {
 			if (key === "display") hasControlledDisplay = true;
@@ -5069,9 +5119,10 @@ function shouldPreserveTextareaResizeStyle(el, key, prev, next) {
 }
 var xlinkNS = "http://www.w3.org/1999/xlink";
 function patchAttr(el, key, value, isSVG, instance, isBoolean = isSpecialBooleanAttr(key)) {
-	if (isSVG && key.startsWith("xlink:")) if (value == null) el.removeAttributeNS(xlinkNS, key.slice(6, key.length));
-	else el.setAttributeNS(xlinkNS, key, value);
-	else if (value == null || isBoolean && !includeBooleanAttr(value)) el.removeAttribute(key);
+	if (isSVG && key.startsWith("xlink:")) {
+		if (value == null) el.removeAttributeNS(xlinkNS, key.slice(6, key.length));
+		else el.setAttributeNS(xlinkNS, key, value);
+	} else if (value == null || isBoolean && !includeBooleanAttr(value)) el.removeAttribute(key);
 	else el.setAttribute(key, isBoolean ? "" : isSymbol(value) ? String(value) : value);
 }
 function patchDOMProp(el, key, value, parentComponent, attrName) {
@@ -5340,6 +5391,7 @@ function onCompositionEnd(e) {
 	}
 }
 var assignKey = /* @__PURE__ */ Symbol("_assign");
+var initialValueKey = /* @__PURE__ */ Symbol("_initialValue");
 function castValue(value, trim, number) {
 	if (trim) value = value.trim();
 	if (number) value = looseToNumber(value);
@@ -5347,6 +5399,10 @@ function castValue(value, trim, number) {
 }
 var vModelText = {
 	created(el, { modifiers: { lazy, trim, number } }, vnode) {
+		if (el.parentNode) {
+			if (el.type === "text") el[initialValueKey] = el.defaultValue.replace(/[\r\n]/g, "");
+			else if (el.type === "textarea") el[initialValueKey] = el.defaultValue.replace(/\r\n?/g, "\n");
+		}
 		el[assignKey] = getModelAssigner(vnode);
 		const castToNumber = number || vnode.props && vnode.props.type === "number";
 		addEventListener$1(el, lazy ? "change" : "input", (e) => {
@@ -5362,8 +5418,12 @@ var vModelText = {
 			addEventListener$1(el, "change", onCompositionEnd);
 		}
 	},
-	mounted(el, { value }) {
-		el.value = value == null ? "" : value;
+	mounted(el, { value, modifiers: { trim, number } }) {
+		const newValue = value == null ? "" : value;
+		const initialValue = el[initialValueKey];
+		delete el[initialValueKey];
+		if (initialValue !== void 0 && (el.type === "text" || el.type === "textarea") && el.value !== initialValue) el[assignKey](castValue(el.value, trim, number));
+		else el.value = newValue;
 	},
 	beforeUpdate(el, { value, oldValue, modifiers: { lazy, trim, number } }, vnode) {
 		el[assignKey] = getModelAssigner(vnode);
@@ -5424,12 +5484,13 @@ function setSelected(el, value) {
 	for (let i = 0, l = el.options.length; i < l; i++) {
 		const option = el.options[i];
 		const optionValue = getValue$1(option);
-		if (isMultiple) if (isArrayValue) {
-			const optionType = typeof optionValue;
-			if (optionType === "string" || optionType === "number") option.selected = value.some((v) => String(v) === String(optionValue));
-			else option.selected = looseIndexOf(value, optionValue) > -1;
-		} else option.selected = value.has(optionValue);
-		else if (looseEqual(getValue$1(option), value)) {
+		if (isMultiple) {
+			if (isArrayValue) {
+				const optionType = typeof optionValue;
+				if (optionType === "string" || optionType === "number") option.selected = value.some((v) => String(v) === String(optionValue));
+				else option.selected = looseIndexOf(value, optionValue) > -1;
+			} else option.selected = value.has(optionValue);
+		} else if (looseEqual(getValue$1(option), value)) {
 			if (el.selectedIndex !== i) el.selectedIndex = i;
 			return;
 		}
@@ -6038,9 +6099,11 @@ var deepMerge = (...sources) => {
 		}
 	}
 	if (searchParameters !== void 0) returnValue.searchParams = searchParameters;
-	if (signals.length > 0) if (signals.length === 1) returnValue.signal = signals[0];
-	else if (supportsAbortSignal) returnValue.signal = AbortSignal.any(signals);
-	else returnValue.signal = signals.at(-1);
+	if (signals.length > 0) {
+		if (signals.length === 1) returnValue.signal = signals[0];
+		else if (supportsAbortSignal) returnValue.signal = AbortSignal.any(signals);
+		else returnValue.signal = signals.at(-1);
+	}
 	return returnValue;
 };
 //#endregion
@@ -6231,7 +6294,7 @@ function isTimeoutError(error) {
 }
 //#endregion
 //#region node_modules/ky/distribution/core/Ky.js
-var maxErrorResponseBodySize = 10 * 1024 * 1024;
+var maxErrorResponseBodySize = 10485760;
 var prefixUrlRenamedErrorMessage = "The `prefixUrl` option has been renamed `prefix` in v2 and enhanced to allow slashes in input. See also the new `baseUrl` option for improved flexibility with standard URL resolution: https://github.com/sindresorhus/ky#baseurl";
 var timedOutResponseData = Symbol("timedOutResponseData");
 var createTextDecoder = (contentType) => {
@@ -6815,7 +6878,7 @@ var moodleFetch = async (methodname, args, async = true, loginrequired = true) =
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/shared/src/utils/isEmptyString.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6824,7 +6887,7 @@ var isEmptyString = (value) => value === "";
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/shared/src/utils/mergeClasses.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6835,7 +6898,7 @@ var mergeClasses = (...classes) => classes.filter((className, index, array) => {
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/shared/src/utils/toKebabCase.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6844,7 +6907,7 @@ var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLo
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/shared/src/utils/toCamelCase.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6853,7 +6916,7 @@ var toCamelCase = (string) => string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/shared/src/utils/toPascalCase.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6865,7 +6928,7 @@ var toPascalCase = (string) => {
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/defaultAttributes.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6884,7 +6947,7 @@ var defaultAttributes = {
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/context.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6899,7 +6962,7 @@ function useLucideProps() {
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/Icon.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6925,7 +6988,7 @@ var Icon = ({ name, iconNode, "icon-node": iconNodeKebabCase, absoluteStrokeWidt
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/createLucideIcon.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6937,7 +7000,7 @@ var createLucideIcon = (iconName, iconNode) => (props, { slots, attrs }) => h$1(
 	name: iconName
 }, slots.default ? { default: slots.default } : void 0);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -6961,31 +7024,7 @@ var AArrowDown = createLucideIcon("a-arrow-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var AArrowUp = createLucideIcon("a-arrow-up", [
-	["path", {
-		d: "m14 11 4-4 4 4",
-		key: "1pu57t"
-	}],
-	["path", {
-		d: "M18 16V7",
-		key: "ty0viw"
-	}],
-	["path", {
-		d: "m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16",
-		key: "d5nyq2"
-	}],
-	["path", {
-		d: "M3.304 13h6.392",
-		key: "1q3zxz"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7009,17 +7048,7 @@ var ALargeSmall = createLucideIcon("a-large-small", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Activity = createLucideIcon("activity", [["path", {
-	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
-	key: "169zse"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7049,7 +7078,41 @@ var Accessibility = createLucideIcon("accessibility", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var AArrowUp = createLucideIcon("a-arrow-up", [
+	["path", {
+		d: "m14 11 4-4 4 4",
+		key: "1pu57t"
+	}],
+	["path", {
+		d: "M18 16V7",
+		key: "ty0viw"
+	}],
+	["path", {
+		d: "m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16",
+		key: "d5nyq2"
+	}],
+	["path", {
+		d: "M3.304 13h6.392",
+		key: "1q3zxz"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Activity = createLucideIcon("activity", [["path", {
+	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
+	key: "169zse"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7077,7 +7140,7 @@ var Ad = createLucideIcon("ad", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7101,7 +7164,7 @@ var AirVent = createLucideIcon("air-vent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7114,7 +7177,7 @@ var Airplay = createLucideIcon("airplay", [["path", {
 	key: "14qnn2"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7148,7 +7211,7 @@ var AlarmClockCheck = createLucideIcon("alarm-clock-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7182,7 +7245,7 @@ var AlarmClockMinus = createLucideIcon("alarm-clock-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7214,7 +7277,7 @@ var AlarmClockOff = createLucideIcon("alarm-clock-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7252,7 +7315,7 @@ var AlarmClockPlus = createLucideIcon("alarm-clock-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7286,7 +7349,7 @@ var AlarmClock = createLucideIcon("alarm-clock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7314,7 +7377,7 @@ var AlarmSmoke = createLucideIcon("alarm-smoke", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7332,7 +7395,7 @@ var Album = createLucideIcon("album", [["rect", {
 	key: "1wcwz3"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7360,7 +7423,7 @@ var AlignCenterHorizontal = createLucideIcon("align-center-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7388,7 +7451,7 @@ var AlignCenterVertical = createLucideIcon("align-center-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7416,7 +7479,7 @@ var AlignEndHorizontal = createLucideIcon("align-end-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7444,7 +7507,7 @@ var AlignEndVertical = createLucideIcon("align-end-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7484,7 +7547,7 @@ var AlignHorizontalDistributeCenter = createLucideIcon("align-horizontal-distrib
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7516,7 +7579,7 @@ var AlignHorizontalDistributeEnd = createLucideIcon("align-horizontal-distribute
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7548,35 +7611,7 @@ var AlignHorizontalDistributeStart = createLucideIcon("align-horizontal-distribu
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var AlignHorizontalJustifyCenter = createLucideIcon("align-horizontal-justify-center", [
-	["rect", {
-		width: "6",
-		height: "14",
-		x: "2",
-		y: "5",
-		rx: "2",
-		key: "dy24zr"
-	}],
-	["rect", {
-		width: "6",
-		height: "10",
-		x: "16",
-		y: "7",
-		rx: "2",
-		key: "13zkjt"
-	}],
-	["path", {
-		d: "M12 2v20",
-		key: "t6zp3m"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7604,7 +7639,35 @@ var AlignHorizontalJustifyEnd = createLucideIcon("align-horizontal-justify-end",
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var AlignHorizontalJustifyCenter = createLucideIcon("align-horizontal-justify-center", [
+	["rect", {
+		width: "6",
+		height: "14",
+		x: "2",
+		y: "5",
+		rx: "2",
+		key: "dy24zr"
+	}],
+	["rect", {
+		width: "6",
+		height: "10",
+		x: "16",
+		y: "7",
+		rx: "2",
+		key: "13zkjt"
+	}],
+	["path", {
+		d: "M12 2v20",
+		key: "t6zp3m"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7632,7 +7695,7 @@ var AlignHorizontalJustifyStart = createLucideIcon("align-horizontal-justify-sta
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7656,7 +7719,7 @@ var AlignHorizontalSpaceAround = createLucideIcon("align-horizontal-space-around
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7688,7 +7751,7 @@ var AlignHorizontalSpaceBetween = createLucideIcon("align-horizontal-space-betwe
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7716,7 +7779,7 @@ var AlignStartHorizontal = createLucideIcon("align-start-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7744,7 +7807,7 @@ var AlignStartVertical = createLucideIcon("align-start-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7784,7 +7847,7 @@ var AlignVerticalDistributeCenter = createLucideIcon("align-vertical-distribute-
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7816,7 +7879,7 @@ var AlignVerticalDistributeEnd = createLucideIcon("align-vertical-distribute-end
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7848,7 +7911,7 @@ var AlignVerticalDistributeStart = createLucideIcon("align-vertical-distribute-s
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7876,7 +7939,7 @@ var AlignVerticalJustifyCenter = createLucideIcon("align-vertical-justify-center
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7904,7 +7967,7 @@ var AlignVerticalJustifyStart = createLucideIcon("align-vertical-justify-start",
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7932,7 +7995,7 @@ var AlignVerticalJustifyEnd = createLucideIcon("align-vertical-justify-end", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7956,7 +8019,7 @@ var AlignVerticalSpaceAround = createLucideIcon("align-vertical-space-around", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -7988,7 +8051,7 @@ var AlignVerticalSpaceBetween = createLucideIcon("align-vertical-space-between",
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8028,7 +8091,7 @@ var Ambulance = createLucideIcon("ambulance", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8041,7 +8104,7 @@ var Ampersand = createLucideIcon("ampersand", [["path", {
 	key: "nfoe1t"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8054,7 +8117,7 @@ var Ampersands = createLucideIcon("ampersands", [["path", {
 	key: "173c68"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8086,93 +8149,20 @@ var Amphora = createLucideIcon("amphora", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Anchor = createLucideIcon("anchor", [
-	["path", {
-		d: "M12 6v16",
-		key: "nqf5sj"
-	}],
-	["path", {
-		d: "m19 13 2-1a9 9 0 0 1-18 0l2 1",
-		key: "y7qv08"
-	}],
-	["path", {
-		d: "M9 11h6",
-		key: "1fldmi"
-	}],
-	["circle", {
-		cx: "12",
-		cy: "4",
-		r: "2",
-		key: "muu5ef"
-	}]
-]);
+var Angle = createLucideIcon("angle", [["path", {
+	d: "M3 3v16a2 2 0 0 0 2 2h16",
+	key: "c24i48"
+}], ["path", {
+	d: "M3 11a10 10 0 0 1 10 10",
+	key: "jhvw44"
+}]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Angry = createLucideIcon("angry", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "M16 16s-1.5-2-4-2-4 2-4 2",
-		key: "epbg0q"
-	}],
-	["path", {
-		d: "M7.5 8 10 9",
-		key: "olxxln"
-	}],
-	["path", {
-		d: "m14 9 2.5-1",
-		key: "1j6cij"
-	}],
-	["path", {
-		d: "M9 10h.01",
-		key: "qbtxuw"
-	}],
-	["path", {
-		d: "M15 10h.01",
-		key: "1qmjsl"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Annoyed = createLucideIcon("annoyed", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "M8 15h8",
-		key: "45n4r"
-	}],
-	["path", {
-		d: "M8 9h2",
-		key: "1g203m"
-	}],
-	["path", {
-		d: "M14 9h2",
-		key: "116p9w"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8204,7 +8194,33 @@ var Antenna = createLucideIcon("antenna", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Anchor = createLucideIcon("anchor", [
+	["path", {
+		d: "M12 6v16",
+		key: "nqf5sj"
+	}],
+	["path", {
+		d: "m19 13 2-1a9 9 0 0 1-18 0l2 1",
+		key: "y7qv08"
+	}],
+	["path", {
+		d: "M9 11h6",
+		key: "1fldmi"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "4",
+		r: "2",
+		key: "muu5ef"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8232,7 +8248,7 @@ var Anvil = createLucideIcon("anvil", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8270,7 +8286,7 @@ var Aperture = createLucideIcon("aperture", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8298,20 +8314,7 @@ var AppWindowMac = createLucideIcon("app-window-mac", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Apple = createLucideIcon("apple", [["path", {
-	d: "M12 6.528V3a1 1 0 0 1 1-1h0",
-	key: "11qiee"
-}], ["path", {
-	d: "M18.237 21A15 15 0 0 0 22 11a6 6 0 0 0-10-4.472A6 6 0 0 0 2 11a15.1 15.1 0 0 0 3.763 10 3 3 0 0 0 3.648.648 5.5 5.5 0 0 1 5.178 0A3 3 0 0 0 18.237 21",
-	key: "110c12"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8339,7 +8342,20 @@ var AppWindow = createLucideIcon("app-window", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Apple = createLucideIcon("apple", [["path", {
+	d: "M12 6.528V3a1 1 0 0 1 1-1h0",
+	key: "11qiee"
+}], ["path", {
+	d: "M18.237 21A15 15 0 0 0 22 11a6 6 0 0 0-10-4.472A6 6 0 0 0 2 11a15.1 15.1 0 0 0 3.763 10 3 3 0 0 0 3.648.648 5.5 5.5 0 0 1 5.178 0A3 3 0 0 0 18.237 21",
+	key: "110c12"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8371,7 +8387,7 @@ var ArchiveRestore = createLucideIcon("archive-restore", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8399,7 +8415,7 @@ var ArchiveX = createLucideIcon("archive-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8423,7 +8439,7 @@ var Archive = createLucideIcon("archive", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8447,7 +8463,7 @@ var Armchair = createLucideIcon("armchair", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8460,7 +8476,7 @@ var ArrowBigDownDash = createLucideIcon("arrow-big-down-dash", [["path", {
 	key: "10am2s"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8470,7 +8486,7 @@ var ArrowBigDown = createLucideIcon("arrow-big-down", [["path", {
 	key: "1o3tkq"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8483,7 +8499,7 @@ var ArrowBigLeftDash = createLucideIcon("arrow-big-left-dash", [["path", {
 	key: "14roy0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8493,7 +8509,17 @@ var ArrowBigLeft = createLucideIcon("arrow-big-left", [["path", {
 	key: "qbhtmx"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ArrowBigRight = createLucideIcon("arrow-big-right", [["path", {
+	d: "M13.207 19.793a.707.707 0 0 1-1.207-.5V16a1 1 0 0 0-1-1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h6a1 1 0 0 0 1-1V4.707a.707.707 0 0 1 1.207-.5l6.94 6.94a1.207 1.207 0 0 1 0 1.707z",
+	key: "zee3eo"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8506,17 +8532,7 @@ var ArrowBigRightDash = createLucideIcon("arrow-big-right-dash", [["path", {
 	key: "bns7oa"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ArrowBigRight = createLucideIcon("arrow-big-right", [["path", {
-	d: "M13.207 19.793a.707.707 0 0 1-1.207-.5V16a1 1 0 0 0-1-1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h6a1 1 0 0 0 1-1V4.707a.707.707 0 0 1 1.207-.5l6.94 6.94a1.207 1.207 0 0 1 0 1.707z",
-	key: "zee3eo"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8529,7 +8545,7 @@ var ArrowBigUpDash = createLucideIcon("arrow-big-up-dash", [["path", {
 	key: "s66wpe"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8539,7 +8555,7 @@ var ArrowBigUp = createLucideIcon("arrow-big-up", [["path", {
 	key: "106j91"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8571,7 +8587,7 @@ var ArrowDown01 = createLucideIcon("arrow-down-0-1", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8603,7 +8619,7 @@ var ArrowDown10 = createLucideIcon("arrow-down-1-0", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8631,7 +8647,7 @@ var ArrowDownAZ = createLucideIcon("arrow-down-a-z", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8651,7 +8667,7 @@ var ArrowDownFromLine = createLucideIcon("arrow-down-from-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8664,20 +8680,7 @@ var ArrowDownLeft = createLucideIcon("arrow-down-left", [["path", {
 	key: "1org7z"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ArrowDownRight = createLucideIcon("arrow-down-right", [["path", {
-	d: "m7 7 10 10",
-	key: "1fmybs"
-}], ["path", {
-	d: "M17 7v10H7",
-	key: "6fjiku"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8705,7 +8708,20 @@ var ArrowDownNarrowWide = createLucideIcon("arrow-down-narrow-wide", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ArrowDownRight = createLucideIcon("arrow-down-right", [["path", {
+	d: "m7 7 10 10",
+	key: "1fmybs"
+}], ["path", {
+	d: "M17 7v10H7",
+	key: "6fjiku"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8727,7 +8743,7 @@ var ArrowDownToDot = createLucideIcon("arrow-down-to-dot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8747,7 +8763,7 @@ var ArrowDownToLine = createLucideIcon("arrow-down-to-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8771,7 +8787,7 @@ var ArrowDownUp = createLucideIcon("arrow-down-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8799,7 +8815,7 @@ var ArrowDownWideNarrow = createLucideIcon("arrow-down-wide-narrow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8827,7 +8843,7 @@ var ArrowDownZA = createLucideIcon("arrow-down-z-a", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8840,7 +8856,7 @@ var ArrowDown = createLucideIcon("arrow-down", [["path", {
 	key: "1idqje"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8860,7 +8876,7 @@ var ArrowLeftFromLine = createLucideIcon("arrow-left-from-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8884,7 +8900,7 @@ var ArrowLeftRight = createLucideIcon("arrow-left-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8904,7 +8920,7 @@ var ArrowLeftToLine = createLucideIcon("arrow-left-to-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8917,7 +8933,7 @@ var ArrowLeft = createLucideIcon("arrow-left", [["path", {
 	key: "x3x0zl"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8937,7 +8953,7 @@ var ArrowRightFromLine = createLucideIcon("arrow-right-from-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8957,7 +8973,7 @@ var ArrowRightToLine = createLucideIcon("arrow-right-to-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8981,7 +8997,7 @@ var ArrowRightLeft = createLucideIcon("arrow-right-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -8994,7 +9010,7 @@ var ArrowRight = createLucideIcon("arrow-right", [["path", {
 	key: "xquz4c"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9026,7 +9042,7 @@ var ArrowUp01 = createLucideIcon("arrow-up-0-1", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9054,7 +9070,7 @@ var ArrowUpAZ = createLucideIcon("arrow-up-a-z", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9086,7 +9102,7 @@ var ArrowUp10 = createLucideIcon("arrow-up-1-0", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9110,7 +9126,7 @@ var ArrowUpDown = createLucideIcon("arrow-up-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9132,7 +9148,7 @@ var ArrowUpFromDot = createLucideIcon("arrow-up-from-dot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9152,20 +9168,7 @@ var ArrowUpFromLine = createLucideIcon("arrow-up-from-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ArrowUpLeft = createLucideIcon("arrow-up-left", [["path", {
-	d: "M7 17V7h10",
-	key: "11bw93"
-}], ["path", {
-	d: "M17 17 7 7",
-	key: "2786uv"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9193,7 +9196,20 @@ var ArrowUpNarrowWide = createLucideIcon("arrow-up-narrow-wide", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ArrowUpLeft = createLucideIcon("arrow-up-left", [["path", {
+	d: "M7 17V7h10",
+	key: "11bw93"
+}], ["path", {
+	d: "M17 17 7 7",
+	key: "2786uv"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9206,7 +9222,7 @@ var ArrowUpRight = createLucideIcon("arrow-up-right", [["path", {
 	key: "1vkiza"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9226,7 +9242,7 @@ var ArrowUpToLine = createLucideIcon("arrow-up-to-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9254,7 +9270,7 @@ var ArrowUpWideNarrow = createLucideIcon("arrow-up-wide-narrow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9282,7 +9298,7 @@ var ArrowUpZA = createLucideIcon("arrow-up-z-a", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9295,7 +9311,7 @@ var ArrowUp = createLucideIcon("arrow-up", [["path", {
 	key: "x0mq9r"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9323,7 +9339,7 @@ var ArrowsUpFromLine = createLucideIcon("arrows-up-from-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9343,7 +9359,7 @@ var Asterisk = createLucideIcon("asterisk", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9353,7 +9369,7 @@ var Astroid = createLucideIcon("astroid", [["path", {
 	key: "1tipus"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9368,7 +9384,7 @@ var AtSign = createLucideIcon("at-sign", [["circle", {
 	key: "7n84p3"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9390,32 +9406,47 @@ var Atom = createLucideIcon("atom", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Award = createLucideIcon("award", [["path", {
-	d: "m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526",
-	key: "1yiouv"
-}], ["circle", {
-	cx: "12",
-	cy: "8",
-	r: "6",
-	key: "1vp47v"
-}]]);
+var AudioLinesX = createLucideIcon("audio-lines-x", [
+	["path", {
+		d: "M10 3v18",
+		key: "yhl04a"
+	}],
+	["path", {
+		d: "M14 8v6.35",
+		key: "1ubbml"
+	}],
+	["path", {
+		d: "m17 17 5 5",
+		key: "p7ous7"
+	}],
+	["path", {
+		d: "M18 5v8.1",
+		key: "1icuhc"
+	}],
+	["path", {
+		d: "M2 10v3",
+		key: "1fnikh"
+	}],
+	["path", {
+		d: "M22 10v3",
+		key: "154ddg"
+	}],
+	["path", {
+		d: "m22 17-5 5",
+		key: "gqnmv0"
+	}],
+	["path", {
+		d: "M6 6v11",
+		key: "11sgs0"
+	}]
+]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var AudioWaveform = createLucideIcon("audio-waveform", [["path", {
-	d: "M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2",
-	key: "57tc96"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9447,7 +9478,17 @@ var AudioLines = createLucideIcon("audio-lines", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var AudioWaveform = createLucideIcon("audio-waveform", [["path", {
+	d: "M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2",
+	key: "57tc96"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9460,31 +9501,22 @@ var Axe = createLucideIcon("axe", [["path", {
 	key: "19zklq"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Axis3d = createLucideIcon("axis-3d", [
-	["path", {
-		d: "M13.5 10.5 15 9",
-		key: "1nsxvm"
-	}],
-	["path", {
-		d: "M4 4v15a1 1 0 0 0 1 1h15",
-		key: "1w6lkd"
-	}],
-	["path", {
-		d: "M4.293 19.707 6 18",
-		key: "3g1p8c"
-	}],
-	["path", {
-		d: "m9 15 1.5-1.5",
-		key: "1xfbes"
-	}]
-]);
+var Award = createLucideIcon("award", [["path", {
+	d: "m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526",
+	key: "1yiouv"
+}], ["circle", {
+	cx: "12",
+	cy: "8",
+	r: "6",
+	key: "1vp47v"
+}]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9508,33 +9540,31 @@ var Baby = createLucideIcon("baby", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var BadgeAlert = createLucideIcon("badge-alert", [
+var Axis3d = createLucideIcon("axis-3d", [
 	["path", {
-		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
-		key: "3c2336"
+		d: "M13.5 10.5 15 9",
+		key: "1nsxvm"
 	}],
-	["line", {
-		x1: "12",
-		x2: "12",
-		y1: "8",
-		y2: "12",
-		key: "1pkeuh"
+	["path", {
+		d: "M4 4v15a1 1 0 0 0 1 1h15",
+		key: "1w6lkd"
 	}],
-	["line", {
-		x1: "12",
-		x2: "12.01",
-		y1: "16",
-		y2: "16",
-		key: "4dfq90"
+	["path", {
+		d: "M4.293 19.707 6 18",
+		key: "3g1p8c"
+	}],
+	["path", {
+		d: "m9 15 1.5-1.5",
+		key: "1xfbes"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9562,7 +9592,46 @@ var Backpack = createLucideIcon("backpack", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BadgeAlert = createLucideIcon("badge-alert", [
+	["path", {
+		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+		key: "3c2336"
+	}],
+	["line", {
+		x1: "12",
+		x2: "12",
+		y1: "8",
+		y2: "12",
+		key: "1pkeuh"
+	}],
+	["line", {
+		x1: "12",
+		x2: "12.01",
+		y1: "16",
+		y2: "16",
+		key: "4dfq90"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BadgeCheck = createLucideIcon("badge-check", [["path", {
+	d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+	key: "3c2336"
+}], ["path", {
+	d: "m9 12 2 2 4-4",
+	key: "dzmm74"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9582,20 +9651,7 @@ var BadgeCent = createLucideIcon("badge-cent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BadgeCheck = createLucideIcon("badge-check", [["path", {
-	d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
-	key: "3c2336"
-}], ["path", {
-	d: "m9 12 2 2 4-4",
-	key: "dzmm74"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9615,7 +9671,7 @@ var BadgeDollarSign = createLucideIcon("badge-dollar-sign", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9635,7 +9691,31 @@ var BadgeEuro = createLucideIcon("badge-euro", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BadgeIndianRupee = createLucideIcon("badge-indian-rupee", [
+	["path", {
+		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+		key: "3c2336"
+	}],
+	["path", {
+		d: "M8 8h8",
+		key: "1bis0t"
+	}],
+	["path", {
+		d: "M8 12h8",
+		key: "1wcyev"
+	}],
+	["path", {
+		d: "m13 17-5-1h1a4 4 0 0 0 0-8",
+		key: "nu2bwa"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9661,31 +9741,7 @@ var BadgeInfo = createLucideIcon("badge-info", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BadgeIndianRupee = createLucideIcon("badge-indian-rupee", [
-	["path", {
-		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
-		key: "3c2336"
-	}],
-	["path", {
-		d: "M8 8h8",
-		key: "1bis0t"
-	}],
-	["path", {
-		d: "M8 12h8",
-		key: "1wcyev"
-	}],
-	["path", {
-		d: "m13 17-5-1h1a4 4 0 0 0 0-8",
-		key: "nu2bwa"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9713,7 +9769,7 @@ var BadgeJapaneseYen = createLucideIcon("badge-japanese-yen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9729,7 +9785,31 @@ var BadgeMinus = createLucideIcon("badge-minus", [["path", {
 	key: "1jonct"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BadgePercent = createLucideIcon("badge-percent", [
+	["path", {
+		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+		key: "3c2336"
+	}],
+	["path", {
+		d: "m15 9-6 6",
+		key: "1uzhvr"
+	}],
+	["path", {
+		d: "M9 9h.01",
+		key: "1q5me6"
+	}],
+	["path", {
+		d: "M15 15h.01",
+		key: "lqbp3k"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9755,31 +9835,7 @@ var BadgePlus = createLucideIcon("badge-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BadgePercent = createLucideIcon("badge-percent", [
-	["path", {
-		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
-		key: "3c2336"
-	}],
-	["path", {
-		d: "m15 9-6 6",
-		key: "1uzhvr"
-	}],
-	["path", {
-		d: "M9 9h.01",
-		key: "1q5me6"
-	}],
-	["path", {
-		d: "M15 15h.01",
-		key: "lqbp3k"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9803,7 +9859,27 @@ var BadgePoundSterling = createLucideIcon("badge-pound-sterling", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BadgeRussianRuble = createLucideIcon("badge-russian-ruble", [
+	["path", {
+		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+		key: "3c2336"
+	}],
+	["path", {
+		d: "M9 16h5",
+		key: "1syiyw"
+	}],
+	["path", {
+		d: "M9 12h5a2 2 0 1 0 0-4h-3v9",
+		key: "1ge9c1"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9826,27 +9902,7 @@ var BadgeQuestionMark = createLucideIcon("badge-question-mark", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BadgeRussianRuble = createLucideIcon("badge-russian-ruble", [
-	["path", {
-		d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
-		key: "3c2336"
-	}],
-	["path", {
-		d: "M9 16h5",
-		key: "1syiyw"
-	}],
-	["path", {
-		d: "M9 12h5a2 2 0 1 0 0-4h-3v9",
-		key: "1ge9c1"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9870,7 +9926,7 @@ var BadgeSwissFranc = createLucideIcon("badge-swiss-franc", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9890,7 +9946,7 @@ var BadgeTurkishLira = createLucideIcon("badge-turkish-lira", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9916,7 +9972,7 @@ var BadgeX = createLucideIcon("badge-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9926,7 +9982,7 @@ var Badge = createLucideIcon("badge", [["path", {
 	key: "3c2336"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9962,7 +10018,7 @@ var BaggageClaim = createLucideIcon("baggage-claim", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9982,7 +10038,7 @@ var Balloon = createLucideIcon("balloon", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -9997,7 +10053,7 @@ var Ban = createLucideIcon("ban", [["circle", {
 	key: "196cmz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10010,7 +10066,7 @@ var Banana = createLucideIcon("banana", [["path", {
 	key: "1y1nbv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10050,7 +10106,7 @@ var Bandage = createLucideIcon("bandage", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10084,7 +10140,7 @@ var BanknoteArrowDown = createLucideIcon("banknote-arrow-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10118,7 +10174,7 @@ var BanknoteArrowUp = createLucideIcon("banknote-arrow-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10148,7 +10204,33 @@ var BanknoteCheck = createLucideIcon("banknote-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Banknote = createLucideIcon("banknote", [
+	["rect", {
+		width: "20",
+		height: "12",
+		x: "2",
+		y: "6",
+		rx: "2",
+		key: "9lu3g6"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "2",
+		key: "1c9p78"
+	}],
+	["path", {
+		d: "M6 12h.01M18 12h.01",
+		key: "113zkx"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10182,33 +10264,7 @@ var BanknoteX = createLucideIcon("banknote-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Banknote = createLucideIcon("banknote", [
-	["rect", {
-		width: "20",
-		height: "12",
-		x: "2",
-		y: "6",
-		rx: "2",
-		key: "9lu3g6"
-	}],
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "2",
-		key: "1c9p78"
-	}],
-	["path", {
-		d: "M6 12h.01M18 12h.01",
-		key: "113zkx"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10236,7 +10292,7 @@ var Barcode = createLucideIcon("barcode", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10264,7 +10320,27 @@ var Barrel = createLucideIcon("barrel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Baseline = createLucideIcon("baseline", [
+	["path", {
+		d: "M4 20h16",
+		key: "14thso"
+	}],
+	["path", {
+		d: "m6 16 6-12 6 12",
+		key: "1b4byz"
+	}],
+	["path", {
+		d: "M8 12h8",
+		key: "1wcyev"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10292,27 +10368,7 @@ var Bath = createLucideIcon("bath", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Baseline = createLucideIcon("baseline", [
-	["path", {
-		d: "M4 20h16",
-		key: "14thso"
-	}],
-	["path", {
-		d: "m6 16 6-12 6 12",
-		key: "1b4byz"
-	}],
-	["path", {
-		d: "M8 12h8",
-		key: "1wcyev"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10336,7 +10392,7 @@ var BatteryCharging = createLucideIcon("battery-charging", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10368,7 +10424,7 @@ var BatteryFull = createLucideIcon("battery-full", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10392,7 +10448,7 @@ var BatteryLow = createLucideIcon("battery-low", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10420,7 +10476,7 @@ var BatteryMedium = createLucideIcon("battery-medium", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10448,7 +10504,7 @@ var BatteryPlus = createLucideIcon("battery-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10476,7 +10532,24 @@ var BatteryWarning = createLucideIcon("battery-warning", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Battery = createLucideIcon("battery", [["path", {
+	d: "M 22 14 L 22 10",
+	key: "nqc4tb"
+}], ["rect", {
+	x: "2",
+	y: "6",
+	width: "16",
+	height: "12",
+	rx: "2",
+	key: "13zb55"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10496,24 +10569,7 @@ var Beaker = createLucideIcon("beaker", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Battery = createLucideIcon("battery", [["path", {
-	d: "M 22 14 L 22 10",
-	key: "nqc4tb"
-}], ["rect", {
-	x: "2",
-	y: "6",
-	width: "16",
-	height: "12",
-	rx: "2",
-	key: "13zb55"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10540,7 +10596,7 @@ var BeanOff = createLucideIcon("bean-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10553,7 +10609,7 @@ var Bean = createLucideIcon("bean", [["path", {
 	key: "2cyri2"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10577,7 +10633,7 @@ var BedDouble = createLucideIcon("bed-double", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10597,7 +10653,7 @@ var BedSingle = createLucideIcon("bed-single", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10621,7 +10677,7 @@ var Bed = createLucideIcon("bed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10653,7 +10709,7 @@ var BeefOff = createLucideIcon("beef-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10675,7 +10731,35 @@ var Beef = createLucideIcon("beef", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Beer = createLucideIcon("beer", [
+	["path", {
+		d: "M17 11h1a3 3 0 0 1 0 6h-1",
+		key: "1yp76v"
+	}],
+	["path", {
+		d: "M9 12v6",
+		key: "1u1cab"
+	}],
+	["path", {
+		d: "M13 12v6",
+		key: "1sugkk"
+	}],
+	["path", {
+		d: "M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z",
+		key: "1510fo"
+	}],
+	["path", {
+		d: "M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8",
+		key: "19jb7n"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10715,35 +10799,7 @@ var BeerOff = createLucideIcon("beer-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Beer = createLucideIcon("beer", [
-	["path", {
-		d: "M17 11h1a3 3 0 0 1 0 6h-1",
-		key: "1yp76v"
-	}],
-	["path", {
-		d: "M9 12v6",
-		key: "1u1cab"
-	}],
-	["path", {
-		d: "M13 12v6",
-		key: "1sugkk"
-	}],
-	["path", {
-		d: "M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z",
-		key: "1510fo"
-	}],
-	["path", {
-		d: "M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8",
-		key: "19jb7n"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10767,7 +10823,7 @@ var BellCheck = createLucideIcon("bell-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10789,7 +10845,7 @@ var BellDot = createLucideIcon("bell-dot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10829,7 +10885,7 @@ var BellElectric = createLucideIcon("bell-electric", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10849,7 +10905,7 @@ var BellMinus = createLucideIcon("bell-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10873,31 +10929,7 @@ var BellOff = createLucideIcon("bell-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BellPlus = createLucideIcon("bell-plus", [
-	["path", {
-		d: "M10.268 21a2 2 0 0 0 3.464 0",
-		key: "vwvbt9"
-	}],
-	["path", {
-		d: "M15 8h6",
-		key: "8ybuxh"
-	}],
-	["path", {
-		d: "M18 5v6",
-		key: "g5ayrv"
-	}],
-	["path", {
-		d: "M20.002 14.464a9 9 0 0 0 .738.863A1 1 0 0 1 20 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 8.75-5.332",
-		key: "1abcvy"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10921,7 +10953,31 @@ var BellRing = createLucideIcon("bell-ring", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BellPlus = createLucideIcon("bell-plus", [
+	["path", {
+		d: "M10.268 21a2 2 0 0 0 3.464 0",
+		key: "vwvbt9"
+	}],
+	["path", {
+		d: "M15 8h6",
+		key: "8ybuxh"
+	}],
+	["path", {
+		d: "M18 5v6",
+		key: "g5ayrv"
+	}],
+	["path", {
+		d: "M20.002 14.464a9 9 0 0 0 .738.863A1 1 0 0 1 20 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 8.75-5.332",
+		key: "1abcvy"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10934,7 +10990,7 @@ var Bell = createLucideIcon("bell", [["path", {
 	key: "11g9vi"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10962,7 +11018,7 @@ var BetweenHorizontalEnd = createLucideIcon("between-horizontal-end", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -10990,7 +11046,7 @@ var BetweenHorizontalStart = createLucideIcon("between-horizontal-start", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11018,7 +11074,7 @@ var BetweenVerticalEnd = createLucideIcon("between-vertical-end", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11046,7 +11102,7 @@ var BetweenVerticalStart = createLucideIcon("between-vertical-start", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11066,7 +11122,7 @@ var BicepsFlexed = createLucideIcon("biceps-flexed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11096,7 +11152,39 @@ var Bike = createLucideIcon("bike", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Binoculars = createLucideIcon("binoculars", [
+	["path", {
+		d: "M10 10h4",
+		key: "tcdvrf"
+	}],
+	["path", {
+		d: "M19 7V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v3",
+		key: "3apit1"
+	}],
+	["path", {
+		d: "M20 21a2 2 0 0 0 2-2v-3.851c0-1.39-2-2.962-2-4.829V8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v11a2 2 0 0 0 2 2z",
+		key: "rhpgnw"
+	}],
+	["path", {
+		d: "M 22 16 L 2 16",
+		key: "14lkq7"
+	}],
+	["path", {
+		d: "M4 21a2 2 0 0 1-2-2v-3.851c0-1.39 2-2.962 2-4.829V8a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2z",
+		key: "104b3k"
+	}],
+	["path", {
+		d: "M9 7V4a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v3",
+		key: "14fczp"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11136,39 +11224,7 @@ var Binary = createLucideIcon("binary", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Binoculars = createLucideIcon("binoculars", [
-	["path", {
-		d: "M10 10h4",
-		key: "tcdvrf"
-	}],
-	["path", {
-		d: "M19 7V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v3",
-		key: "3apit1"
-	}],
-	["path", {
-		d: "M20 21a2 2 0 0 0 2-2v-3.851c0-1.39-2-2.962-2-4.829V8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v11a2 2 0 0 0 2 2z",
-		key: "rhpgnw"
-	}],
-	["path", {
-		d: "M 22 16 L 2 16",
-		key: "14lkq7"
-	}],
-	["path", {
-		d: "M4 21a2 2 0 0 1-2-2v-3.851c0-1.39 2-2.962 2-4.829V8a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2z",
-		key: "104b3k"
-	}],
-	["path", {
-		d: "M9 7V4a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v3",
-		key: "14fczp"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11218,7 +11274,7 @@ var Biohazard = createLucideIcon("biohazard", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11250,7 +11306,7 @@ var Bird = createLucideIcon("bird", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11260,7 +11316,7 @@ var Bitcoin = createLucideIcon("bitcoin", [["path", {
 	key: "yr8idg"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11294,7 +11350,7 @@ var Birdhouse = createLucideIcon("birdhouse", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11311,7 +11367,7 @@ var Blend = createLucideIcon("blend", [["circle", {
 	key: "19ennj"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11343,7 +11399,7 @@ var Blender = createLucideIcon("blender", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11381,7 +11437,7 @@ var Blinds = createLucideIcon("blinds", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11398,7 +11454,7 @@ var Blocks = createLucideIcon("blocks", [["path", {
 	key: "88lufb"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11424,7 +11480,7 @@ var BluetoothConnected = createLucideIcon("bluetooth-connected", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11444,7 +11500,7 @@ var BluetoothOff = createLucideIcon("bluetooth-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11464,17 +11520,7 @@ var BluetoothSearching = createLucideIcon("bluetooth-searching", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Bold = createLucideIcon("bold", [["path", {
-	d: "M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8",
-	key: "mg9rjx"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11484,7 +11530,17 @@ var Bluetooth = createLucideIcon("bluetooth", [["path", {
 	key: "1q5490"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Bold = createLucideIcon("bold", [["path", {
+	d: "M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8",
+	key: "mg9rjx"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11499,29 +11555,7 @@ var Bolt = createLucideIcon("bolt", [["path", {
 	key: "4exip2"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Bomb = createLucideIcon("bomb", [
-	["circle", {
-		cx: "11",
-		cy: "13",
-		r: "9",
-		key: "hd149"
-	}],
-	["path", {
-		d: "M14.35 4.65 16.3 2.7a2.41 2.41 0 0 1 3.4 0l1.6 1.6a2.4 2.4 0 0 1 0 3.4l-1.95 1.95",
-		key: "jp4j1b"
-	}],
-	["path", {
-		d: "m22 2-1.5 1.5",
-		key: "ay92ug"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11553,7 +11587,29 @@ var BoneFracture = createLucideIcon("bone-fracture", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Bomb = createLucideIcon("bomb", [
+	["circle", {
+		cx: "11",
+		cy: "13",
+		r: "9",
+		key: "hd149"
+	}],
+	["path", {
+		d: "M14.35 4.65 16.3 2.7a2.41 2.41 0 0 1 3.4 0l1.6 1.6a2.4 2.4 0 0 1 0 3.4l-1.95 1.95",
+		key: "jp4j1b"
+	}],
+	["path", {
+		d: "m22 2-1.5 1.5",
+		key: "ay92ug"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11563,7 +11619,7 @@ var Bone = createLucideIcon("bone", [["path", {
 	key: "w610uw"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11583,7 +11639,7 @@ var BookA = createLucideIcon("book-a", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11603,7 +11659,7 @@ var BookAlert = createLucideIcon("book-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11627,7 +11683,20 @@ var BookAudio = createLucideIcon("book-audio", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BookCheck = createLucideIcon("book-check", [["path", {
+	d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
+	key: "k3hazp"
+}], ["path", {
+	d: "m9 9.5 2 2 4-4",
+	key: "1dth82"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11647,20 +11716,7 @@ var BookCopy = createLucideIcon("book-copy", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BookCheck = createLucideIcon("book-check", [["path", {
-	d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
-	key: "k3hazp"
-}], ["path", {
-	d: "m9 9.5 2 2 4-4",
-	key: "1dth82"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11712,7 +11768,7 @@ var BookDashed = createLucideIcon("book-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11732,7 +11788,7 @@ var BookDown = createLucideIcon("book-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11760,7 +11816,7 @@ var BookHeadphones = createLucideIcon("book-headphones", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11773,7 +11829,7 @@ var BookHeart = createLucideIcon("book-heart", [["path", {
 	key: "9v40y5"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11795,7 +11851,7 @@ var BookImage = createLucideIcon("book-image", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11825,7 +11881,20 @@ var BookKey = createLucideIcon("book-key", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BookMarked = createLucideIcon("book-marked", [["path", {
+	d: "M10 2v8l3-3 3 3V2",
+	key: "sqw3rj"
+}], ["path", {
+	d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
+	key: "k3hazp"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11853,20 +11922,7 @@ var BookLock = createLucideIcon("book-lock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BookMarked = createLucideIcon("book-marked", [["path", {
-	d: "M10 2v8l3-3 3 3V2",
-	key: "sqw3rj"
-}], ["path", {
-	d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
-	key: "k3hazp"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11879,7 +11935,7 @@ var BookMinus = createLucideIcon("book-minus", [["path", {
 	key: "9gxzsh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11899,7 +11955,7 @@ var BookOpenCheck = createLucideIcon("book-open-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11931,7 +11987,7 @@ var BookOpenText = createLucideIcon("book-open-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11944,7 +12000,7 @@ var BookOpen = createLucideIcon("book-open", [["path", {
 	key: "1fyvmf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11964,7 +12020,7 @@ var BookPlus = createLucideIcon("book-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -11990,7 +12046,51 @@ var BookSearch = createLucideIcon("book-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BookText = createLucideIcon("book-text", [
+	["path", {
+		d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
+		key: "k3hazp"
+	}],
+	["path", {
+		d: "M8 11h8",
+		key: "vwpz6n"
+	}],
+	["path", {
+		d: "M8 7h6",
+		key: "1f0q6e"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BookType = createLucideIcon("book-type", [
+	["path", {
+		d: "M10 13h4",
+		key: "ytezjc"
+	}],
+	["path", {
+		d: "M12 6v7",
+		key: "1f6ttz"
+	}],
+	["path", {
+		d: "M16 8V6H8v2",
+		key: "x8j6u4"
+	}],
+	["path", {
+		d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
+		key: "k3hazp"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12018,51 +12118,7 @@ var BookUp2 = createLucideIcon("book-up-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BookText = createLucideIcon("book-text", [
-	["path", {
-		d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
-		key: "k3hazp"
-	}],
-	["path", {
-		d: "M8 11h8",
-		key: "vwpz6n"
-	}],
-	["path", {
-		d: "M8 7h6",
-		key: "1f0q6e"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BookType = createLucideIcon("book-type", [
-	["path", {
-		d: "M10 13h4",
-		key: "ytezjc"
-	}],
-	["path", {
-		d: "M12 6v7",
-		key: "1f6ttz"
-	}],
-	["path", {
-		d: "M16 8V6H8v2",
-		key: "x8j6u4"
-	}],
-	["path", {
-		d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20",
-		key: "k3hazp"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12082,7 +12138,7 @@ var BookUp = createLucideIcon("book-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12104,7 +12160,7 @@ var BookUser = createLucideIcon("book-user", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12124,7 +12180,7 @@ var BookX = createLucideIcon("book-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12134,7 +12190,7 @@ var Book = createLucideIcon("book", [["path", {
 	key: "k3hazp"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12147,7 +12203,7 @@ var BookmarkCheck = createLucideIcon("bookmark-check", [["path", {
 	key: "1gnqz4"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12160,7 +12216,7 @@ var BookmarkMinus = createLucideIcon("bookmark-minus", [["path", {
 	key: "oz39mx"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12180,7 +12236,7 @@ var BookmarkOff = createLucideIcon("bookmark-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12200,7 +12256,7 @@ var BookmarkPlus = createLucideIcon("bookmark-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12220,7 +12276,7 @@ var BookmarkX = createLucideIcon("bookmark-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12230,7 +12286,7 @@ var Bookmark = createLucideIcon("bookmark", [["path", {
 	key: "oz39mx"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12274,7 +12330,7 @@ var BoomBox = createLucideIcon("boom-box", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12306,7 +12362,7 @@ var BotMessageSquare = createLucideIcon("bot-message-square", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12342,7 +12398,7 @@ var BotOff = createLucideIcon("bot-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12378,7 +12434,7 @@ var Bot = createLucideIcon("bot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12391,27 +12447,7 @@ var BottleWine = createLucideIcon("bottle-wine", [["path", {
 	key: "43jbee"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Box = createLucideIcon("box", [
-	["path", {
-		d: "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z",
-		key: "hh9hay"
-	}],
-	["path", {
-		d: "m3.3 7 8.7 5 8.7-5",
-		key: "g66t2b"
-	}],
-	["path", {
-		d: "M12 22V12",
-		key: "d0xqtd"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12439,7 +12475,27 @@ var BowArrow = createLucideIcon("bow-arrow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Box = createLucideIcon("box", [
+	["path", {
+		d: "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z",
+		key: "hh9hay"
+	}],
+	["path", {
+		d: "m3.3 7 8.7 5 8.7-5",
+		key: "g66t2b"
+	}],
+	["path", {
+		d: "M12 22V12",
+		key: "d0xqtd"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12495,7 +12551,7 @@ var Boxes = createLucideIcon("boxes", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12508,7 +12564,7 @@ var Braces = createLucideIcon("braces", [["path", {
 	key: "e1hn23"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12521,7 +12577,7 @@ var Brackets = createLucideIcon("brackets", [["path", {
 	key: "gduv9"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12589,7 +12645,47 @@ var BrainCircuit = createLucideIcon("brain-circuit", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Brain = createLucideIcon("brain", [
+	["path", {
+		d: "M12 18V5",
+		key: "adv99a"
+	}],
+	["path", {
+		d: "M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4",
+		key: "1e3is1"
+	}],
+	["path", {
+		d: "M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5",
+		key: "1gqd8o"
+	}],
+	["path", {
+		d: "M17.997 5.125a4 4 0 0 1 2.526 5.77",
+		key: "iwvgf7"
+	}],
+	["path", {
+		d: "M18 18a4 4 0 0 0 2-7.464",
+		key: "efp6ie"
+	}],
+	["path", {
+		d: "M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517",
+		key: "1gq6am"
+	}],
+	["path", {
+		d: "M6 18a4 4 0 0 1-2-7.464",
+		key: "k1g0md"
+	}],
+	["path", {
+		d: "M6.003 5.125a4 4 0 0 0-2.526 5.77",
+		key: "q97ue3"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12659,47 +12755,7 @@ var BrainCog = createLucideIcon("brain-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Brain = createLucideIcon("brain", [
-	["path", {
-		d: "M12 18V5",
-		key: "adv99a"
-	}],
-	["path", {
-		d: "M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4",
-		key: "1e3is1"
-	}],
-	["path", {
-		d: "M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5",
-		key: "1gqd8o"
-	}],
-	["path", {
-		d: "M17.997 5.125a4 4 0 0 1 2.526 5.77",
-		key: "iwvgf7"
-	}],
-	["path", {
-		d: "M18 18a4 4 0 0 0 2-7.464",
-		key: "efp6ie"
-	}],
-	["path", {
-		d: "M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517",
-		key: "1gq6am"
-	}],
-	["path", {
-		d: "M6 18a4 4 0 0 1-2-7.464",
-		key: "k1g0md"
-	}],
-	["path", {
-		d: "M6.003 5.125a4 4 0 0 0-2.526 5.77",
-		key: "q97ue3"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12735,7 +12791,7 @@ var BrickWallFire = createLucideIcon("brick-wall-fire", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12775,7 +12831,7 @@ var BrickWallShield = createLucideIcon("brick-wall-shield", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12819,7 +12875,7 @@ var BrickWall = createLucideIcon("brick-wall", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12847,7 +12903,7 @@ var BriefcaseBusiness = createLucideIcon("briefcase-business", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12887,7 +12943,7 @@ var BriefcaseConveyorBelt = createLucideIcon("briefcase-conveyor-belt", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12923,7 +12979,7 @@ var BriefcaseMedical = createLucideIcon("briefcase-medical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12940,7 +12996,7 @@ var Briefcase = createLucideIcon("briefcase", [["path", {
 	key: "i6l2r4"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12964,7 +13020,7 @@ var BringToFront = createLucideIcon("bring-to-front", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -12988,7 +13044,99 @@ var Broccoli = createLucideIcon("broccoli", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BroomSparkles = createLucideIcon("broom-sparkles", [
+	["path", {
+		d: "M11 2v2",
+		key: "1539x4"
+	}],
+	["path", {
+		d: "M12 3h-2",
+		key: "1su5n0"
+	}],
+	["path", {
+		d: "M13.5 10.5 22 2",
+		key: "1yxz6l"
+	}],
+	["path", {
+		d: "M14.734 13.841a2 2 0 00-.314-2.42L12.58 9.58a2 2 0 00-2.421-.314l-7.657 4.461A1 1 0 002.3 15.3l6.403 6.403a1 1 0 001.571-.204z",
+		key: "1q75r6"
+	}],
+	["path", {
+		d: "M20 15v4",
+		key: "nmhudv"
+	}],
+	["path", {
+		d: "M22 17h-4",
+		key: "1sj068"
+	}],
+	["path", {
+		d: "M4 4v4",
+		key: "a4sqb9"
+	}],
+	["path", {
+		d: "m5 18 2-2",
+		key: "11qwpn"
+	}],
+	["path", {
+		d: "M6 6H2",
+		key: "1cli1h"
+	}],
+	["path", {
+		d: "m7.699 10.7 5.602 5.601",
+		key: "1rehuz"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Brush = createLucideIcon("brush", [
+	["path", {
+		d: "m11 10 3 3",
+		key: "fzmg1i"
+	}],
+	["path", {
+		d: "M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z",
+		key: "p4q2r7"
+	}],
+	["path", {
+		d: "M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031",
+		key: "wy6l02"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Broom = createLucideIcon("broom", [
+	["path", {
+		d: "M13.5 10.5 22 2",
+		key: "1yxz6l"
+	}],
+	["path", {
+		d: "M14.734 13.841a2 2 0 00-.314-2.42L12.58 9.58a2 2 0 00-2.421-.314l-7.657 4.461A1 1 0 002.3 15.3l6.403 6.403a1 1 0 001.571-.204z",
+		key: "1q75r6"
+	}],
+	["path", {
+		d: "m5 18 2-2",
+		key: "11qwpn"
+	}],
+	["path", {
+		d: "m7.699 10.7 5.602 5.601",
+		key: "1rehuz"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13012,27 +13160,7 @@ var BrushCleaning = createLucideIcon("brush-cleaning", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Brush = createLucideIcon("brush", [
-	["path", {
-		d: "m11 10 3 3",
-		key: "fzmg1i"
-	}],
-	["path", {
-		d: "M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z",
-		key: "p4q2r7"
-	}],
-	["path", {
-		d: "M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031",
-		key: "wy6l02"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13062,7 +13190,7 @@ var Bubbles = createLucideIcon("bubbles", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13118,7 +13246,51 @@ var BugOff = createLucideIcon("bug-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var BugPlay = createLucideIcon("bug-play", [
+	["path", {
+		d: "M10 19.655A6 6 0 0 1 6 14v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 3.97",
+		key: "1gnv52"
+	}],
+	["path", {
+		d: "M14 15.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997a1 1 0 0 1-1.517-.86z",
+		key: "1weqy9"
+	}],
+	["path", {
+		d: "M14.12 3.88 16 2",
+		key: "qol33r"
+	}],
+	["path", {
+		d: "M21 5a4 4 0 0 1-3.55 3.97",
+		key: "5cxbf6"
+	}],
+	["path", {
+		d: "M3 21a4 4 0 0 1 3.81-4",
+		key: "1fjd4g"
+	}],
+	["path", {
+		d: "M3 5a4 4 0 0 0 3.55 3.97",
+		key: "1d7oge"
+	}],
+	["path", {
+		d: "M6 13H2",
+		key: "82j7cp"
+	}],
+	["path", {
+		d: "m8 2 1.88 1.88",
+		key: "fmnt4t"
+	}],
+	["path", {
+		d: "M9 7.13V6a3 3 0 1 1 6 0v1.13",
+		key: "1vgav8"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13170,79 +13342,7 @@ var Bug = createLucideIcon("bug", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var BugPlay = createLucideIcon("bug-play", [
-	["path", {
-		d: "M10 19.655A6 6 0 0 1 6 14v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 3.97",
-		key: "1gnv52"
-	}],
-	["path", {
-		d: "M14 15.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997a1 1 0 0 1-1.517-.86z",
-		key: "1weqy9"
-	}],
-	["path", {
-		d: "M14.12 3.88 16 2",
-		key: "qol33r"
-	}],
-	["path", {
-		d: "M21 5a4 4 0 0 1-3.55 3.97",
-		key: "5cxbf6"
-	}],
-	["path", {
-		d: "M3 21a4 4 0 0 1 3.81-4",
-		key: "1fjd4g"
-	}],
-	["path", {
-		d: "M3 5a4 4 0 0 0 3.55 3.97",
-		key: "1d7oge"
-	}],
-	["path", {
-		d: "M6 13H2",
-		key: "82j7cp"
-	}],
-	["path", {
-		d: "m8 2 1.88 1.88",
-		key: "fmnt4t"
-	}],
-	["path", {
-		d: "M9 7.13V6a3 3 0 1 1 6 0v1.13",
-		key: "1vgav8"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Building2 = createLucideIcon("building-2", [
-	["path", {
-		d: "M10 12h4",
-		key: "a56b0p"
-	}],
-	["path", {
-		d: "M10 8h4",
-		key: "1sr2af"
-	}],
-	["path", {
-		d: "M14 21v-3a2 2 0 0 0-4 0v3",
-		key: "1rgiei"
-	}],
-	["path", {
-		d: "M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2",
-		key: "secmi2"
-	}],
-	["path", {
-		d: "M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16",
-		key: "16ra0t"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13298,47 +13398,7 @@ var Building = createLucideIcon("building", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Bus = createLucideIcon("bus", [
-	["path", {
-		d: "M8 6v6",
-		key: "18i7km"
-	}],
-	["path", {
-		d: "M15 6v6",
-		key: "1sg6z9"
-	}],
-	["path", {
-		d: "M2 12h19.6",
-		key: "de5uta"
-	}],
-	["path", {
-		d: "M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3",
-		key: "1wwztk"
-	}],
-	["circle", {
-		cx: "7",
-		cy: "18",
-		r: "2",
-		key: "19iecd"
-	}],
-	["path", {
-		d: "M9 18h5",
-		key: "lrx6i"
-	}],
-	["circle", {
-		cx: "16",
-		cy: "18",
-		r: "2",
-		key: "1v4tcr"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13386,7 +13446,75 @@ var BusFront = createLucideIcon("bus-front", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Building2 = createLucideIcon("building-2", [
+	["path", {
+		d: "M10 12h4",
+		key: "a56b0p"
+	}],
+	["path", {
+		d: "M10 8h4",
+		key: "1sr2af"
+	}],
+	["path", {
+		d: "M14 21v-3a2 2 0 0 0-4 0v3",
+		key: "1rgiei"
+	}],
+	["path", {
+		d: "M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2",
+		key: "secmi2"
+	}],
+	["path", {
+		d: "M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16",
+		key: "16ra0t"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Bus = createLucideIcon("bus", [
+	["path", {
+		d: "M8 6v6",
+		key: "18i7km"
+	}],
+	["path", {
+		d: "M15 6v6",
+		key: "1sg6z9"
+	}],
+	["path", {
+		d: "M2 12h19.6",
+		key: "de5uta"
+	}],
+	["path", {
+		d: "M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3",
+		key: "1wwztk"
+	}],
+	["circle", {
+		cx: "7",
+		cy: "18",
+		r: "2",
+		key: "19iecd"
+	}],
+	["path", {
+		d: "M9 18h5",
+		key: "lrx6i"
+	}],
+	["circle", {
+		cx: "16",
+		cy: "18",
+		r: "2",
+		key: "1v4tcr"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13430,7 +13558,7 @@ var CableCar = createLucideIcon("cable-car", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13466,7 +13594,7 @@ var Cable = createLucideIcon("cable", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13492,7 +13620,7 @@ var CakeSlice = createLucideIcon("cake-slice", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13536,7 +13664,7 @@ var Cake = createLucideIcon("cake", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13594,163 +13722,187 @@ var Calculator = createLucideIcon("calculator", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var Calendar1 = createLucideIcon("calendar-1", [
 	["path", {
-		d: "M11 14h1v4",
-		key: "fy54vd"
+		d: "M11 13h1v4",
+		key: "10p4bv"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["rect", {
 		x: "3",
-		y: "4",
+		y: "3",
 		width: "18",
 		height: "18",
 		rx: "2",
-		key: "12vinp"
+		key: "h1oib"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarArrowDown = createLucideIcon("calendar-arrow-down", [
 	["path", {
-		d: "m14 18 4 4 4-4",
-		key: "1waygx"
+		d: "m14 17 4 4 4-4",
+		key: "17qdjf"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M18 14v8",
-		key: "irew45"
+		d: "M18 13v8",
+		key: "1a00n0"
 	}],
 	["path", {
-		d: "M21 11.354V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.343",
-		key: "bse4f3"
+		d: "M21 10.354V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h7.343",
+		key: "1qsorh"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarArrowUp = createLucideIcon("calendar-arrow-up", [
 	["path", {
-		d: "m14 18 4-4 4 4",
-		key: "ftkppy"
+		d: "m14 17 4-4 4 4",
+		key: "1qa3u6"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M18 22v-8",
-		key: "su0gjh"
+		d: "M18 21v-8",
+		key: "1ao88k"
 	}],
 	["path", {
-		d: "M21 11.343V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9",
-		key: "1exg90"
+		d: "M21 10.343V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h9",
+		key: "185mot"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarCheck2 = createLucideIcon("calendar-check-2", [
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M 19 3 L 5 3",
+		key: "1xn3iy"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M 21 13 L 21 5",
+		key: "102s58"
 	}],
 	["path", {
-		d: "M21 14V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8",
-		key: "bce9hv"
+		d: "M 21 5 A2 2 0 0 0 19 3",
+		key: "1xylja"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M 3 19 A2 2 0 0 0 5 21",
+		key: "19jxbv"
 	}],
 	["path", {
-		d: "m16 20 2 2 4-4",
-		key: "13tcca"
+		d: "M 3 5 L 3 19",
+		key: "1yylhw"
+	}],
+	["path", {
+		d: "M 5 3 A2 2 0 0 0 3 5",
+		key: "164twa"
+	}],
+	["path", {
+		d: "m16 19 2 2 4-4",
+		key: "1b14m6"
+	}],
+	["path", {
+		d: "M16 2v3",
+		key: "otl347"
+	}],
+	["path", {
+		d: "M3 9h18",
+		key: "1pudct"
+	}],
+	["path", {
+		d: "M5 21 L12.5 21",
+		key: "1n38e0"
+	}],
+	["path", {
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarCheck = createLucideIcon("calendar-check", [
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["rect", {
+		x: "3",
+		y: "3",
 		width: "18",
 		height: "18",
-		x: "3",
-		y: "4",
 		rx: "2",
-		key: "1hopcy"
+		key: "h1oib"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "m9 16 2 2 4-4",
-		key: "19s6y9"
+		d: "m9 15 2 2 4-4",
+		key: "1grp1n"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13761,20 +13913,20 @@ var CalendarClock = createLucideIcon("calendar-clock", [
 		key: "fo4ql5"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5",
-		key: "1osxxc"
+		d: "M21 7.338V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h2.338",
+		key: "7hb8p4"
 	}],
 	["path", {
-		d: "M3 10h5",
-		key: "r794hk"
+		d: "M3 9h5.859",
+		key: "numkqi"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["circle", {
 		cx: "16",
@@ -13784,7 +13936,7 @@ var CalendarClock = createLucideIcon("calendar-clock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -13799,8 +13951,8 @@ var CalendarCog = createLucideIcon("calendar-cog", [
 		key: "51cr3n"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
 		d: "m16.47 14.305.382.923",
@@ -13819,24 +13971,24 @@ var CalendarCog = createLucideIcon("calendar-cog", [
 		key: "1goivc"
 	}],
 	["path", {
-		d: "m20.772 16.852.924-.383",
-		key: "htqkph"
+		d: "m20.773 16.852.924-.383",
+		key: "ybmb4k"
 	}],
 	["path", {
-		d: "m20.772 19.148.924.383",
-		key: "9w9pjp"
+		d: "m20.773 19.148.924.383",
+		key: "1c2d3p"
 	}],
 	["path", {
-		d: "M21 10.592V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6",
-		key: "1pvbig"
+		d: "M21 10.5V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h5.5",
+		key: "1e6z1y"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["circle", {
 		cx: "18",
@@ -13846,353 +13998,349 @@ var CalendarCog = createLucideIcon("calendar-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CalendarDays = createLucideIcon("calendar-days", [
-	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
-	}],
-	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "4",
-		rx: "2",
-		key: "1hopcy"
-	}],
-	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
-	}],
-	["path", {
-		d: "M8 14h.01",
-		key: "6423bh"
-	}],
-	["path", {
-		d: "M12 14h.01",
-		key: "1etili"
-	}],
-	["path", {
-		d: "M16 14h.01",
-		key: "1gbofw"
-	}],
-	["path", {
-		d: "M8 18h.01",
-		key: "lrp35t"
-	}],
-	["path", {
-		d: "M12 18h.01",
-		key: "mhygvu"
-	}],
-	["path", {
-		d: "M16 18h.01",
-		key: "kzsmim"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CalendarHeart = createLucideIcon("calendar-heart", [
-	["path", {
-		d: "M12.127 22H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5.125",
-		key: "vxdnp4"
-	}],
-	["path", {
-		d: "M14.62 18.8A2.25 2.25 0 1 1 18 15.836a2.25 2.25 0 1 1 3.38 2.966l-2.626 2.856a.998.998 0 0 1-1.507 0z",
-		key: "15cy7q"
-	}],
-	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
-	}],
-	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CalendarMinus2 = createLucideIcon("calendar-minus-2", [
-	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
-	}],
-	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "4",
-		rx: "2",
-		key: "1hopcy"
-	}],
-	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
-	}],
-	["path", {
-		d: "M10 16h4",
-		key: "17e571"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarFold = createLucideIcon("calendar-fold", [
 	["path", {
-		d: "M3 20a2 2 0 0 0 2 2h10a2.4 2.4 0 0 0 1.706-.706l3.588-3.588A2.4 2.4 0 0 0 21 16V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z",
-		key: "r586nh"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M15 22v-5a1 1 0 0 1 1-1h5",
-		key: "xl3app"
+		d: "M21 15V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h10v-5a1 1 0 011-1za2.4 2.4 0 01-.706 1.706l-3.588 3.588A2.4 2.4 0 0115 21",
+		key: "4uit17"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CalendarDays = createLucideIcon("calendar-days", [
+	["path", {
+		d: "M8 2v3",
+		key: "1ioesn"
+	}],
+	["path", {
+		d: "M16 2v3",
+		key: "otl347"
+	}],
+	["rect", {
+		x: "3",
+		y: "3",
+		width: "18",
+		height: "18",
+		rx: "2",
+		key: "h1oib"
+	}],
+	["path", {
+		d: "M3 9h18",
+		key: "1pudct"
+	}],
+	["path", {
+		d: "M8 13h.01",
+		key: "1sbv64"
+	}],
+	["path", {
+		d: "M12 13h.01",
+		key: "y0uutt"
+	}],
+	["path", {
+		d: "M16 13h.01",
+		key: "wip0gl"
+	}],
+	["path", {
+		d: "M8 17h.01",
+		key: "p3bg7i"
+	}],
+	["path", {
+		d: "M12 17h.01",
+		key: "p32p05"
+	}],
+	["path", {
+		d: "M16 17h.01",
+		key: "ql8jdd"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CalendarHeart = createLucideIcon("calendar-heart", [
+	["path", {
+		d: "M12.127 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5.125",
+		key: "1fsxpc"
+	}],
+	["path", {
+		d: "M14.62 17.8A2.25 2.25 0 1118 14.836a2.25 2.25 0 113.38 2.966l-2.626 2.856a.998.998 0 01-1.507 0z",
+		key: "1gk3ue"
+	}],
+	["path", {
+		d: "M16 2v3",
+		key: "otl347"
+	}],
+	["path", {
+		d: "M3 9h18",
+		key: "1pudct"
+	}],
+	["path", {
+		d: "M8 2v3",
+		key: "1ioesn"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CalendarMinus2 = createLucideIcon("calendar-minus-2", [
+	["path", {
+		d: "M8 2v3",
+		key: "1ioesn"
+	}],
+	["path", {
+		d: "M16 2v3",
+		key: "otl347"
+	}],
+	["rect", {
+		x: "3",
+		y: "3",
+		width: "18",
+		height: "18",
+		rx: "2",
+		key: "h1oib"
+	}],
+	["path", {
+		d: "M3 9h18",
+		key: "1pudct"
+	}],
+	["path", {
+		d: "M10 15h4",
+		key: "192ueg"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarMinus = createLucideIcon("calendar-minus", [
 	["path", {
-		d: "M16 19h6",
-		key: "xwg31i"
+		d: "M16 18h6",
+		key: "987eiv"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8.5",
-		key: "1scpom"
+		d: "M21 14V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h8.3",
+		key: "gcu0od"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarOff = createLucideIcon("calendar-off", [
 	["path", {
-		d: "M4.2 4.2A2 2 0 0 0 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 1.82-1.18",
-		key: "16swn3"
-	}],
-	["path", {
-		d: "M21 15.5V6a2 2 0 0 0-2-2H9.5",
-		key: "yhw86o"
-	}],
-	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["path", {
-		d: "M3 10h7",
-		key: "1wap6i"
-	}],
-	["path", {
-		d: "M21 10h-5.5",
-		key: "quycpq"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
 		d: "m2 2 20 20",
 		key: "1ooewy"
+	}],
+	["path", {
+		d: "M21 9h-5.5",
+		key: "1g344v"
+	}],
+	["path", {
+		d: "M3 9h6",
+		key: "1q2djq"
+	}],
+	["path", {
+		d: "M3.586 3.586A2 2 0 003 5v14a2 2 0 002 2h14a2 2 0 001.414-.586",
+		key: "1g7ltu"
+	}],
+	["path", {
+		d: "M8.656 3H19a2 2 0 012 2v10.344",
+		key: "1bwpd1"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarPlus2 = createLucideIcon("calendar-plus-2", [
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["rect", {
+		x: "3",
+		y: "3",
 		width: "18",
 		height: "18",
-		x: "3",
-		y: "4",
 		rx: "2",
-		key: "1hopcy"
+		key: "h1oib"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M10 16h4",
-		key: "17e571"
+		d: "M10 15h4",
+		key: "192ueg"
 	}],
 	["path", {
-		d: "M12 14v4",
-		key: "1thi36"
+		d: "M12 13v4",
+		key: "1il4po"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarPlus = createLucideIcon("calendar-plus", [
 	["path", {
-		d: "M16 19h6",
-		key: "xwg31i"
+		d: "M16 18h6",
+		key: "987eiv"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M19 16v6",
-		key: "tddt3s"
+		d: "M19 15v6",
+		key: "10aioa"
 	}],
 	["path", {
-		d: "M21 12.598V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8.5",
-		key: "1glfrc"
+		d: "M21 11.5V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h8.3",
+		key: "jgwkxf"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarRange = createLucideIcon("calendar-range", [
 	["rect", {
+		x: "3",
+		y: "3",
 		width: "18",
 		height: "18",
-		x: "3",
-		y: "4",
 		rx: "2",
-		key: "1hopcy"
+		key: "h1oib"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["path", {
-		d: "M17 14h-6",
-		key: "bkmgh3"
+		d: "M17 13h-6",
+		key: "1qbiup"
 	}],
 	["path", {
-		d: "M13 18H7",
-		key: "bb0bb7"
+		d: "M13 17H7",
+		key: "1x38vv"
 	}],
 	["path", {
-		d: "M7 14h.01",
-		key: "1qa3f1"
+		d: "M7 13h.01",
+		key: "1vezk1"
 	}],
 	["path", {
-		d: "M17 18h.01",
-		key: "1bdyru"
+		d: "M17 17h.01",
+		key: "1sd3ek"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarSearch = createLucideIcon("calendar-search", [
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M21 11.75V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.25",
-		key: "1jrsq6"
+		d: "M21 10.69V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h7.25",
+		key: "h6gkkz"
 	}],
 	["path", {
-		d: "m22 22-1.875-1.875",
-		key: "13zax7"
+		d: "m22 21-1.875-1.875",
+		key: "1dzjql"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["circle", {
 		cx: "18",
-		cy: "18",
+		cy: "17",
 		r: "3",
-		key: "1xkwt0"
+		key: "1hty4x"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14203,132 +14351,132 @@ var CalendarSync = createLucideIcon("calendar-sync", [
 		key: "172dkj"
 	}],
 	["path", {
-		d: "m11 14 1.535-1.605a5 5 0 0 1 8 1.5",
-		key: "vu0qm5"
+		d: "m11 14 1.535-1.605a5 5 0 018 1.5",
+		key: "jekqcd"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "m21 18-1.535 1.605a5 5 0 0 1-8-1.5",
-		key: "1qgeyt"
+		d: "m21 18-1.535 1.605a5 5 0 01-8-1.5",
+		key: "n107hu"
 	}],
 	["path", {
 		d: "M21 22v-4h-4",
 		key: "hrummi"
 	}],
 	["path", {
-		d: "M21 8.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4.3",
-		key: "mctw84"
+		d: "M21 8.517V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h3.517",
+		key: "yafrba"
 	}],
 	["path", {
-		d: "M3 10h4",
-		key: "1el30a"
+		d: "M3 9h4",
+		key: "rnfnj5"
 	}],
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var CalendarX2 = createLucideIcon("calendar-x-2", [
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "m17 16 5 5",
+		key: "1a37d9"
 	}],
 	["path", {
-		d: "M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8",
-		key: "3spt84"
+		d: "m17 21 5-5",
+		key: "1b797a"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M21 12V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h8",
+		key: "14ws7l"
 	}],
 	["path", {
-		d: "m17 22 5-5",
-		key: "1k6ppv"
+		d: "M3 9h18",
+		key: "1pudct"
 	}],
 	["path", {
-		d: "m17 17 5 5",
-		key: "p7ous7"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CalendarX = createLucideIcon("calendar-x", [
-	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
-	}],
-	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "4",
-		rx: "2",
-		key: "1hopcy"
-	}],
-	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
-	}],
-	["path", {
-		d: "m14 14-4 4",
-		key: "rymu2i"
-	}],
-	["path", {
-		d: "m10 14 4 4",
-		key: "3sz06r"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
 var Calendar = createLucideIcon("calendar", [
 	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
+		d: "M8 2v3",
+		key: "1ioesn"
 	}],
 	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
+		d: "M16 2v3",
+		key: "otl347"
 	}],
 	["rect", {
+		x: "3",
+		y: "3",
 		width: "18",
 		height: "18",
-		x: "3",
-		y: "4",
 		rx: "2",
-		key: "1hopcy"
+		key: "h1oib"
 	}],
 	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
+		d: "M3 9h18",
+		key: "1pudct"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CalendarX = createLucideIcon("calendar-x", [
+	["path", {
+		d: "M8 2v3",
+		key: "1ioesn"
+	}],
+	["path", {
+		d: "M16 2v3",
+		key: "otl347"
+	}],
+	["rect", {
+		x: "3",
+		y: "3",
+		width: "18",
+		height: "18",
+		rx: "2",
+		key: "h1oib"
+	}],
+	["path", {
+		d: "M3 9h18",
+		key: "1pudct"
+	}],
+	["path", {
+		d: "m14 13-4 4",
+		key: "1gib57"
+	}],
+	["path", {
+		d: "m10 13 4 4",
+		key: "153uiq"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14364,7 +14512,7 @@ var Calendars = createLucideIcon("calendars", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14388,7 +14536,22 @@ var CameraOff = createLucideIcon("camera-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Camera = createLucideIcon("camera", [["path", {
+	d: "M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z",
+	key: "18u6gg"
+}], ["circle", {
+	cx: "12",
+	cy: "13",
+	r: "3",
+	key: "1vg3eu"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14416,22 +14579,7 @@ var CandyCane = createLucideIcon("candy-cane", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Camera = createLucideIcon("camera", [["path", {
-	d: "M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z",
-	key: "18u6gg"
-}], ["circle", {
-	cx: "12",
-	cy: "13",
-	r: "3",
-	key: "1vg3eu"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14467,7 +14615,7 @@ var CandyOff = createLucideIcon("candy-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14495,7 +14643,7 @@ var Candy = createLucideIcon("candy", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14527,7 +14675,7 @@ var CannabisOff = createLucideIcon("cannabis-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14540,7 +14688,7 @@ var Cannabis = createLucideIcon("cannabis", [["path", {
 	key: "1mezod"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14572,7 +14720,7 @@ var CaptionsOff = createLucideIcon("captions-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14590,7 +14738,7 @@ var Captions = createLucideIcon("captions", [["rect", {
 	key: "1ueiar"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14626,7 +14774,7 @@ var CarFront = createLucideIcon("car-front", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14666,7 +14814,33 @@ var CarTaxiFront = createLucideIcon("car-taxi-front", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Caravan = createLucideIcon("caravan", [
+	["path", {
+		d: "M18 19V9a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v8a2 2 0 0 0 2 2h2",
+		key: "19jm3t"
+	}],
+	["path", {
+		d: "M2 9h3a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2",
+		key: "13hakp"
+	}],
+	["path", {
+		d: "M22 17v1a1 1 0 0 1-1 1H10v-9a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v9",
+		key: "1crci8"
+	}],
+	["circle", {
+		cx: "8",
+		cy: "19",
+		r: "2",
+		key: "t8fc5s"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14694,33 +14868,7 @@ var Car = createLucideIcon("car", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Caravan = createLucideIcon("caravan", [
-	["path", {
-		d: "M18 19V9a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v8a2 2 0 0 0 2 2h2",
-		key: "19jm3t"
-	}],
-	["path", {
-		d: "M2 9h3a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2",
-		key: "13hakp"
-	}],
-	["path", {
-		d: "M22 17v1a1 1 0 0 1-1 1H10v-9a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v9",
-		key: "1crci8"
-	}],
-	["circle", {
-		cx: "8",
-		cy: "19",
-		r: "2",
-		key: "t8fc5s"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14748,7 +14896,7 @@ var CardSim = createLucideIcon("card-sim", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14768,7 +14916,7 @@ var Carrot = createLucideIcon("carrot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14796,7 +14944,7 @@ var CaseLower = createLucideIcon("case-lower", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14822,7 +14970,7 @@ var CaseSensitive = createLucideIcon("case-sensitive", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14842,7 +14990,7 @@ var CaseUpper = createLucideIcon("case-upper", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14878,7 +15026,7 @@ var CassetteTape = createLucideIcon("cassette-tape", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14905,7 +15053,7 @@ var Cast = createLucideIcon("cast", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14945,7 +15093,7 @@ var Castle = createLucideIcon("castle", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -14969,7 +15117,7 @@ var Cat = createLucideIcon("cat", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15001,7 +15149,7 @@ var CctvOff = createLucideIcon("cctv-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15029,7 +15177,7 @@ var Cctv = createLucideIcon("cctv", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15042,7 +15190,7 @@ var ChartArea = createLucideIcon("chart-area", [["path", {
 	key: "q0gr47"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15070,7 +15218,7 @@ var ChartBarBig = createLucideIcon("chart-bar-big", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15094,7 +15242,7 @@ var ChartBarDecreasing = createLucideIcon("chart-bar-decreasing", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15118,7 +15266,7 @@ var ChartBarIncreasing = createLucideIcon("chart-bar-increasing", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15154,7 +15302,7 @@ var ChartBarStacked = createLucideIcon("chart-bar-stacked", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15178,7 +15326,7 @@ var ChartBar = createLucideIcon("chart-bar", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15222,7 +15370,7 @@ var ChartCandlestick = createLucideIcon("chart-candlestick", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15250,7 +15398,7 @@ var ChartColumnBig = createLucideIcon("chart-column-big", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15274,31 +15422,7 @@ var ChartColumnDecreasing = createLucideIcon("chart-column-decreasing", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ChartColumnIncreasing = createLucideIcon("chart-column-increasing", [
-	["path", {
-		d: "M13 17V9",
-		key: "1fwyjl"
-	}],
-	["path", {
-		d: "M18 17V5",
-		key: "sfb6ij"
-	}],
-	["path", {
-		d: "M3 3v16a2 2 0 0 0 2 2h16",
-		key: "c24i48"
-	}],
-	["path", {
-		d: "M8 17v-3",
-		key: "17ska0"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15334,7 +15458,31 @@ var ChartColumnStacked = createLucideIcon("chart-column-stacked", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChartColumnIncreasing = createLucideIcon("chart-column-increasing", [
+	["path", {
+		d: "M13 17V9",
+		key: "1fwyjl"
+	}],
+	["path", {
+		d: "M18 17V5",
+		key: "sfb6ij"
+	}],
+	["path", {
+		d: "M3 3v16a2 2 0 0 0 2 2h16",
+		key: "c24i48"
+	}],
+	["path", {
+		d: "M8 17v-3",
+		key: "17ska0"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15358,7 +15506,7 @@ var ChartColumn = createLucideIcon("chart-column", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15382,7 +15530,7 @@ var ChartGantt = createLucideIcon("chart-gantt", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15395,7 +15543,27 @@ var ChartLine = createLucideIcon("chart-line", [["path", {
 	key: "2osh9i"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChartNoAxesColumnDecreasing = createLucideIcon("chart-no-axes-column-decreasing", [
+	["path", {
+		d: "M5 21V3",
+		key: "clc1r8"
+	}],
+	["path", {
+		d: "M12 21V9",
+		key: "uvy0l4"
+	}],
+	["path", {
+		d: "M19 21v-6",
+		key: "tkawy9"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15437,27 +15605,7 @@ var ChartNetwork = createLucideIcon("chart-network", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ChartNoAxesColumnDecreasing = createLucideIcon("chart-no-axes-column-decreasing", [
-	["path", {
-		d: "M5 21V3",
-		key: "clc1r8"
-	}],
-	["path", {
-		d: "M12 21V9",
-		key: "uvy0l4"
-	}],
-	["path", {
-		d: "M19 21v-6",
-		key: "tkawy9"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15477,7 +15625,7 @@ var ChartNoAxesColumnIncreasing = createLucideIcon("chart-no-axes-column-increas
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15497,7 +15645,7 @@ var ChartNoAxesColumn = createLucideIcon("chart-no-axes-column", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15529,7 +15677,7 @@ var ChartNoAxesCombined = createLucideIcon("chart-no-axes-combined", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15549,7 +15697,7 @@ var ChartNoAxesGantt = createLucideIcon("chart-no-axes-gantt", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15562,7 +15710,7 @@ var ChartPie = createLucideIcon("chart-pie", [["path", {
 	key: "k2fpak"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15609,20 +15757,7 @@ var ChartScatter = createLucideIcon("chart-scatter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CheckCheck = createLucideIcon("check-check", [["path", {
-	d: "M18 6 7 17l-5-5",
-	key: "116fxf"
-}], ["path", {
-	d: "m22 10-7.5 7.5L13 16",
-	key: "ke71qq"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15635,7 +15770,30 @@ var ChartSpline = createLucideIcon("chart-spline", [["path", {
 	key: "lw07rv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CheckCheck = createLucideIcon("check-check", [["path", {
+	d: "M18 6 7 17l-5-5",
+	key: "116fxf"
+}], ["path", {
+	d: "m22 10-7.5 7.5L13 16",
+	key: "ke71qq"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Check = createLucideIcon("check", [["path", {
+	d: "M20 6 9 17l-5-5",
+	key: "1gmf2c"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15655,17 +15813,7 @@ var CheckLine = createLucideIcon("check-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Check = createLucideIcon("check", [["path", {
-	d: "M20 6 9 17l-5-5",
-	key: "1gmf2c"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15678,7 +15826,7 @@ var ChefHat = createLucideIcon("chef-hat", [["path", {
 	key: "1jwigz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15702,7 +15850,7 @@ var Cherry = createLucideIcon("cherry", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15726,31 +15874,7 @@ var ChessBishop = createLucideIcon("chess-bishop", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ChessKing = createLucideIcon("chess-king", [
-	["path", {
-		d: "M4 20a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z",
-		key: "mqzwx6"
-	}],
-	["path", {
-		d: "m6.7 18-1-1C4.35 15.682 3 14.09 3 12a5 5 0 0 1 4.95-5c1.584 0 2.7.455 4.05 1.818C13.35 7.455 14.466 7 16.05 7A5 5 0 0 1 21 12c0 2.082-1.359 3.673-2.7 5l-1 1",
-		key: "1gdt1g"
-	}],
-	["path", {
-		d: "M10 4h4",
-		key: "1xpv9s"
-	}],
-	["path", {
-		d: "M12 2v6.818",
-		key: "b17a49"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15778,7 +15902,31 @@ var ChessKnight = createLucideIcon("chess-knight", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChessKing = createLucideIcon("chess-king", [
+	["path", {
+		d: "M4 20a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z",
+		key: "mqzwx6"
+	}],
+	["path", {
+		d: "m6.7 18-1-1C4.35 15.682 3 14.09 3 12a5 5 0 0 1 4.95-5c1.584 0 2.7.455 4.05 1.818C13.35 7.455 14.466 7 16.05 7A5 5 0 0 1 21 12c0 2.082-1.359 3.673-2.7 5l-1 1",
+		key: "1gdt1g"
+	}],
+	["path", {
+		d: "M10 4h4",
+		key: "1xpv9s"
+	}],
+	["path", {
+		d: "M12 2v6.818",
+		key: "b17a49"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15808,7 +15956,7 @@ var ChessPawn = createLucideIcon("chess-pawn", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15854,7 +16002,7 @@ var ChessQueen = createLucideIcon("chess-queen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15890,17 +16038,7 @@ var ChessRook = createLucideIcon("chess-rook", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ChevronDown = createLucideIcon("chevron-down", [["path", {
-	d: "m6 9 6 6 6-6",
-	key: "qrunsl"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15913,7 +16051,17 @@ var ChevronFirst = createLucideIcon("chevron-first", [["path", {
 	key: "1p53r6"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChevronDown = createLucideIcon("chevron-down", [["path", {
+	d: "m6 9 6 6 6-6",
+	key: "qrunsl"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15926,7 +16074,7 @@ var ChevronLast = createLucideIcon("chevron-last", [["path", {
 	key: "1o0aio"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15936,7 +16084,7 @@ var ChevronLeft = createLucideIcon("chevron-left", [["path", {
 	key: "1wnfg3"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15946,7 +16094,7 @@ var ChevronRight = createLucideIcon("chevron-right", [["path", {
 	key: "mthhwq"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15956,7 +16104,7 @@ var ChevronUp = createLucideIcon("chevron-up", [["path", {
 	key: "153udz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15969,7 +16117,7 @@ var ChevronsDownUp = createLucideIcon("chevrons-down-up", [["path", {
 	key: "1kwcof"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -15982,7 +16130,7 @@ var ChevronsDown = createLucideIcon("chevrons-down", [["path", {
 	key: "1d48rs"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16010,7 +16158,7 @@ var ChevronsLeftRightEllipsis = createLucideIcon("chevrons-left-right-ellipsis",
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16023,7 +16171,7 @@ var ChevronsLeftRight = createLucideIcon("chevrons-left-right", [["path", {
 	key: "1bl6da"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16036,7 +16184,7 @@ var ChevronsLeft = createLucideIcon("chevrons-left", [["path", {
 	key: "h8a8et"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16049,7 +16197,7 @@ var ChevronsRightLeft = createLucideIcon("chevrons-right-left", [["path", {
 	key: "16spf4"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16062,7 +16210,7 @@ var ChevronsRight = createLucideIcon("chevrons-right", [["path", {
 	key: "17xmmf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16075,7 +16223,7 @@ var ChevronsUpDown = createLucideIcon("chevrons-up-down", [["path", {
 	key: "sgt6xg"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16088,7 +16236,7 @@ var ChevronsUp = createLucideIcon("chevrons-up", [["path", {
 	key: "2avn1x"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16116,7 +16264,7 @@ var Church = createLucideIcon("church", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16148,7 +16296,7 @@ var CigaretteOff = createLucideIcon("cigarette-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16176,7 +16324,7 @@ var Cigarette = createLucideIcon("cigarette", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16198,7 +16346,7 @@ var CircleArrowDown = createLucideIcon("circle-arrow-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16226,7 +16374,7 @@ var CircleAlert = createLucideIcon("circle-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16248,7 +16396,7 @@ var CircleArrowLeft = createLucideIcon("circle-arrow-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16268,7 +16416,7 @@ var CircleArrowOutDownLeft = createLucideIcon("circle-arrow-out-down-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16288,7 +16436,7 @@ var CircleArrowOutDownRight = createLucideIcon("circle-arrow-out-down-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16308,7 +16456,7 @@ var CircleArrowOutUpLeft = createLucideIcon("circle-arrow-out-up-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16328,7 +16476,7 @@ var CircleArrowOutUpRight = createLucideIcon("circle-arrow-out-up-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16350,7 +16498,7 @@ var CircleArrowRight = createLucideIcon("circle-arrow-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16372,7 +16520,7 @@ var CircleArrowUp = createLucideIcon("circle-arrow-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16385,7 +16533,7 @@ var CircleCheckBig = createLucideIcon("circle-check-big", [["path", {
 	key: "1pflzl"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16400,7 +16548,7 @@ var CircleCheck = createLucideIcon("circle-check", [["circle", {
 	key: "dzmm74"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16415,7 +16563,7 @@ var CircleChevronDown = createLucideIcon("circle-chevron-down", [["circle", {
 	key: "894hmk"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16430,7 +16578,7 @@ var CircleChevronLeft = createLucideIcon("circle-chevron-left", [["circle", {
 	key: "ojs7w8"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16445,7 +16593,7 @@ var CircleChevronRight = createLucideIcon("circle-chevron-right", [["circle", {
 	key: "1wy4r4"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16460,7 +16608,7 @@ var CircleChevronUp = createLucideIcon("circle-chevron-up", [["circle", {
 	key: "fy2ptz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16500,29 +16648,7 @@ var CircleDashed = createLucideIcon("circle-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CircleDollarSign = createLucideIcon("circle-dollar-sign", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8",
-		key: "1h4pet"
-	}],
-	["path", {
-		d: "M12 18V6",
-		key: "zqpxq5"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16557,7 +16683,29 @@ var CircleDivide = createLucideIcon("circle-divide", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CircleDollarSign = createLucideIcon("circle-dollar-sign", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["path", {
+		d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8",
+		key: "1h4pet"
+	}],
+	["path", {
+		d: "M12 18V6",
+		key: "zqpxq5"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16603,7 +16751,7 @@ var CircleDotDashed = createLucideIcon("circle-dot-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16620,7 +16768,7 @@ var CircleDot = createLucideIcon("circle-dot", [["circle", {
 	key: "41hilf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16646,7 +16794,7 @@ var CircleEllipsis = createLucideIcon("circle-ellipsis", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16668,7 +16816,7 @@ var CircleEqual = createLucideIcon("circle-equal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16690,43 +16838,7 @@ var CircleEuro = createLucideIcon("circle-euro", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CircleFadingPlus = createLucideIcon("circle-fading-plus", [
-	["path", {
-		d: "M12 2a10 10 0 0 1 7.38 16.75",
-		key: "175t95"
-	}],
-	["path", {
-		d: "M12 8v8",
-		key: "napkw2"
-	}],
-	["path", {
-		d: "M16 12H8",
-		key: "1fr5h0"
-	}],
-	["path", {
-		d: "M2.5 8.875a10 10 0 0 0-.5 3",
-		key: "1vce0s"
-	}],
-	["path", {
-		d: "M2.83 16a10 10 0 0 0 2.43 3.4",
-		key: "o3fkw4"
-	}],
-	["path", {
-		d: "M4.636 5.235a10 10 0 0 1 .891-.857",
-		key: "1szpfk"
-	}],
-	["path", {
-		d: "M8.644 21.42a10 10 0 0 0 7.631-.38",
-		key: "9yhvd4"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16762,7 +16874,43 @@ var CircleFadingArrowUp = createLucideIcon("circle-fading-arrow-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CircleFadingPlus = createLucideIcon("circle-fading-plus", [
+	["path", {
+		d: "M12 2a10 10 0 0 1 7.38 16.75",
+		key: "175t95"
+	}],
+	["path", {
+		d: "M12 8v8",
+		key: "napkw2"
+	}],
+	["path", {
+		d: "M16 12H8",
+		key: "1fr5h0"
+	}],
+	["path", {
+		d: "M2.5 8.875a10 10 0 0 0-.5 3",
+		key: "1vce0s"
+	}],
+	["path", {
+		d: "M2.83 16a10 10 0 0 0 2.43 3.4",
+		key: "o3fkw4"
+	}],
+	["path", {
+		d: "M4.636 5.235a10 10 0 0 1 .891-.857",
+		key: "1szpfk"
+	}],
+	["path", {
+		d: "M8.644 21.42a10 10 0 0 0 7.631-.38",
+		key: "9yhvd4"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16784,7 +16932,7 @@ var CircleGauge = createLucideIcon("circle-gauge", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16799,7 +16947,7 @@ var CircleMinus = createLucideIcon("circle-minus", [["circle", {
 	key: "1wcyev"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16819,7 +16967,7 @@ var CircleOff = createLucideIcon("circle-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16851,7 +16999,7 @@ var CircleParkingOff = createLucideIcon("circle-parking-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16866,7 +17014,7 @@ var CircleParking = createLucideIcon("circle-parking", [["circle", {
 	key: "1dfk2c"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16894,7 +17042,33 @@ var CirclePause = createLucideIcon("circle-pause", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CirclePercent = createLucideIcon("circle-percent", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["path", {
+		d: "m15 9-6 6",
+		key: "1uzhvr"
+	}],
+	["path", {
+		d: "M9 9h.01",
+		key: "1q5me6"
+	}],
+	["path", {
+		d: "M15 15h.01",
+		key: "lqbp3k"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16938,33 +17112,7 @@ var CirclePile = createLucideIcon("circle-pile", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CirclePercent = createLucideIcon("circle-percent", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "m15 9-6 6",
-		key: "1uzhvr"
-	}],
-	["path", {
-		d: "M9 9h.01",
-		key: "1q5me6"
-	}],
-	["path", {
-		d: "M15 15h.01",
-		key: "lqbp3k"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -16979,7 +17127,7 @@ var CirclePlay = createLucideIcon("circle-play", [["path", {
 	key: "1mglay"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17001,7 +17149,7 @@ var CirclePlus = createLucideIcon("circle-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17027,29 +17175,7 @@ var CirclePoundSterling = createLucideIcon("circle-pound-sterling", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CircleQuestionMark = createLucideIcon("circle-question-mark", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3",
-		key: "1u773s"
-	}],
-	["path", {
-		d: "M12 17h.01",
-		key: "p32p05"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17071,7 +17197,29 @@ var CirclePower = createLucideIcon("circle-power", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CircleQuestionMark = createLucideIcon("circle-question-mark", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["path", {
+		d: "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3",
+		key: "1u773s"
+	}],
+	["path", {
+		d: "M12 17h.01",
+		key: "p32p05"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17086,7 +17234,7 @@ var CircleSlash2 = createLucideIcon("circle-slash-2", [["circle", {
 	key: "y4kqgn"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17104,7 +17252,7 @@ var CircleSlash = createLucideIcon("circle-slash", [["circle", {
 	key: "1dfufj"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17116,22 +17264,7 @@ var CircleSmall = createLucideIcon("circle-small", [["circle", {
 	key: "1vlfrh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CircleStar = createLucideIcon("circle-star", [["circle", {
-	cx: "12",
-	cy: "12",
-	r: "10",
-	key: "1mglay"
-}], ["path", {
-	d: "M11.051 7.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.867l-1.156-1.152a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z",
-	key: "285bvi"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17150,7 +17283,22 @@ var CircleStop = createLucideIcon("circle-stop", [["circle", {
 	key: "1ssd4o"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CircleStar = createLucideIcon("circle-star", [["circle", {
+	cx: "12",
+	cy: "12",
+	r: "10",
+	key: "1mglay"
+}], ["path", {
+	d: "M11.051 7.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.867l-1.156-1.152a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z",
+	key: "285bvi"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17174,7 +17322,7 @@ var CircleUserRound = createLucideIcon("circle-user-round", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17198,7 +17346,7 @@ var CircleUser = createLucideIcon("circle-user", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17220,7 +17368,7 @@ var CircleX = createLucideIcon("circle-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17232,7 +17380,7 @@ var Circle = createLucideIcon("circle", [["circle", {
 	key: "1mglay"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17268,7 +17416,7 @@ var CircuitBoard = createLucideIcon("circuit-board", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17292,7 +17440,7 @@ var Citrus = createLucideIcon("citrus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17316,7 +17464,7 @@ var Clapperboard = createLucideIcon("clapperboard", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17341,7 +17489,7 @@ var ClipboardCheck = createLucideIcon("clipboard-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17375,7 +17523,7 @@ var ClipboardClock = createLucideIcon("clipboard-clock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17408,7 +17556,7 @@ var ClipboardCopy = createLucideIcon("clipboard-copy", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17445,7 +17593,7 @@ var ClipboardList = createLucideIcon("clipboard-list", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17470,7 +17618,7 @@ var ClipboardMinus = createLucideIcon("clipboard-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17502,35 +17650,7 @@ var ClipboardPaste = createLucideIcon("clipboard-paste", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ClipboardPen = createLucideIcon("clipboard-pen", [
-	["path", {
-		d: "M16 4h2a2 2 0 0 1 2 2v2",
-		key: "j91f56"
-	}],
-	["path", {
-		d: "M21.34 15.664a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z",
-		key: "16fuwn"
-	}],
-	["path", {
-		d: "M8 22H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2",
-		key: "120tdm"
-	}],
-	["rect", {
-		x: "8",
-		y: "2",
-		width: "8",
-		height: "4",
-		rx: "1",
-		key: "ublpy"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17562,7 +17682,35 @@ var ClipboardPenLine = createLucideIcon("clipboard-pen-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ClipboardPen = createLucideIcon("clipboard-pen", [
+	["path", {
+		d: "M16 4h2a2 2 0 0 1 2 2v2",
+		key: "j91f56"
+	}],
+	["path", {
+		d: "M21.34 15.664a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z",
+		key: "16fuwn"
+	}],
+	["path", {
+		d: "M8 22H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2",
+		key: "120tdm"
+	}],
+	["rect", {
+		x: "8",
+		y: "2",
+		width: "8",
+		height: "4",
+		rx: "1",
+		key: "ublpy"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17591,7 +17739,7 @@ var ClipboardPlus = createLucideIcon("clipboard-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17624,7 +17772,7 @@ var ClipboardType = createLucideIcon("clipboard-type", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17653,7 +17801,7 @@ var ClipboardX = createLucideIcon("clipboard-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17671,7 +17819,7 @@ var Clipboard = createLucideIcon("clipboard", [["rect", {
 	key: "116196"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17686,7 +17834,7 @@ var Clock1 = createLucideIcon("clock-1", [["circle", {
 	key: "miptyd"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17701,22 +17849,7 @@ var Clock10 = createLucideIcon("clock-10", [["circle", {
 	key: "cedpoo"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Clock11 = createLucideIcon("clock-11", [["circle", {
-	cx: "12",
-	cy: "12",
-	r: "10",
-	key: "1mglay"
-}], ["path", {
-	d: "M12 6v6l-2-4",
-	key: "ns39ag"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17731,7 +17864,22 @@ var Clock12 = createLucideIcon("clock-12", [["circle", {
 	key: "1ipuwl"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Clock11 = createLucideIcon("clock-11", [["circle", {
+	cx: "12",
+	cy: "12",
+	r: "10",
+	key: "1mglay"
+}], ["path", {
+	d: "M12 6v6l-2-4",
+	key: "ns39ag"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17746,7 +17894,7 @@ var Clock2 = createLucideIcon("clock-2", [["circle", {
 	key: "1r2kuh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17761,22 +17909,7 @@ var Clock3 = createLucideIcon("clock-3", [["circle", {
 	key: "135r8i"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Clock5 = createLucideIcon("clock-5", [["circle", {
-	cx: "12",
-	cy: "12",
-	r: "10",
-	key: "1mglay"
-}], ["path", {
-	d: "M12 6v6l2 4",
-	key: "1287s9"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17791,7 +17924,22 @@ var Clock4 = createLucideIcon("clock-4", [["circle", {
 	key: "mmk7yg"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Clock5 = createLucideIcon("clock-5", [["circle", {
+	cx: "12",
+	cy: "12",
+	r: "10",
+	key: "1mglay"
+}], ["path", {
+	d: "M12 6v6l2 4",
+	key: "1287s9"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17806,7 +17954,7 @@ var Clock6 = createLucideIcon("clock-6", [["circle", {
 	key: "wf7rdh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17821,7 +17969,7 @@ var Clock7 = createLucideIcon("clock-7", [["circle", {
 	key: "1095bu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17836,7 +17984,7 @@ var Clock8 = createLucideIcon("clock-8", [["circle", {
 	key: "imc3wl"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17851,7 +17999,7 @@ var Clock9 = createLucideIcon("clock-9", [["circle", {
 	key: "u39vzm"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17875,7 +18023,7 @@ var ClockAlert = createLucideIcon("clock-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17899,7 +18047,7 @@ var ClockArrowDown = createLucideIcon("clock-arrow-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17923,7 +18071,7 @@ var ClockArrowLeft = createLucideIcon("clock-arrow-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17947,7 +18095,7 @@ var ClockArrowRight = createLucideIcon("clock-arrow-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17971,7 +18119,7 @@ var ClockArrowUp = createLucideIcon("clock-arrow-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -17991,7 +18139,7 @@ var ClockCheck = createLucideIcon("clock-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18023,7 +18171,7 @@ var ClockFading = createLucideIcon("clock-fading", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18047,7 +18195,22 @@ var ClockPlus = createLucideIcon("clock-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Clock = createLucideIcon("clock", [["circle", {
+	cx: "12",
+	cy: "12",
+	r: "10",
+	key: "1mglay"
+}], ["path", {
+	d: "M12 6v6l4 2",
+	key: "mmk7yg"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18071,22 +18234,7 @@ var ClosedCaption = createLucideIcon("closed-caption", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Clock = createLucideIcon("clock", [["circle", {
-	cx: "12",
-	cy: "12",
-	r: "10",
-	key: "1mglay"
-}], ["path", {
-	d: "M12 6v6l4 2",
-	key: "mmk7yg"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18106,7 +18254,7 @@ var CloudAlert = createLucideIcon("cloud-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18126,7 +18274,20 @@ var CloudBackup = createLucideIcon("cloud-backup", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CloudCheck = createLucideIcon("cloud-check", [["path", {
+	d: "m17 15-5.5 5.5L9 18",
+	key: "15q87x"
+}], ["path", {
+	d: "M5.516 16.07A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 3.501 7.327",
+	key: "1xtj56"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18170,7 +18331,7 @@ var CloudCog = createLucideIcon("cloud-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18190,56 +18351,7 @@ var CloudDownload = createLucideIcon("cloud-download", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CloudCheck = createLucideIcon("cloud-check", [["path", {
-	d: "m17 15-5.5 5.5L9 18",
-	key: "15q87x"
-}], ["path", {
-	d: "M5.516 16.07A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 3.501 7.327",
-	key: "1xtj56"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CloudDrizzle = createLucideIcon("cloud-drizzle", [
-	["path", {
-		d: "M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242",
-		key: "1pljnt"
-	}],
-	["path", {
-		d: "M8 19v1",
-		key: "1dk2by"
-	}],
-	["path", {
-		d: "M8 14v1",
-		key: "84yxot"
-	}],
-	["path", {
-		d: "M16 19v1",
-		key: "v220m7"
-	}],
-	["path", {
-		d: "M16 14v1",
-		key: "g12gj6"
-	}],
-	["path", {
-		d: "M12 21v1",
-		key: "q8vafk"
-	}],
-	["path", {
-		d: "M12 16v1",
-		key: "1mx6rx"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18259,7 +18371,7 @@ var CloudFog = createLucideIcon("cloud-fog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18295,7 +18407,56 @@ var CloudHail = createLucideIcon("cloud-hail", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CloudDrizzle = createLucideIcon("cloud-drizzle", [
+	["path", {
+		d: "M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242",
+		key: "1pljnt"
+	}],
+	["path", {
+		d: "M8 19v1",
+		key: "1dk2by"
+	}],
+	["path", {
+		d: "M8 14v1",
+		key: "84yxot"
+	}],
+	["path", {
+		d: "M16 19v1",
+		key: "v220m7"
+	}],
+	["path", {
+		d: "M16 14v1",
+		key: "g12gj6"
+	}],
+	["path", {
+		d: "M12 21v1",
+		key: "q8vafk"
+	}],
+	["path", {
+		d: "M12 16v1",
+		key: "1mx6rx"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CloudLightning = createLucideIcon("cloud-lightning", [["path", {
+	d: "M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973",
+	key: "1cez44"
+}], ["path", {
+	d: "m13 12-3 5h4l-3 5",
+	key: "1t22er"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18319,20 +18480,7 @@ var CloudMoonRain = createLucideIcon("cloud-moon-rain", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CloudLightning = createLucideIcon("cloud-lightning", [["path", {
-	d: "M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973",
-	key: "1cez44"
-}], ["path", {
-	d: "m13 12-3 5h4l-3 5",
-	key: "1t22er"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18345,7 +18493,7 @@ var CloudMoon = createLucideIcon("cloud-moon", [["path", {
 	key: "zwnc1e"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18365,31 +18513,7 @@ var CloudOff = createLucideIcon("cloud-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CloudRain = createLucideIcon("cloud-rain", [
-	["path", {
-		d: "M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242",
-		key: "1pljnt"
-	}],
-	["path", {
-		d: "M16 14v6",
-		key: "1j4efv"
-	}],
-	["path", {
-		d: "M8 14v6",
-		key: "17c4r9"
-	}],
-	["path", {
-		d: "M12 16v6",
-		key: "c8a4gj"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18413,7 +18537,31 @@ var CloudRainWind = createLucideIcon("cloud-rain-wind", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CloudRain = createLucideIcon("cloud-rain", [
+	["path", {
+		d: "M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242",
+		key: "1pljnt"
+	}],
+	["path", {
+		d: "M16 14v6",
+		key: "1j4efv"
+	}],
+	["path", {
+		d: "M8 14v6",
+		key: "17c4r9"
+	}],
+	["path", {
+		d: "M12 16v6",
+		key: "c8a4gj"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18449,7 +18597,7 @@ var CloudSnow = createLucideIcon("cloud-snow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18489,7 +18637,7 @@ var CloudSunRain = createLucideIcon("cloud-sun-rain", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18521,7 +18669,7 @@ var CloudSun = createLucideIcon("cloud-sun", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18549,7 +18697,7 @@ var CloudSync = createLucideIcon("cloud-sync", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18569,7 +18717,7 @@ var CloudUpload = createLucideIcon("cloud-upload", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18579,7 +18727,7 @@ var Cloud = createLucideIcon("cloud", [["path", {
 	key: "p7xjir"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18592,7 +18740,7 @@ var Cloudy = createLucideIcon("cloudy", [["path", {
 	key: "leugyv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18612,7 +18760,7 @@ var Clover = createLucideIcon("clover", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18625,7 +18773,7 @@ var Club = createLucideIcon("club", [["path", {
 	key: "ogfahf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18645,7 +18793,7 @@ var CodeXml = createLucideIcon("code-xml", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18658,7 +18806,7 @@ var Code = createLucideIcon("code", [["path", {
 	key: "ppft3o"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18682,7 +18830,7 @@ var Coffee = createLucideIcon("coffee", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18750,7 +18898,50 @@ var Cog = createLucideIcon("cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Coins = createLucideIcon("coins", [
+	["path", {
+		d: "M13.744 17.736a6 6 0 1 1-7.48-7.48",
+		key: "bq4yh3"
+	}],
+	["path", {
+		d: "M15 6h1v4",
+		key: "11y1tn"
+	}],
+	["path", {
+		d: "m6.134 14.768.866-.5 2 3.464",
+		key: "17snzx"
+	}],
+	["circle", {
+		cx: "16",
+		cy: "8",
+		r: "6",
+		key: "14bfc9"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Columns2 = createLucideIcon("columns-2", [["rect", {
+	width: "18",
+	height: "18",
+	x: "3",
+	y: "3",
+	rx: "2",
+	key: "afitv7"
+}], ["path", {
+	d: "M12 3v18",
+	key: "108xh3"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18808,50 +18999,7 @@ var Columns3Cog = createLucideIcon("columns-3-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Coins = createLucideIcon("coins", [
-	["path", {
-		d: "M13.744 17.736a6 6 0 1 1-7.48-7.48",
-		key: "bq4yh3"
-	}],
-	["path", {
-		d: "M15 6h1v4",
-		key: "11y1tn"
-	}],
-	["path", {
-		d: "m6.134 14.768.866-.5 2 3.464",
-		key: "17snzx"
-	}],
-	["circle", {
-		cx: "16",
-		cy: "8",
-		r: "6",
-		key: "14bfc9"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Columns2 = createLucideIcon("columns-2", [["rect", {
-	width: "18",
-	height: "18",
-	x: "3",
-	y: "3",
-	rx: "2",
-	key: "afitv7"
-}], ["path", {
-	d: "M12 3v18",
-	key: "108xh3"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18875,7 +19023,7 @@ var Columns3 = createLucideIcon("columns-3", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18903,17 +19051,7 @@ var Columns4 = createLucideIcon("columns-4", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Command = createLucideIcon("command", [["path", {
-	d: "M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3",
-	key: "11bfej"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18953,7 +19091,7 @@ var Combine = createLucideIcon("combine", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18968,7 +19106,7 @@ var Compass = createLucideIcon("compass", [["circle", {
 	key: "9ktpf1"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -18992,7 +19130,17 @@ var Component = createLucideIcon("component", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Command = createLucideIcon("command", [["path", {
+	d: "M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3",
+	key: "11bfej"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19024,7 +19172,7 @@ var Computer = createLucideIcon("computer", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19048,23 +19196,7 @@ var ConciergeBell = createLucideIcon("concierge-bell", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Cone = createLucideIcon("cone", [["path", {
-	d: "m20.9 18.55-8-15.98a1 1 0 0 0-1.8 0l-8 15.98",
-	key: "53pte7"
-}], ["ellipse", {
-	cx: "12",
-	cy: "19",
-	rx: "9",
-	ry: "3",
-	key: "1ji25f"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19108,7 +19240,23 @@ var Construction = createLucideIcon("construction", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Cone = createLucideIcon("cone", [["path", {
+	d: "m20.9 18.55-8-15.98a1 1 0 0 0-1.8 0l-8 15.98",
+	key: "53pte7"
+}], ["ellipse", {
+	cx: "12",
+	cy: "19",
+	rx: "9",
+	ry: "3",
+	key: "1ji25f"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19119,8 +19267,8 @@ var ContactRound = createLucideIcon("contact-round", [
 		key: "scm5qe"
 	}],
 	["path", {
-		d: "M17.915 22a6 6 0 0 0-12 0",
-		key: "suqz9p"
+		d: "M17.915 21a6 6 0 10-12 0",
+		key: "13n4mv"
 	}],
 	["path", {
 		d: "M8 2v2",
@@ -19128,21 +19276,21 @@ var ContactRound = createLucideIcon("contact-round", [
 	}],
 	["circle", {
 		cx: "12",
-		cy: "12",
+		cy: "11",
 		r: "4",
-		key: "4exip2"
+		key: "1gt34v"
 	}],
 	["rect", {
 		x: "3",
-		y: "4",
+		y: "3",
 		width: "18",
 		height: "18",
 		rx: "2",
-		key: "12vinp"
+		key: "h1oib"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19153,8 +19301,8 @@ var Contact = createLucideIcon("contact", [
 		key: "scm5qe"
 	}],
 	["path", {
-		d: "M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2",
-		key: "1waht3"
+		d: "M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2",
+		key: "k82dct"
 	}],
 	["path", {
 		d: "M8 2v2",
@@ -19162,21 +19310,36 @@ var Contact = createLucideIcon("contact", [
 	}],
 	["circle", {
 		cx: "12",
-		cy: "11",
+		cy: "10",
 		r: "3",
-		key: "itu57m"
+		key: "ilqhr7"
 	}],
 	["rect", {
 		x: "3",
-		y: "4",
+		y: "3",
 		width: "18",
 		height: "18",
 		rx: "2",
-		key: "12vinp"
+		key: "h1oib"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Contrast = createLucideIcon("contrast", [["circle", {
+	cx: "12",
+	cy: "12",
+	r: "10",
+	key: "1mglay"
+}], ["path", {
+	d: "M12 18a6 6 0 0 0 0-12v12z",
+	key: "j4l70d"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19204,22 +19367,7 @@ var Container = createLucideIcon("container", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Contrast = createLucideIcon("contrast", [["circle", {
-	cx: "12",
-	cy: "12",
-	r: "10",
-	key: "1mglay"
-}], ["path", {
-	d: "M12 18a6 6 0 0 0 0-12v12z",
-	key: "j4l70d"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19251,7 +19399,7 @@ var Cookie = createLucideIcon("cookie", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19275,7 +19423,7 @@ var CookingPot = createLucideIcon("cooking-pot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19300,7 +19448,7 @@ var CopyCheck = createLucideIcon("copy-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19328,7 +19476,7 @@ var CopyMinus = createLucideIcon("copy-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19363,7 +19511,7 @@ var CopyPlus = createLucideIcon("copy-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19391,7 +19539,7 @@ var CopySlash = createLucideIcon("copy-slash", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19426,7 +19574,7 @@ var CopyX = createLucideIcon("copy-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19444,7 +19592,7 @@ var Copy = createLucideIcon("copy", [["rect", {
 	key: "zix9uf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19459,7 +19607,7 @@ var Copyleft = createLucideIcon("copyleft", [["circle", {
 	key: "1sveal"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19474,7 +19622,7 @@ var Copyright = createLucideIcon("copyright", [["circle", {
 	key: "1i56pz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19487,7 +19635,7 @@ var CornerDownLeft = createLucideIcon("corner-down-left", [["path", {
 	key: "1kshq7"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19500,7 +19648,7 @@ var CornerDownRight = createLucideIcon("corner-down-right", [["path", {
 	key: "z08zvw"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19513,7 +19661,7 @@ var CornerLeftDown = createLucideIcon("corner-left-down", [["path", {
 	key: "nbpdq2"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19526,33 +19674,7 @@ var CornerLeftUp = createLucideIcon("corner-left-up", [["path", {
 	key: "1blwi3"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CornerRightUp = createLucideIcon("corner-right-up", [["path", {
-	d: "m10 9 5-5 5 5",
-	key: "9ctzwi"
-}], ["path", {
-	d: "M4 20h7a4 4 0 0 0 4-4V4",
-	key: "1plgdj"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var CornerUpLeft = createLucideIcon("corner-up-left", [["path", {
-	d: "M20 20v-7a4 4 0 0 0-4-4H4",
-	key: "1nkjon"
-}], ["path", {
-	d: "M9 14 4 9l5-5",
-	key: "102s5s"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19565,7 +19687,33 @@ var CornerRightDown = createLucideIcon("corner-right-down", [["path", {
 	key: "wcbgct"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CornerRightUp = createLucideIcon("corner-right-up", [["path", {
+	d: "m10 9 5-5 5 5",
+	key: "9ctzwi"
+}], ["path", {
+	d: "M4 20h7a4 4 0 0 0 4-4V4",
+	key: "1plgdj"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var CornerUpLeft = createLucideIcon("corner-up-left", [["path", {
+	d: "M20 20v-7a4 4 0 0 0-4-4H4",
+	key: "1nkjon"
+}], ["path", {
+	d: "M9 14 4 9l5-5",
+	key: "102s5s"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19578,7 +19726,7 @@ var CornerUpRight = createLucideIcon("corner-up-right", [["path", {
 	key: "1lu4f8"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19650,7 +19798,7 @@ var Cpu = createLucideIcon("cpu", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19672,7 +19820,7 @@ var CreativeCommons = createLucideIcon("creative-commons", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19692,7 +19840,7 @@ var CreditCard = createLucideIcon("credit-card", [["rect", {
 	key: "1b3vmo"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19720,7 +19868,7 @@ var Croissant = createLucideIcon("croissant", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19733,7 +19881,7 @@ var Crop = createLucideIcon("crop", [["path", {
 	key: "7s9ehn"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19743,7 +19891,7 @@ var Cross = createLucideIcon("cross", [["path", {
 	key: "1xbrqy"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19785,7 +19933,7 @@ var Crosshair = createLucideIcon("crosshair", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19798,7 +19946,7 @@ var Crown = createLucideIcon("crown", [["path", {
 	key: "11awu3"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19818,7 +19966,7 @@ var Cuboid = createLucideIcon("cuboid", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19842,7 +19990,7 @@ var CupSoda = createLucideIcon("cup-soda", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19884,7 +20032,7 @@ var Currency = createLucideIcon("currency", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19900,7 +20048,7 @@ var Cylinder = createLucideIcon("cylinder", [["ellipse", {
 	key: "aqi0yr"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19936,7 +20084,7 @@ var Dam = createLucideIcon("dam", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -19971,7 +20119,7 @@ var DatabaseArrowDown = createLucideIcon("database-arrow-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20006,7 +20154,7 @@ var DatabaseArrowUp = createLucideIcon("database-arrow-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20041,7 +20189,7 @@ var DatabaseBackup = createLucideIcon("database-backup", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20072,7 +20220,7 @@ var DatabaseCheck = createLucideIcon("database-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20103,7 +20251,7 @@ var DatabaseMinus = createLucideIcon("database-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20138,7 +20286,7 @@ var DatabasePlus = createLucideIcon("database-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20175,7 +20323,7 @@ var DatabaseSearch = createLucideIcon("database-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20214,7 +20362,7 @@ var DatabaseX = createLucideIcon("database-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20245,7 +20393,7 @@ var DatabaseZap = createLucideIcon("database-zap", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20268,7 +20416,7 @@ var Database = createLucideIcon("database", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20296,7 +20444,7 @@ var DecimalsArrowLeft = createLucideIcon("decimals-arrow-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20332,7 +20480,7 @@ var DecimalsArrowRight = createLucideIcon("decimals-arrow-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20352,7 +20500,7 @@ var Delete = createLucideIcon("delete", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20374,7 +20522,7 @@ var Dessert = createLucideIcon("dessert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20406,7 +20554,7 @@ var Diameter = createLucideIcon("diameter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20419,7 +20567,7 @@ var DiamondMinus = createLucideIcon("diamond-minus", [["path", {
 	key: "1wcyev"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20443,7 +20591,7 @@ var DiamondPercent = createLucideIcon("diamond-percent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20463,7 +20611,7 @@ var DiamondPlus = createLucideIcon("diamond-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20473,7 +20621,7 @@ var Diamond = createLucideIcon("diamond", [["path", {
 	key: "1f1r0c"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20491,7 +20639,61 @@ var Dice1 = createLucideIcon("dice-1", [["rect", {
 	key: "1mp3jc"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Dice3 = createLucideIcon("dice-3", [
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		ry: "2",
+		key: "1m3agn"
+	}],
+	["path", {
+		d: "M16 8h.01",
+		key: "cr5u4v"
+	}],
+	["path", {
+		d: "M12 12h.01",
+		key: "1mp3jc"
+	}],
+	["path", {
+		d: "M8 16h.01",
+		key: "18s6g9"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Dice2 = createLucideIcon("dice-2", [
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		ry: "2",
+		key: "1m3agn"
+	}],
+	["path", {
+		d: "M15 9h.01",
+		key: "x1ddxp"
+	}],
+	["path", {
+		d: "M9 15h.01",
+		key: "fzyn71"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20524,37 +20726,12 @@ var Dice4 = createLucideIcon("dice-4", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Dice2 = createLucideIcon("dice-2", [
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "3",
-		rx: "2",
-		ry: "2",
-		key: "1m3agn"
-	}],
-	["path", {
-		d: "M15 9h.01",
-		key: "x1ddxp"
-	}],
-	["path", {
-		d: "M9 15h.01",
-		key: "fzyn71"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Dice3 = createLucideIcon("dice-3", [
+var Dice5 = createLucideIcon("dice-5", [
 	["rect", {
 		width: "18",
 		height: "18",
@@ -20569,16 +20746,24 @@ var Dice3 = createLucideIcon("dice-3", [
 		key: "cr5u4v"
 	}],
 	["path", {
-		d: "M12 12h.01",
-		key: "1mp3jc"
+		d: "M8 8h.01",
+		key: "1e4136"
 	}],
 	["path", {
 		d: "M8 16h.01",
 		key: "18s6g9"
+	}],
+	["path", {
+		d: "M16 16h.01",
+		key: "1f9h7w"
+	}],
+	["path", {
+		d: "M12 12h.01",
+		key: "1mp3jc"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20619,44 +20804,7 @@ var Dice6 = createLucideIcon("dice-6", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Dice5 = createLucideIcon("dice-5", [
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "3",
-		rx: "2",
-		ry: "2",
-		key: "1m3agn"
-	}],
-	["path", {
-		d: "M16 8h.01",
-		key: "cr5u4v"
-	}],
-	["path", {
-		d: "M8 8h.01",
-		key: "1e4136"
-	}],
-	["path", {
-		d: "M8 16h.01",
-		key: "18s6g9"
-	}],
-	["path", {
-		d: "M16 16h.01",
-		key: "1f9h7w"
-	}],
-	["path", {
-		d: "M12 12h.01",
-		key: "1mp3jc"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20693,7 +20841,7 @@ var Dices = createLucideIcon("dices", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20713,7 +20861,7 @@ var Diff = createLucideIcon("diff", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20737,7 +20885,7 @@ var Disc2 = createLucideIcon("disc-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20765,7 +20913,7 @@ var Disc3 = createLucideIcon("disc-3", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20791,7 +20939,7 @@ var DiscAlbum = createLucideIcon("disc-album", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20808,7 +20956,7 @@ var Disc = createLucideIcon("disc", [["circle", {
 	key: "1c9p78"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20835,7 +20983,7 @@ var Divide = createLucideIcon("divide", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20883,7 +21031,31 @@ var DnaOff = createLucideIcon("dna-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Dock = createLucideIcon("dock", [
+	["path", {
+		d: "M2 8h20",
+		key: "d11cs7"
+	}],
+	["rect", {
+		width: "20",
+		height: "16",
+		x: "2",
+		y: "4",
+		rx: "2",
+		key: "18n3k1"
+	}],
+	["path", {
+		d: "M6 16h12",
+		key: "u522kt"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20935,31 +21107,7 @@ var Dna = createLucideIcon("dna", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Dock = createLucideIcon("dock", [
-	["path", {
-		d: "M2 8h20",
-		key: "d11cs7"
-	}],
-	["rect", {
-		width: "20",
-		height: "16",
-		x: "2",
-		y: "4",
-		rx: "2",
-		key: "18n3k1"
-	}],
-	["path", {
-		d: "M6 16h12",
-		key: "u522kt"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -20987,7 +21135,7 @@ var Dog = createLucideIcon("dog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21003,7 +21151,7 @@ var DollarSign = createLucideIcon("dollar-sign", [["line", {
 	key: "1b0p4s"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21018,7 +21166,7 @@ var Donut = createLucideIcon("donut", [["path", {
 	key: "1v7zrd"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21050,7 +21198,7 @@ var DoorClosedLocked = createLucideIcon("door-closed-locked", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21070,7 +21218,7 @@ var DoorClosed = createLucideIcon("door-closed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21098,7 +21246,7 @@ var DoorOpen = createLucideIcon("door-open", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21110,7 +21258,7 @@ var Dot = createLucideIcon("dot", [["circle", {
 	key: "41hilf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21130,7 +21278,7 @@ var Download = createLucideIcon("download", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21160,7 +21308,7 @@ var DraftingCompass = createLucideIcon("drafting-compass", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21200,7 +21348,7 @@ var Drama = createLucideIcon("drama", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21232,7 +21380,7 @@ var Drill = createLucideIcon("drill", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21280,7 +21428,7 @@ var Drone = createLucideIcon("drone", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21300,7 +21448,7 @@ var DropletOff = createLucideIcon("droplet-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21310,7 +21458,7 @@ var Droplet = createLucideIcon("droplet", [["path", {
 	key: "c7niix"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21323,7 +21471,7 @@ var Droplets = createLucideIcon("droplets", [["path", {
 	key: "1sl1rz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21362,7 +21510,7 @@ var Drum = createLucideIcon("drum", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21375,7 +21523,7 @@ var Drumstick = createLucideIcon("drumstick", [["path", {
 	key: "1oq1fw"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21403,7 +21551,20 @@ var Dumbbell = createLucideIcon("dumbbell", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Ear = createLucideIcon("ear", [["path", {
+	d: "M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0",
+	key: "1dfaln"
+}], ["path", {
+	d: "M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4",
+	key: "1qnva7"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21434,20 +21595,7 @@ var EarOff = createLucideIcon("ear-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Ear = createLucideIcon("ear", [["path", {
-	d: "M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0",
-	key: "1dfaln"
-}], ["path", {
-	d: "M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4",
-	key: "1qnva7"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21483,7 +21631,7 @@ var EarthLock = createLucideIcon("earth-lock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21509,22 +21657,7 @@ var Earth = createLucideIcon("earth", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var EggFried = createLucideIcon("egg-fried", [["circle", {
-	cx: "11.5",
-	cy: "12.5",
-	r: "3.5",
-	key: "1cl1mi"
-}], ["path", {
-	d: "M3 8c0-3.5 2.5-6 6.5-6 5 0 4.83 3 7.5 5s5 2 5 6c0 4.5-2.5 6.5-7 6.5-2.5 0-2.5 2.5-6 2.5s-7-2-7-5.5c0-3 1.5-3 1.5-5C3.5 10 3 9 3 8Z",
-	key: "165ef9"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21539,7 +21672,22 @@ var Eclipse = createLucideIcon("eclipse", [["circle", {
 	key: "1yuj32"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var EggFried = createLucideIcon("egg-fried", [["circle", {
+	cx: "11.5",
+	cy: "12.5",
+	r: "3.5",
+	key: "1cl1mi"
+}], ["path", {
+	d: "M3 8c0-3.5 2.5-6 6.5-6 5 0 4.83 3 7.5 5s5 2 5 6c0 4.5-2.5 6.5-7 6.5-2.5 0-2.5 2.5-6 2.5s-7-2-7-5.5c0-3 1.5-3 1.5-5C3.5 10 3 9 3 8Z",
+	key: "165ef9"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21559,7 +21707,7 @@ var EggOff = createLucideIcon("egg-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21569,20 +21717,24 @@ var Egg = createLucideIcon("egg", [["path", {
 	key: "1le142"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Ellipse = createLucideIcon("ellipse", [["ellipse", {
-	cx: "12",
-	cy: "12",
-	rx: "10",
-	ry: "6",
-	key: "swdkt4"
+var Eject = createLucideIcon("eject", [["path", {
+	d: "M4 13a1 1 0 0 1-.72-1.695l7.257-7.668a2 2 0 0 1 2.926 0l7.256 7.668A1 1 0 0 1 20 13z",
+	key: "ua5u6w"
+}], ["rect", {
+	x: "3",
+	y: "17",
+	width: "18",
+	height: "4",
+	rx: "1",
+	key: "kj6cfs"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21608,7 +21760,20 @@ var EllipsisVertical = createLucideIcon("ellipsis-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Ellipse = createLucideIcon("ellipse", [["ellipse", {
+	cx: "12",
+	cy: "12",
+	rx: "10",
+	ry: "6",
+	key: "swdkt4"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21634,7 +21799,7 @@ var Ellipsis = createLucideIcon("ellipsis", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21647,7 +21812,7 @@ var EqualApproximately = createLucideIcon("equal-approximately", [["path", {
 	key: "gzkvyz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21676,7 +21841,20 @@ var EqualNot = createLucideIcon("equal-not", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Eraser = createLucideIcon("eraser", [["path", {
+	d: "M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21",
+	key: "g5wo59"
+}], ["path", {
+	d: "m5.082 11.09 8.828 8.828",
+	key: "1wx5vj"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21695,20 +21873,7 @@ var Equal = createLucideIcon("equal", [["line", {
 	key: "g8yjpy"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Eraser = createLucideIcon("eraser", [["path", {
-	d: "M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21",
-	key: "g5wo59"
-}], ["path", {
-	d: "m5.082 11.09 8.828 8.828",
-	key: "1wx5vj"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21736,7 +21901,27 @@ var EthernetPort = createLucideIcon("ethernet-port", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Euro = createLucideIcon("euro", [
+	["path", {
+		d: "M4 10h12",
+		key: "1y6xl8"
+	}],
+	["path", {
+		d: "M4 14h9",
+		key: "1loblj"
+	}],
+	["path", {
+		d: "M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2",
+		key: "1j6lzo"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21764,27 +21949,7 @@ var EvCharger = createLucideIcon("ev-charger", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Euro = createLucideIcon("euro", [
-	["path", {
-		d: "M4 10h12",
-		key: "1y6xl8"
-	}],
-	["path", {
-		d: "M4 14h9",
-		key: "1loblj"
-	}],
-	["path", {
-		d: "M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2",
-		key: "1j6lzo"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21824,7 +21989,7 @@ var Expand = createLucideIcon("expand", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21844,7 +22009,7 @@ var ExternalLink = createLucideIcon("external-link", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21872,7 +22037,7 @@ var EyeClosed = createLucideIcon("eye-closed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21918,7 +22083,7 @@ var EyeDashed = createLucideIcon("eye-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21942,7 +22107,7 @@ var EyeOff = createLucideIcon("eye-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21957,7 +22122,203 @@ var Eye = createLucideIcon("eye", [["path", {
 	key: "1v7zrd"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FaceAngry = createLucideIcon("face-angry", [
+	["path", {
+		d: "M15 11V9.416",
+		key: "v2ax0h"
+	}],
+	["path", {
+		d: "M17 9a5 5 0 00-3 1",
+		key: "1d2djj"
+	}],
+	["path", {
+		d: "M7 9a5 5 0 013 1",
+		key: "y5n5ez"
+	}],
+	["path", {
+		d: "M9 11V9.416",
+		key: "1t25y0"
+	}],
+	["path", {
+		d: "M9 16a5 5 0 016.001 0",
+		key: "111vmx"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FaceExpressionless = createLucideIcon("face-expressionless", [
+	["path", {
+		d: "M14 10h2",
+		key: "1lstlu"
+	}],
+	["path", {
+		d: "M8 10h2",
+		key: "66od0"
+	}],
+	["path", {
+		d: "M8 16h8",
+		key: "10ke2u"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FaceGrinning = createLucideIcon("face-grinning", [
+	["path", {
+		d: "M15 10V9",
+		key: "4dkmfx"
+	}],
+	["path", {
+		d: "M7.084 14.302a5.12 5.12 0 009.833 0 .24.24 0 00-.235-.302H7.32a.24.24 0 00-.235.302",
+		key: "1ad3z7"
+	}],
+	["path", {
+		d: "M9 10V9",
+		key: "1lazqi"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FaceNeutral = createLucideIcon("face-neutral", [
+	["path", {
+		d: "M15 10V9",
+		key: "4dkmfx"
+	}],
+	["path", {
+		d: "M8 16h8",
+		key: "10ke2u"
+	}],
+	["path", {
+		d: "M9 10V9",
+		key: "1lazqi"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FaceSlightlyFrowning = createLucideIcon("face-slightly-frowning", [
+	["path", {
+		d: "M15 10V9",
+		key: "4dkmfx"
+	}],
+	["path", {
+		d: "M9 10V9",
+		key: "1lazqi"
+	}],
+	["path", {
+		d: "M9 16a5 5 0 016 0",
+		key: "34mdxb"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FaceSlightlySmilingPlus = createLucideIcon("face-slightly-smiling-plus", [
+	["path", {
+		d: "M13.267 2.08a10 10 0 108.653 8.653",
+		key: "1wbpyh"
+	}],
+	["path", {
+		d: "M15 10V9",
+		key: "4dkmfx"
+	}],
+	["path", {
+		d: "M16 5h6",
+		key: "1vod17"
+	}],
+	["path", {
+		d: "M16.472 15a6 6 0 01-8.943 0",
+		key: "7qomzy"
+	}],
+	["path", {
+		d: "M19 2v6",
+		key: "4bpg5p"
+	}],
+	["path", {
+		d: "M9 10V9",
+		key: "1lazqi"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FaceSlightlySmiling = createLucideIcon("face-slightly-smiling", [
+	["path", {
+		d: "M15 10V9",
+		key: "4dkmfx"
+	}],
+	["path", {
+		d: "M16.472 15a6 6 0 01-8.943 0",
+		key: "7qomzy"
+	}],
+	["path", {
+		d: "M9 10V9",
+		key: "1lazqi"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21981,7 +22342,7 @@ var Factory = createLucideIcon("factory", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -21994,7 +22355,7 @@ var Fan = createLucideIcon("fan", [["path", {
 	key: "u5ubse"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22007,7 +22368,7 @@ var FastForward = createLucideIcon("fast-forward", [["path", {
 	key: "h7h5ge"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22027,7 +22388,7 @@ var Feather = createLucideIcon("feather", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22063,7 +22424,7 @@ var Fence = createLucideIcon("fence", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22109,7 +22470,7 @@ var FerrisWheel = createLucideIcon("ferris-wheel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22143,7 +22504,7 @@ var FileArchive = createLucideIcon("file-archive", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22167,7 +22528,33 @@ var FileAxis3d = createLucideIcon("file-axis-3d", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FileBadge = createLucideIcon("file-badge", [
+	["path", {
+		d: "M13 22h5a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.3",
+		key: "cvl1xm"
+	}],
+	["path", {
+		d: "M14 2v5a1 1 0 0 0 1 1h5",
+		key: "wfsgrz"
+	}],
+	["path", {
+		d: "m7.69 16.479 1.29 4.88a.5.5 0 0 1-.698.591l-1.843-.849a1 1 0 0 0-.879.001l-1.846.85a.5.5 0 0 1-.692-.593l1.29-4.88",
+		key: "1ff7gj"
+	}],
+	["circle", {
+		cx: "6",
+		cy: "14",
+		r: "3",
+		key: "a1xfv6"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22195,33 +22582,7 @@ var FileBox = createLucideIcon("file-box", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FileBadge = createLucideIcon("file-badge", [
-	["path", {
-		d: "M13 22h5a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.3",
-		key: "cvl1xm"
-	}],
-	["path", {
-		d: "M14 2v5a1 1 0 0 0 1 1h5",
-		key: "wfsgrz"
-	}],
-	["path", {
-		d: "m7.69 16.479 1.29 4.88a.5.5 0 0 1-.698.591l-1.843-.849a1 1 0 0 0-.879.001l-1.846.85a.5.5 0 0 1-.692-.593l1.29-4.88",
-		key: "1ff7gj"
-	}],
-	["circle", {
-		cx: "6",
-		cy: "14",
-		r: "3",
-		key: "a1xfv6"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22245,7 +22606,7 @@ var FileBracesCorner = createLucideIcon("file-braces-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22269,7 +22630,7 @@ var FileBraces = createLucideIcon("file-braces", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22297,7 +22658,7 @@ var FileChartColumnIncreasing = createLucideIcon("file-chart-column-increasing",
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22325,7 +22686,7 @@ var FileChartColumn = createLucideIcon("file-chart-column", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22345,7 +22706,7 @@ var FileChartLine = createLucideIcon("file-chart-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22369,27 +22730,7 @@ var FileChartPie = createLucideIcon("file-chart-pie", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FileCheck = createLucideIcon("file-check", [
-	["path", {
-		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
-		key: "1oefj6"
-	}],
-	["path", {
-		d: "M14 2v5a1 1 0 0 0 1 1h5",
-		key: "wfsgrz"
-	}],
-	["path", {
-		d: "m9 15 2 2 4-4",
-		key: "1grp1n"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22409,7 +22750,27 @@ var FileCheckCorner = createLucideIcon("file-check-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FileCheck = createLucideIcon("file-check", [
+	["path", {
+		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
+		key: "1oefj6"
+	}],
+	["path", {
+		d: "M14 2v5a1 1 0 0 0 1 1h5",
+		key: "wfsgrz"
+	}],
+	["path", {
+		d: "m9 15 2 2 4-4",
+		key: "1grp1n"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22435,7 +22796,7 @@ var FileClock = createLucideIcon("file-clock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22459,7 +22820,7 @@ var FileCodeCorner = createLucideIcon("file-code-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22483,7 +22844,7 @@ var FileCode = createLucideIcon("file-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22541,7 +22902,7 @@ var FileCog = createLucideIcon("file-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22565,31 +22926,7 @@ var FileDiff = createLucideIcon("file-diff", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FileDown = createLucideIcon("file-down", [
-	["path", {
-		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
-		key: "1oefj6"
-	}],
-	["path", {
-		d: "M14 2v5a1 1 0 0 0 1 1h5",
-		key: "wfsgrz"
-	}],
-	["path", {
-		d: "M12 18v-6",
-		key: "17g6i2"
-	}],
-	["path", {
-		d: "m9 15 3 3 3-3",
-		key: "1npd3o"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22621,7 +22958,31 @@ var FileDigit = createLucideIcon("file-digit", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FileDown = createLucideIcon("file-down", [
+	["path", {
+		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
+		key: "1oefj6"
+	}],
+	["path", {
+		d: "M14 2v5a1 1 0 0 0 1 1h5",
+		key: "wfsgrz"
+	}],
+	["path", {
+		d: "M12 18v-6",
+		key: "17g6i2"
+	}],
+	["path", {
+		d: "m9 15 3 3 3-3",
+		key: "1npd3o"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22641,7 +23002,7 @@ var FileExclamationPoint = createLucideIcon("file-exclamation-point", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22661,7 +23022,27 @@ var FileHeadphone = createLucideIcon("file-headphone", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FileHeart = createLucideIcon("file-heart", [
+	["path", {
+		d: "M13 22h5a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v7",
+		key: "oagw2b"
+	}],
+	["path", {
+		d: "M14 2v5a1 1 0 0 0 1 1h5",
+		key: "wfsgrz"
+	}],
+	["path", {
+		d: "M3.62 18.8A2.25 2.25 0 1 1 7 15.836a2.25 2.25 0 1 1 3.38 2.966l-2.626 2.856a1 1 0 0 1-1.507 0z",
+		key: "rg3psg"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22685,27 +23066,7 @@ var FileInput = createLucideIcon("file-input", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FileHeart = createLucideIcon("file-heart", [
-	["path", {
-		d: "M13 22h5a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v7",
-		key: "oagw2b"
-	}],
-	["path", {
-		d: "M14 2v5a1 1 0 0 0 1 1h5",
-		key: "wfsgrz"
-	}],
-	["path", {
-		d: "M3.62 18.8A2.25 2.25 0 1 1 7 15.836a2.25 2.25 0 1 1 3.38 2.966l-2.626 2.856a1 1 0 0 1-1.507 0z",
-		key: "rg3psg"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22731,7 +23092,7 @@ var FileImage = createLucideIcon("file-image", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22761,7 +23122,27 @@ var FileKey = createLucideIcon("file-key", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FileMinusCorner = createLucideIcon("file-minus-corner", [
+	["path", {
+		d: "M20 14V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12",
+		key: "l9p8hp"
+	}],
+	["path", {
+		d: "M14 2v5a1 1 0 0 0 1 1h5",
+		key: "wfsgrz"
+	}],
+	["path", {
+		d: "M14 18h6",
+		key: "1m8k6r"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22789,27 +23170,7 @@ var FileLock = createLucideIcon("file-lock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FileMinusCorner = createLucideIcon("file-minus-corner", [
-	["path", {
-		d: "M20 14V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12",
-		key: "l9p8hp"
-	}],
-	["path", {
-		d: "M14 2v5a1 1 0 0 0 1 1h5",
-		key: "wfsgrz"
-	}],
-	["path", {
-		d: "M14 18h6",
-		key: "1m8k6r"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22829,7 +23190,7 @@ var FileMinus = createLucideIcon("file-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22855,7 +23216,7 @@ var FileMusic = createLucideIcon("file-music", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22879,7 +23240,7 @@ var FileOutput = createLucideIcon("file-output", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22903,7 +23264,7 @@ var FilePenLine = createLucideIcon("file-pen-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22923,7 +23284,7 @@ var FilePen = createLucideIcon("file-pen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22943,7 +23304,7 @@ var FilePlay = createLucideIcon("file-play", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22967,7 +23328,7 @@ var FilePlusCorner = createLucideIcon("file-plus-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -22991,7 +23352,7 @@ var FilePlus = createLucideIcon("file-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23011,7 +23372,7 @@ var FileQuestionMark = createLucideIcon("file-question-mark", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23043,7 +23404,7 @@ var FileScan = createLucideIcon("file-scan", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23069,7 +23430,7 @@ var FileSearchCorner = createLucideIcon("file-search-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23095,7 +23456,7 @@ var FileSearch = createLucideIcon("file-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23123,7 +23484,7 @@ var FileSignal = createLucideIcon("file-signal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23155,7 +23516,7 @@ var FileSliders = createLucideIcon("file-sliders", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23187,7 +23548,7 @@ var FileSpreadsheet = createLucideIcon("file-spreadsheet", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23207,7 +23568,7 @@ var FileStack = createLucideIcon("file-stack", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23227,7 +23588,7 @@ var FileSymlink = createLucideIcon("file-symlink", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23251,7 +23612,7 @@ var FileTerminal = createLucideIcon("file-terminal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23279,7 +23640,7 @@ var FileText = createLucideIcon("file-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23307,7 +23668,7 @@ var FileTypeCorner = createLucideIcon("file-type-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23335,7 +23696,7 @@ var FileType = createLucideIcon("file-type", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23359,7 +23720,7 @@ var FileUp = createLucideIcon("file-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23385,7 +23746,7 @@ var FileUser = createLucideIcon("file-user", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23413,7 +23774,7 @@ var FileVideoCamera = createLucideIcon("file-video-camera", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23437,7 +23798,7 @@ var FileVolume = createLucideIcon("file-volume", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23461,7 +23822,7 @@ var FileXCorner = createLucideIcon("file-x-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23485,7 +23846,7 @@ var FileX = createLucideIcon("file-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23498,51 +23859,7 @@ var File$1 = createLucideIcon("file", [["path", {
 	key: "wfsgrz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FingerprintPattern = createLucideIcon("fingerprint-pattern", [
-	["path", {
-		d: "M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4",
-		key: "1nerag"
-	}],
-	["path", {
-		d: "M14 13.12c0 2.38 0 6.38-1 8.88",
-		key: "o46ks0"
-	}],
-	["path", {
-		d: "M17.29 21.02c.12-.6.43-2.3.5-3.02",
-		key: "ptglia"
-	}],
-	["path", {
-		d: "M2 12a10 10 0 0 1 18-6",
-		key: "ydlgp0"
-	}],
-	["path", {
-		d: "M2 16h.01",
-		key: "1gqxmh"
-	}],
-	["path", {
-		d: "M21.8 16c.2-2 .131-5.354 0-6",
-		key: "drycrb"
-	}],
-	["path", {
-		d: "M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2",
-		key: "1tidbn"
-	}],
-	["path", {
-		d: "M8.65 22c.21-.66.45-1.32.57-2",
-		key: "13wd9y"
-	}],
-	["path", {
-		d: "M9 6.8a6 6 0 0 1 9 5.2v2",
-		key: "1fr1j5"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23562,7 +23879,7 @@ var Files = createLucideIcon("files", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23606,27 +23923,51 @@ var Film = createLucideIcon("film", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var FishOff = createLucideIcon("fish-off", [
+var FingerprintPattern = createLucideIcon("fingerprint-pattern", [
 	["path", {
-		d: "M18 12.47v.03m0-.5v.47m-.475 5.056A6.744 6.744 0 0 1 15 18c-3.56 0-7.56-2.53-8.5-6 .348-1.28 1.114-2.433 2.121-3.38m3.444-2.088A8.802 8.802 0 0 1 15 6c3.56 0 6.06 2.54 7 6-.309 1.14-.786 2.177-1.413 3.058",
-		key: "1j1hse"
+		d: "M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4",
+		key: "1nerag"
 	}],
 	["path", {
-		d: "M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33m7.48-4.372A9.77 9.77 0 0 1 16 6.07m0 11.86a9.77 9.77 0 0 1-1.728-3.618",
-		key: "1q46z8"
+		d: "M14 13.12c0 2.38 0 6.38-1 8.88",
+		key: "o46ks0"
 	}],
 	["path", {
-		d: "m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98M8.53 3h5.27a2 2 0 0 1 1.98 1.67l.23 1.4M2 2l20 20",
-		key: "1407gh"
+		d: "M17.29 21.02c.12-.6.43-2.3.5-3.02",
+		key: "ptglia"
+	}],
+	["path", {
+		d: "M2 12a10 10 0 0 1 18-6",
+		key: "ydlgp0"
+	}],
+	["path", {
+		d: "M2 16h.01",
+		key: "1gqxmh"
+	}],
+	["path", {
+		d: "M21.8 16c.2-2 .131-5.354 0-6",
+		key: "drycrb"
+	}],
+	["path", {
+		d: "M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2",
+		key: "1tidbn"
+	}],
+	["path", {
+		d: "M8.65 22c.21-.66.45-1.32.57-2",
+		key: "13wd9y"
+	}],
+	["path", {
+		d: "M9 6.8a6 6 0 0 1 9 5.2v2",
+		key: "1fr1j5"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23658,7 +23999,27 @@ var FireExtinguisher = createLucideIcon("fire-extinguisher", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FishOff = createLucideIcon("fish-off", [
+	["path", {
+		d: "M18 12.47v.03m0-.5v.47m-.475 5.056A6.744 6.744 0 0 1 15 18c-3.56 0-7.56-2.53-8.5-6 .348-1.28 1.114-2.433 2.121-3.38m3.444-2.088A8.802 8.802 0 0 1 15 6c3.56 0 6.06 2.54 7 6-.309 1.14-.786 2.177-1.413 3.058",
+		key: "1j1hse"
+	}],
+	["path", {
+		d: "M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33m7.48-4.372A9.77 9.77 0 0 1 16 6.07m0 11.86a9.77 9.77 0 0 1-1.728-3.618",
+		key: "1q46z8"
+	}],
+	["path", {
+		d: "m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98M8.53 3h5.27a2 2 0 0 1 1.98 1.67l.23 1.4M2 2l20 20",
+		key: "1407gh"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23668,7 +24029,29 @@ var FishSymbol = createLucideIcon("fish-symbol", [["path", {
 	key: "h4oh4o"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FishingHook = createLucideIcon("fishing-hook", [
+	["path", {
+		d: "m17.586 11.414-5.93 5.93a1 1 0 0 1-8-8l3.137-3.137a.707.707 0 0 1 1.207.5V10",
+		key: "157y8s"
+	}],
+	["path", {
+		d: "M20.414 8.586 22 7",
+		key: "5g2s34"
+	}],
+	["circle", {
+		cx: "19",
+		cy: "10",
+		r: "2",
+		key: "7363ft"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23700,29 +24083,7 @@ var Fish = createLucideIcon("fish", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FishingHook = createLucideIcon("fishing-hook", [
-	["path", {
-		d: "m17.586 11.414-5.93 5.93a1 1 0 0 1-8-8l3.137-3.137a.707.707 0 0 1 1.207.5V10",
-		key: "157y8s"
-	}],
-	["path", {
-		d: "M20.414 8.586 22 7",
-		key: "5g2s34"
-	}],
-	["circle", {
-		cx: "19",
-		cy: "10",
-		r: "2",
-		key: "7363ft"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23744,7 +24105,7 @@ var FishingRod = createLucideIcon("fishing-rod", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23768,7 +24129,7 @@ var FlagOff = createLucideIcon("flag-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23778,7 +24139,7 @@ var FlagTriangleLeft = createLucideIcon("flag-triangle-left", [["path", {
 	key: "rbbtmw"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23788,7 +24149,7 @@ var FlagTriangleRight = createLucideIcon("flag-triangle-right", [["path", {
 	key: "kfjsu0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23798,7 +24159,7 @@ var Flag = createLucideIcon("flag", [["path", {
 	key: "1jaruq"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23818,7 +24179,7 @@ var FlameKindling = createLucideIcon("flame-kindling", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23828,7 +24189,7 @@ var Flame = createLucideIcon("flame", [["path", {
 	key: "1slcih"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23856,27 +24217,7 @@ var FlashlightOff = createLucideIcon("flashlight-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Flashlight = createLucideIcon("flashlight", [
-	["path", {
-		d: "M12 13v1",
-		key: "176q98"
-	}],
-	["path", {
-		d: "M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z",
-		key: "17vh7j"
-	}],
-	["path", {
-		d: "M6 6h12",
-		key: "n6hhss"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23908,27 +24249,27 @@ var FlaskConicalOff = createLucideIcon("flask-conical-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var FlaskConical = createLucideIcon("flask-conical", [
+var Flashlight = createLucideIcon("flashlight", [
 	["path", {
-		d: "M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2",
-		key: "18mbvz"
+		d: "M12 13v1",
+		key: "176q98"
 	}],
 	["path", {
-		d: "M6.453 15h11.094",
-		key: "3shlmq"
+		d: "M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z",
+		key: "17vh7j"
 	}],
 	["path", {
-		d: "M8.5 2h7",
-		key: "csnxdl"
+		d: "M6 6h12",
+		key: "n6hhss"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23948,7 +24289,27 @@ var FlaskRound = createLucideIcon("flask-round", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FlaskConical = createLucideIcon("flask-conical", [
+	["path", {
+		d: "M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2",
+		key: "18mbvz"
+	}],
+	["path", {
+		d: "M6.453 15h11.094",
+		key: "3shlmq"
+	}],
+	["path", {
+		d: "M8.5 2h7",
+		key: "csnxdl"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -23980,7 +24341,7 @@ var FlipHorizontal2 = createLucideIcon("flip-horizontal-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24012,7 +24373,7 @@ var FlipVertical2 = createLucideIcon("flip-vertical-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24042,7 +24403,7 @@ var Flower2 = createLucideIcon("flower-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24092,37 +24453,7 @@ var Flower = createLucideIcon("flower", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Focus = createLucideIcon("focus", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "3",
-		key: "1v7zrd"
-	}],
-	["path", {
-		d: "M3 7V5a2 2 0 0 1 2-2h2",
-		key: "aa7l1z"
-	}],
-	["path", {
-		d: "M17 3h2a2 2 0 0 1 2 2v2",
-		key: "4qcy5o"
-	}],
-	["path", {
-		d: "M21 17v2a2 2 0 0 1-2 2h-2",
-		key: "6vwrx8"
-	}],
-	["path", {
-		d: "M7 21H5a2 2 0 0 1-2-2v-2",
-		key: "ioqczr"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24162,33 +24493,37 @@ var FoldHorizontal = createLucideIcon("fold-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var FolderArchive = createLucideIcon("folder-archive", [
+var Focus = createLucideIcon("focus", [
 	["circle", {
-		cx: "15",
-		cy: "19",
-		r: "2",
-		key: "u2pros"
+		cx: "12",
+		cy: "12",
+		r: "3",
+		key: "1v7zrd"
 	}],
 	["path", {
-		d: "M20.9 19.8A2 2 0 0 0 22 18V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h5.1",
-		key: "1jj40k"
+		d: "M3 7V5a2 2 0 0 1 2-2h2",
+		key: "aa7l1z"
 	}],
 	["path", {
-		d: "M15 11v-1",
-		key: "cntcp"
+		d: "M17 3h2a2 2 0 0 1 2 2v2",
+		key: "4qcy5o"
 	}],
 	["path", {
-		d: "M15 17v-2",
-		key: "1279jj"
+		d: "M21 17v2a2 2 0 0 1-2 2h-2",
+		key: "6vwrx8"
+	}],
+	["path", {
+		d: "M7 21H5a2 2 0 0 1-2-2v-2",
+		key: "ioqczr"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24228,7 +24563,33 @@ var FoldVertical = createLucideIcon("fold-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FolderArchive = createLucideIcon("folder-archive", [
+	["circle", {
+		cx: "15",
+		cy: "19",
+		r: "2",
+		key: "u2pros"
+	}],
+	["path", {
+		d: "M20.9 19.8A2 2 0 0 0 22 18V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h5.1",
+		key: "1jj40k"
+	}],
+	["path", {
+		d: "M15 11v-1",
+		key: "cntcp"
+	}],
+	["path", {
+		d: "M15 17v-2",
+		key: "1279jj"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24241,7 +24602,7 @@ var FolderBookmark = createLucideIcon("folder-bookmark", [["path", {
 	key: "1u1bxd"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24254,7 +24615,7 @@ var FolderCheck = createLucideIcon("folder-check", [["path", {
 	key: "6343dt"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24276,7 +24637,7 @@ var FolderClock = createLucideIcon("folder-clock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24289,27 +24650,7 @@ var FolderClosed = createLucideIcon("folder-closed", [["path", {
 	key: "1ir3d8"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FolderCode = createLucideIcon("folder-code", [
-	["path", {
-		d: "M10 10.5 8 13l2 2.5",
-		key: "m4t9c1"
-	}],
-	["path", {
-		d: "m14 10.5 2 2.5-2 2.5",
-		key: "14w2eb"
-	}],
-	["path", {
-		d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z",
-		key: "1u1bxd"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24359,7 +24700,27 @@ var FolderCog = createLucideIcon("folder-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FolderCode = createLucideIcon("folder-code", [
+	["path", {
+		d: "M10 10.5 8 13l2 2.5",
+		key: "m4t9c1"
+	}],
+	["path", {
+		d: "m14 10.5 2 2.5-2 2.5",
+		key: "14w2eb"
+	}],
+	["path", {
+		d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z",
+		key: "1u1bxd"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24374,7 +24735,7 @@ var FolderDot = createLucideIcon("folder-dot", [["path", {
 	key: "49l61u"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24394,7 +24755,7 @@ var FolderDown = createLucideIcon("folder-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24422,7 +24783,7 @@ var FolderGit2 = createLucideIcon("folder-git-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24448,7 +24809,7 @@ var FolderGit = createLucideIcon("folder-git", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24461,7 +24822,7 @@ var FolderHeart = createLucideIcon("folder-heart", [["path", {
 	key: "15cy7q"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24481,31 +24842,7 @@ var FolderInput = createLucideIcon("folder-input", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FolderKanban = createLucideIcon("folder-kanban", [
-	["path", {
-		d: "M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z",
-		key: "1fr9dc"
-	}],
-	["path", {
-		d: "M8 10v4",
-		key: "tgpxqk"
-	}],
-	["path", {
-		d: "M12 10v2",
-		key: "hh53o1"
-	}],
-	["path", {
-		d: "M16 10v6",
-		key: "1d6xys"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24531,7 +24868,44 @@ var FolderKey = createLucideIcon("folder-key", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FolderKanban = createLucideIcon("folder-kanban", [
+	["path", {
+		d: "M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z",
+		key: "1fr9dc"
+	}],
+	["path", {
+		d: "M8 10v4",
+		key: "tgpxqk"
+	}],
+	["path", {
+		d: "M12 10v2",
+		key: "hh53o1"
+	}],
+	["path", {
+		d: "M16 10v6",
+		key: "1d6xys"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FolderMinus = createLucideIcon("folder-minus", [["path", {
+	d: "M9 13h6",
+	key: "1uhe8q"
+}], ["path", {
+	d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z",
+	key: "1kt360"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24555,20 +24929,7 @@ var FolderLock = createLucideIcon("folder-lock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FolderMinus = createLucideIcon("folder-minus", [["path", {
-	d: "M9 13h6",
-	key: "1uhe8q"
-}], ["path", {
-	d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z",
-	key: "1kt360"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24583,7 +24944,7 @@ var FolderOpenDot = createLucideIcon("folder-open-dot", [["path", {
 	key: "1gm4qj"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24593,7 +24954,7 @@ var FolderOpen = createLucideIcon("folder-open", [["path", {
 	key: "usdka0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24613,7 +24974,7 @@ var FolderOutput = createLucideIcon("folder-output", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24626,7 +24987,7 @@ var FolderPen = createLucideIcon("folder-pen", [["path", {
 	key: "1saktj"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24646,7 +25007,7 @@ var FolderPlus = createLucideIcon("folder-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24668,7 +25029,7 @@ var FolderRoot = createLucideIcon("folder-root", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24690,7 +25051,7 @@ var FolderSearch2 = createLucideIcon("folder-search-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24712,20 +25073,7 @@ var FolderSearch = createLucideIcon("folder-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var FolderSymlink = createLucideIcon("folder-symlink", [["path", {
-	d: "M2 9.35V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h7",
-	key: "y8kt7d"
-}], ["path", {
-	d: "m8 16 3-3-3-3",
-	key: "rlqrt1"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24753,7 +25101,20 @@ var FolderSync = createLucideIcon("folder-sync", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var FolderSymlink = createLucideIcon("folder-symlink", [["path", {
+	d: "M2 9.35V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h7",
+	key: "y8kt7d"
+}], ["path", {
+	d: "m8 16 3-3-3-3",
+	key: "rlqrt1"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24777,7 +25138,7 @@ var FolderTree = createLucideIcon("folder-tree", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24797,7 +25158,30 @@ var FolderUp = createLucideIcon("folder-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Folder = createLucideIcon("folder", [["path", {
+	d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z",
+	key: "1kt360"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Folders = createLucideIcon("folders", [["path", {
+	d: "M20 5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2.5a1.5 1.5 0 0 1 1.2.6l.6.8a1.5 1.5 0 0 0 1.2.6z",
+	key: "a4852j"
+}], ["path", {
+	d: "M3 8.268a2 2 0 0 0-1 1.738V19a2 2 0 0 0 2 2h11a2 2 0 0 0 1.732-1",
+	key: "yxbcw3"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24817,30 +25201,7 @@ var FolderX = createLucideIcon("folder-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Folder = createLucideIcon("folder", [["path", {
-	d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z",
-	key: "1kt360"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Folders = createLucideIcon("folders", [["path", {
-	d: "M20 5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2.5a1.5 1.5 0 0 1 1.2.6l.6.8a1.5 1.5 0 0 0 1.2.6z",
-	key: "a4852j"
-}], ["path", {
-	d: "M3 8.268a2 2 0 0 0-1 1.738V19a2 2 0 0 0 2 2h11a2 2 0 0 0 1.732-1",
-	key: "yxbcw3"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24864,7 +25225,7 @@ var Footprints = createLucideIcon("footprints", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24904,7 +25265,7 @@ var Forklift = createLucideIcon("forklift", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24936,7 +25297,7 @@ var Form = createLucideIcon("form", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24949,7 +25310,7 @@ var Forward = createLucideIcon("forward", [["path", {
 	key: "jmiej9"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -24985,39 +25346,7 @@ var Frame = createLucideIcon("frame", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Frown = createLucideIcon("frown", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "M16 16s-1.5-2-4-2-4 2-4 2",
-		key: "epbg0q"
-	}],
-	["line", {
-		x1: "9",
-		x2: "9.01",
-		y1: "9",
-		y2: "9",
-		key: "yxxnd0"
-	}],
-	["line", {
-		x1: "15",
-		x2: "15.01",
-		y1: "9",
-		y2: "9",
-		key: "1p4y9e"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25041,7 +25370,7 @@ var Fuel = createLucideIcon("fuel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25073,7 +25402,7 @@ var Fullscreen = createLucideIcon("fullscreen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25093,7 +25422,7 @@ var FunnelPlus = createLucideIcon("funnel-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25113,7 +25442,7 @@ var FunnelX = createLucideIcon("funnel-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25123,7 +25452,7 @@ var Funnel = createLucideIcon("funnel", [["path", {
 	key: "sc7q7i"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25147,7 +25476,31 @@ var GalleryHorizontalEnd = createLucideIcon("gallery-horizontal-end", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var GalleryHorizontal = createLucideIcon("gallery-horizontal", [
+	["path", {
+		d: "M2 3v18",
+		key: "pzttux"
+	}],
+	["rect", {
+		width: "12",
+		height: "18",
+		x: "6",
+		y: "3",
+		rx: "2",
+		key: "btr8bg"
+	}],
+	["path", {
+		d: "M22 3v18",
+		key: "6jf3v"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25179,31 +25532,7 @@ var GalleryThumbnails = createLucideIcon("gallery-thumbnails", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var GalleryHorizontal = createLucideIcon("gallery-horizontal", [
-	["path", {
-		d: "M2 3v18",
-		key: "pzttux"
-	}],
-	["rect", {
-		width: "12",
-		height: "18",
-		x: "6",
-		y: "3",
-		rx: "2",
-		key: "btr8bg"
-	}],
-	["path", {
-		d: "M22 3v18",
-		key: "6jf3v"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25227,7 +25556,7 @@ var GalleryVerticalEnd = createLucideIcon("gallery-vertical-end", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25251,7 +25580,7 @@ var GalleryVertical = createLucideIcon("gallery-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25291,7 +25620,7 @@ var Gamepad2 = createLucideIcon("gamepad-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25315,20 +25644,7 @@ var GamepadDirectional = createLucideIcon("gamepad-directional", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Gauge = createLucideIcon("gauge", [["path", {
-	d: "m12 14 4-4",
-	key: "9kzdfg"
-}], ["path", {
-	d: "M3.34 19a10 10 0 1 1 17.32 0",
-	key: "19p75a"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25372,7 +25688,20 @@ var Gamepad = createLucideIcon("gamepad", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Gauge = createLucideIcon("gauge", [["path", {
+	d: "m12 14 4-4",
+	key: "9kzdfg"
+}], ["path", {
+	d: "M3.34 19a10 10 0 1 1 17.32 0",
+	key: "19p75a"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25400,7 +25729,7 @@ var Gavel = createLucideIcon("gavel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25420,7 +25749,31 @@ var Gem = createLucideIcon("gem", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var GeorgianLari = createLucideIcon("georgian-lari", [
+	["path", {
+		d: "M11.5 21a7.5 7.5 0 1 1 7.35-9",
+		key: "1gyj8k"
+	}],
+	["path", {
+		d: "M13 12V3",
+		key: "18om2a"
+	}],
+	["path", {
+		d: "M4 21h16",
+		key: "1h09gz"
+	}],
+	["path", {
+		d: "M9 12V3",
+		key: "geutu0"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25440,7 +25793,7 @@ var Ghost = createLucideIcon("ghost", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25468,31 +25821,7 @@ var Gift = createLucideIcon("gift", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var GeorgianLari = createLucideIcon("georgian-lari", [
-	["path", {
-		d: "M11.5 21a7.5 7.5 0 1 1 7.35-9",
-		key: "1gyj8k"
-	}],
-	["path", {
-		d: "M13 12V3",
-		key: "18om2a"
-	}],
-	["path", {
-		d: "M4 21h16",
-		key: "1h09gz"
-	}],
-	["path", {
-		d: "M9 12V3",
-		key: "geutu0"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25520,7 +25849,7 @@ var GitBranchMinus = createLucideIcon("git-branch-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25552,31 +25881,7 @@ var GitBranchPlus = createLucideIcon("git-branch-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var GitBranch = createLucideIcon("git-branch", [
-	["path", {
-		d: "M15 6a9 9 0 0 0-9 9V3",
-		key: "1cii5b"
-	}],
-	["circle", {
-		cx: "18",
-		cy: "6",
-		r: "3",
-		key: "1h7g24"
-	}],
-	["circle", {
-		cx: "6",
-		cy: "18",
-		r: "3",
-		key: "fqmcym"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25604,7 +25909,31 @@ var GitCommitHorizontal = createLucideIcon("git-commit-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var GitBranch = createLucideIcon("git-branch", [
+	["path", {
+		d: "M15 6a9 9 0 0 0-9 9V3",
+		key: "1cii5b"
+	}],
+	["circle", {
+		cx: "18",
+		cy: "6",
+		r: "3",
+		key: "1h7g24"
+	}],
+	["circle", {
+		cx: "6",
+		cy: "18",
+		r: "3",
+		key: "fqmcym"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25626,7 +25955,7 @@ var GitCommitVertical = createLucideIcon("git-commit-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25662,7 +25991,7 @@ var GitCompareArrows = createLucideIcon("git-compare-arrows", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25690,7 +26019,7 @@ var GitCompare = createLucideIcon("git-compare", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25724,7 +26053,7 @@ var GitFork = createLucideIcon("git-fork", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25762,7 +26091,7 @@ var GitGraph = createLucideIcon("git-graph", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25792,7 +26121,31 @@ var GitMergeConflict = createLucideIcon("git-merge-conflict", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var GitMerge = createLucideIcon("git-merge", [
+	["circle", {
+		cx: "18",
+		cy: "18",
+		r: "3",
+		key: "1xkwt0"
+	}],
+	["circle", {
+		cx: "6",
+		cy: "6",
+		r: "3",
+		key: "1lh9wr"
+	}],
+	["path", {
+		d: "M6 21V9a9 9 0 0 0 9 9",
+		key: "7kw0sc"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25824,31 +26177,7 @@ var GitPullRequestArrow = createLucideIcon("git-pull-request-arrow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var GitMerge = createLucideIcon("git-merge", [
-	["circle", {
-		cx: "18",
-		cy: "18",
-		r: "3",
-		key: "1xkwt0"
-	}],
-	["circle", {
-		cx: "6",
-		cy: "6",
-		r: "3",
-		key: "1lh9wr"
-	}],
-	["path", {
-		d: "M6 21V9a9 9 0 0 0 9 9",
-		key: "7kw0sc"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25884,7 +26213,7 @@ var GitPullRequestClosed = createLucideIcon("git-pull-request-closed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25918,7 +26247,7 @@ var GitPullRequestCreateArrow = createLucideIcon("git-pull-request-create-arrow"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25948,7 +26277,7 @@ var GitPullRequestCreate = createLucideIcon("git-pull-request-create", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -25983,7 +26312,7 @@ var GitPullRequestDraft = createLucideIcon("git-pull-request-draft", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26014,7 +26343,7 @@ var GitPullRequest = createLucideIcon("git-pull-request", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26027,7 +26356,7 @@ var GlassWater = createLucideIcon("glass-water", [["path", {
 	key: "mjntcy"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26059,7 +26388,7 @@ var Glasses = createLucideIcon("glasses", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26072,7 +26401,7 @@ var GlobeCheck = createLucideIcon("globe-check", [["path", {
 	key: "46evmv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26100,7 +26429,7 @@ var GlobeLock = createLucideIcon("globe-lock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26136,7 +26465,7 @@ var GlobeOff = createLucideIcon("globe-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26156,7 +26485,7 @@ var GlobeX = createLucideIcon("globe-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26178,7 +26507,7 @@ var Globe = createLucideIcon("globe", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26198,7 +26527,7 @@ var Goal = createLucideIcon("goal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26230,7 +26559,7 @@ var Gpu = createLucideIcon("gpu", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26250,7 +26579,7 @@ var GraduationCap = createLucideIcon("graduation-cap", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26310,7 +26639,20 @@ var Grape = createLucideIcon("grape", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Grid2x2Check = createLucideIcon("grid-2x2-check", [["path", {
+	d: "M12 3v17a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1H3",
+	key: "11za1p"
+}], ["path", {
+	d: "m16 19 2 2 4-4",
+	key: "1b14m6"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26330,20 +26672,7 @@ var Grid2x2Plus = createLucideIcon("grid-2x2-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Grid2x2Check = createLucideIcon("grid-2x2-check", [["path", {
-	d: "M12 3v17a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1H3",
-	key: "11za1p"
-}], ["path", {
-	d: "m16 19 2 2 4-4",
-	key: "1b14m6"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26363,7 +26692,7 @@ var Grid2x2X = createLucideIcon("grid-2x2-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26387,7 +26716,7 @@ var Grid2x2 = createLucideIcon("grid-2x2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26415,7 +26744,7 @@ var Grid3x2 = createLucideIcon("grid-3x2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26447,7 +26776,7 @@ var Grid3x3 = createLucideIcon("grid-3x3", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26491,7 +26820,7 @@ var GripHorizontal = createLucideIcon("grip-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26535,7 +26864,7 @@ var GripVertical = createLucideIcon("grip-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26597,7 +26926,7 @@ var Grip = createLucideIcon("grip", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26637,31 +26966,7 @@ var Group = createLucideIcon("group", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Ham = createLucideIcon("ham", [
-	["path", {
-		d: "M13.144 21.144A7.274 10.445 45 1 0 2.856 10.856",
-		key: "1k1t7q"
-	}],
-	["path", {
-		d: "M13.144 21.144A7.274 4.365 45 0 0 2.856 10.856a7.274 4.365 45 0 0 10.288 10.288",
-		key: "153t1g"
-	}],
-	["path", {
-		d: "M16.565 10.435 18.6 8.4a2.501 2.501 0 1 0 1.65-4.65 2.5 2.5 0 1 0-4.66 1.66l-2.024 2.025",
-		key: "gzrt0n"
-	}],
-	["path", {
-		d: "m8.5 16.5-1-1",
-		key: "otr954"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26685,7 +26990,31 @@ var Guitar = createLucideIcon("guitar", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Ham = createLucideIcon("ham", [
+	["path", {
+		d: "M13.144 21.144A7.274 10.445 45 1 0 2.856 10.856",
+		key: "1k1t7q"
+	}],
+	["path", {
+		d: "M13.144 21.144A7.274 4.365 45 0 0 2.856 10.856a7.274 4.365 45 0 0 10.288 10.288",
+		key: "153t1g"
+	}],
+	["path", {
+		d: "M16.565 10.435 18.6 8.4a2.501 2.501 0 1 0 1.65-4.65 2.5 2.5 0 1 0-4.66 1.66l-2.024 2.025",
+		key: "gzrt0n"
+	}],
+	["path", {
+		d: "m8.5 16.5-1-1",
+		key: "otr954"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26709,7 +27038,7 @@ var Hamburger = createLucideIcon("hamburger", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26729,7 +27058,7 @@ var Hammer = createLucideIcon("hammer", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26761,31 +27090,7 @@ var HandCoins = createLucideIcon("hand-coins", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var HandFist = createLucideIcon("hand-fist", [
-	["path", {
-		d: "M12.035 17.012a3 3 0 0 0-3-3l-.311-.002a.72.72 0 0 1-.505-1.229l1.195-1.195A2 2 0 0 1 10.828 11H12a2 2 0 0 0 0-4H9.243a3 3 0 0 0-2.122.879l-2.707 2.707A4.83 4.83 0 0 0 3 14a8 8 0 0 0 8 8h2a8 8 0 0 0 8-8V7a2 2 0 1 0-4 0v2a2 2 0 1 0 4 0",
-		key: "1ff7rl"
-	}],
-	["path", {
-		d: "M13.888 9.662A2 2 0 0 0 17 8V5A2 2 0 1 0 13 5",
-		key: "1xmd21"
-	}],
-	["path", {
-		d: "M9 5A2 2 0 1 0 5 5V10",
-		key: "f3wfjw"
-	}],
-	["path", {
-		d: "M9 7V4A2 2 0 1 1 13 4V7.268",
-		key: "eaoucv"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26813,7 +27118,31 @@ var HandGrab = createLucideIcon("hand-grab", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var HandFist = createLucideIcon("hand-fist", [
+	["path", {
+		d: "M12.035 17.012a3 3 0 0 0-3-3l-.311-.002a.72.72 0 0 1-.505-1.229l1.195-1.195A2 2 0 0 1 10.828 11H12a2 2 0 0 0 0-4H9.243a3 3 0 0 0-2.122.879l-2.707 2.707A4.83 4.83 0 0 0 3 14a8 8 0 0 0 8 8h2a8 8 0 0 0 8-8V7a2 2 0 1 0-4 0v2a2 2 0 1 0 4 0",
+		key: "1ff7rl"
+	}],
+	["path", {
+		d: "M13.888 9.662A2 2 0 0 0 17 8V5A2 2 0 1 0 13 5",
+		key: "1xmd21"
+	}],
+	["path", {
+		d: "M9 5A2 2 0 1 0 5 5V10",
+		key: "f3wfjw"
+	}],
+	["path", {
+		d: "M9 7V4A2 2 0 1 1 13 4V7.268",
+		key: "eaoucv"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26837,27 +27166,7 @@ var HandHeart = createLucideIcon("hand-heart", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var HandHelping = createLucideIcon("hand-helping", [
-	["path", {
-		d: "M11 12h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 14",
-		key: "1j4xps"
-	}],
-	["path", {
-		d: "m7 18 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9",
-		key: "uospg8"
-	}],
-	["path", {
-		d: "m2 13 6 6",
-		key: "16e5sb"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26881,7 +27190,27 @@ var HandMetal = createLucideIcon("hand-metal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var HandHelping = createLucideIcon("hand-helping", [
+	["path", {
+		d: "M11 12h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 14",
+		key: "1j4xps"
+	}],
+	["path", {
+		d: "m7 18 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9",
+		key: "uospg8"
+	}],
+	["path", {
+		d: "m2 13 6 6",
+		key: "16e5sb"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26913,7 +27242,7 @@ var HandPlatter = createLucideIcon("hand-platter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26937,7 +27266,7 @@ var Hand = createLucideIcon("hand", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26950,7 +27279,7 @@ var Handbag = createLucideIcon("handbag", [["path", {
 	key: "tcht90"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -26978,7 +27307,7 @@ var Handshake = createLucideIcon("handshake", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27010,7 +27339,7 @@ var HardDriveDownload = createLucideIcon("hard-drive-download", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27042,7 +27371,7 @@ var HardDriveUpload = createLucideIcon("hard-drive-upload", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27066,7 +27395,7 @@ var HardDrive = createLucideIcon("hard-drive", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27094,7 +27423,7 @@ var HardHat = createLucideIcon("hard-hat", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27130,7 +27459,7 @@ var Hash = createLucideIcon("hash", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27162,7 +27491,7 @@ var HatGlasses = createLucideIcon("hat-glasses", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27202,7 +27531,7 @@ var Haze = createLucideIcon("haze", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27234,20 +27563,7 @@ var Hd = createLucideIcon("hd", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var HdmiPort = createLucideIcon("hdmi-port", [["path", {
-	d: "M22 9a1 1 0 00-1-1H3a1 1 0 00-1 1v4a1 1 0 001 1h.5a2 2 0 011.6.8l.3.4A2 2 0 007 16h10a2 2 0 001.6-.8l.3-.4a2 2 0 011.6-.8h.5a1 1 0 001-1z",
-	key: "1kwg9h"
-}], ["path", {
-	d: "M8 12h8",
-	key: "1wcyev"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27271,7 +27587,44 @@ var Heading1 = createLucideIcon("heading-1", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var HdmiPort = createLucideIcon("hdmi-port", [["path", {
+	d: "M22 9a1 1 0 00-1-1H3a1 1 0 00-1 1v4a1 1 0 001 1h.5a2 2 0 011.6.8l.3.4A2 2 0 007 16h10a2 2 0 001.6-.8l.3-.4a2 2 0 011.6-.8h.5a1 1 0 001-1z",
+	key: "1kwg9h"
+}], ["path", {
+	d: "M8 12h8",
+	key: "1wcyev"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Heading2 = createLucideIcon("heading-2", [
+	["path", {
+		d: "M4 12h8",
+		key: "17cfdx"
+	}],
+	["path", {
+		d: "M4 18V6",
+		key: "1rz3zl"
+	}],
+	["path", {
+		d: "M12 18V6",
+		key: "zqpxq5"
+	}],
+	["path", {
+		d: "M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1",
+		key: "9jr5yi"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27299,59 +27652,7 @@ var Heading3 = createLucideIcon("heading-3", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Heading2 = createLucideIcon("heading-2", [
-	["path", {
-		d: "M4 12h8",
-		key: "17cfdx"
-	}],
-	["path", {
-		d: "M4 18V6",
-		key: "1rz3zl"
-	}],
-	["path", {
-		d: "M12 18V6",
-		key: "zqpxq5"
-	}],
-	["path", {
-		d: "M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1",
-		key: "9jr5yi"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Heading4 = createLucideIcon("heading-4", [
-	["path", {
-		d: "M12 18V6",
-		key: "zqpxq5"
-	}],
-	["path", {
-		d: "M17 10v3a1 1 0 0 0 1 1h3",
-		key: "tj5zdr"
-	}],
-	["path", {
-		d: "M21 10v8",
-		key: "1kdml4"
-	}],
-	["path", {
-		d: "M4 12h8",
-		key: "17cfdx"
-	}],
-	["path", {
-		d: "M4 18V6",
-		key: "1rz3zl"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27379,7 +27680,35 @@ var Heading5 = createLucideIcon("heading-5", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Heading4 = createLucideIcon("heading-4", [
+	["path", {
+		d: "M12 18V6",
+		key: "zqpxq5"
+	}],
+	["path", {
+		d: "M17 10v3a1 1 0 0 0 1 1h3",
+		key: "tj5zdr"
+	}],
+	["path", {
+		d: "M21 10v8",
+		key: "1kdml4"
+	}],
+	["path", {
+		d: "M4 12h8",
+		key: "17cfdx"
+	}],
+	["path", {
+		d: "M4 18V6",
+		key: "1rz3zl"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27409,7 +27738,7 @@ var Heading6 = createLucideIcon("heading-6", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27429,30 +27758,7 @@ var Heading = createLucideIcon("heading", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Headphones = createLucideIcon("headphones", [["path", {
-	d: "M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3",
-	key: "1xhozi"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Headset = createLucideIcon("headset", [["path", {
-	d: "M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z",
-	key: "12oyoe"
-}], ["path", {
-	d: "M21 16v2a4 4 0 0 1-4 4h-5",
-	key: "1x7m43"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27480,7 +27786,30 @@ var HeadphoneOff = createLucideIcon("headphone-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Headphones = createLucideIcon("headphones", [["path", {
+	d: "M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3",
+	key: "1xhozi"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Headset = createLucideIcon("headset", [["path", {
+	d: "M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z",
+	key: "12oyoe"
+}], ["path", {
+	d: "M21 16v2a4 4 0 0 1-4 4h-5",
+	key: "1x7m43"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27493,7 +27822,7 @@ var HeartCrack = createLucideIcon("heart-crack", [["path", {
 	key: "1su70f"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27503,7 +27832,7 @@ var HeartHandshake = createLucideIcon("heart-handshake", [["path", {
 	key: "17lmqv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27516,7 +27845,7 @@ var HeartMinus = createLucideIcon("heart-minus", [["path", {
 	key: "1u4692"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27536,7 +27865,7 @@ var HeartOff = createLucideIcon("heart-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27556,7 +27885,7 @@ var HeartPlus = createLucideIcon("heart-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27569,7 +27898,7 @@ var HeartPulse = createLucideIcon("heart-pulse", [["path", {
 	key: "auskq0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27589,7 +27918,7 @@ var HeartX = createLucideIcon("heart-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27599,7 +27928,7 @@ var Heart = createLucideIcon("heart", [["path", {
 	key: "mvr1a0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27647,17 +27976,7 @@ var Heater = createLucideIcon("heater", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Hexagon = createLucideIcon("hexagon", [["path", {
-	d: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z",
-	key: "yt0hxn"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27697,7 +28016,17 @@ var Helicopter = createLucideIcon("helicopter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Hexagon = createLucideIcon("hexagon", [["path", {
+	d: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z",
+	key: "yt0hxn"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27710,47 +28039,7 @@ var Highlighter = createLucideIcon("highlighter", [["path", {
 	key: "14a9rk"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Hop = createLucideIcon("hop", [
-	["path", {
-		d: "M10.82 16.12c1.69.6 3.91.79 5.18.85.55.03 1-.42.97-.97-.06-1.27-.26-3.5-.85-5.18",
-		key: "18lxf1"
-	}],
-	["path", {
-		d: "M11.5 6.5c1.64 0 5-.38 6.71-1.07.52-.2.55-.82.12-1.17A10 10 0 0 0 4.26 18.33c.35.43.96.4 1.17-.12.69-1.71 1.07-5.07 1.07-6.71 1.34.45 3.1.9 4.88.62a.88.88 0 0 0 .73-.74c.3-2.14-.15-3.5-.61-4.88",
-		key: "vtfxrw"
-	}],
-	["path", {
-		d: "M15.62 16.95c.2.85.62 2.76.5 4.28a.77.77 0 0 1-.9.7 16.64 16.64 0 0 1-4.08-1.36",
-		key: "13hl71"
-	}],
-	["path", {
-		d: "M16.13 21.05c1.65.63 3.68.84 4.87.91a.9.9 0 0 0 .96-.96 17.68 17.68 0 0 0-.9-4.87",
-		key: "1sl8oj"
-	}],
-	["path", {
-		d: "M16.94 15.62c.86.2 2.77.62 4.29.5a.77.77 0 0 0 .7-.9 16.64 16.64 0 0 0-1.36-4.08",
-		key: "19c6kt"
-	}],
-	["path", {
-		d: "M17.99 5.52a20.82 20.82 0 0 1 3.15 4.5.8.8 0 0 1-.68 1.13c-2.33.2-5.3-.32-8.27-1.57",
-		key: "85ghs3"
-	}],
-	["path", {
-		d: "M4.93 4.93 3 3a.7.7 0 0 1 0-1",
-		key: "x087yj"
-	}],
-	["path", {
-		d: "M9.58 12.18c1.24 2.98 1.77 5.95 1.57 8.28a.8.8 0 0 1-1.13.68 20.82 20.82 0 0 1-4.5-3.15",
-		key: "11xdqo"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27794,7 +28083,47 @@ var HopOff = createLucideIcon("hop-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Hop = createLucideIcon("hop", [
+	["path", {
+		d: "M10.82 16.12c1.69.6 3.91.79 5.18.85.55.03 1-.42.97-.97-.06-1.27-.26-3.5-.85-5.18",
+		key: "18lxf1"
+	}],
+	["path", {
+		d: "M11.5 6.5c1.64 0 5-.38 6.71-1.07.52-.2.55-.82.12-1.17A10 10 0 0 0 4.26 18.33c.35.43.96.4 1.17-.12.69-1.71 1.07-5.07 1.07-6.71 1.34.45 3.1.9 4.88.62a.88.88 0 0 0 .73-.74c.3-2.14-.15-3.5-.61-4.88",
+		key: "vtfxrw"
+	}],
+	["path", {
+		d: "M15.62 16.95c.2.85.62 2.76.5 4.28a.77.77 0 0 1-.9.7 16.64 16.64 0 0 1-4.08-1.36",
+		key: "13hl71"
+	}],
+	["path", {
+		d: "M16.13 21.05c1.65.63 3.68.84 4.87.91a.9.9 0 0 0 .96-.96 17.68 17.68 0 0 0-.9-4.87",
+		key: "1sl8oj"
+	}],
+	["path", {
+		d: "M16.94 15.62c.86.2 2.77.62 4.29.5a.77.77 0 0 0 .7-.9 16.64 16.64 0 0 0-1.36-4.08",
+		key: "19c6kt"
+	}],
+	["path", {
+		d: "M17.99 5.52a20.82 20.82 0 0 1 3.15 4.5.8.8 0 0 1-.68 1.13c-2.33.2-5.3-.32-8.27-1.57",
+		key: "85ghs3"
+	}],
+	["path", {
+		d: "M4.93 4.93 3 3a.7.7 0 0 1 0-1",
+		key: "x087yj"
+	}],
+	["path", {
+		d: "M9.58 12.18c1.24 2.98 1.77 5.95 1.57 8.28a.8.8 0 0 1-1.13.68 20.82 20.82 0 0 1-4.5-3.15",
+		key: "11xdqo"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27822,7 +28151,7 @@ var Hospital = createLucideIcon("hospital", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27874,7 +28203,7 @@ var Hotel = createLucideIcon("hotel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27898,7 +28227,7 @@ var Hourglass = createLucideIcon("hourglass", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27911,7 +28240,7 @@ var HouseHeart = createLucideIcon("house-heart", [["path", {
 	key: "r6nss1"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27935,7 +28264,7 @@ var HousePlug = createLucideIcon("house-plug", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27959,7 +28288,7 @@ var HousePlus = createLucideIcon("house-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -27983,20 +28312,7 @@ var HouseWifi = createLucideIcon("house-wifi", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var House = createLucideIcon("house", [["path", {
-	d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8",
-	key: "5wwlr5"
-}], ["path", {
-	d: "M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
-	key: "r6nss1"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28016,7 +28332,7 @@ var IceCreamBowl = createLucideIcon("ice-cream-bowl", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28036,7 +28352,20 @@ var IceCreamCone = createLucideIcon("ice-cream-cone", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var House = createLucideIcon("house", [["path", {
+	d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8",
+	key: "5wwlr5"
+}], ["path", {
+	d: "M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+	key: "r6nss1"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28066,7 +28395,7 @@ var IdCardLanyard = createLucideIcon("id-card-lanyard", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28100,33 +28429,7 @@ var IdCard = createLucideIcon("id-card", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ImageDown = createLucideIcon("image-down", [
-	["path", {
-		d: "M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21",
-		key: "9csbqa"
-	}],
-	["path", {
-		d: "m14 19 3 3v-5.5",
-		key: "9ldu5r"
-	}],
-	["path", {
-		d: "m17 22 3-3",
-		key: "1nkfve"
-	}],
-	["circle", {
-		cx: "9",
-		cy: "9",
-		r: "2",
-		key: "af1f0g"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28155,7 +28458,7 @@ var ImageMinus = createLucideIcon("image-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28196,7 +28499,33 @@ var ImageOff = createLucideIcon("image-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ImageDown = createLucideIcon("image-down", [
+	["path", {
+		d: "M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21",
+		key: "9csbqa"
+	}],
+	["path", {
+		d: "m14 19 3 3v-5.5",
+		key: "9ldu5r"
+	}],
+	["path", {
+		d: "m17 22 3-3",
+		key: "1nkfve"
+	}],
+	["circle", {
+		cx: "9",
+		cy: "9",
+		r: "2",
+		key: "af1f0g"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28222,7 +28551,7 @@ var ImagePlay = createLucideIcon("image-play", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28252,7 +28581,33 @@ var ImagePlus = createLucideIcon("image-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ImageUp = createLucideIcon("image-up", [
+	["path", {
+		d: "M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21",
+		key: "9csbqa"
+	}],
+	["path", {
+		d: "m14 19.5 3-3 3 3",
+		key: "9vmjn0"
+	}],
+	["path", {
+		d: "M17 22v-5.5",
+		key: "1aa6fl"
+	}],
+	["circle", {
+		cx: "9",
+		cy: "9",
+		r: "2",
+		key: "af1f0g"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28296,33 +28651,7 @@ var ImageUpscale = createLucideIcon("image-upscale", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ImageUp = createLucideIcon("image-up", [
-	["path", {
-		d: "M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21",
-		key: "9csbqa"
-	}],
-	["path", {
-		d: "m14 19.5 3-3 3 3",
-		key: "9vmjn0"
-	}],
-	["path", {
-		d: "M17 22v-5.5",
-		key: "1aa6fl"
-	}],
-	["circle", {
-		cx: "9",
-		cy: "9",
-		r: "2",
-		key: "af1f0g"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28349,7 +28678,7 @@ var Image$1 = createLucideIcon("image", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28380,7 +28709,7 @@ var Images = createLucideIcon("images", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28400,7 +28729,7 @@ var Import = createLucideIcon("import", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28413,7 +28742,7 @@ var Inbox = createLucideIcon("inbox", [["polyline", {
 	key: "oot6mr"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28441,7 +28770,7 @@ var IndianRupee = createLucideIcon("indian-rupee", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28451,7 +28780,7 @@ var Infinity$1 = createLucideIcon("infinity", [["path", {
 	key: "18ogeb"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28473,7 +28802,7 @@ var Info = createLucideIcon("info", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28505,7 +28834,7 @@ var InspectionPanel = createLucideIcon("inspection-panel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28534,7 +28863,20 @@ var Italic = createLucideIcon("italic", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var IterationCcw = createLucideIcon("iteration-ccw", [["path", {
+	d: "m16 14 4 4-4 4",
+	key: "hkso8o"
+}], ["path", {
+	d: "M20 10a8 8 0 1 0-8 8h8",
+	key: "1bik7b"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28547,7 +28889,7 @@ var IterationCw = createLucideIcon("iteration-cw", [["path", {
 	key: "6g7gki"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28567,20 +28909,7 @@ var JapaneseYen = createLucideIcon("japanese-yen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var IterationCcw = createLucideIcon("iteration-ccw", [["path", {
-	d: "m16 14 4 4-4 4",
-	key: "hkso8o"
-}], ["path", {
-	d: "M20 10a8 8 0 1 0-8 8h8",
-	key: "1bik7b"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28606,7 +28935,7 @@ var Joystick = createLucideIcon("joystick", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28626,7 +28955,7 @@ var Kanban = createLucideIcon("kanban", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28650,23 +28979,7 @@ var Kayak = createLucideIcon("kayak", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var KeyRound = createLucideIcon("key-round", [["path", {
-	d: "M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z",
-	key: "1s6t7t"
-}], ["circle", {
-	cx: "16.5",
-	cy: "7.5",
-	r: ".5",
-	fill: "currentColor",
-	key: "w0ekpg"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28686,7 +28999,23 @@ var KeySquare = createLucideIcon("key-square", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var KeyRound = createLucideIcon("key-round", [["path", {
+	d: "M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z",
+	key: "1s6t7t"
+}], ["circle", {
+	cx: "16.5",
+	cy: "7.5",
+	r: ".5",
+	fill: "currentColor",
+	key: "w0ekpg"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28708,55 +29037,7 @@ var Key = createLucideIcon("key", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var KeyboardOff = createLucideIcon("keyboard-off", [
-	["path", {
-		d: "M 20 4 A2 2 0 0 1 22 6",
-		key: "1g1fkt"
-	}],
-	["path", {
-		d: "M 22 6 L 22 16.41",
-		key: "1qjg3w"
-	}],
-	["path", {
-		d: "M 7 16 L 16 16",
-		key: "n0yqwb"
-	}],
-	["path", {
-		d: "M 9.69 4 L 20 4",
-		key: "kbpcgx"
-	}],
-	["path", {
-		d: "M14 8h.01",
-		key: "1primd"
-	}],
-	["path", {
-		d: "M18 8h.01",
-		key: "emo2bl"
-	}],
-	["path", {
-		d: "m2 2 20 20",
-		key: "1ooewy"
-	}],
-	["path", {
-		d: "M20 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2",
-		key: "s23sx2"
-	}],
-	["path", {
-		d: "M6 8h.01",
-		key: "x9i8wu"
-	}],
-	["path", {
-		d: "M8 12h.01",
-		key: "czm47f"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28804,7 +29085,7 @@ var KeyboardMusic = createLucideIcon("keyboard-music", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28852,7 +29133,75 @@ var Keyboard = createLucideIcon("keyboard", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var KeyboardOff = createLucideIcon("keyboard-off", [
+	["path", {
+		d: "M 20 4 A2 2 0 0 1 22 6",
+		key: "1g1fkt"
+	}],
+	["path", {
+		d: "M 22 6 L 22 16.41",
+		key: "1qjg3w"
+	}],
+	["path", {
+		d: "M 7 16 L 16 16",
+		key: "n0yqwb"
+	}],
+	["path", {
+		d: "M 9.69 4 L 20 4",
+		key: "kbpcgx"
+	}],
+	["path", {
+		d: "M14 8h.01",
+		key: "1primd"
+	}],
+	["path", {
+		d: "M18 8h.01",
+		key: "emo2bl"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}],
+	["path", {
+		d: "M20 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2",
+		key: "s23sx2"
+	}],
+	["path", {
+		d: "M6 8h.01",
+		key: "x9i8wu"
+	}],
+	["path", {
+		d: "M8 12h.01",
+		key: "czm47f"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var LampCeiling = createLucideIcon("lamp-ceiling", [
+	["path", {
+		d: "M12 2v5",
+		key: "nd4vlx"
+	}],
+	["path", {
+		d: "M14.829 15.998a3 3 0 1 1-5.658 0",
+		key: "1pybiy"
+	}],
+	["path", {
+		d: "M20.92 14.606A1 1 0 0 1 20 16H4a1 1 0 0 1-.92-1.394l3-7A1 1 0 0 1 7 7h10a1 1 0 0 1 .92.606z",
+		key: "ma1wor"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28876,7 +29225,7 @@ var LampDesk = createLucideIcon("lamp-desk", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28896,27 +29245,7 @@ var LampFloor = createLucideIcon("lamp-floor", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var LampCeiling = createLucideIcon("lamp-ceiling", [
-	["path", {
-		d: "M12 2v5",
-		key: "nd4vlx"
-	}],
-	["path", {
-		d: "M14.829 15.998a3 3 0 1 1-5.658 0",
-		key: "1pybiy"
-	}],
-	["path", {
-		d: "M20.92 14.606A1 1 0 0 1 20 16H4a1 1 0 0 1-.92-1.394l3-7A1 1 0 0 1 7 7h10a1 1 0 0 1 .92.606z",
-		key: "ma1wor"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28936,7 +29265,7 @@ var LampWallDown = createLucideIcon("lamp-wall-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28956,7 +29285,7 @@ var LampWallUp = createLucideIcon("lamp-wall-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -28976,7 +29305,7 @@ var Lamp = createLucideIcon("lamp", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29000,7 +29329,7 @@ var LandPlot = createLucideIcon("land-plot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29032,7 +29361,7 @@ var Landmark = createLucideIcon("landmark", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29064,41 +29393,7 @@ var Languages = createLucideIcon("languages", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var LaptopMinimal = createLucideIcon("laptop-minimal", [["rect", {
-	width: "18",
-	height: "12",
-	x: "3",
-	y: "4",
-	rx: "2",
-	ry: "2",
-	key: "1qhy41"
-}], ["line", {
-	x1: "2",
-	x2: "22",
-	y1: "20",
-	y2: "20",
-	key: "ni3hll"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Laptop = createLucideIcon("laptop", [["path", {
-	d: "M18 5a2 2 0 0 1 2 2v8.526a2 2 0 0 0 .212.897l1.068 2.127a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45l1.068-2.127A2 2 0 0 0 4 15.526V7a2 2 0 0 1 2-2z",
-	key: "1pdavp"
-}], ["path", {
-	d: "M20.054 15.987H3.946",
-	key: "14rxg9"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29122,7 +29417,41 @@ var LaptopMinimalCheck = createLucideIcon("laptop-minimal-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var LaptopMinimal = createLucideIcon("laptop-minimal", [["rect", {
+	width: "18",
+	height: "12",
+	x: "3",
+	y: "4",
+	rx: "2",
+	ry: "2",
+	key: "1qhy41"
+}], ["line", {
+	x1: "2",
+	x2: "22",
+	y1: "20",
+	y2: "20",
+	key: "ni3hll"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Laptop = createLucideIcon("laptop", [["path", {
+	d: "M18 5a2 2 0 0 1 2 2v8.526a2 2 0 0 0 .212.897l1.068 2.127a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45l1.068-2.127A2 2 0 0 0 4 15.526V7a2 2 0 0 1 2-2z",
+	key: "1pdavp"
+}], ["path", {
+	d: "M20.054 15.987H3.946",
+	key: "14rxg9"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29150,7 +29479,7 @@ var LassoSelect = createLucideIcon("lasso-select", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29172,39 +29501,51 @@ var Lasso = createLucideIcon("lasso", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Laugh = createLucideIcon("laugh", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
+var LayerArrowDown = createLucideIcon("layer-arrow-down", [
+	["path", {
+		d: "M12 10v10",
+		key: "1ogziz"
 	}],
 	["path", {
-		d: "M18 13a6 6 0 0 1-6 5 6 6 0 0 1-6-5h12Z",
-		key: "b2q4dd"
+		d: "M22 10a1 1 0 01-.59.92l-5.077 2.308",
+		key: "q38q1t"
 	}],
-	["line", {
-		x1: "9",
-		x2: "9.01",
-		y1: "9",
-		y2: "9",
-		key: "yxxnd0"
+	["path", {
+		d: "M22.017 10.005a1 1 0 00-.597-.916l-8.59-3.91a2 2 0 00-1.66.001L2.6 9.08a1 1 0 00-.02 1.831l5.093 2.316",
+		key: "h1p4gn"
 	}],
-	["line", {
-		x1: "15",
-		x2: "15.01",
-		y1: "9",
-		y2: "9",
-		key: "1p4y9e"
+	["path", {
+		d: "m9 17 3 3 3-3",
+		key: "l18qqt"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var LayerArrowUp = createLucideIcon("layer-arrow-up", [
+	["path", {
+		d: "M12 14V4",
+		key: "1t7zjg"
+	}],
+	["path", {
+		d: "M7.674 10.774 2.58 13.09a1 1 0 000 1.822l8.6 3.91a2 2 0 001.65 0l8.58-3.9a1 1 0 00.59-.92 1 1 0 00-.59-.922l-5.078-2.308",
+		key: "1cy4ex"
+	}],
+	["path", {
+		d: "m9 7 3-3 3 3",
+		key: "8sjys4"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29217,7 +29558,59 @@ var Layers2 = createLucideIcon("layers-2", [["path", {
 	key: "byia6g"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var LayersArrowDown = createLucideIcon("layers-arrow-down", [
+	["path", {
+		d: "M12 7v15",
+		key: "1onnba"
+	}],
+	["path", {
+		d: "M2 12a1 1 0 00.58.91l5.093 2.316",
+		key: "xofxlj"
+	}],
+	["path", {
+		d: "M22 12a1 1 0 01-.59.92l-5.077 2.308",
+		key: "cc7swz"
+	}],
+	["path", {
+		d: "M8 10.37 2.6 7.91a1 1 0 010-1.831l8.57-3.9a2 2 0 011.66.001l8.59 3.91a1 1 0 010 1.831l-5.392 2.45",
+		key: "kdwjlb"
+	}],
+	["path", {
+		d: "m9 19 3 3 3-3",
+		key: "1fhphp"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var LayersArrowUp = createLucideIcon("layers-arrow-up", [
+	["path", {
+		d: "M12 12V2",
+		key: "17ugg4"
+	}],
+	["path", {
+		d: "M2 17.002a1 1 0 00.58.91l8.6 3.91a2 2 0 001.65 0l8.58-3.9a1 1 0 00.59-.92",
+		key: "1ke1hd"
+	}],
+	["path", {
+		d: "M7.674 8.774 2.58 11.09a1 1 0 000 1.822l8.6 3.91a2 2 0 001.65 0l8.58-3.9a1 1 0 00.59-.92 1 1 0 00-.59-.922l-5.078-2.308",
+		key: "hlro1u"
+	}],
+	["path", {
+		d: "m9 5 3-3 3 3",
+		key: "l8vdw6"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29245,7 +29638,7 @@ var LayersMinus = createLucideIcon("layers-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29273,7 +29666,7 @@ var LayersPlus = createLucideIcon("layers-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29293,7 +29686,7 @@ var Layers = createLucideIcon("layers", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29333,7 +29726,7 @@ var LayoutDashboard = createLucideIcon("layout-dashboard", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29365,47 +29758,7 @@ var LayoutFreeform = createLucideIcon("layout-freeform", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var LayoutList = createLucideIcon("layout-list", [
-	["rect", {
-		width: "7",
-		height: "7",
-		x: "3",
-		y: "3",
-		rx: "1",
-		key: "1g98yp"
-	}],
-	["rect", {
-		width: "7",
-		height: "7",
-		x: "3",
-		y: "14",
-		rx: "1",
-		key: "1bb6yr"
-	}],
-	["path", {
-		d: "M14 4h7",
-		key: "3xa0d5"
-	}],
-	["path", {
-		d: "M14 9h7",
-		key: "1icrd9"
-	}],
-	["path", {
-		d: "M14 15h7",
-		key: "1mj8o2"
-	}],
-	["path", {
-		d: "M14 20h7",
-		key: "11slyb"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29445,39 +29798,47 @@ var LayoutGrid = createLucideIcon("layout-grid", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var LayoutPanelLeft = createLucideIcon("layout-panel-left", [
+var LayoutList = createLucideIcon("layout-list", [
 	["rect", {
 		width: "7",
-		height: "18",
+		height: "7",
 		x: "3",
 		y: "3",
 		rx: "1",
-		key: "2obqm"
+		key: "1g98yp"
 	}],
 	["rect", {
 		width: "7",
 		height: "7",
-		x: "14",
-		y: "3",
-		rx: "1",
-		key: "6d4xhi"
-	}],
-	["rect", {
-		width: "7",
-		height: "7",
-		x: "14",
+		x: "3",
 		y: "14",
 		rx: "1",
-		key: "nxv5o0"
+		key: "1bb6yr"
+	}],
+	["path", {
+		d: "M14 4h7",
+		key: "3xa0d5"
+	}],
+	["path", {
+		d: "M14 9h7",
+		key: "1icrd9"
+	}],
+	["path", {
+		d: "M14 15h7",
+		key: "1mj8o2"
+	}],
+	["path", {
+		d: "M14 20h7",
+		key: "11slyb"
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29509,7 +29870,39 @@ var LayoutPanelTop = createLucideIcon("layout-panel-top", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var LayoutPanelLeft = createLucideIcon("layout-panel-left", [
+	["rect", {
+		width: "7",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "1",
+		key: "2obqm"
+	}],
+	["rect", {
+		width: "7",
+		height: "7",
+		x: "14",
+		y: "3",
+		rx: "1",
+		key: "6d4xhi"
+	}],
+	["rect", {
+		width: "7",
+		height: "7",
+		x: "14",
+		y: "14",
+		rx: "1",
+		key: "nxv5o0"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29541,7 +29934,7 @@ var LayoutTemplate = createLucideIcon("layout-template", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29554,7 +29947,7 @@ var Leaf = createLucideIcon("leaf", [["path", {
 	key: "mt58a7"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29567,7 +29960,7 @@ var LeafyGreen = createLucideIcon("leafy-green", [["path", {
 	key: "1q7jp2"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29591,7 +29984,7 @@ var Lectern = createLucideIcon("lectern", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29601,7 +29994,7 @@ var LensConcave = createLucideIcon("lens-concave", [["path", {
 	key: "109j23"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29611,7 +30004,7 @@ var LensConvex = createLucideIcon("lens-convex", [["path", {
 	key: "cq67go"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29635,7 +30028,7 @@ var LibraryBig = createLucideIcon("library-big", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29659,7 +30052,7 @@ var Library = createLucideIcon("library", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29695,7 +30088,7 @@ var LifeBuoy = createLucideIcon("life-buoy", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29723,7 +30116,7 @@ var Ligature = createLucideIcon("ligature", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29751,7 +30144,7 @@ var LightbulbOff = createLucideIcon("lightbulb-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29771,7 +30164,7 @@ var Lightbulb = createLucideIcon("lightbulb", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29786,7 +30179,7 @@ var LineDotRightHorizontal = createLucideIcon("line-dot-right-horizontal", [["pa
 	key: "1kchzo"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29796,7 +30189,7 @@ var LineSquiggle = createLucideIcon("line-squiggle", [["path", {
 	key: "1lrphd"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29828,7 +30221,7 @@ var LineStyle = createLucideIcon("line-style", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29858,7 +30251,7 @@ var Link2Off = createLucideIcon("link-2-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29881,7 +30274,20 @@ var Link2 = createLucideIcon("link-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Link = createLucideIcon("link", [["path", {
+	d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71",
+	key: "1cjeqo"
+}], ["path", {
+	d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
+	key: "19qd67"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29905,20 +30311,7 @@ var ListCheck = createLucideIcon("list-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Link = createLucideIcon("link", [["path", {
-	d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71",
-	key: "1cjeqo"
-}], ["path", {
-	d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
-	key: "19qd67"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29946,7 +30339,7 @@ var ListChecks = createLucideIcon("list-checks", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -29974,7 +30367,7 @@ var ListChevronsDownUp = createLucideIcon("list-chevrons-down-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30002,7 +30395,7 @@ var ListChevronsUpDown = createLucideIcon("list-chevrons-up-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30030,7 +30423,7 @@ var ListCollapse = createLucideIcon("list-collapse", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30058,7 +30451,7 @@ var ListEnd = createLucideIcon("list-end", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30086,7 +30479,7 @@ var ListFilterPlus = createLucideIcon("list-filter-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30106,7 +30499,7 @@ var ListFilter = createLucideIcon("list-filter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30130,7 +30523,7 @@ var ListIndentDecrease = createLucideIcon("list-indent-decrease", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30154,7 +30547,31 @@ var ListIndentIncrease = createLucideIcon("list-indent-increase", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ListMinus = createLucideIcon("list-minus", [
+	["path", {
+		d: "M16 5H3",
+		key: "m91uny"
+	}],
+	["path", {
+		d: "M11 12H3",
+		key: "51ecnj"
+	}],
+	["path", {
+		d: "M16 19H3",
+		key: "zzsher"
+	}],
+	["path", {
+		d: "M21 12h-6",
+		key: "bt1uis"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30184,31 +30601,7 @@ var ListMusic = createLucideIcon("list-music", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ListMinus = createLucideIcon("list-minus", [
-	["path", {
-		d: "M16 5H3",
-		key: "m91uny"
-	}],
-	["path", {
-		d: "M11 12H3",
-		key: "51ecnj"
-	}],
-	["path", {
-		d: "M16 19H3",
-		key: "zzsher"
-	}],
-	["path", {
-		d: "M21 12h-6",
-		key: "bt1uis"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30240,35 +30633,7 @@ var ListOrdered = createLucideIcon("list-ordered", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ListPlus = createLucideIcon("list-plus", [
-	["path", {
-		d: "M16 5H3",
-		key: "m91uny"
-	}],
-	["path", {
-		d: "M11 12H3",
-		key: "51ecnj"
-	}],
-	["path", {
-		d: "M16 19H3",
-		key: "zzsher"
-	}],
-	["path", {
-		d: "M18 9v6",
-		key: "1twb98"
-	}],
-	["path", {
-		d: "M21 12h-6",
-		key: "bt1uis"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30296,7 +30661,35 @@ var ListRestart = createLucideIcon("list-restart", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ListPlus = createLucideIcon("list-plus", [
+	["path", {
+		d: "M16 5H3",
+		key: "m91uny"
+	}],
+	["path", {
+		d: "M11 12H3",
+		key: "51ecnj"
+	}],
+	["path", {
+		d: "M16 19H3",
+		key: "zzsher"
+	}],
+	["path", {
+		d: "M18 9v6",
+		key: "1twb98"
+	}],
+	["path", {
+		d: "M21 12h-6",
+		key: "bt1uis"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30316,7 +30709,27 @@ var ListSortAscending = createLucideIcon("list-sort-ascending", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ListSortDescending = createLucideIcon("list-sort-descending", [
+	["path", {
+		d: "M15 12H3",
+		key: "6jk70r"
+	}],
+	["path", {
+		d: "M3 5h18",
+		key: "1u36vt"
+	}],
+	["path", {
+		d: "M9 19H3",
+		key: "s61nz1"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30344,27 +30757,7 @@ var ListStart = createLucideIcon("list-start", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ListSortDescending = createLucideIcon("list-sort-descending", [
-	["path", {
-		d: "M15 12H3",
-		key: "6jk70r"
-	}],
-	["path", {
-		d: "M3 5h18",
-		key: "1u36vt"
-	}],
-	["path", {
-		d: "M9 19H3",
-		key: "s61nz1"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30396,7 +30789,7 @@ var ListTodo = createLucideIcon("list-todo", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30424,7 +30817,7 @@ var ListTree = createLucideIcon("list-tree", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30448,7 +30841,7 @@ var ListVideo = createLucideIcon("list-video", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30476,7 +30869,7 @@ var ListX = createLucideIcon("list-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30508,7 +30901,7 @@ var List = createLucideIcon("list", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30518,33 +30911,7 @@ var LoaderCircle = createLucideIcon("loader-circle", [["path", {
 	key: "13zald"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var LoaderPinwheel = createLucideIcon("loader-pinwheel", [
-	["path", {
-		d: "M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0",
-		key: "1lzz15"
-	}],
-	["path", {
-		d: "M7 20.7a1 1 0 1 1 5-8.7 1 1 0 1 0 5-8.6",
-		key: "1gnrpi"
-	}],
-	["path", {
-		d: "M7 3.3a1 1 0 1 1 5 8.6 1 1 0 1 0 5 8.6",
-		key: "u9yy5q"
-	}],
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30584,7 +30951,33 @@ var Loader = createLucideIcon("loader", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var LoaderPinwheel = createLucideIcon("loader-pinwheel", [
+	["path", {
+		d: "M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0",
+		key: "1lzz15"
+	}],
+	["path", {
+		d: "M7 20.7a1 1 0 1 1 5-8.7 1 1 0 1 0 5-8.6",
+		key: "1gnrpi"
+	}],
+	["path", {
+		d: "M7 3.3a1 1 0 1 1 5 8.6 1 1 0 1 0 5 8.6",
+		key: "u9yy5q"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30632,7 +31025,7 @@ var LocateFixed = createLucideIcon("locate-fixed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30668,7 +31061,7 @@ var LocateOff = createLucideIcon("locate-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30710,7 +31103,7 @@ var Locate = createLucideIcon("locate", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30736,7 +31129,7 @@ var LockKeyholeOpen = createLucideIcon("lock-keyhole-open", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30762,7 +31155,7 @@ var LockKeyhole = createLucideIcon("lock-keyhole", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30780,25 +31173,7 @@ var LockOpen = createLucideIcon("lock-open", [["rect", {
 	key: "1mm8w8"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Lock = createLucideIcon("lock", [["rect", {
-	width: "18",
-	height: "11",
-	x: "3",
-	y: "11",
-	rx: "2",
-	ry: "2",
-	key: "1w4ew1"
-}], ["path", {
-	d: "M7 11V7a5 5 0 0 1 10 0v4",
-	key: "fwvmzm"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30818,7 +31193,7 @@ var LogIn = createLucideIcon("log-in", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30838,7 +31213,25 @@ var LogOut = createLucideIcon("log-out", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Lock = createLucideIcon("lock", [["rect", {
+	width: "18",
+	height: "11",
+	x: "3",
+	y: "11",
+	rx: "2",
+	ry: "2",
+	key: "1w4ew1"
+}], ["path", {
+	d: "M7 11V7a5 5 0 0 1 10 0v4",
+	key: "fwvmzm"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30882,7 +31275,7 @@ var Logs = createLucideIcon("logs", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30904,7 +31297,7 @@ var Lollipop = createLucideIcon("lollipop", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30936,7 +31329,7 @@ var Luggage = createLucideIcon("luggage", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30956,7 +31349,33 @@ var Magnet = createLucideIcon("magnet", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MailBadge = createLucideIcon("mail-badge", [
+	["path", {
+		d: "M22 7.7V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8.25",
+		key: "1a6dr2"
+	}],
+	["path", {
+		d: "M12 12.996a1.94 1.94 0 0 1-1.03-.296L2 7",
+		key: "15acam"
+	}],
+	["path", {
+		d: "m20.69 16.479 1.29 4.88a.5.5 0 0 1-.698.591l-1.843-.849a1 1 0 0 0-.879.001l-1.846.85a.5.5 0 0 1-.692-.593l1.29-4.88",
+		key: "1kx8o4"
+	}],
+	["circle", {
+		cx: "19",
+		cy: "14",
+		r: "3",
+		key: "9c2nho"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30976,7 +31395,7 @@ var MailCheck = createLucideIcon("mail-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -30996,7 +31415,7 @@ var MailMinus = createLucideIcon("mail-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31009,7 +31428,7 @@ var MailOpen = createLucideIcon("mail-open", [["path", {
 	key: "1qfld7"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31033,7 +31452,7 @@ var MailPlus = createLucideIcon("mail-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31057,7 +31476,7 @@ var MailQuestionMark = createLucideIcon("mail-question-mark", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31087,7 +31506,7 @@ var MailSearch = createLucideIcon("mail-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31111,7 +31530,7 @@ var MailWarning = createLucideIcon("mail-warning", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31135,7 +31554,7 @@ var MailX = createLucideIcon("mail-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31152,7 +31571,31 @@ var Mail = createLucideIcon("mail", [["path", {
 	key: "izxlao"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Mails = createLucideIcon("mails", [
+	["path", {
+		d: "M17 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 1-1.732",
+		key: "1vyzll"
+	}],
+	["path", {
+		d: "m22 5.5-6.419 4.179a2 2 0 0 1-2.162 0L7 5.5",
+		key: "k7ramc"
+	}],
+	["rect", {
+		x: "7",
+		y: "3",
+		width: "15",
+		height: "12",
+		rx: "2",
+		key: "17196g"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31179,31 +31622,20 @@ var Mailbox = createLucideIcon("mailbox", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Mails = createLucideIcon("mails", [
-	["path", {
-		d: "M17 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 1-1.732",
-		key: "1vyzll"
-	}],
-	["path", {
-		d: "m22 5.5-6.419 4.179a2 2 0 0 1-2.162 0L7 5.5",
-		key: "k7ramc"
-	}],
-	["rect", {
-		x: "7",
-		y: "3",
-		width: "15",
-		height: "12",
-		rx: "2",
-		key: "17196g"
-	}]
-]);
+var MapPinCheckInside = createLucideIcon("map-pin-check-inside", [["path", {
+	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
+	key: "1r0f0z"
+}], ["path", {
+	d: "m9 10 2 2 4-4",
+	key: "1gnqz4"
+}]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31227,20 +31659,7 @@ var MapMinus = createLucideIcon("map-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MapPinCheckInside = createLucideIcon("map-pin-check-inside", [["path", {
-	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
-	key: "1r0f0z"
-}], ["path", {
-	d: "m9 10 2 2 4-4",
-	key: "1gnqz4"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31262,7 +31681,7 @@ var MapPinCheck = createLucideIcon("map-pin-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31288,7 +31707,7 @@ var MapPinHouse = createLucideIcon("map-pin-house", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31301,7 +31720,7 @@ var MapPinMinusInside = createLucideIcon("map-pin-minus-inside", [["path", {
 	key: "9gxzsh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31323,7 +31742,7 @@ var MapPinMinus = createLucideIcon("map-pin-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31351,27 +31770,7 @@ var MapPinOff = createLucideIcon("map-pin-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MapPinPlusInside = createLucideIcon("map-pin-plus-inside", [
-	["path", {
-		d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
-		key: "1r0f0z"
-	}],
-	["path", {
-		d: "M12 7v6",
-		key: "lw1j43"
-	}],
-	["path", {
-		d: "M9 10h6",
-		key: "9gxzsh"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31393,7 +31792,27 @@ var MapPinPen = createLucideIcon("map-pin-pen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MapPinPlusInside = createLucideIcon("map-pin-plus-inside", [
+	["path", {
+		d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
+		key: "1r0f0z"
+	}],
+	["path", {
+		d: "M12 7v6",
+		key: "lw1j43"
+	}],
+	["path", {
+		d: "M9 10h6",
+		key: "9gxzsh"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31419,7 +31838,7 @@ var MapPinPlus = createLucideIcon("map-pin-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31447,7 +31866,7 @@ var MapPinSearch = createLucideIcon("map-pin-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31467,7 +31886,7 @@ var MapPinXInside = createLucideIcon("map-pin-x-inside", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31493,7 +31912,22 @@ var MapPinX = createLucideIcon("map-pin-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MapPin = createLucideIcon("map-pin", [["path", {
+	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
+	key: "1r0f0z"
+}], ["circle", {
+	cx: "12",
+	cy: "10",
+	r: "3",
+	key: "ilqhr7"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31515,22 +31949,7 @@ var MapPinned = createLucideIcon("map-pinned", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MapPin = createLucideIcon("map-pin", [["path", {
-	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
-	key: "1r0f0z"
-}], ["circle", {
-	cx: "12",
-	cy: "10",
-	r: "3",
-	key: "ilqhr7"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31558,7 +31977,7 @@ var MapPlus = createLucideIcon("map-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31578,7 +31997,7 @@ var Map$1 = createLucideIcon("map", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31604,7 +32023,7 @@ var MarsStroke = createLucideIcon("mars-stroke", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31626,7 +32045,7 @@ var Mars = createLucideIcon("mars", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31646,31 +32065,7 @@ var Martini = createLucideIcon("martini", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Maximize2 = createLucideIcon("maximize-2", [
-	["path", {
-		d: "M15 3h6v6",
-		key: "1q9fwt"
-	}],
-	["path", {
-		d: "m21 3-7 7",
-		key: "1l2asr"
-	}],
-	["path", {
-		d: "m3 21 7-7",
-		key: "tjx5ai"
-	}],
-	["path", {
-		d: "M9 21H3v-6",
-		key: "wtvkvv"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31694,7 +32089,31 @@ var Maximize = createLucideIcon("maximize", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Maximize2 = createLucideIcon("maximize-2", [
+	["path", {
+		d: "M15 3h6v6",
+		key: "1q9fwt"
+	}],
+	["path", {
+		d: "m21 3-7 7",
+		key: "1l2asr"
+	}],
+	["path", {
+		d: "m3 21 7-7",
+		key: "tjx5ai"
+	}],
+	["path", {
+		d: "M9 21H3v-6",
+		key: "wtvkvv"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31728,7 +32147,7 @@ var Medal = createLucideIcon("medal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31756,7 +32175,7 @@ var MegaphoneOff = createLucideIcon("megaphone-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31776,42 +32195,7 @@ var Megaphone = createLucideIcon("megaphone", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Meh = createLucideIcon("meh", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["line", {
-		x1: "8",
-		x2: "16",
-		y1: "15",
-		y2: "15",
-		key: "1xb1d9"
-	}],
-	["line", {
-		x1: "9",
-		x2: "9.01",
-		y1: "9",
-		y2: "9",
-		key: "yxxnd0"
-	}],
-	["line", {
-		x1: "15",
-		x2: "15.01",
-		y1: "9",
-		y2: "9",
-		key: "1p4y9e"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31867,7 +32251,7 @@ var MemoryStick = createLucideIcon("memory-stick", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31887,7 +32271,7 @@ var Menu = createLucideIcon("menu", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31907,7 +32291,7 @@ var Merge = createLucideIcon("merge", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31920,7 +32304,7 @@ var MessageCircleCheck = createLucideIcon("message-circle-check", [["path", {
 	key: "dzmm74"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31940,7 +32324,7 @@ var MessageCircleCode = createLucideIcon("message-circle-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31980,7 +32364,7 @@ var MessageCircleDashed = createLucideIcon("message-circle-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -31993,7 +32377,7 @@ var MessageCircleHeart = createLucideIcon("message-circle-heart", [["path", {
 	key: "hoo97p"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32017,7 +32401,7 @@ var MessageCircleMore = createLucideIcon("message-circle-more", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32037,7 +32421,7 @@ var MessageCircleOff = createLucideIcon("message-circle-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32057,7 +32441,7 @@ var MessageCirclePlus = createLucideIcon("message-circle-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32077,7 +32461,7 @@ var MessageCircleQuestionMark = createLucideIcon("message-circle-question-mark",
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32097,7 +32481,7 @@ var MessageCircleReply = createLucideIcon("message-circle-reply", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32117,7 +32501,7 @@ var MessageCircleWarning = createLucideIcon("message-circle-warning", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32137,7 +32521,17 @@ var MessageCircleX = createLucideIcon("message-circle-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MessageCircle = createLucideIcon("message-circle", [["path", {
+	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
+	key: "1sd12s"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32150,17 +32544,7 @@ var MessageSquareCheck = createLucideIcon("message-square-check", [["path", {
 	key: "kz4plv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MessageCircle = createLucideIcon("message-circle", [["path", {
-	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
-	key: "1sd12s"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32180,31 +32564,7 @@ var MessageSquareCode = createLucideIcon("message-square-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MessageSquareDiff = createLucideIcon("message-square-diff", [
-	["path", {
-		d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
-		key: "18887p"
-	}],
-	["path", {
-		d: "M10 15h4",
-		key: "192ueg"
-	}],
-	["path", {
-		d: "M10 9h4",
-		key: "u4k05v"
-	}],
-	["path", {
-		d: "M12 7v4",
-		key: "xawao1"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32252,7 +32612,31 @@ var MessageSquareDashed = createLucideIcon("message-square-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MessageSquareDiff = createLucideIcon("message-square-diff", [
+	["path", {
+		d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
+		key: "18887p"
+	}],
+	["path", {
+		d: "M10 15h4",
+		key: "192ueg"
+	}],
+	["path", {
+		d: "M10 9h4",
+		key: "u4k05v"
+	}],
+	["path", {
+		d: "M12 7v4",
+		key: "xawao1"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32267,7 +32651,7 @@ var MessageSquareDot = createLucideIcon("message-square-dot", [["path", {
 	key: "108a5v"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32280,51 +32664,7 @@ var MessageSquareHeart = createLucideIcon("message-square-heart", [["path", {
 	key: "1faxuh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MessageSquareMore = createLucideIcon("message-square-more", [
-	["path", {
-		d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
-		key: "18887p"
-	}],
-	["path", {
-		d: "M12 11h.01",
-		key: "z322tv"
-	}],
-	["path", {
-		d: "M16 11h.01",
-		key: "xkw8gn"
-	}],
-	["path", {
-		d: "M8 11h.01",
-		key: "1dfujw"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MessageSquareOff = createLucideIcon("message-square-off", [
-	["path", {
-		d: "M19 19H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.7.7 0 0 1 2 21.286V5a2 2 0 0 1 1.184-1.826",
-		key: "1wyg69"
-	}],
-	["path", {
-		d: "m2 2 20 20",
-		key: "1ooewy"
-	}],
-	["path", {
-		d: "M8.656 3H20a2 2 0 0 1 2 2v11.344",
-		key: "mhl4k6"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32348,7 +32688,51 @@ var MessageSquareLock = createLucideIcon("message-square-lock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MessageSquareOff = createLucideIcon("message-square-off", [
+	["path", {
+		d: "M19 19H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.7.7 0 0 1 2 21.286V5a2 2 0 0 1 1.184-1.826",
+		key: "1wyg69"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}],
+	["path", {
+		d: "M8.656 3H20a2 2 0 0 1 2 2v11.344",
+		key: "mhl4k6"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MessageSquareMore = createLucideIcon("message-square-more", [
+	["path", {
+		d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
+		key: "18887p"
+	}],
+	["path", {
+		d: "M12 11h.01",
+		key: "z322tv"
+	}],
+	["path", {
+		d: "M16 11h.01",
+		key: "xkw8gn"
+	}],
+	["path", {
+		d: "M8 11h.01",
+		key: "1dfujw"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32368,7 +32752,7 @@ var MessageSquarePlus = createLucideIcon("message-square-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32388,7 +32772,7 @@ var MessageSquareQuote = createLucideIcon("message-square-quote", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32408,7 +32792,7 @@ var MessageSquareReply = createLucideIcon("message-square-reply", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32428,7 +32812,7 @@ var MessageSquareShare = createLucideIcon("message-square-share", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32452,27 +32836,7 @@ var MessageSquareText = createLucideIcon("message-square-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MessageSquareX = createLucideIcon("message-square-x", [
-	["path", {
-		d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
-		key: "18887p"
-	}],
-	["path", {
-		d: "m14.5 8.5-5 5",
-		key: "19tnj2"
-	}],
-	["path", {
-		d: "m9.5 8.5 5 5",
-		key: "1oa8ql"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32492,7 +32856,27 @@ var MessageSquareWarning = createLucideIcon("message-square-warning", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MessageSquareX = createLucideIcon("message-square-x", [
+	["path", {
+		d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
+		key: "18887p"
+	}],
+	["path", {
+		d: "m14.5 8.5-5 5",
+		key: "19tnj2"
+	}],
+	["path", {
+		d: "m9.5 8.5 5 5",
+		key: "1oa8ql"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32502,7 +32886,7 @@ var MessageSquare = createLucideIcon("message-square", [["path", {
 	key: "18887p"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32515,33 +32899,7 @@ var MessagesSquare = createLucideIcon("messages-square", [["path", {
 	key: "1qfcsi"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Metronome = createLucideIcon("metronome", [
-	["path", {
-		d: "M12 11.4V9.1",
-		key: "audfby"
-	}],
-	["path", {
-		d: "m12 17 6.59-6.59",
-		key: "c0sb7j"
-	}],
-	["path", {
-		d: "m15.05 5.7-.218-.691a3 3 0 0 0-5.663 0L4.418 19.695A1 1 0 0 0 5.37 21h13.253a1 1 0 0 0 .951-1.31L18.45 16.2",
-		key: "1pkfrk"
-	}],
-	["circle", {
-		cx: "20",
-		cy: "9",
-		r: "2",
-		key: "1udoqf"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32589,7 +32947,65 @@ var MicAudioLines = createLucideIcon("mic-audio-lines", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Metronome = createLucideIcon("metronome", [
+	["path", {
+		d: "M12 11.4V9.1",
+		key: "audfby"
+	}],
+	["path", {
+		d: "m12 17 6.59-6.59",
+		key: "c0sb7j"
+	}],
+	["path", {
+		d: "m15.05 5.7-.218-.691a3 3 0 0 0-5.663 0L4.418 19.695A1 1 0 0 0 5.37 21h13.253a1 1 0 0 0 .951-1.31L18.45 16.2",
+		key: "1pkfrk"
+	}],
+	["circle", {
+		cx: "20",
+		cy: "9",
+		r: "2",
+		key: "1udoqf"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MicOff = createLucideIcon("mic-off", [
+	["path", {
+		d: "M12 19v3",
+		key: "npa21l"
+	}],
+	["path", {
+		d: "M15 9.34V5a3 3 0 0 0-5.68-1.33",
+		key: "1gzdoj"
+	}],
+	["path", {
+		d: "M16.95 16.95A7 7 0 0 1 5 12v-2",
+		key: "cqa7eg"
+	}],
+	["path", {
+		d: "M18.89 13.23A7 7 0 0 0 19 12v-2",
+		key: "16hl24"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}],
+	["path", {
+		d: "M9 9v3a3 3 0 0 0 5.12 2.12",
+		key: "r2i35w"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32629,39 +33045,7 @@ var MicSignal = createLucideIcon("mic-signal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MicOff = createLucideIcon("mic-off", [
-	["path", {
-		d: "M12 19v3",
-		key: "npa21l"
-	}],
-	["path", {
-		d: "M15 9.34V5a3 3 0 0 0-5.68-1.33",
-		key: "1gzdoj"
-	}],
-	["path", {
-		d: "M16.95 16.95A7 7 0 0 1 5 12v-2",
-		key: "cqa7eg"
-	}],
-	["path", {
-		d: "M18.89 13.23A7 7 0 0 0 19 12v-2",
-		key: "16hl24"
-	}],
-	["path", {
-		d: "m2 2 20 20",
-		key: "1ooewy"
-	}],
-	["path", {
-		d: "M9 9v3a3 3 0 0 0 5.12 2.12",
-		key: "r2i35w"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32683,7 +33067,7 @@ var MicVocal = createLucideIcon("mic-vocal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32707,7 +33091,7 @@ var Mic = createLucideIcon("mic", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32759,7 +33143,7 @@ var Microchip = createLucideIcon("microchip", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32791,7 +33175,7 @@ var Microscope = createLucideIcon("microscope", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32827,27 +33211,7 @@ var Microwave = createLucideIcon("microwave", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Milestone = createLucideIcon("milestone", [
-	["path", {
-		d: "M12 13v8",
-		key: "1l5pq0"
-	}],
-	["path", {
-		d: "M12 3v3",
-		key: "1n5kay"
-	}],
-	["path", {
-		d: "M18.172 6a2 2 0 0 1 1.414.586l2.06 2.06a1.207 1.207 0 0 1 0 1.708l-2.06 2.06a2 2 0 0 1-1.414.586H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z",
-		key: "8gz4t4"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32874,7 +33238,27 @@ var MilkOff = createLucideIcon("milk-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Milestone = createLucideIcon("milestone", [
+	["path", {
+		d: "M12 13v8",
+		key: "1l5pq0"
+	}],
+	["path", {
+		d: "M12 3v3",
+		key: "1n5kay"
+	}],
+	["path", {
+		d: "M18.172 6a2 2 0 0 1 1.414.586l2.06 2.06a1.207 1.207 0 0 1 0 1.708l-2.06 2.06a2 2 0 0 1-1.414.586H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z",
+		key: "8gz4t4"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32894,7 +33278,7 @@ var Milk = createLucideIcon("milk", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32918,7 +33302,7 @@ var Minimize2 = createLucideIcon("minimize-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32942,7 +33326,7 @@ var Minimize = createLucideIcon("minimize", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32952,7 +33336,31 @@ var Minus = createLucideIcon("minus", [["path", {
 	key: "1ays0h"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MirrorRectangular = createLucideIcon("mirror-rectangular", [
+	["path", {
+		d: "M11 6 8 9",
+		key: "7zt14w"
+	}],
+	["path", {
+		d: "m16 7-8 8",
+		key: "tkgtvu"
+	}],
+	["rect", {
+		x: "4",
+		y: "2",
+		width: "16",
+		height: "20",
+		rx: "2",
+		key: "1uxh74"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -32982,31 +33390,7 @@ var MirrorRound = createLucideIcon("mirror-round", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MirrorRectangular = createLucideIcon("mirror-rectangular", [
-	["path", {
-		d: "M11 6 8 9",
-		key: "7zt14w"
-	}],
-	["path", {
-		d: "m16 7-8 8",
-		key: "tkgtvu"
-	}],
-	["rect", {
-		x: "4",
-		y: "2",
-		width: "16",
-		height: "20",
-		rx: "2",
-		key: "1uxh74"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33034,7 +33418,35 @@ var MonitorCheck = createLucideIcon("monitor-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MonitorCloud = createLucideIcon("monitor-cloud", [
+	["path", {
+		d: "M11 13a3 3 0 1 1 2.83-4H14a2 2 0 0 1 0 4z",
+		key: "1da4q6"
+	}],
+	["path", {
+		d: "M12 17v4",
+		key: "1riwvh"
+	}],
+	["path", {
+		d: "M8 21h8",
+		key: "1ev6f3"
+	}],
+	["rect", {
+		x: "2",
+		y: "3",
+		width: "20",
+		height: "14",
+		rx: "2",
+		key: "x3v2xh"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33092,35 +33504,7 @@ var MonitorCog = createLucideIcon("monitor-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MonitorCloud = createLucideIcon("monitor-cloud", [
-	["path", {
-		d: "M11 13a3 3 0 1 1 2.83-4H14a2 2 0 0 1 0 4z",
-		key: "1da4q6"
-	}],
-	["path", {
-		d: "M12 17v4",
-		key: "1riwvh"
-	}],
-	["path", {
-		d: "M8 21h8",
-		key: "1ev6f3"
-	}],
-	["rect", {
-		x: "2",
-		y: "3",
-		width: "20",
-		height: "14",
-		rx: "2",
-		key: "x3v2xh"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33146,7 +33530,7 @@ var MonitorDot = createLucideIcon("monitor-dot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33178,7 +33562,7 @@ var MonitorDown = createLucideIcon("monitor-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33206,7 +33590,7 @@ var MonitorOff = createLucideIcon("monitor-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33238,7 +33622,7 @@ var MonitorPause = createLucideIcon("monitor-pause", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33266,35 +33650,7 @@ var MonitorPlay = createLucideIcon("monitor-play", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MonitorSmartphone = createLucideIcon("monitor-smartphone", [
-	["path", {
-		d: "M18 8V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h8",
-		key: "10dyio"
-	}],
-	["path", {
-		d: "M10 19v-3.96 3.15",
-		key: "1irgej"
-	}],
-	["path", {
-		d: "M7 19h5",
-		key: "qswx4l"
-	}],
-	["rect", {
-		width: "6",
-		height: "10",
-		x: "16",
-		y: "12",
-		rx: "2",
-		key: "1egngj"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33328,7 +33684,35 @@ var MonitorSpeaker = createLucideIcon("monitor-speaker", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MonitorSmartphone = createLucideIcon("monitor-smartphone", [
+	["path", {
+		d: "M18 8V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h8",
+		key: "10dyio"
+	}],
+	["path", {
+		d: "M10 19v-3.96 3.15",
+		key: "1irgej"
+	}],
+	["path", {
+		d: "M7 19h5",
+		key: "qswx4l"
+	}],
+	["rect", {
+		width: "6",
+		height: "10",
+		x: "16",
+		y: "12",
+		rx: "2",
+		key: "1egngj"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33360,7 +33744,7 @@ var MonitorStop = createLucideIcon("monitor-stop", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33392,7 +33776,7 @@ var MonitorUp = createLucideIcon("monitor-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33424,7 +33808,7 @@ var MonitorX = createLucideIcon("monitor-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33454,7 +33838,7 @@ var Monitor = createLucideIcon("monitor", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33474,7 +33858,7 @@ var MoonStar = createLucideIcon("moon-star", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33484,39 +33868,7 @@ var Moon = createLucideIcon("moon", [["path", {
 	key: "kfwtm"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Mosque = createLucideIcon("mosque", [
-	["path", {
-		d: "M12.268 2a2 2 0 003.465 2",
-		key: "3in8xp"
-	}],
-	["path", {
-		d: "M14 5 L14 8",
-		key: "1fhhfb"
-	}],
-	["path", {
-		d: "M16 22v-3a2 2 0 00-4 0v3",
-		key: "1p6nbd"
-	}],
-	["path", {
-		d: "M21 13c-.662-1.497-1.666-2.753-2.9-3.63C16.825 8.47 15.422 8 14 8s-2.826.47-4.1 1.37C8.668 10.248 7.663 11.504 7 13z",
-		key: "ck3r5y"
-	}],
-	["path", {
-		d: "M3 9h4",
-		key: "rnfnj5"
-	}],
-	["path", {
-		d: "M7 22V6a5 5 0 00-2-4 5 5 0 00-2 4v14a2 2 0 002 2h14a2 2 0 002-2v-7",
-		key: "28kgc3"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33548,7 +33900,39 @@ var Motorbike = createLucideIcon("motorbike", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Mosque = createLucideIcon("mosque", [
+	["path", {
+		d: "M12.268 2a2 2 0 003.465 2",
+		key: "3in8xp"
+	}],
+	["path", {
+		d: "M14 5 L14 8",
+		key: "1fhhfb"
+	}],
+	["path", {
+		d: "M16 22v-3a2 2 0 00-4 0v3",
+		key: "1p6nbd"
+	}],
+	["path", {
+		d: "M21 13c-.662-1.497-1.666-2.753-2.9-3.63C16.825 8.47 15.422 8 14 8s-2.826.47-4.1 1.37C8.668 10.248 7.663 11.504 7 13z",
+		key: "ck3r5y"
+	}],
+	["path", {
+		d: "M3 9h4",
+		key: "rnfnj5"
+	}],
+	["path", {
+		d: "M7 22V6a5 5 0 00-2-4 5 5 0 00-2 4v14a2 2 0 002 2h14a2 2 0 002-2v-7",
+		key: "28kgc3"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33561,7 +33945,7 @@ var MountainSnow = createLucideIcon("mountain-snow", [["path", {
 	key: "1pvmmp"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33571,7 +33955,7 @@ var Mountain = createLucideIcon("mountain", [["path", {
 	key: "otkl63"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33593,7 +33977,7 @@ var MouseLeft = createLucideIcon("mouse-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33617,7 +34001,7 @@ var MouseOff = createLucideIcon("mouse-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33637,7 +34021,7 @@ var MousePointer2Off = createLucideIcon("mouse-pointer-2-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33647,7 +34031,7 @@ var MousePointer2 = createLucideIcon("mouse-pointer-2", [["path", {
 	key: "edeuup"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33669,7 +34053,7 @@ var MousePointerBan = createLucideIcon("mouse-pointer-ban", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33697,7 +34081,7 @@ var MousePointerClick = createLucideIcon("mouse-pointer-click", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33710,7 +34094,7 @@ var MousePointer = createLucideIcon("mouse-pointer", [["path", {
 	key: "277e5u"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33732,7 +34116,7 @@ var MouseRight = createLucideIcon("mouse-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33749,7 +34133,7 @@ var Mouse = createLucideIcon("mouse", [["rect", {
 	key: "16clxf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33773,27 +34157,7 @@ var Move3d = createLucideIcon("move-3d", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var MoveDiagonal2 = createLucideIcon("move-diagonal-2", [
-	["path", {
-		d: "M19 13v6h-6",
-		key: "1hxl6d"
-	}],
-	["path", {
-		d: "M5 11V5h6",
-		key: "12e2xe"
-	}],
-	["path", {
-		d: "m5 5 14 14",
-		key: "11anup"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33813,7 +34177,27 @@ var MoveDiagonal = createLucideIcon("move-diagonal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var MoveDiagonal2 = createLucideIcon("move-diagonal-2", [
+	["path", {
+		d: "M19 13v6h-6",
+		key: "1hxl6d"
+	}],
+	["path", {
+		d: "M5 11V5h6",
+		key: "12e2xe"
+	}],
+	["path", {
+		d: "m5 5 14 14",
+		key: "11anup"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33826,7 +34210,7 @@ var MoveDownLeft = createLucideIcon("move-down-left", [["path", {
 	key: "72u4yj"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33839,7 +34223,7 @@ var MoveDownRight = createLucideIcon("move-down-right", [["path", {
 	key: "5zm2fv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33852,7 +34236,7 @@ var MoveDown = createLucideIcon("move-down", [["path", {
 	key: "r89rzk"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33872,7 +34256,7 @@ var MoveHorizontal = createLucideIcon("move-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33885,7 +34269,7 @@ var MoveLeft = createLucideIcon("move-left", [["path", {
 	key: "1m8cig"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33898,7 +34282,7 @@ var MoveRight = createLucideIcon("move-right", [["path", {
 	key: "1m8cig"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33911,7 +34295,7 @@ var MoveUpLeft = createLucideIcon("move-up-left", [["path", {
 	key: "5zm2fv"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33924,7 +34308,7 @@ var MoveUpRight = createLucideIcon("move-up-right", [["path", {
 	key: "72u4yj"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33937,7 +34321,7 @@ var MoveUp = createLucideIcon("move-up", [["path", {
 	key: "r89rzk"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33957,7 +34341,7 @@ var MoveVertical = createLucideIcon("move-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -33989,7 +34373,7 @@ var Move = createLucideIcon("move", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34004,7 +34388,7 @@ var Music2 = createLucideIcon("music-2", [["circle", {
 	key: "g04rme"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34019,64 +34403,7 @@ var Music3 = createLucideIcon("music-3", [["circle", {
 	key: "40x2m5"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Music = createLucideIcon("music", [
-	["path", {
-		d: "M9 18V5l12-2v13",
-		key: "1jmyc2"
-	}],
-	["circle", {
-		cx: "6",
-		cy: "18",
-		r: "3",
-		key: "fqmcym"
-	}],
-	["circle", {
-		cx: "18",
-		cy: "16",
-		r: "3",
-		key: "1hluhg"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Navigation2Off = createLucideIcon("navigation-2-off", [
-	["path", {
-		d: "M9.31 9.31 5 21l7-4 7 4-1.17-3.17",
-		key: "qoq2o2"
-	}],
-	["path", {
-		d: "M14.53 8.88 12 2l-1.17 3.17",
-		key: "k3sjzy"
-	}],
-	["line", {
-		x1: "2",
-		x2: "22",
-		y1: "2",
-		y2: "22",
-		key: "a6p6uj"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Navigation2 = createLucideIcon("navigation-2", [["polygon", {
-	points: "12 2 19 21 12 17 5 21 12 2",
-	key: "x8c0qg"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34104,7 +34431,64 @@ var Music4 = createLucideIcon("music-4", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Music = createLucideIcon("music", [
+	["path", {
+		d: "M9 18V5l12-2v13",
+		key: "1jmyc2"
+	}],
+	["circle", {
+		cx: "6",
+		cy: "18",
+		r: "3",
+		key: "fqmcym"
+	}],
+	["circle", {
+		cx: "18",
+		cy: "16",
+		r: "3",
+		key: "1hluhg"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Navigation2Off = createLucideIcon("navigation-2-off", [
+	["path", {
+		d: "M9.31 9.31 5 21l7-4 7 4-1.17-3.17",
+		key: "qoq2o2"
+	}],
+	["path", {
+		d: "M14.53 8.88 12 2l-1.17 3.17",
+		key: "k3sjzy"
+	}],
+	["line", {
+		x1: "2",
+		x2: "22",
+		y1: "2",
+		y2: "22",
+		key: "a6p6uj"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Navigation2 = createLucideIcon("navigation-2", [["polygon", {
+	points: "12 2 19 21 12 17 5 21 12 2",
+	key: "x8c0qg"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34127,7 +34511,17 @@ var NavigationOff = createLucideIcon("navigation-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Navigation = createLucideIcon("navigation", [["polygon", {
+	points: "3 11 22 2 13 21 11 13 3 11",
+	key: "1ltx0t"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34167,17 +34561,7 @@ var Network = createLucideIcon("network", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Navigation = createLucideIcon("navigation", [["polygon", {
-	points: "3 11 22 2 13 21 11 13 3 11",
-	key: "1ltx0t"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34205,7 +34589,7 @@ var Newspaper = createLucideIcon("newspaper", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34229,7 +34613,7 @@ var Nfc = createLucideIcon("nfc", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34255,7 +34639,7 @@ var NonBinary = createLucideIcon("non-binary", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34287,7 +34671,7 @@ var NotebookPen = createLucideIcon("notebook-pen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34335,7 +34719,7 @@ var NotebookTabs = createLucideIcon("notebook-tabs", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34379,7 +34763,7 @@ var NotebookText = createLucideIcon("notebook-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34415,7 +34799,7 @@ var Notebook = createLucideIcon("notebook", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34475,7 +34859,7 @@ var NotepadTextDashed = createLucideIcon("notepad-text-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34515,27 +34899,7 @@ var NotepadText = createLucideIcon("notepad-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Nut = createLucideIcon("nut", [
-	["path", {
-		d: "M12 4V2",
-		key: "1k5q1u"
-	}],
-	["path", {
-		d: "M5 10v4a7.004 7.004 0 0 0 5.277 6.787c.412.104.802.292 1.102.592L12 22l.621-.621c.3-.3.69-.488 1.102-.592A7.003 7.003 0 0 0 19 14v-4",
-		key: "1tgyif"
-	}],
-	["path", {
-		d: "M12 4C8 4 4.5 6 4 8c-.243.97-.919 1.952-2 3 1.31-.082 1.972-.29 3-1 .54.92.982 1.356 2 2 1.452-.647 1.954-1.098 2.5-2 .595.995 1.151 1.427 2.5 2 1.31-.621 1.862-1.058 2.5-2 .629.977 1.162 1.423 2.5 2 1.209-.548 1.68-.967 2-2 1.032.916 1.683 1.157 3 1-1.297-1.036-1.758-2.03-2-3-.5-2-4-4-8-4Z",
-		key: "tnsqj"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34566,7 +34930,27 @@ var NutOff = createLucideIcon("nut-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Nut = createLucideIcon("nut", [
+	["path", {
+		d: "M12 4V2",
+		key: "1k5q1u"
+	}],
+	["path", {
+		d: "M5 10v4a7.004 7.004 0 0 0 5.277 6.787c.412.104.802.292 1.102.592L12 22l.621-.621c.3-.3.69-.488 1.102-.592A7.003 7.003 0 0 0 19 14v-4",
+		key: "1tgyif"
+	}],
+	["path", {
+		d: "M12 4C8 4 4.5 6 4 8c-.243.97-.919 1.952-2 3 1.31-.082 1.972-.29 3-1 .54.92.982 1.356 2 2 1.452-.647 1.954-1.098 2.5-2 .595.995 1.151 1.427 2.5 2 1.31-.621 1.862-1.058 2.5-2 .629.977 1.162 1.423 2.5 2 1.209-.548 1.68-.967 2-2 1.032.916 1.683 1.157 3 1-1.297-1.036-1.758-2.03-2-3-.5-2-4-4-8-4Z",
+		key: "tnsqj"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34586,7 +34970,7 @@ var OctagonAlert = createLucideIcon("octagon-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34599,7 +34983,7 @@ var OctagonMinus = createLucideIcon("octagon-minus", [["path", {
 	key: "1wcyev"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34619,7 +35003,7 @@ var OctagonPause = createLucideIcon("octagon-pause", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34639,7 +35023,7 @@ var OctagonX = createLucideIcon("octagon-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34649,7 +35033,7 @@ var Octagon = createLucideIcon("octagon", [["path", {
 	key: "2d38gg"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34659,7 +35043,7 @@ var Omega = createLucideIcon("omega", [["path", {
 	key: "1x94xo"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34672,7 +35056,7 @@ var Option = createLucideIcon("option", [["path", {
 	key: "1qf1im"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34706,7 +35090,7 @@ var Orbit = createLucideIcon("orbit", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34726,7 +35110,7 @@ var Origami = createLucideIcon("origami", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34746,7 +35130,7 @@ var Package2 = createLucideIcon("package-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34774,7 +35158,7 @@ var PackageCheck = createLucideIcon("package-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34802,7 +35186,7 @@ var PackageMinus = createLucideIcon("package-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34826,7 +35210,7 @@ var PackageOpen = createLucideIcon("package-open", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34858,7 +35242,7 @@ var PackagePlus = createLucideIcon("package-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34892,7 +35276,7 @@ var PackageSearch = createLucideIcon("package-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34924,31 +35308,7 @@ var PackageX = createLucideIcon("package-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PaintBucket = createLucideIcon("paint-bucket", [
-	["path", {
-		d: "M11 7 6 2",
-		key: "1jwth8"
-	}],
-	["path", {
-		d: "M18.992 12H2.041",
-		key: "xw1gg"
-	}],
-	["path", {
-		d: "M21.145 18.38A3.34 3.34 0 0 1 20 16.5a3.3 3.3 0 0 1-1.145 1.88c-.575.46-.855 1.02-.855 1.595A2 2 0 0 0 20 22a2 2 0 0 0 2-2.025c0-.58-.285-1.13-.855-1.595",
-		key: "1nkol4"
-	}],
-	["path", {
-		d: "m8.5 4.5 2.148-2.148a1.205 1.205 0 0 1 1.704 0l7.296 7.296a1.205 1.205 0 0 1 0 1.704l-7.592 7.592a3.615 3.615 0 0 1-5.112 0l-3.888-3.888a3.615 3.615 0 0 1 0-5.112L5.67 7.33",
-		key: "1nk1rd"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -34972,7 +35332,31 @@ var Package = createLucideIcon("package", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PaintBucket = createLucideIcon("paint-bucket", [
+	["path", {
+		d: "M11 7 6 2",
+		key: "1jwth8"
+	}],
+	["path", {
+		d: "M18.992 12H2.041",
+		key: "xw1gg"
+	}],
+	["path", {
+		d: "M21.145 18.38A3.34 3.34 0 0 1 20 16.5a3.3 3.3 0 0 1-1.145 1.88c-.575.46-.855 1.02-.855 1.595A2 2 0 0 0 20 22a2 2 0 0 0 2-2.025c0-.58-.285-1.13-.855-1.595",
+		key: "1nkol4"
+	}],
+	["path", {
+		d: "m8.5 4.5 2.148-2.148a1.205 1.205 0 0 1 1.704 0l7.296 7.296a1.205 1.205 0 0 1 0 1.704l-7.592 7.592a3.615 3.615 0 0 1-5.112 0l-3.888-3.888a3.615 3.615 0 0 1 0-5.112L5.67 7.33",
+		key: "1nk1rd"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35000,7 +35384,7 @@ var PaintRoller = createLucideIcon("paint-roller", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35024,7 +35408,7 @@ var PaintbrushVertical = createLucideIcon("paintbrush-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35044,7 +35428,7 @@ var Paintbrush = createLucideIcon("paintbrush", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35084,7 +35468,7 @@ var Palette = createLucideIcon("palette", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35116,7 +35500,7 @@ var Panda = createLucideIcon("panda", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35140,7 +35524,7 @@ var PanelBottomClose = createLucideIcon("panel-bottom-close", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35172,7 +35556,7 @@ var PanelBottomDashed = createLucideIcon("panel-bottom-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35196,7 +35580,7 @@ var PanelBottomOpen = createLucideIcon("panel-bottom-open", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35213,7 +35597,7 @@ var PanelBottom = createLucideIcon("panel-bottom", [["rect", {
 	key: "5xshup"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35237,7 +35621,7 @@ var PanelLeftClose = createLucideIcon("panel-left-close", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35269,7 +35653,7 @@ var PanelLeftDashed = createLucideIcon("panel-left-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35293,7 +35677,7 @@ var PanelLeftOpen = createLucideIcon("panel-left-open", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35341,7 +35725,7 @@ var PanelLeftRightDashed = createLucideIcon("panel-left-right-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35358,7 +35742,7 @@ var PanelLeft = createLucideIcon("panel-left", [["rect", {
 	key: "fh3hqa"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35382,31 +35766,7 @@ var PanelRightClose = createLucideIcon("panel-right-close", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PanelRightOpen = createLucideIcon("panel-right-open", [
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "3",
-		rx: "2",
-		key: "afitv7"
-	}],
-	["path", {
-		d: "M15 3v18",
-		key: "14nvp0"
-	}],
-	["path", {
-		d: "m10 15-3-3 3-3",
-		key: "1pgupc"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35438,7 +35798,31 @@ var PanelRightDashed = createLucideIcon("panel-right-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PanelRightOpen = createLucideIcon("panel-right-open", [
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		key: "afitv7"
+	}],
+	["path", {
+		d: "M15 3v18",
+		key: "14nvp0"
+	}],
+	["path", {
+		d: "m10 15-3-3 3-3",
+		key: "1pgupc"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35455,7 +35839,31 @@ var PanelRight = createLucideIcon("panel-right", [["rect", {
 	key: "14nvp0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PanelTopClose = createLucideIcon("panel-top-close", [
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		key: "afitv7"
+	}],
+	["path", {
+		d: "M3 9h18",
+		key: "1pudct"
+	}],
+	["path", {
+		d: "m9 16 3-3 3 3",
+		key: "1idcnm"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35503,31 +35911,7 @@ var PanelTopBottomDashed = createLucideIcon("panel-top-bottom-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PanelTopClose = createLucideIcon("panel-top-close", [
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "3",
-		rx: "2",
-		key: "afitv7"
-	}],
-	["path", {
-		d: "M3 9h18",
-		key: "1pudct"
-	}],
-	["path", {
-		d: "m9 16 3-3 3 3",
-		key: "1idcnm"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35559,7 +35943,7 @@ var PanelTopDashed = createLucideIcon("panel-top-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35583,7 +35967,7 @@ var PanelTopOpen = createLucideIcon("panel-top-open", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35600,31 +35984,7 @@ var PanelTop = createLucideIcon("panel-top", [["rect", {
 	key: "1pudct"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PanelsRightBottom = createLucideIcon("panels-right-bottom", [
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "3",
-		rx: "2",
-		key: "afitv7"
-	}],
-	["path", {
-		d: "M3 15h12",
-		key: "1wkqb3"
-	}],
-	["path", {
-		d: "M15 3v18",
-		key: "14nvp0"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35648,7 +36008,31 @@ var PanelsLeftBottom = createLucideIcon("panels-left-bottom", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PanelsRightBottom = createLucideIcon("panels-right-bottom", [
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		key: "afitv7"
+	}],
+	["path", {
+		d: "M3 15h12",
+		key: "1wkqb3"
+	}],
+	["path", {
+		d: "M15 3v18",
+		key: "14nvp0"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35672,7 +36056,7 @@ var PanelsTopLeft = createLucideIcon("panels-top-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35685,7 +36069,7 @@ var PaperBag = createLucideIcon("paper-bag", [["path", {
 	key: "12exh5"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35695,7 +36079,20 @@ var Paperclip = createLucideIcon("paperclip", [["path", {
 	key: "1miecu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Parentheses = createLucideIcon("parentheses", [["path", {
+	d: "M8 21s-4-3-4-9 4-9 4-9",
+	key: "uto9ud"
+}], ["path", {
+	d: "M16 3s4 3 4 9-4 9-4 9",
+	key: "4w2vsq"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35715,20 +36112,7 @@ var Parasol = createLucideIcon("parasol", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Parentheses = createLucideIcon("parentheses", [["path", {
-	d: "M8 21s-4-3-4-9 4-9 4-9",
-	key: "uto9ud"
-}], ["path", {
-	d: "M16 3s4 3 4 9-4 9-4 9",
-	key: "4w2vsq"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35756,7 +36140,7 @@ var ParkingMeter = createLucideIcon("parking-meter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35800,7 +36184,7 @@ var PartyPopper = createLucideIcon("party-popper", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35821,35 +36205,7 @@ var Pause = createLucideIcon("pause", [["rect", {
 	key: "1wsw3u"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PcCase = createLucideIcon("pc-case", [
-	["rect", {
-		width: "14",
-		height: "20",
-		x: "5",
-		y: "2",
-		rx: "2",
-		key: "1uq1d7"
-	}],
-	["path", {
-		d: "M15 14h.01",
-		key: "1kp3bh"
-	}],
-	["path", {
-		d: "M9 6h6",
-		key: "dgm16u"
-	}],
-	["path", {
-		d: "M9 10h6",
-		key: "9gxzsh"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35879,7 +36235,7 @@ var PawPrint = createLucideIcon("paw-print", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35892,7 +36248,7 @@ var PenLine = createLucideIcon("pen-line", [["path", {
 	key: "1a8usu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35912,7 +36268,35 @@ var PenOff = createLucideIcon("pen-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PcCase = createLucideIcon("pc-case", [
+	["rect", {
+		width: "14",
+		height: "20",
+		x: "5",
+		y: "2",
+		rx: "2",
+		key: "1uq1d7"
+	}],
+	["path", {
+		d: "M15 14h.01",
+		key: "1kp3bh"
+	}],
+	["path", {
+		d: "M9 6h6",
+		key: "dgm16u"
+	}],
+	["path", {
+		d: "M9 10h6",
+		key: "9gxzsh"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35938,7 +36322,7 @@ var PenTool = createLucideIcon("pen-tool", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35948,7 +36332,7 @@ var Pen = createLucideIcon("pen", [["path", {
 	key: "1a8usu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35968,7 +36352,7 @@ var PencilLine = createLucideIcon("pencil-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -35992,7 +36376,7 @@ var PencilOff = createLucideIcon("pencil-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36024,20 +36408,7 @@ var PencilRuler = createLucideIcon("pencil-ruler", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Pencil = createLucideIcon("pencil", [["path", {
-	d: "M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",
-	key: "1a8usu"
-}], ["path", {
-	d: "m15 5 4 4",
-	key: "1mk7zo"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36077,7 +36448,20 @@ var PencilSparkles = createLucideIcon("pencil-sparkles", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Pencil = createLucideIcon("pencil", [["path", {
+	d: "M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",
+	key: "1a8usu"
+}], ["path", {
+	d: "m15 5 4 4",
+	key: "1mk7zo"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36087,7 +36471,7 @@ var Pentagon = createLucideIcon("pentagon", [["path", {
 	key: "2hea0t"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36114,7 +36498,27 @@ var Percent = createLucideIcon("percent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PhilippinePeso = createLucideIcon("philippine-peso", [
+	["path", {
+		d: "M20 11H4",
+		key: "6ut86h"
+	}],
+	["path", {
+		d: "M20 7H4",
+		key: "zbl0bi"
+	}],
+	["path", {
+		d: "M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7",
+		key: "1ana5r"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36140,7 +36544,7 @@ var PersonStanding = createLucideIcon("person-standing", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36155,27 +36559,7 @@ var Phi = createLucideIcon("phi", [["path", {
 	key: "fim9np"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PhilippinePeso = createLucideIcon("philippine-peso", [
-	["path", {
-		d: "M20 11H4",
-		key: "6ut86h"
-	}],
-	["path", {
-		d: "M20 7H4",
-		key: "zbl0bi"
-	}],
-	["path", {
-		d: "M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7",
-		key: "1ana5r"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36195,27 +36579,7 @@ var PhoneCall = createLucideIcon("phone-call", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PhoneForwarded = createLucideIcon("phone-forwarded", [
-	["path", {
-		d: "M14 6h8",
-		key: "yd68k4"
-	}],
-	["path", {
-		d: "m18 2 4 4-4 4",
-		key: "pucp1d"
-	}],
-	["path", {
-		d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
-		key: "9njp5v"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36235,7 +36599,27 @@ var PhoneIncoming = createLucideIcon("phone-incoming", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PhoneForwarded = createLucideIcon("phone-forwarded", [
+	["path", {
+		d: "M14 6h8",
+		key: "yd68k4"
+	}],
+	["path", {
+		d: "m18 2 4 4-4 4",
+		key: "pucp1d"
+	}],
+	["path", {
+		d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
+		key: "9njp5v"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36255,7 +36639,7 @@ var PhoneMissed = createLucideIcon("phone-missed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36275,7 +36659,7 @@ var PhoneOff = createLucideIcon("phone-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36295,7 +36679,7 @@ var PhoneOutgoing = createLucideIcon("phone-outgoing", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36305,7 +36689,7 @@ var Phone = createLucideIcon("phone", [["path", {
 	key: "9njp5v"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36328,7 +36712,7 @@ var Pi = createLucideIcon("pi", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36360,7 +36744,7 @@ var Piano = createLucideIcon("piano", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36384,7 +36768,7 @@ var Pickaxe = createLucideIcon("pickaxe", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36401,7 +36785,27 @@ var PictureInPicture2 = createLucideIcon("picture-in-picture-2", [["path", {
 	key: "1nb8gs"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var PiggyBank = createLucideIcon("piggy-bank", [
+	["path", {
+		d: "M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z",
+		key: "1piglc"
+	}],
+	["path", {
+		d: "M16 10h.01",
+		key: "1m94wz"
+	}],
+	["path", {
+		d: "M2 8v1a2 2 0 0 0 2 2h1",
+		key: "1env43"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36433,27 +36837,7 @@ var PictureInPicture = createLucideIcon("picture-in-picture", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var PiggyBank = createLucideIcon("piggy-bank", [
-	["path", {
-		d: "M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z",
-		key: "1piglc"
-	}],
-	["path", {
-		d: "M16 10h.01",
-		key: "1m94wz"
-	}],
-	["path", {
-		d: "M2 8v1a2 2 0 0 0 2 2h1",
-		key: "1env43"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36481,7 +36865,7 @@ var PilcrowLeft = createLucideIcon("pilcrow-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36509,7 +36893,7 @@ var PilcrowRight = createLucideIcon("pilcrow-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36529,7 +36913,7 @@ var Pilcrow = createLucideIcon("pilcrow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36553,7 +36937,7 @@ var PillBottle = createLucideIcon("pill-bottle", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36566,7 +36950,7 @@ var Pill = createLucideIcon("pill", [["path", {
 	key: "rvfmvr"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36590,7 +36974,7 @@ var PinOff = createLucideIcon("pin-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36603,27 +36987,7 @@ var Pin = createLucideIcon("pin", [["path", {
 	key: "1nkz8b"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Pipette = createLucideIcon("pipette", [
-	["path", {
-		d: "m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12",
-		key: "1y3wsu"
-	}],
-	["path", {
-		d: "m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z",
-		key: "110lr1"
-	}],
-	["path", {
-		d: "m2 22 .414-.414",
-		key: "jhxm08"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36651,7 +37015,27 @@ var Pizza = createLucideIcon("pizza", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Pipette = createLucideIcon("pipette", [
+	["path", {
+		d: "m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12",
+		key: "1y3wsu"
+	}],
+	["path", {
+		d: "m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z",
+		key: "110lr1"
+	}],
+	["path", {
+		d: "m2 22 .414-.414",
+		key: "jhxm08"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36664,7 +37048,7 @@ var PlaneLanding = createLucideIcon("plane-landing", [["path", {
 	key: "1ma21e"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36677,7 +37061,7 @@ var PlaneTakeoff = createLucideIcon("plane-takeoff", [["path", {
 	key: "fkigj9"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36687,7 +37071,7 @@ var Plane = createLucideIcon("plane", [["path", {
 	key: "1v9wt8"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36707,7 +37091,7 @@ var PlayOff = createLucideIcon("play-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36717,7 +37101,7 @@ var Play = createLucideIcon("play", [["path", {
 	key: "10ikf1"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36745,7 +37129,7 @@ var Plug2 = createLucideIcon("plug-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36773,7 +37157,7 @@ var PlugZap = createLucideIcon("plug-zap", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36797,7 +37181,7 @@ var Plug = createLucideIcon("plug", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36810,27 +37194,7 @@ var Plus = createLucideIcon("plus", [["path", {
 	key: "s699le"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Podium = createLucideIcon("podium", [
-	["path", {
-		d: "M12 6V2h-1",
-		key: "1hv4eo"
-	}],
-	["path", {
-		d: "M9 15a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1",
-		key: "1jvw5n"
-	}],
-	["path", {
-		d: "M9 21V11a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v10",
-		key: "rgi5dp"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36858,7 +37222,27 @@ var PocketKnife = createLucideIcon("pocket-knife", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Podium = createLucideIcon("podium", [
+	["path", {
+		d: "M12 6V2h-1",
+		key: "1hv4eo"
+	}],
+	["path", {
+		d: "M9 15a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1",
+		key: "1jvw5n"
+	}],
+	["path", {
+		d: "M9 21V11a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v10",
+		key: "rgi5dp"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36890,7 +37274,7 @@ var PointerOff = createLucideIcon("pointer-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36918,7 +37302,7 @@ var Pointer = createLucideIcon("pointer", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36942,7 +37326,20 @@ var Popcorn = createLucideIcon("popcorn", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Popsicle = createLucideIcon("popsicle", [["path", {
+	d: "M18.6 14.4c.8-.8.8-2 0-2.8l-8.1-8.1a4.95 4.95 0 1 0-7.1 7.1l8.1 8.1c.9.7 2.1.7 2.9-.1Z",
+	key: "1o68ps"
+}], ["path", {
+	d: "m22 22-5.5-5.5",
+	key: "17o70y"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36966,7 +37363,20 @@ var PoundSterling = createLucideIcon("pound-sterling", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Power = createLucideIcon("power", [["path", {
+	d: "M12 2v10",
+	key: "mnfbl"
+}], ["path", {
+	d: "M18.4 6.6a9 9 0 1 1-12.77.04",
+	key: "obofu9"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -36990,33 +37400,7 @@ var PowerOff = createLucideIcon("power-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Popsicle = createLucideIcon("popsicle", [["path", {
-	d: "M18.6 14.4c.8-.8.8-2 0-2.8l-8.1-8.1a4.95 4.95 0 1 0-7.1 7.1l8.1 8.1c.9.7 2.1.7 2.9-.1Z",
-	key: "1o68ps"
-}], ["path", {
-	d: "m22 22-5.5-5.5",
-	key: "17o70y"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Power = createLucideIcon("power", [["path", {
-	d: "M12 2v10",
-	key: "mnfbl"
-}], ["path", {
-	d: "M18.4 6.6a9 9 0 1 1-12.77.04",
-	key: "obofu9"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37036,7 +37420,7 @@ var Presentation = createLucideIcon("presentation", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37060,31 +37444,7 @@ var PrinterCheck = createLucideIcon("printer-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Printer = createLucideIcon("printer", [
-	["path", {
-		d: "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2",
-		key: "143wyd"
-	}],
-	["path", {
-		d: "M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6",
-		key: "1itne7"
-	}],
-	["rect", {
-		x: "6",
-		y: "14",
-		width: "12",
-		height: "8",
-		rx: "1",
-		key: "1ue0tg"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37112,7 +37472,31 @@ var PrinterX = createLucideIcon("printer-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Printer = createLucideIcon("printer", [
+	["path", {
+		d: "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2",
+		key: "143wyd"
+	}],
+	["path", {
+		d: "M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6",
+		key: "1itne7"
+	}],
+	["rect", {
+		x: "6",
+		y: "14",
+		width: "12",
+		height: "8",
+		rx: "1",
+		key: "1ue0tg"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37146,7 +37530,7 @@ var Projector = createLucideIcon("projector", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37170,7 +37554,7 @@ var Proportions = createLucideIcon("proportions", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37180,7 +37564,7 @@ var Puzzle = createLucideIcon("puzzle", [["path", {
 	key: "w46dr5"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37193,7 +37577,7 @@ var Pyramid = createLucideIcon("pyramid", [["path", {
 	key: "t6zp3m"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37261,7 +37645,7 @@ var QrCode = createLucideIcon("qr-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37274,7 +37658,7 @@ var Quote = createLucideIcon("quote", [["path", {
 	key: "1ymkrd"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37302,7 +37686,31 @@ var Rabbit = createLucideIcon("rabbit", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Radiation = createLucideIcon("radiation", [
+	["path", {
+		d: "M12 12h.01",
+		key: "1mp3jc"
+	}],
+	["path", {
+		d: "M14 15.4641a4 4 0 0 1-4 0L7.52786 19.74597 A 1 1 0 0 0 7.99303 21.16211 10 10 0 0 0 16.00697 21.16211 1 1 0 0 0 16.47214 19.74597z",
+		key: "1y4lzb"
+	}],
+	["path", {
+		d: "M16 12a4 4 0 0 0-2-3.464l2.472-4.282a1 1 0 0 1 1.46-.305 10 10 0 0 1 4.006 6.94A1 1 0 0 1 21 12z",
+		key: "163ggk"
+	}],
+	["path", {
+		d: "M8 12a4 4 0 0 1 2-3.464L7.528 4.254a1 1 0 0 0-1.46-.305 10 10 0 0 0-4.006 6.94A1 1 0 0 0 3 12z",
+		key: "1l9i0b"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37344,31 +37752,7 @@ var Radar = createLucideIcon("radar", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Radiation = createLucideIcon("radiation", [
-	["path", {
-		d: "M12 12h.01",
-		key: "1mp3jc"
-	}],
-	["path", {
-		d: "M14 15.4641a4 4 0 0 1-4 0L7.52786 19.74597 A 1 1 0 0 0 7.99303 21.16211 10 10 0 0 0 16.00697 21.16211 1 1 0 0 0 16.47214 19.74597z",
-		key: "1y4lzb"
-	}],
-	["path", {
-		d: "M16 12a4 4 0 0 0-2-3.464l2.472-4.282a1 1 0 0 1 1.46-.305 10 10 0 0 1 4.006 6.94A1 1 0 0 1 21 12z",
-		key: "163ggk"
-	}],
-	["path", {
-		d: "M8 12a4 4 0 0 1 2-3.464L7.528 4.254a1 1 0 0 0-1.46-.305 10 10 0 0 0-4.006 6.94A1 1 0 0 0 3 12z",
-		key: "1l9i0b"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37378,7 +37762,7 @@ var Radical = createLucideIcon("radical", [["path", {
 	key: "1mqj8i"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37410,7 +37794,7 @@ var RadioOff = createLucideIcon("radio-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37438,7 +37822,7 @@ var RadioReceiver = createLucideIcon("radio-receiver", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37476,7 +37860,7 @@ var RadioTower = createLucideIcon("radio-tower", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37506,27 +37890,7 @@ var Radio = createLucideIcon("radio", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Rainbow = createLucideIcon("rainbow", [
-	["path", {
-		d: "M22 17a10 10 0 0 0-20 0",
-		key: "ozegv"
-	}],
-	["path", {
-		d: "M6 17a6 6 0 0 1 12 0",
-		key: "5giftw"
-	}],
-	["path", {
-		d: "M10 17a2 2 0 0 1 4 0",
-		key: "gnsikk"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37554,7 +37918,27 @@ var Radius = createLucideIcon("radius", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Rainbow = createLucideIcon("rainbow", [
+	["path", {
+		d: "M22 17a10 10 0 0 0-20 0",
+		key: "ozegv"
+	}],
+	["path", {
+		d: "M6 17a6 6 0 0 1 12 0",
+		key: "5giftw"
+	}],
+	["path", {
+		d: "M10 17a2 2 0 0 1 4 0",
+		key: "gnsikk"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37582,7 +37966,7 @@ var Rat = createLucideIcon("rat", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37603,7 +37987,7 @@ var Ratio = createLucideIcon("ratio", [["rect", {
 	key: "9lu3g6"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37623,7 +38007,7 @@ var ReceiptCent = createLucideIcon("receipt-cent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37643,7 +38027,7 @@ var ReceiptEuro = createLucideIcon("receipt-euro", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37667,7 +38051,31 @@ var ReceiptIndianRupee = createLucideIcon("receipt-indian-rupee", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ReceiptPoundSterling = createLucideIcon("receipt-pound-sterling", [
+	["path", {
+		d: "M10 17V9.5a1 1 0 0 1 5 0",
+		key: "td22vl"
+	}],
+	["path", {
+		d: "M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z",
+		key: "ycz6yz"
+	}],
+	["path", {
+		d: "M8 13h5",
+		key: "1k9z8w"
+	}],
+	["path", {
+		d: "M8 17h7",
+		key: "8mjdqu"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37695,31 +38103,7 @@ var ReceiptJapaneseYen = createLucideIcon("receipt-japanese-yen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ReceiptPoundSterling = createLucideIcon("receipt-pound-sterling", [
-	["path", {
-		d: "M10 17V9.5a1 1 0 0 1 5 0",
-		key: "td22vl"
-	}],
-	["path", {
-		d: "M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z",
-		key: "ycz6yz"
-	}],
-	["path", {
-		d: "M8 13h5",
-		key: "1k9z8w"
-	}],
-	["path", {
-		d: "M8 17h7",
-		key: "8mjdqu"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37739,31 +38123,7 @@ var ReceiptRussianRuble = createLucideIcon("receipt-russian-ruble", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ReceiptText = createLucideIcon("receipt-text", [
-	["path", {
-		d: "M13 16H8",
-		key: "wsln4y"
-	}],
-	["path", {
-		d: "M14 8H8",
-		key: "1l3xfs"
-	}],
-	["path", {
-		d: "M16 12H8",
-		key: "1fr5h0"
-	}],
-	["path", {
-		d: "M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z",
-		key: "ycz6yz"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37787,7 +38147,31 @@ var ReceiptSwissFranc = createLucideIcon("receipt-swiss-franc", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ReceiptText = createLucideIcon("receipt-text", [
+	["path", {
+		d: "M13 16H8",
+		key: "wsln4y"
+	}],
+	["path", {
+		d: "M14 8H8",
+		key: "1l3xfs"
+	}],
+	["path", {
+		d: "M16 12H8",
+		key: "1fr5h0"
+	}],
+	["path", {
+		d: "M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z",
+		key: "ycz6yz"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37807,7 +38191,7 @@ var ReceiptTurkishLira = createLucideIcon("receipt-turkish-lira", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37827,7 +38211,7 @@ var Receipt = createLucideIcon("receipt", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37842,7 +38226,7 @@ var RectangleCircle = createLucideIcon("rectangle-circle", [["path", {
 	key: "1pag6k"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37870,7 +38254,7 @@ var RectangleEllipsis = createLucideIcon("rectangle-ellipsis", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37880,7 +38264,7 @@ var RectangleGoggles = createLucideIcon("rectangle-goggles", [["path", {
 	key: "d5y1f"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37894,7 +38278,7 @@ var RectangleHorizontal = createLucideIcon("rectangle-horizontal", [["rect", {
 	key: "9lu3g6"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37908,7 +38292,7 @@ var RectangleVertical = createLucideIcon("rectangle-vertical", [["rect", {
 	key: "1oxtiu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37940,7 +38324,7 @@ var Recycle = createLucideIcon("recycle", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37953,7 +38337,20 @@ var Redo2 = createLucideIcon("redo-2", [["path", {
 	key: "6uklza"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Redo = createLucideIcon("redo", [["path", {
+	d: "M21 7v6h-6",
+	key: "3ptur4"
+}], ["path", {
+	d: "M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7",
+	key: "1kgawr"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -37975,20 +38372,7 @@ var RedoDot = createLucideIcon("redo-dot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Redo = createLucideIcon("redo", [["path", {
-	d: "M21 7v6h-6",
-	key: "3ptur4"
-}], ["path", {
-	d: "M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7",
-	key: "1kgawr"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38018,7 +38402,7 @@ var RefreshCcwDot = createLucideIcon("refresh-ccw-dot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38042,7 +38426,7 @@ var RefreshCcw = createLucideIcon("refresh-ccw", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38078,7 +38462,27 @@ var RefreshCwOff = createLucideIcon("refresh-cw-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Refrigerator = createLucideIcon("refrigerator", [
+	["path", {
+		d: "M5 6a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6Z",
+		key: "fpq118"
+	}],
+	["path", {
+		d: "M5 10h14",
+		key: "elsbfy"
+	}],
+	["path", {
+		d: "M15 7v6",
+		key: "1nx30x"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38102,27 +38506,7 @@ var RefreshCw = createLucideIcon("refresh-cw", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Refrigerator = createLucideIcon("refrigerator", [
-	["path", {
-		d: "M5 6a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6Z",
-		key: "fpq118"
-	}],
-	["path", {
-		d: "M5 10h14",
-		key: "elsbfy"
-	}],
-	["path", {
-		d: "M15 7v6",
-		key: "1nx30x"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38146,7 +38530,7 @@ var Regex = createLucideIcon("regex", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38174,7 +38558,7 @@ var RemoveFormatting = createLucideIcon("remove-formatting", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38202,7 +38586,31 @@ var Repeat1 = createLucideIcon("repeat-1", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Repeat2 = createLucideIcon("repeat-2", [
+	["path", {
+		d: "m2 9 3-3 3 3",
+		key: "1ltn5i"
+	}],
+	["path", {
+		d: "M13 18H7a2 2 0 0 1-2-2V6",
+		key: "1r6tfw"
+	}],
+	["path", {
+		d: "m22 15-3 3-3-3",
+		key: "4rnwn2"
+	}],
+	["path", {
+		d: "M11 6h6a2 2 0 0 1 2 2v10",
+		key: "2f72bc"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38238,31 +38646,7 @@ var RepeatOff = createLucideIcon("repeat-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Repeat2 = createLucideIcon("repeat-2", [
-	["path", {
-		d: "m2 9 3-3 3 3",
-		key: "1ltn5i"
-	}],
-	["path", {
-		d: "M13 18H7a2 2 0 0 1-2-2V6",
-		key: "1r6tfw"
-	}],
-	["path", {
-		d: "m22 15-3 3-3-3",
-		key: "4rnwn2"
-	}],
-	["path", {
-		d: "M11 6h6a2 2 0 0 1 2 2v10",
-		key: "2f72bc"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38286,47 +38670,7 @@ var Repeat = createLucideIcon("repeat", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Replace = createLucideIcon("replace", [
-	["path", {
-		d: "M14 4a1 1 0 0 1 1-1",
-		key: "dhj8ez"
-	}],
-	["path", {
-		d: "M15 10a1 1 0 0 1-1-1",
-		key: "1mnyi5"
-	}],
-	["path", {
-		d: "M21 4a1 1 0 0 0-1-1",
-		key: "sfs9ap"
-	}],
-	["path", {
-		d: "M21 9a1 1 0 0 1-1 1",
-		key: "mp6qeo"
-	}],
-	["path", {
-		d: "m3 7 3 3 3-3",
-		key: "x25e72"
-	}],
-	["path", {
-		d: "M6 10V5a2 2 0 0 1 2-2h2",
-		key: "15xut4"
-	}],
-	["rect", {
-		x: "3",
-		y: "14",
-		width: "7",
-		height: "7",
-		rx: "1",
-		key: "1bkyp8"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38374,7 +38718,47 @@ var ReplaceAll = createLucideIcon("replace-all", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Replace = createLucideIcon("replace", [
+	["path", {
+		d: "M14 4a1 1 0 0 1 1-1",
+		key: "dhj8ez"
+	}],
+	["path", {
+		d: "M15 10a1 1 0 0 1-1-1",
+		key: "1mnyi5"
+	}],
+	["path", {
+		d: "M21 4a1 1 0 0 0-1-1",
+		key: "sfs9ap"
+	}],
+	["path", {
+		d: "M21 9a1 1 0 0 1-1 1",
+		key: "mp6qeo"
+	}],
+	["path", {
+		d: "m3 7 3 3 3-3",
+		key: "x25e72"
+	}],
+	["path", {
+		d: "M6 10V5a2 2 0 0 1 2-2h2",
+		key: "15xut4"
+	}],
+	["rect", {
+		x: "3",
+		y: "14",
+		width: "7",
+		height: "7",
+		rx: "1",
+		key: "1bkyp8"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38394,20 +38778,7 @@ var ReplyAll = createLucideIcon("reply-all", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Reply = createLucideIcon("reply", [["path", {
-	d: "M20 18v-2a4 4 0 0 0-4-4H4",
-	key: "5vmcpk"
-}], ["path", {
-	d: "m9 17-5-5 5-5",
-	key: "nvlc11"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38420,7 +38791,7 @@ var Rewind = createLucideIcon("rewind", [["path", {
 	key: "rg3s36"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38448,7 +38819,20 @@ var Ribbon = createLucideIcon("ribbon", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Reply = createLucideIcon("reply", [["path", {
+	d: "M20 18v-2a4 4 0 0 0-4-4H4",
+	key: "5vmcpk"
+}], ["path", {
+	d: "m9 17-5-5 5-5",
+	key: "nvlc11"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38472,7 +38856,7 @@ var Road = createLucideIcon("road", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38496,31 +38880,7 @@ var Rocket = createLucideIcon("rocket", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var RockingChair = createLucideIcon("rocking-chair", [
-	["path", {
-		d: "m15 13 3.708 7.416",
-		key: "1edxn9"
-	}],
-	["path", {
-		d: "M3 19a15 15 0 0 0 18 0",
-		key: "d0d1c4"
-	}],
-	["path", {
-		d: "m3 2 3.21 9.633A2 2 0 0 0 8.109 13H18",
-		key: "tpa4et"
-	}],
-	["path", {
-		d: "m9 13-3.708 7.416",
-		key: "1oplxx"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38556,7 +38916,31 @@ var RollerCoaster = createLucideIcon("roller-coaster", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var RockingChair = createLucideIcon("rocking-chair", [
+	["path", {
+		d: "m15 13 3.708 7.416",
+		key: "1edxn9"
+	}],
+	["path", {
+		d: "M3 19a15 15 0 0 0 18 0",
+		key: "d0d1c4"
+	}],
+	["path", {
+		d: "m3 2 3.21 9.633A2 2 0 0 0 8.109 13H18",
+		key: "tpa4et"
+	}],
+	["path", {
+		d: "m9 13-3.708 7.416",
+		key: "1oplxx"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38586,7 +38970,7 @@ var Rose = createLucideIcon("rose", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38606,7 +38990,7 @@ var Rotate3d = createLucideIcon("rotate-3d", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38626,7 +39010,7 @@ var RotateCcwClock = createLucideIcon("rotate-ccw-clock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38656,7 +39040,7 @@ var RotateCcwKey = createLucideIcon("rotate-ccw-key", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38676,7 +39060,7 @@ var RotateCcwSquare = createLucideIcon("rotate-ccw-square", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38689,7 +39073,7 @@ var RotateCcw = createLucideIcon("rotate-ccw", [["path", {
 	key: "1xhq8a"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38737,7 +39121,7 @@ var RotateCwFadingClock = createLucideIcon("rotate-cw-fading-clock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38757,7 +39141,7 @@ var RotateCwSquare = createLucideIcon("rotate-cw-square", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38770,7 +39154,7 @@ var RotateCw = createLucideIcon("rotate-cw", [["path", {
 	key: "1q7to0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38810,7 +39194,7 @@ var RouteOff = createLucideIcon("route-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38834,7 +39218,7 @@ var Route = createLucideIcon("route", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38870,7 +39254,7 @@ var Router = createLucideIcon("router", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38887,7 +39271,7 @@ var Rows2 = createLucideIcon("rows-2", [["rect", {
 	key: "1i2n21"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38911,7 +39295,7 @@ var Rows3 = createLucideIcon("rows-3", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -38939,29 +39323,7 @@ var Rows4 = createLucideIcon("rows-4", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Rss = createLucideIcon("rss", [
-	["path", {
-		d: "M4 11a9 9 0 0 1 9 9",
-		key: "pv89mb"
-	}],
-	["path", {
-		d: "M4 4a16 16 0 0 1 16 16",
-		key: "k0647b"
-	}],
-	["circle", {
-		cx: "5",
-		cy: "19",
-		r: "1",
-		key: "bfqh0e"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39005,7 +39367,42 @@ var RulerDimensionLine = createLucideIcon("ruler-dimension-line", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Rss = createLucideIcon("rss", [
+	["path", {
+		d: "M4 11a9 9 0 0 1 9 9",
+		key: "pv89mb"
+	}],
+	["path", {
+		d: "M4 4a16 16 0 0 1 16 16",
+		key: "k0647b"
+	}],
+	["circle", {
+		cx: "5",
+		cy: "19",
+		r: "1",
+		key: "bfqh0e"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var RussianRuble = createLucideIcon("russian-ruble", [["path", {
+	d: "M6 11h8a4 4 0 0 0 0-8H9v18",
+	key: "18ai8t"
+}], ["path", {
+	d: "M6 15h8",
+	key: "1y8f6l"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39033,20 +39430,27 @@ var Ruler = createLucideIcon("ruler", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var RussianRuble = createLucideIcon("russian-ruble", [["path", {
-	d: "M6 11h8a4 4 0 0 0 0-8H9v18",
-	key: "18ai8t"
-}], ["path", {
-	d: "M6 15h8",
-	key: "1y8f6l"
-}]]);
+var Sailboat = createLucideIcon("sailboat", [
+	["path", {
+		d: "M10 2v15",
+		key: "1qf71f"
+	}],
+	["path", {
+		d: "M7 22a4 4 0 0 1-4-4 1 1 0 0 1 1-1h16a1 1 0 0 1 1 1 4 4 0 0 1-4 4z",
+		key: "1pxcvx"
+	}],
+	["path", {
+		d: "M9.159 2.46a1 1 0 0 1 1.521-.193l9.977 8.98A1 1 0 0 1 20 13H4a1 1 0 0 1-.824-1.567z",
+		key: "5oog16"
+	}]
+]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39074,27 +39478,7 @@ var Salad = createLucideIcon("salad", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Sailboat = createLucideIcon("sailboat", [
-	["path", {
-		d: "M10 2v15",
-		key: "1qf71f"
-	}],
-	["path", {
-		d: "M7 22a4 4 0 0 1-4-4 1 1 0 0 1 1-1h16a1 1 0 0 1 1 1 4 4 0 0 1-4 4z",
-		key: "1pxcvx"
-	}],
-	["path", {
-		d: "M9.159 2.46a1 1 0 0 1 1.521-.193l9.977 8.98A1 1 0 0 1 20 13H4a1 1 0 0 1-.824-1.567z",
-		key: "5oog16"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39126,55 +39510,7 @@ var Sandwich = createLucideIcon("sandwich", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SatelliteDish = createLucideIcon("satellite-dish", [
-	["path", {
-		d: "M4 10a7.31 7.31 0 0 0 10 10Z",
-		key: "1fzpp3"
-	}],
-	["path", {
-		d: "m9 15 3-3",
-		key: "88sc13"
-	}],
-	["path", {
-		d: "M17 13a6 6 0 0 0-6-6",
-		key: "15cc6u"
-	}],
-	["path", {
-		d: "M21 13A10 10 0 0 0 11 3",
-		key: "11nf8s"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SaudiRiyal = createLucideIcon("saudi-riyal", [
-	["path", {
-		d: "m20 19.5-5.5 1.2",
-		key: "1aenhr"
-	}],
-	["path", {
-		d: "M14.5 4v11.22a1 1 0 0 0 1.242.97L20 15.2",
-		key: "2rtezt"
-	}],
-	["path", {
-		d: "m2.978 19.351 5.549-1.363A2 2 0 0 0 10 16V2",
-		key: "1kbm92"
-	}],
-	["path", {
-		d: "M20 10 4 13.5",
-		key: "8nums9"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39202,7 +39538,55 @@ var Satellite = createLucideIcon("satellite", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SatelliteDish = createLucideIcon("satellite-dish", [
+	["path", {
+		d: "M4 10a7.31 7.31 0 0 0 10 10Z",
+		key: "1fzpp3"
+	}],
+	["path", {
+		d: "m9 15 3-3",
+		key: "88sc13"
+	}],
+	["path", {
+		d: "M17 13a6 6 0 0 0-6-6",
+		key: "15cc6u"
+	}],
+	["path", {
+		d: "M21 13A10 10 0 0 0 11 3",
+		key: "11nf8s"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SaudiRiyal = createLucideIcon("saudi-riyal", [
+	["path", {
+		d: "m20 19.5-5.5 1.2",
+		key: "1aenhr"
+	}],
+	["path", {
+		d: "M14.5 4v11.22a1 1 0 0 0 1.242.97L20 15.2",
+		key: "2rtezt"
+	}],
+	["path", {
+		d: "m2.978 19.351 5.549-1.363A2 2 0 0 0 10 16V2",
+		key: "1kbm92"
+	}],
+	["path", {
+		d: "M20 10 4 13.5",
+		key: "8nums9"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39226,7 +39610,7 @@ var SaveAll = createLucideIcon("save-all", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39250,59 +39634,7 @@ var SaveCheck = createLucideIcon("save-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SavePen = createLucideIcon("save-pen", [
-	["path", {
-		d: "M13.33 13H8a1 1 0 00-1 1v7",
-		key: "60fs50"
-	}],
-	["path", {
-		d: "M14.363 17.634a2 2 0 00-.506.854l-.837 2.87a.5.5 0 00.62.62l2.87-.837a2 2 0 00.854-.506l4.013-4.009a1 1 0 10-3.004-3.004z",
-		key: "dpj1he"
-	}],
-	["path", {
-		d: "M7 3v4a1 1 0 001 1h7",
-		key: "vkun1b"
-	}],
-	["path", {
-		d: "M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h10.2a2 2 0 011.4.6l3.8 3.8a2 2 0 01.6 1.4v.3",
-		key: "1oj3yb"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SavePlus = createLucideIcon("save-plus", [
-	["path", {
-		d: "M12.5 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10.2a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V12",
-		key: "bhibzn"
-	}],
-	["path", {
-		d: "M16 13H8a1 1 0 0 0-1 1v7",
-		key: "164ge7"
-	}],
-	["path", {
-		d: "M19 22v-6",
-		key: "qhmiwi"
-	}],
-	["path", {
-		d: "M22 19h-6",
-		key: "vcuq98"
-	}],
-	["path", {
-		d: "M7 3v4a1 1 0 0 0 1 1h7",
-		key: "t51u73"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39338,7 +39670,59 @@ var SaveOff = createLucideIcon("save-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SavePen = createLucideIcon("save-pen", [
+	["path", {
+		d: "M13.33 13H8a1 1 0 00-1 1v7",
+		key: "60fs50"
+	}],
+	["path", {
+		d: "M14.363 17.634a2 2 0 00-.506.854l-.837 2.87a.5.5 0 00.62.62l2.87-.837a2 2 0 00.854-.506l4.013-4.009a1 1 0 10-3.004-3.004z",
+		key: "dpj1he"
+	}],
+	["path", {
+		d: "M7 3v4a1 1 0 001 1h7",
+		key: "vkun1b"
+	}],
+	["path", {
+		d: "M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h10.2a2 2 0 011.4.6l3.8 3.8a2 2 0 01.6 1.4v.3",
+		key: "1oj3yb"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SavePlus = createLucideIcon("save-plus", [
+	["path", {
+		d: "M12.5 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10.2a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V12",
+		key: "bhibzn"
+	}],
+	["path", {
+		d: "M16 13H8a1 1 0 0 0-1 1v7",
+		key: "164ge7"
+	}],
+	["path", {
+		d: "M19 22v-6",
+		key: "qhmiwi"
+	}],
+	["path", {
+		d: "M22 19h-6",
+		key: "vcuq98"
+	}],
+	["path", {
+		d: "M7 3v4a1 1 0 0 0 1 1h7",
+		key: "t51u73"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39358,35 +39742,7 @@ var Save = createLucideIcon("save", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Scale3d = createLucideIcon("scale-3d", [
-	["path", {
-		d: "M5 7v11a1 1 0 0 0 1 1h11",
-		key: "13dt1j"
-	}],
-	["path", {
-		d: "M5.293 18.707 11 13",
-		key: "ezgbsx"
-	}],
-	["circle", {
-		cx: "19",
-		cy: "19",
-		r: "2",
-		key: "17f5cg"
-	}],
-	["circle", {
-		cx: "5",
-		cy: "5",
-		r: "2",
-		key: "1gwv83"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39414,7 +39770,35 @@ var Scale = createLucideIcon("scale", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Scale3d = createLucideIcon("scale-3d", [
+	["path", {
+		d: "M5 7v11a1 1 0 0 0 1 1h11",
+		key: "13dt1j"
+	}],
+	["path", {
+		d: "M5.293 18.707 11 13",
+		key: "ezgbsx"
+	}],
+	["circle", {
+		cx: "19",
+		cy: "19",
+		r: "2",
+		key: "17f5cg"
+	}],
+	["circle", {
+		cx: "5",
+		cy: "5",
+		r: "2",
+		key: "1gwv83"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39438,7 +39822,7 @@ var Scaling = createLucideIcon("scaling", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39474,7 +39858,7 @@ var ScanBarcode = createLucideIcon("scan-barcode", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39510,7 +39894,41 @@ var ScanBox = createLucideIcon("scan-box", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ScanEye = createLucideIcon("scan-eye", [
+	["path", {
+		d: "M3 7V5a2 2 0 0 1 2-2h2",
+		key: "aa7l1z"
+	}],
+	["path", {
+		d: "M17 3h2a2 2 0 0 1 2 2v2",
+		key: "4qcy5o"
+	}],
+	["path", {
+		d: "M21 17v2a2 2 0 0 1-2 2h-2",
+		key: "6vwrx8"
+	}],
+	["path", {
+		d: "M7 21H5a2 2 0 0 1-2-2v-2",
+		key: "ioqczr"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "1",
+		key: "41hilf"
+	}],
+	["path", {
+		d: "M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0",
+		key: "11ak4c"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39546,69 +39964,7 @@ var ScanFace = createLucideIcon("scan-face", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ScanEye = createLucideIcon("scan-eye", [
-	["path", {
-		d: "M3 7V5a2 2 0 0 1 2-2h2",
-		key: "aa7l1z"
-	}],
-	["path", {
-		d: "M17 3h2a2 2 0 0 1 2 2v2",
-		key: "4qcy5o"
-	}],
-	["path", {
-		d: "M21 17v2a2 2 0 0 1-2 2h-2",
-		key: "6vwrx8"
-	}],
-	["path", {
-		d: "M7 21H5a2 2 0 0 1-2-2v-2",
-		key: "ioqczr"
-	}],
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "1",
-		key: "41hilf"
-	}],
-	["path", {
-		d: "M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0",
-		key: "11ak4c"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ScanLine = createLucideIcon("scan-line", [
-	["path", {
-		d: "M3 7V5a2 2 0 0 1 2-2h2",
-		key: "aa7l1z"
-	}],
-	["path", {
-		d: "M17 3h2a2 2 0 0 1 2 2v2",
-		key: "4qcy5o"
-	}],
-	["path", {
-		d: "M21 17v2a2 2 0 0 1-2 2h-2",
-		key: "6vwrx8"
-	}],
-	["path", {
-		d: "M7 21H5a2 2 0 0 1-2-2v-2",
-		key: "ioqczr"
-	}],
-	["path", {
-		d: "M7 12h10",
-		key: "b7w52i"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39636,7 +39992,35 @@ var ScanHeart = createLucideIcon("scan-heart", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ScanLine = createLucideIcon("scan-line", [
+	["path", {
+		d: "M3 7V5a2 2 0 0 1 2-2h2",
+		key: "aa7l1z"
+	}],
+	["path", {
+		d: "M17 3h2a2 2 0 0 1 2 2v2",
+		key: "4qcy5o"
+	}],
+	["path", {
+		d: "M21 17v2a2 2 0 0 1-2 2h-2",
+		key: "6vwrx8"
+	}],
+	["path", {
+		d: "M7 21H5a2 2 0 0 1-2-2v-2",
+		key: "ioqczr"
+	}],
+	["path", {
+		d: "M7 12h10",
+		key: "b7w52i"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39680,7 +40064,7 @@ var ScanQrCode = createLucideIcon("scan-qr-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39714,7 +40098,39 @@ var ScanSearch = createLucideIcon("scan-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ScanSquare = createLucideIcon("scan-square", [
+	["path", {
+		d: "M3 7V5a2 2 0 0 1 2-2h2",
+		key: "aa7l1z"
+	}],
+	["path", {
+		d: "M17 3h2a2 2 0 0 1 2 2v2",
+		key: "4qcy5o"
+	}],
+	["path", {
+		d: "M21 17v2a2 2 0 0 1-2 2h-2",
+		key: "6vwrx8"
+	}],
+	["path", {
+		d: "M7 21H5a2 2 0 0 1-2-2v-2",
+		key: "ioqczr"
+	}],
+	["rect", {
+		width: "8",
+		height: "8",
+		x: "8",
+		y: "8",
+		rx: "1",
+		key: "69yp3k"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39750,39 +40166,7 @@ var ScanText = createLucideIcon("scan-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ScanSquare = createLucideIcon("scan-square", [
-	["path", {
-		d: "M3 7V5a2 2 0 0 1 2-2h2",
-		key: "aa7l1z"
-	}],
-	["path", {
-		d: "M17 3h2a2 2 0 0 1 2 2v2",
-		key: "4qcy5o"
-	}],
-	["path", {
-		d: "M21 17v2a2 2 0 0 1-2 2h-2",
-		key: "6vwrx8"
-	}],
-	["path", {
-		d: "M7 21H5a2 2 0 0 1-2-2v-2",
-		key: "ioqczr"
-	}],
-	["rect", {
-		width: "8",
-		height: "8",
-		x: "8",
-		y: "8",
-		rx: "1",
-		key: "69yp3k"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39806,7 +40190,7 @@ var Scan = createLucideIcon("scan", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39840,7 +40224,7 @@ var School = createLucideIcon("school", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39880,7 +40264,7 @@ var ScissorsLineDashed = createLucideIcon("scissors-line-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39912,7 +40296,7 @@ var Scissors = createLucideIcon("scissors", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39940,7 +40324,7 @@ var Scooter = createLucideIcon("scooter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39968,7 +40352,7 @@ var ScreenShareOff = createLucideIcon("screen-share-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -39996,7 +40380,7 @@ var ScreenShare = createLucideIcon("screen-share", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40020,7 +40404,7 @@ var ScrollText = createLucideIcon("scroll-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40033,7 +40417,7 @@ var Scroll = createLucideIcon("scroll", [["path", {
 	key: "1ph1d7"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40059,7 +40443,7 @@ var SearchAlert = createLucideIcon("search-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40081,7 +40465,7 @@ var SearchCheck = createLucideIcon("search-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40107,7 +40491,7 @@ var SearchCode = createLucideIcon("search-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40129,7 +40513,7 @@ var SearchSlash = createLucideIcon("search-slash", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40155,7 +40539,7 @@ var SearchX = createLucideIcon("search-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40170,7 +40554,7 @@ var Search = createLucideIcon("search", [["path", {
 	key: "4ej97u"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40183,7 +40567,7 @@ var Section = createLucideIcon("section", [["path", {
 	key: "wdjd8o"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40196,7 +40580,7 @@ var SendHorizontal = createLucideIcon("send-horizontal", [["path", {
 	key: "s4cdu5"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40228,7 +40612,7 @@ var SendToBack = createLucideIcon("send-to-back", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40241,7 +40625,7 @@ var Send = createLucideIcon("send", [["path", {
 	key: "12cjpa"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40261,7 +40645,7 @@ var SeparatorHorizontal = createLucideIcon("separator-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40281,7 +40665,7 @@ var SeparatorVertical = createLucideIcon("separator-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40337,7 +40721,7 @@ var ServerCog = createLucideIcon("server-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40365,7 +40749,7 @@ var ServerCrash = createLucideIcon("server-crash", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40397,7 +40781,7 @@ var ServerOff = createLucideIcon("server-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40429,7 +40813,7 @@ var ServerPlus = createLucideIcon("server-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40469,7 +40853,7 @@ var Server = createLucideIcon("server", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40497,7 +40881,22 @@ var Settings2 = createLucideIcon("settings-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Settings = createLucideIcon("settings", [["path", {
+	d: "M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915",
+	key: "1i5ecw"
+}], ["circle", {
+	cx: "12",
+	cy: "12",
+	r: "3",
+	key: "1v7zrd"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40523,22 +40922,7 @@ var Shapes = createLucideIcon("shapes", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Settings = createLucideIcon("settings", [["path", {
-	d: "M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915",
-	key: "1i5ecw"
-}], ["circle", {
-	cx: "12",
-	cy: "12",
-	r: "3",
-	key: "1v7zrd"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40578,7 +40962,7 @@ var Share2 = createLucideIcon("share-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40598,7 +40982,7 @@ var Share = createLucideIcon("share", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40643,7 +41027,7 @@ var Sheet = createLucideIcon("sheet", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40653,7 +41037,7 @@ var Shell = createLucideIcon("shell", [["path", {
 	key: "1cn552"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40689,20 +41073,7 @@ var ShelvingUnit = createLucideIcon("shelving-unit", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ShieldBan = createLucideIcon("shield-ban", [["path", {
-	d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
-	key: "oel41y"
-}], ["path", {
-	d: "m4.243 5.21 14.39 12.472",
-	key: "1c9a7c"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40722,7 +41093,20 @@ var ShieldAlert = createLucideIcon("shield-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ShieldBan = createLucideIcon("shield-ban", [["path", {
+	d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+	key: "oel41y"
+}], ["path", {
+	d: "m4.243 5.21 14.39 12.472",
+	key: "1c9a7c"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40735,7 +41119,7 @@ var ShieldCheck = createLucideIcon("shield-check", [["path", {
 	key: "dzmm74"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40785,7 +41169,7 @@ var ShieldCogCorner = createLucideIcon("shield-cog-corner", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40835,7 +41219,7 @@ var ShieldCog = createLucideIcon("shield-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40859,7 +41243,7 @@ var ShieldEllipsis = createLucideIcon("shield-ellipsis", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40872,7 +41256,7 @@ var ShieldHalf = createLucideIcon("shield-half", [["path", {
 	key: "zs6s6o"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40894,7 +41278,31 @@ var ShieldKeyhole = createLucideIcon("shield-keyhole", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ShieldLock = createLucideIcon("shield-lock", [
+	["path", {
+		d: "M20 9.807V6a1 1 0 00-1-1c-2 0-4.49-1.19-6.24-2.72a1.17 1.17 0 00-1.52 0C9.5 3.8 7 5 5 5a1 1 0 00-1 1v7c0 3.88 2.107 6.254 5 7.796",
+		key: "1gl1o4"
+	}],
+	["path", {
+		d: "M19 17v-2a2 2 0 00-4 0v2",
+		key: "uefur0"
+	}],
+	["rect", {
+		x: "13",
+		y: "17",
+		width: "8",
+		height: "5",
+		rx: "1",
+		key: "2y8vuh"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40907,7 +41315,7 @@ var ShieldMinus = createLucideIcon("shield-minus", [["path", {
 	key: "1c52cq"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40927,7 +41335,7 @@ var ShieldOff = createLucideIcon("shield-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40947,7 +41355,7 @@ var ShieldPlus = createLucideIcon("shield-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40967,7 +41375,7 @@ var ShieldQuestionMark = createLucideIcon("shield-question-mark", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -40989,17 +41397,7 @@ var ShieldUser = createLucideIcon("shield-user", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Shield = createLucideIcon("shield", [["path", {
-	d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
-	key: "oel41y"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41019,7 +41417,17 @@ var ShieldX = createLucideIcon("shield-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Shield = createLucideIcon("shield", [["path", {
+	d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+	key: "oel41y"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41071,7 +41479,17 @@ var ShipWheel = createLucideIcon("ship-wheel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Shirt = createLucideIcon("shirt", [["path", {
+	d: "M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z",
+	key: "1wgbhj"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41099,7 +41517,7 @@ var Ship = createLucideIcon("ship", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41119,17 +41537,7 @@ var ShoppingBag = createLucideIcon("shopping-bag", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Shirt = createLucideIcon("shirt", [["path", {
-	d: "M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z",
-	key: "1wgbhj"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41165,7 +41573,7 @@ var ShoppingBasket = createLucideIcon("shopping-basket", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41189,7 +41597,7 @@ var ShoppingCart = createLucideIcon("shopping-cart", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41209,7 +41617,7 @@ var Shovel = createLucideIcon("shovel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41257,7 +41665,7 @@ var ShowerHead = createLucideIcon("shower-head", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41293,7 +41701,7 @@ var Shredder = createLucideIcon("shredder", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41321,7 +41729,7 @@ var Shrimp = createLucideIcon("shrimp", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41345,7 +41753,7 @@ var Shrink = createLucideIcon("shrink", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41365,7 +41773,7 @@ var Shrub = createLucideIcon("shrub", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41393,7 +41801,7 @@ var Shuffle = createLucideIcon("shuffle", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41403,7 +41811,7 @@ var Sigma = createLucideIcon("sigma", [["path", {
 	key: "wuwx1p"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41427,7 +41835,7 @@ var SignalHigh = createLucideIcon("signal-high", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41440,7 +41848,7 @@ var SignalLow = createLucideIcon("signal-low", [["path", {
 	key: "j294jx"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41460,7 +41868,7 @@ var SignalMedium = createLucideIcon("signal-medium", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41470,7 +41878,7 @@ var SignalZero = createLucideIcon("signal-zero", [["path", {
 	key: "4haj6o"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41498,7 +41906,7 @@ var Signal = createLucideIcon("signal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41511,7 +41919,7 @@ var Signature = createLucideIcon("signature", [["path", {
 	key: "itz85i"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41535,7 +41943,7 @@ var SignpostBig = createLucideIcon("signpost-big", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41555,7 +41963,7 @@ var Signpost = createLucideIcon("signpost", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41595,20 +42003,7 @@ var Siren = createLucideIcon("siren", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SkipForward = createLucideIcon("skip-forward", [["path", {
-	d: "M21 4v16",
-	key: "7j8fe9"
-}], ["path", {
-	d: "M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z",
-	key: "zs4d6"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41621,7 +42016,20 @@ var SkipBack = createLucideIcon("skip-back", [["path", {
 	key: "1ptbpl"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SkipForward = createLucideIcon("skip-forward", [["path", {
+	d: "M21 4v16",
+	key: "7j8fe9"
+}], ["path", {
+	d: "M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z",
+	key: "zs4d6"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41649,7 +42057,7 @@ var Skull = createLucideIcon("skull", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41659,7 +42067,7 @@ var Slash = createLucideIcon("slash", [["path", {
 	key: "y4kqgn"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41669,7 +42077,7 @@ var Slice = createLucideIcon("slice", [["path", {
 	key: "1sllp5"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41713,7 +42121,7 @@ var SlidersHorizontal = createLucideIcon("sliders-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41757,7 +42165,7 @@ var SlidersVertical = createLucideIcon("sliders-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41775,7 +42183,7 @@ var SmartphoneCharging = createLucideIcon("smartphone-charging", [["rect", {
 	key: "h9lk2d"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41803,7 +42211,7 @@ var SmartphoneNfc = createLucideIcon("smartphone-nfc", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41821,77 +42229,7 @@ var Smartphone = createLucideIcon("smartphone", [["rect", {
 	key: "mhygvu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SmilePlus = createLucideIcon("smile-plus", [
-	["path", {
-		d: "M22 11v1a10 10 0 1 1-9-10",
-		key: "ew0xw9"
-	}],
-	["path", {
-		d: "M8 14s1.5 2 4 2 4-2 4-2",
-		key: "1y1vjs"
-	}],
-	["line", {
-		x1: "9",
-		x2: "9.01",
-		y1: "9",
-		y2: "9",
-		key: "yxxnd0"
-	}],
-	["line", {
-		x1: "15",
-		x2: "15.01",
-		y1: "9",
-		y2: "9",
-		key: "1p4y9e"
-	}],
-	["path", {
-		d: "M16 5h6",
-		key: "1vod17"
-	}],
-	["path", {
-		d: "M19 2v6",
-		key: "4bpg5p"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Smile = createLucideIcon("smile", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "M8 14s1.5 2 4 2 4-2 4-2",
-		key: "1y1vjs"
-	}],
-	["line", {
-		x1: "9",
-		x2: "9.01",
-		y1: "9",
-		y2: "9",
-		key: "yxxnd0"
-	}],
-	["line", {
-		x1: "15",
-		x2: "15.01",
-		y1: "9",
-		y2: "9",
-		key: "1p4y9e"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41921,7 +42259,7 @@ var Snail = createLucideIcon("snail", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -41977,7 +42315,7 @@ var Snowflake = createLucideIcon("snowflake", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42001,7 +42339,7 @@ var SoapDispenserDroplet = createLucideIcon("soap-dispenser-droplet", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42029,7 +42367,7 @@ var Sofa = createLucideIcon("sofa", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42065,7 +42403,7 @@ var SolarPanel = createLucideIcon("solar-panel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42097,7 +42435,7 @@ var Soup = createLucideIcon("soup", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42107,7 +42445,7 @@ var Space = createLucideIcon("space", [["path", {
 	key: "lt2kga"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42120,7 +42458,7 @@ var Spade = createLucideIcon("spade", [["path", {
 	key: "1aw2pz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42130,7 +42468,33 @@ var Sparkle = createLucideIcon("sparkle", [["path", {
 	key: "1s2grr"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Sparkles = createLucideIcon("sparkles", [
+	["path", {
+		d: "M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z",
+		key: "1s2grr"
+	}],
+	["path", {
+		d: "M20 2v4",
+		key: "1rf3ol"
+	}],
+	["path", {
+		d: "M22 4h-4",
+		key: "gwowj6"
+	}],
+	["circle", {
+		cx: "4",
+		cy: "20",
+		r: "2",
+		key: "6kqj1y"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42160,33 +42524,7 @@ var Speaker = createLucideIcon("speaker", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Sparkles = createLucideIcon("sparkles", [
-	["path", {
-		d: "M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z",
-		key: "1s2grr"
-	}],
-	["path", {
-		d: "M20 2v4",
-		key: "1rf3ol"
-	}],
-	["path", {
-		d: "M22 4h-4",
-		key: "gwowj6"
-	}],
-	["circle", {
-		cx: "4",
-		cy: "20",
-		r: "2",
-		key: "6kqj1y"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42206,7 +42544,7 @@ var Speech = createLucideIcon("speech", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42226,7 +42564,27 @@ var SpellCheck2 = createLucideIcon("spell-check-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SpellCheck = createLucideIcon("spell-check", [
+	["path", {
+		d: "m6 16 6-12 6 12",
+		key: "1b4byz"
+	}],
+	["path", {
+		d: "M8 12h8",
+		key: "1wcyev"
+	}],
+	["path", {
+		d: "m16 20 2 2 4-4",
+		key: "13tcca"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42254,27 +42612,7 @@ var SplinePointer = createLucideIcon("spline-pointer", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SpellCheck = createLucideIcon("spell-check", [
-	["path", {
-		d: "m6 16 6-12 6 12",
-		key: "1b4byz"
-	}],
-	["path", {
-		d: "M8 12h8",
-		key: "1wcyev"
-	}],
-	["path", {
-		d: "m16 20 2 2 4-4",
-		key: "13tcca"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42298,7 +42636,7 @@ var Spline = createLucideIcon("spline", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42322,7 +42660,7 @@ var Split = createLucideIcon("split", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42335,7 +42673,7 @@ var Spool = createLucideIcon("spool", [["path", {
 	key: "s8x3u0"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42355,7 +42693,7 @@ var SportShoe = createLucideIcon("sport-shoe", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42383,7 +42721,7 @@ var Spotlight = createLucideIcon("spotlight", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42434,27 +42772,7 @@ var SprayCan = createLucideIcon("spray-can", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Sprout = createLucideIcon("sprout", [
-	["path", {
-		d: "M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3",
-		key: "139s4v"
-	}],
-	["path", {
-		d: "M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4",
-		key: "1dlkgp"
-	}],
-	["path", {
-		d: "M5 21h14",
-		key: "11awu3"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42471,7 +42789,7 @@ var SquareActivity = createLucideIcon("square-activity", [["rect", {
 	key: "15hlnc"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42495,7 +42813,27 @@ var SquareArrowDownLeft = createLucideIcon("square-arrow-down-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Sprout = createLucideIcon("sprout", [
+	["path", {
+		d: "M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3",
+		key: "139s4v"
+	}],
+	["path", {
+		d: "M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4",
+		key: "1dlkgp"
+	}],
+	["path", {
+		d: "M5 21h14",
+		key: "11awu3"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42519,7 +42857,7 @@ var SquareArrowDownRight = createLucideIcon("square-arrow-down-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42543,7 +42881,7 @@ var SquareArrowDown = createLucideIcon("square-arrow-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42567,7 +42905,7 @@ var SquareArrowLeft = createLucideIcon("square-arrow-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42587,7 +42925,7 @@ var SquareArrowOutDownLeft = createLucideIcon("square-arrow-out-down-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42607,7 +42945,7 @@ var SquareArrowOutDownRight = createLucideIcon("square-arrow-out-down-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42627,7 +42965,7 @@ var SquareArrowOutUpLeft = createLucideIcon("square-arrow-out-up-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42647,7 +42985,7 @@ var SquareArrowOutUpRight = createLucideIcon("square-arrow-out-up-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42667,7 +43005,7 @@ var SquareArrowRightEnter = createLucideIcon("square-arrow-right-enter", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42687,7 +43025,7 @@ var SquareArrowRightExit = createLucideIcon("square-arrow-right-exit", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42711,31 +43049,7 @@ var SquareArrowRight = createLucideIcon("square-arrow-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareArrowUpLeft = createLucideIcon("square-arrow-up-left", [
-	["path", {
-		d: "M15 15 9 9",
-		key: "qb9ybb"
-	}],
-	["path", {
-		d: "M9 15V9h6",
-		key: "1pdr5l"
-	}],
-	["rect", {
-		x: "3",
-		y: "3",
-		width: "18",
-		height: "18",
-		rx: "2",
-		key: "h1oib"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42759,7 +43073,31 @@ var SquareArrowUpRight = createLucideIcon("square-arrow-up-right", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareArrowUpLeft = createLucideIcon("square-arrow-up-left", [
+	["path", {
+		d: "M15 15 9 9",
+		key: "qb9ybb"
+	}],
+	["path", {
+		d: "M9 15V9h6",
+		key: "1pdr5l"
+	}],
+	["rect", {
+		x: "3",
+		y: "3",
+		width: "18",
+		height: "18",
+		rx: "2",
+		key: "h1oib"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42783,7 +43121,7 @@ var SquareArrowUp = createLucideIcon("square-arrow-up", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42811,7 +43149,7 @@ var SquareAsterisk = createLucideIcon("square-asterisk", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42855,7 +43193,7 @@ var SquareBottomDashedScissors = createLucideIcon("square-bottom-dashed-scissors
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42887,7 +43225,7 @@ var SquareCenterlineDashedHorizontal = createLucideIcon("square-centerline-dashe
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42919,7 +43257,7 @@ var SquareCenterlineDashedVertical = createLucideIcon("square-centerline-dashed-
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42947,7 +43285,20 @@ var SquareChartGantt = createLucideIcon("square-chart-gantt", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareCheckBig = createLucideIcon("square-check-big", [["path", {
+	d: "M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344",
+	key: "2acyp4"
+}], ["path", {
+	d: "m9 11 3 3L22 4",
+	key: "1pflzl"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42964,20 +43315,7 @@ var SquareCheck = createLucideIcon("square-check", [["rect", {
 	key: "dzmm74"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareCheckBig = createLucideIcon("square-check-big", [["path", {
-	d: "M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344",
-	key: "2acyp4"
-}], ["path", {
-	d: "m9 11 3 3L22 4",
-	key: "1pflzl"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -42994,24 +43332,7 @@ var SquareChevronDown = createLucideIcon("square-chevron-down", [["rect", {
 	key: "894hmk"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareChevronLeft = createLucideIcon("square-chevron-left", [["rect", {
-	width: "18",
-	height: "18",
-	x: "3",
-	y: "3",
-	rx: "2",
-	key: "afitv7"
-}], ["path", {
-	d: "m14 16-4-4 4-4",
-	key: "ojs7w8"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43028,7 +43349,24 @@ var SquareChevronRight = createLucideIcon("square-chevron-right", [["rect", {
 	key: "1wy4r4"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareChevronLeft = createLucideIcon("square-chevron-left", [["rect", {
+	width: "18",
+	height: "18",
+	x: "3",
+	y: "3",
+	rx: "2",
+	key: "afitv7"
+}], ["path", {
+	d: "m14 16-4-4 4-4",
+	key: "ojs7w8"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43045,7 +43383,7 @@ var SquareChevronUp = createLucideIcon("square-chevron-up", [["rect", {
 	key: "fy2ptz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43069,7 +43407,7 @@ var SquareCode = createLucideIcon("square-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43097,7 +43435,7 @@ var SquareDashedBottomCode = createLucideIcon("square-dashed-bottom-code", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43117,7 +43455,7 @@ var SquareDashedBottom = createLucideIcon("square-dashed-bottom", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43185,7 +43523,7 @@ var SquareDashedKanban = createLucideIcon("square-dashed-kanban", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43233,7 +43571,7 @@ var SquareDashedMousePointer = createLucideIcon("square-dashed-mouse-pointer", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43301,7 +43639,7 @@ var SquareDashedText = createLucideIcon("square-dashed-text", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43345,7 +43683,7 @@ var SquareDashedTopSolid = createLucideIcon("square-dashed-top-solid", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43401,7 +43739,7 @@ var SquareDashed = createLucideIcon("square-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43439,26 +43777,7 @@ var SquareDivide = createLucideIcon("square-divide", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareDot = createLucideIcon("square-dot", [["rect", {
-	width: "18",
-	height: "18",
-	x: "3",
-	y: "3",
-	rx: "2",
-	key: "afitv7"
-}], ["circle", {
-	cx: "12",
-	cy: "12",
-	r: "1",
-	key: "41hilf"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43482,7 +43801,26 @@ var SquareEqual = createLucideIcon("square-equal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareDot = createLucideIcon("square-dot", [["rect", {
+	width: "18",
+	height: "18",
+	x: "3",
+	y: "3",
+	rx: "2",
+	key: "afitv7"
+}], ["circle", {
+	cx: "12",
+	cy: "12",
+	r: "1",
+	key: "41hilf"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43507,7 +43845,7 @@ var SquareFunction = createLucideIcon("square-function", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43535,7 +43873,7 @@ var SquareKanban = createLucideIcon("square-kanban", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43563,7 +43901,7 @@ var SquareLibrary = createLucideIcon("square-library", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43580,7 +43918,7 @@ var SquareM = createLucideIcon("square-m", [["path", {
 	key: "h1oib"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43608,7 +43946,24 @@ var SquareMenu = createLucideIcon("square-menu", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareMinus = createLucideIcon("square-minus", [["rect", {
+	width: "18",
+	height: "18",
+	x: "3",
+	y: "3",
+	rx: "2",
+	key: "afitv7"
+}], ["path", {
+	d: "M8 12h8",
+	key: "1wcyev"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43621,7 +43976,7 @@ var SquareMousePointer = createLucideIcon("square-mouse-pointer", [["path", {
 	key: "14rsvq"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43641,24 +43996,7 @@ var SquareOff = createLucideIcon("square-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareMinus = createLucideIcon("square-minus", [["rect", {
-	width: "18",
-	height: "18",
-	x: "3",
-	y: "3",
-	rx: "2",
-	key: "afitv7"
-}], ["path", {
-	d: "M8 12h8",
-	key: "1wcyev"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43686,7 +44024,7 @@ var SquareParkingOff = createLucideIcon("square-parking-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43703,7 +44041,20 @@ var SquareParking = createLucideIcon("square-parking", [["rect", {
 	key: "1dfk2c"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquarePen = createLucideIcon("square-pen", [["path", {
+	d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7",
+	key: "1m0v6g"
+}], ["path", {
+	d: "M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z",
+	key: "ohrbg2"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43733,20 +44084,7 @@ var SquarePause = createLucideIcon("square-pause", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquarePen = createLucideIcon("square-pen", [["path", {
-	d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7",
-	key: "1m0v6g"
-}], ["path", {
-	d: "M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z",
-	key: "ohrbg2"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43774,7 +44112,7 @@ var SquarePercent = createLucideIcon("square-percent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43802,7 +44140,7 @@ var SquarePi = createLucideIcon("square-pi", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43830,7 +44168,7 @@ var SquarePilcrow = createLucideIcon("square-pilcrow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43847,7 +44185,7 @@ var SquarePlay = createLucideIcon("square-play", [["rect", {
 	key: "kmsa83"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43871,7 +44209,37 @@ var SquarePlus = createLucideIcon("square-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareRadical = createLucideIcon("square-radical", [["path", {
+	d: "M7 12h2l2 5 2-10h4",
+	key: "1fxv6h"
+}], ["rect", {
+	x: "3",
+	y: "3",
+	width: "18",
+	height: "18",
+	rx: "2",
+	key: "h1oib"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareRoundCorner = createLucideIcon("square-round-corner", [["path", {
+	d: "M21 11a8 8 0 0 0-8-8",
+	key: "1lxwo5"
+}], ["path", {
+	d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4",
+	key: "1dv2y5"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43895,37 +44263,24 @@ var SquarePower = createLucideIcon("square-power", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var SquareRadical = createLucideIcon("square-radical", [["path", {
-	d: "M7 12h2l2 5 2-10h4",
-	key: "1fxv6h"
-}], ["rect", {
-	x: "3",
-	y: "3",
+var SquareSigma = createLucideIcon("square-sigma", [["rect", {
 	width: "18",
 	height: "18",
+	x: "3",
+	y: "3",
 	rx: "2",
-	key: "h1oib"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareRoundCorner = createLucideIcon("square-round-corner", [["path", {
-	d: "M21 11a8 8 0 0 0-8-8",
-	key: "1lxwo5"
+	key: "afitv7"
 }], ["path", {
-	d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4",
-	key: "1dv2y5"
+	d: "M16 8.9V7H8l4 5-4 5h8v-1.9",
+	key: "9nih0i"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -43965,24 +44320,7 @@ var SquareScissors = createLucideIcon("square-scissors", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareSigma = createLucideIcon("square-sigma", [["rect", {
-	width: "18",
-	height: "18",
-	x: "3",
-	y: "3",
-	rx: "2",
-	key: "afitv7"
-}], ["path", {
-	d: "M16 8.9V7H8l4 5-4 5h8v-1.9",
-	key: "9nih0i"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44002,7 +44340,7 @@ var SquareSlash = createLucideIcon("square-slash", [["rect", {
 	key: "1dfufj"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44025,7 +44363,7 @@ var SquareSplitHorizontal = createLucideIcon("square-split-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44048,7 +44386,7 @@ var SquareSplitVertical = createLucideIcon("square-split-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44069,7 +44407,7 @@ var SquareSquare = createLucideIcon("square-square", [["rect", {
 	key: "z9xiuo"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44093,7 +44431,7 @@ var SquareStack = createLucideIcon("square-stack", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44110,7 +44448,7 @@ var SquareStar = createLucideIcon("square-star", [["path", {
 	key: "h1oib"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44131,32 +44469,7 @@ var SquareStop = createLucideIcon("square-stop", [["rect", {
 	key: "1ssd4o"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquareTerminal = createLucideIcon("square-terminal", [
-	["path", {
-		d: "m7 11 2-2-2-2",
-		key: "1lz0vl"
-	}],
-	["path", {
-		d: "M11 13h4",
-		key: "1p7l4v"
-	}],
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "3",
-		rx: "2",
-		ry: "2",
-		key: "1m3agn"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44182,7 +44495,32 @@ var SquareUserRound = createLucideIcon("square-user-round", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquareTerminal = createLucideIcon("square-terminal", [
+	["path", {
+		d: "m7 11 2-2-2-2",
+		key: "1lz0vl"
+	}],
+	["path", {
+		d: "M11 13h4",
+		key: "1p7l4v"
+	}],
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		ry: "2",
+		key: "1m3agn"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44208,7 +44546,7 @@ var SquareUser = createLucideIcon("square-user", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44233,7 +44571,7 @@ var SquareX = createLucideIcon("square-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44247,7 +44585,7 @@ var Square = createLucideIcon("square", [["rect", {
 	key: "afitv7"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44260,7 +44598,7 @@ var SquaresExclude = createLucideIcon("squares-exclude", [["path", {
 	key: "1r1efp"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44312,7 +44650,7 @@ var SquaresIntersect = createLucideIcon("squares-intersect", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44344,7 +44682,7 @@ var SquaresSubtract = createLucideIcon("squares-subtract", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44354,7 +44692,7 @@ var SquaresUnite = createLucideIcon("squares-unite", [["path", {
 	key: "17jnth"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44394,7 +44732,7 @@ var SquircleDashed = createLucideIcon("squircle-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44404,7 +44742,7 @@ var Squircle = createLucideIcon("squircle", [["path", {
 	key: "garfkc"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44428,7 +44766,7 @@ var Squirrel = createLucideIcon("squirrel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44448,7 +44786,7 @@ var Stamp = createLucideIcon("stamp", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44461,7 +44799,7 @@ var StarCheck = createLucideIcon("star-check", [["path", {
 	key: "1szwhi"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44471,7 +44809,7 @@ var StarHalf = createLucideIcon("star-half", [["path", {
 	key: "2ksp49"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44484,7 +44822,7 @@ var StarMinus = createLucideIcon("star-minus", [["path", {
 	key: "rwo527"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44504,7 +44842,7 @@ var StarOff = createLucideIcon("star-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44524,7 +44862,17 @@ var StarPlus = createLucideIcon("star-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Star = createLucideIcon("star", [["path", {
+	d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
+	key: "r04s7s"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44544,17 +44892,7 @@ var StarX = createLucideIcon("star-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Star = createLucideIcon("star", [["path", {
-	d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
-	key: "r04s7s"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44567,7 +44905,7 @@ var StepBack = createLucideIcon("step-back", [["path", {
 	key: "cb8qj8"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44580,7 +44918,7 @@ var StepForward = createLucideIcon("step-forward", [["path", {
 	key: "1ph11n"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44610,7 +44948,7 @@ var Stethoscope = createLucideIcon("stethoscope", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44638,7 +44976,7 @@ var Sticker = createLucideIcon("sticker", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44658,7 +44996,7 @@ var StickyNoteCheck = createLucideIcon("sticky-note-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44678,31 +45016,7 @@ var StickyNoteMinus = createLucideIcon("sticky-note-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var StickyNoteOff = createLucideIcon("sticky-note-off", [
-	["path", {
-		d: "M15 3v5a1 1 0 0 0 1 1h5",
-		key: "6s6qgf"
-	}],
-	["path", {
-		d: "m2 2 20 20",
-		key: "1ooewy"
-	}],
-	["path", {
-		d: "M3.586 3.586A2 2 0 0 0 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 1.414-.586",
-		key: "12nghy"
-	}],
-	["path", {
-		d: "M8.656 3H15a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 21 9v6.344",
-		key: "134c6x"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44726,7 +45040,31 @@ var StickyNotePlus = createLucideIcon("sticky-note-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var StickyNoteOff = createLucideIcon("sticky-note-off", [
+	["path", {
+		d: "M15 3v5a1 1 0 0 0 1 1h5",
+		key: "6s6qgf"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}],
+	["path", {
+		d: "M3.586 3.586A2 2 0 0 0 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 1.414-.586",
+		key: "12nghy"
+	}],
+	["path", {
+		d: "M8.656 3H15a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 21 9v6.344",
+		key: "134c6x"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44750,7 +45088,7 @@ var StickyNoteX = createLucideIcon("sticky-note-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44763,7 +45101,27 @@ var StickyNote = createLucideIcon("sticky-note", [["path", {
 	key: "6s6qgf"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Stone = createLucideIcon("stone", [
+	["path", {
+		d: "M11.264 2.205A4 4 0 0 0 6.42 4.211l-4 8a4 4 0 0 0 1.359 5.117l6 4a4 4 0 0 0 4.438 0l6-4a4 4 0 0 0 1.576-4.592l-2-6a4 4 0 0 0-2.53-2.53z",
+		key: "1si4ox"
+	}],
+	["path", {
+		d: "M11.99 22 14 12l7.822 3.184",
+		key: "1u8to0"
+	}],
+	["path", {
+		d: "M14 12 8.47 2.302",
+		key: "guo3d5"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44787,27 +45145,7 @@ var StickyNotes = createLucideIcon("sticky-notes", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Stone = createLucideIcon("stone", [
-	["path", {
-		d: "M11.264 2.205A4 4 0 0 0 6.42 4.211l-4 8a4 4 0 0 0 1.359 5.117l6 4a4 4 0 0 0 4.438 0l6-4a4 4 0 0 0 1.576-4.592l-2-6a4 4 0 0 0-2.53-2.53z",
-		key: "1si4ox"
-	}],
-	["path", {
-		d: "M11.99 22 14 12l7.822 3.184",
-		key: "1u8to0"
-	}],
-	["path", {
-		d: "M14 12 8.47 2.302",
-		key: "guo3d5"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44827,7 +45165,7 @@ var Store = createLucideIcon("store", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44848,7 +45186,7 @@ var StretchHorizontal = createLucideIcon("stretch-horizontal", [["rect", {
 	key: "1xrn6j"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44869,27 +45207,7 @@ var StretchVertical = createLucideIcon("stretch-vertical", [["rect", {
 	key: "24v0nk"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Subscript = createLucideIcon("subscript", [
-	["path", {
-		d: "m4 5 8 8",
-		key: "1eunvl"
-	}],
-	["path", {
-		d: "m12 5-8 8",
-		key: "1ah0jp"
-	}],
-	["path", {
-		d: "M20 19h-4c0-1.5.44-2 1.5-2.5S20 15.33 20 14c0-.47-.17-.93-.48-1.29a2.11 2.11 0 0 0-2.62-.44c-.42.24-.74.62-.9 1.07",
-		key: "e8ta8j"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44912,7 +45230,27 @@ var Strikethrough = createLucideIcon("strikethrough", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Subscript = createLucideIcon("subscript", [
+	["path", {
+		d: "m4 5 8 8",
+		key: "1eunvl"
+	}],
+	["path", {
+		d: "m12 5-8 8",
+		key: "1ah0jp"
+	}],
+	["path", {
+		d: "M20 19h-4c0-1.5.44-2 1.5-2.5S20 15.33 20 14c0-.47-.17-.93-.48-1.29a2.11 2.11 0 0 0-2.62-.44c-.42.24-.74.62-.9 1.07",
+		key: "e8ta8j"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44940,7 +45278,7 @@ var Summary = createLucideIcon("summary", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -44986,7 +45324,7 @@ var SunDim = createLucideIcon("sun-dim", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45032,7 +45370,7 @@ var SunMedium = createLucideIcon("sun-medium", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45060,7 +45398,7 @@ var SunMoon = createLucideIcon("sun-moon", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45112,87 +45450,7 @@ var SunSnow = createLucideIcon("sun-snow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Sunrise = createLucideIcon("sunrise", [
-	["path", {
-		d: "M12 2v8",
-		key: "1q4o3n"
-	}],
-	["path", {
-		d: "m4.93 10.93 1.41 1.41",
-		key: "2a7f42"
-	}],
-	["path", {
-		d: "M2 18h2",
-		key: "j10viu"
-	}],
-	["path", {
-		d: "M20 18h2",
-		key: "wocana"
-	}],
-	["path", {
-		d: "m19.07 10.93-1.41 1.41",
-		key: "15zs5n"
-	}],
-	["path", {
-		d: "M22 22H2",
-		key: "19qnx5"
-	}],
-	["path", {
-		d: "m8 6 4-4 4 4",
-		key: "ybng9g"
-	}],
-	["path", {
-		d: "M16 18a4 4 0 0 0-8 0",
-		key: "1lzouq"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Sunset = createLucideIcon("sunset", [
-	["path", {
-		d: "M12 10V2",
-		key: "16sf7g"
-	}],
-	["path", {
-		d: "m4.93 10.93 1.41 1.41",
-		key: "2a7f42"
-	}],
-	["path", {
-		d: "M2 18h2",
-		key: "j10viu"
-	}],
-	["path", {
-		d: "M20 18h2",
-		key: "wocana"
-	}],
-	["path", {
-		d: "m19.07 10.93-1.41 1.41",
-		key: "15zs5n"
-	}],
-	["path", {
-		d: "M22 22H2",
-		key: "19qnx5"
-	}],
-	["path", {
-		d: "m16 6-4 4-4-4",
-		key: "6wukr"
-	}],
-	["path", {
-		d: "M16 18a4 4 0 0 0-8 0",
-		key: "1lzouq"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45238,7 +45496,87 @@ var Sun = createLucideIcon("sun", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Sunrise = createLucideIcon("sunrise", [
+	["path", {
+		d: "M12 2v8",
+		key: "1q4o3n"
+	}],
+	["path", {
+		d: "m4.93 10.93 1.41 1.41",
+		key: "2a7f42"
+	}],
+	["path", {
+		d: "M2 18h2",
+		key: "j10viu"
+	}],
+	["path", {
+		d: "M20 18h2",
+		key: "wocana"
+	}],
+	["path", {
+		d: "m19.07 10.93-1.41 1.41",
+		key: "15zs5n"
+	}],
+	["path", {
+		d: "M22 22H2",
+		key: "19qnx5"
+	}],
+	["path", {
+		d: "m8 6 4-4 4 4",
+		key: "ybng9g"
+	}],
+	["path", {
+		d: "M16 18a4 4 0 0 0-8 0",
+		key: "1lzouq"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Sunset = createLucideIcon("sunset", [
+	["path", {
+		d: "M12 10V2",
+		key: "16sf7g"
+	}],
+	["path", {
+		d: "m4.93 10.93 1.41 1.41",
+		key: "2a7f42"
+	}],
+	["path", {
+		d: "M2 18h2",
+		key: "j10viu"
+	}],
+	["path", {
+		d: "M20 18h2",
+		key: "wocana"
+	}],
+	["path", {
+		d: "m19.07 10.93-1.41 1.41",
+		key: "15zs5n"
+	}],
+	["path", {
+		d: "M22 22H2",
+		key: "19qnx5"
+	}],
+	["path", {
+		d: "m16 6-4 4-4-4",
+		key: "6wukr"
+	}],
+	["path", {
+		d: "M16 18a4 4 0 0 0-8 0",
+		key: "1lzouq"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45258,27 +45596,7 @@ var Superscript = createLucideIcon("superscript", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SwissFranc = createLucideIcon("swiss-franc", [
-	["path", {
-		d: "M10 21V3h8",
-		key: "br2l0g"
-	}],
-	["path", {
-		d: "M6 16h9",
-		key: "2py0wn"
-	}],
-	["path", {
-		d: "M10 9.5h7",
-		key: "13dmhz"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45302,7 +45620,27 @@ var SwatchBook = createLucideIcon("swatch-book", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SwissFranc = createLucideIcon("swiss-franc", [
+	["path", {
+		d: "M10 21V3h8",
+		key: "br2l0g"
+	}],
+	["path", {
+		d: "M6 16h9",
+		key: "2py0wn"
+	}],
+	["path", {
+		d: "M10 9.5h7",
+		key: "13dmhz"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45332,7 +45670,7 @@ var SwitchCamera = createLucideIcon("switch-camera", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45356,7 +45694,7 @@ var Sword = createLucideIcon("sword", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45414,7 +45752,7 @@ var Swords = createLucideIcon("swords", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45446,7 +45784,17 @@ var Syringe = createLucideIcon("syringe", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Table2 = createLucideIcon("table-2", [["path", {
+	d: "M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18",
+	key: "gugj83"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45478,17 +45826,7 @@ var TableCellsMerge = createLucideIcon("table-cells-merge", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Table2 = createLucideIcon("table-2", [["path", {
-	d: "M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18",
-	key: "gugj83"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45516,39 +45854,7 @@ var TableCellsSplit = createLucideIcon("table-cells-split", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TableOfContents = createLucideIcon("table-of-contents", [
-	["path", {
-		d: "M16 5H3",
-		key: "m91uny"
-	}],
-	["path", {
-		d: "M16 12H3",
-		key: "1a2rj7"
-	}],
-	["path", {
-		d: "M16 19H3",
-		key: "zzsher"
-	}],
-	["path", {
-		d: "M21 5h.01",
-		key: "wa75ra"
-	}],
-	["path", {
-		d: "M21 12h.01",
-		key: "msek7k"
-	}],
-	["path", {
-		d: "M21 19h.01",
-		key: "qvbq2j"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45600,7 +45906,39 @@ var TableColumnsSplit = createLucideIcon("table-columns-split", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TableOfContents = createLucideIcon("table-of-contents", [
+	["path", {
+		d: "M16 5H3",
+		key: "m91uny"
+	}],
+	["path", {
+		d: "M16 12H3",
+		key: "1a2rj7"
+	}],
+	["path", {
+		d: "M16 19H3",
+		key: "zzsher"
+	}],
+	["path", {
+		d: "M21 5h.01",
+		key: "wa75ra"
+	}],
+	["path", {
+		d: "M21 12h.01",
+		key: "msek7k"
+	}],
+	["path", {
+		d: "M21 19h.01",
+		key: "qvbq2j"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45628,7 +45966,7 @@ var TableProperties = createLucideIcon("table-properties", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45680,7 +46018,7 @@ var TableRowsSplit = createLucideIcon("table-rows-split", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45708,7 +46046,7 @@ var Table = createLucideIcon("table", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45732,7 +46070,7 @@ var TabletSmartphone = createLucideIcon("tablet-smartphone", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45753,7 +46091,7 @@ var Tablet = createLucideIcon("tablet", [["rect", {
 	key: "1dp563"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45781,34 +46119,7 @@ var Tablets = createLucideIcon("tablets", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TagPlus = createLucideIcon("tag-plus", [
-	["path", {
-		d: "M16 13h6",
-		key: "1um0mj"
-	}],
-	["path", {
-		d: "m16.5 6.5-3.914-3.914A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l1.79-1.79",
-		key: "dp0yc9"
-	}],
-	["path", {
-		d: "M19 10v6",
-		key: "13mz7b"
-	}],
-	["circle", {
-		cx: "7.5",
-		cy: "7.5",
-		r: ".5",
-		fill: "currentColor",
-		key: "kqv944"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45835,7 +46146,34 @@ var TagX = createLucideIcon("tag-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TagPlus = createLucideIcon("tag-plus", [
+	["path", {
+		d: "M16 13h6",
+		key: "1um0mj"
+	}],
+	["path", {
+		d: "m16.5 6.5-3.914-3.914A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l1.79-1.79",
+		key: "dp0yc9"
+	}],
+	["path", {
+		d: "M19 10v6",
+		key: "13mz7b"
+	}],
+	["circle", {
+		cx: "7.5",
+		cy: "7.5",
+		r: ".5",
+		fill: "currentColor",
+		key: "kqv944"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45851,7 +46189,7 @@ var Tag = createLucideIcon("tag", [["path", {
 	key: "kqv944"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45874,7 +46212,7 @@ var Tags = createLucideIcon("tags", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45884,7 +46222,7 @@ var Tally1 = createLucideIcon("tally-1", [["path", {
 	key: "6qkkli"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45897,7 +46235,7 @@ var Tally2 = createLucideIcon("tally-2", [["path", {
 	key: "81ygyz"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45917,7 +46255,7 @@ var Tally3 = createLucideIcon("tally-3", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45941,7 +46279,7 @@ var Tally4 = createLucideIcon("tally-4", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45969,7 +46307,7 @@ var Tally5 = createLucideIcon("tally-5", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -45997,7 +46335,33 @@ var Tangent = createLucideIcon("tangent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Target = createLucideIcon("target", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "6",
+		key: "1vlfrh"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "2",
+		key: "1c9p78"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46035,33 +46399,7 @@ var Telescope = createLucideIcon("telescope", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Target = createLucideIcon("target", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "6",
-		key: "1vlfrh"
-	}],
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "2",
-		key: "1c9p78"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46099,7 +46437,7 @@ var TentTree = createLucideIcon("tent-tree", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46123,7 +46461,7 @@ var Tent = createLucideIcon("tent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46136,7 +46474,7 @@ var Terminal = createLucideIcon("terminal", [["path", {
 	key: "1yngyt"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46156,7 +46494,7 @@ var TestTubeDiagonal = createLucideIcon("test-tube-diagonal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46176,7 +46514,7 @@ var TestTube = createLucideIcon("test-tube", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46208,7 +46546,7 @@ var TestTubes = createLucideIcon("test-tubes", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46228,7 +46566,7 @@ var TextAlignCenter = createLucideIcon("text-align-center", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46248,7 +46586,7 @@ var TextAlignEnd = createLucideIcon("text-align-end", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46268,7 +46606,7 @@ var TextAlignJustify = createLucideIcon("text-align-justify", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46288,7 +46626,27 @@ var TextAlignStart = createLucideIcon("text-align-start", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TextCursor = createLucideIcon("text-cursor", [
+	["path", {
+		d: "M17 22h-1a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h1",
+		key: "uvaxm9"
+	}],
+	["path", {
+		d: "M7 22h1a4 4 0 0 0 4-4",
+		key: "1l7xii"
+	}],
+	["path", {
+		d: "M7 2h1a4 4 0 0 1 4 4",
+		key: "1vrvvh"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46316,7 +46674,7 @@ var TextCursorInput = createLucideIcon("text-cursor-input", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46344,27 +46702,7 @@ var TextInitial = createLucideIcon("text-initial", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TextCursor = createLucideIcon("text-cursor", [
-	["path", {
-		d: "M17 22h-1a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h1",
-		key: "uvaxm9"
-	}],
-	["path", {
-		d: "M7 22h1a4 4 0 0 0 4-4",
-		key: "1l7xii"
-	}],
-	["path", {
-		d: "M7 2h1a4 4 0 0 1 4 4",
-		key: "1vrvvh"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46388,7 +46726,7 @@ var TextQuote = createLucideIcon("text-quote", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46418,7 +46756,7 @@ var TextSearch = createLucideIcon("text-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46442,7 +46780,7 @@ var TextWrap = createLucideIcon("text-wrap", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46486,7 +46824,7 @@ var Theater = createLucideIcon("theater", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46526,7 +46864,7 @@ var ThermometerSnowflake = createLucideIcon("thermometer-snowflake", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46558,7 +46896,7 @@ var ThermometerSun = createLucideIcon("thermometer-sun", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46568,7 +46906,7 @@ var Thermometer = createLucideIcon("thermometer", [["path", {
 	key: "17jzev"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46581,7 +46919,7 @@ var ThumbsDown = createLucideIcon("thumbs-down", [["path", {
 	key: "8ymqnk"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46594,7 +46932,7 @@ var ThumbsUp = createLucideIcon("thumbs-up", [["path", {
 	key: "1qc93n"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46607,7 +46945,20 @@ var TicketCheck = createLucideIcon("ticket-check", [["path", {
 	key: "dzmm74"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TicketMinus = createLucideIcon("ticket-minus", [["path", {
+	d: "M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z",
+	key: "qn84l0"
+}], ["path", {
+	d: "M9 12h6",
+	key: "1c52cq"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46631,33 +46982,7 @@ var TicketPercent = createLucideIcon("ticket-percent", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TicketMinus = createLucideIcon("ticket-minus", [["path", {
-	d: "M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z",
-	key: "qn84l0"
-}], ["path", {
-	d: "M9 12h6",
-	key: "1c52cq"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TicketSlash = createLucideIcon("ticket-slash", [["path", {
-	d: "M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z",
-	key: "qn84l0"
-}], ["path", {
-	d: "m9.5 14.5 5-5",
-	key: "qviqfa"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46677,7 +47002,7 @@ var TicketPlus = createLucideIcon("ticket-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46697,7 +47022,7 @@ var TicketX = createLucideIcon("ticket-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46721,7 +47046,20 @@ var Ticket = createLucideIcon("ticket", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TicketSlash = createLucideIcon("ticket-slash", [["path", {
+	d: "M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z",
+	key: "qn84l0"
+}], ["path", {
+	d: "m9.5 14.5 5-5",
+	key: "qviqfa"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46761,7 +47099,7 @@ var TicketsPlane = createLucideIcon("tickets-plane", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46793,35 +47131,7 @@ var Tickets = createLucideIcon("tickets", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TimerOff = createLucideIcon("timer-off", [
-	["path", {
-		d: "M10 2h4",
-		key: "n1abiw"
-	}],
-	["path", {
-		d: "M4.6 11a8 8 0 0 0 1.7 8.7 8 8 0 0 0 8.7 1.7",
-		key: "10he05"
-	}],
-	["path", {
-		d: "M7.4 7.4a8 8 0 0 1 10.3 1 8 8 0 0 1 .9 10.2",
-		key: "15f7sh"
-	}],
-	["path", {
-		d: "m2 2 20 20",
-		key: "1ooewy"
-	}],
-	["path", {
-		d: "M12 12v-2",
-		key: "fwoke6"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46861,7 +47171,35 @@ var Timeline = createLucideIcon("timeline", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TimerOff = createLucideIcon("timer-off", [
+	["path", {
+		d: "M10 2h4",
+		key: "n1abiw"
+	}],
+	["path", {
+		d: "M4.6 11a8 8 0 0 0 1.7 8.7 8 8 0 0 0 8.7 1.7",
+		key: "10he05"
+	}],
+	["path", {
+		d: "M7.4 7.4a8 8 0 0 1 10.3 1 8 8 0 0 1 .9 10.2",
+		key: "15f7sh"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}],
+	["path", {
+		d: "M12 12v-2",
+		key: "fwoke6"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46885,7 +47223,7 @@ var TimerReset = createLucideIcon("timer-reset", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46913,7 +47251,7 @@ var Timer = createLucideIcon("timer", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46932,7 +47270,7 @@ var ToggleLeft = createLucideIcon("toggle-left", [["circle", {
 	key: "g7kal2"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46951,7 +47289,7 @@ var ToggleRight = createLucideIcon("toggle-right", [["circle", {
 	key: "g7kal2"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46964,7 +47302,7 @@ var Toilet = createLucideIcon("toilet", [["path", {
 	key: "1tqs57"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -46988,7 +47326,7 @@ var ToolCase = createLucideIcon("tool-case", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47016,7 +47354,7 @@ var Toolbox = createLucideIcon("toolbox", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47044,7 +47382,7 @@ var Tornado = createLucideIcon("tornado", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47063,7 +47401,7 @@ var Torus = createLucideIcon("torus", [["ellipse", {
 	key: "h8emeu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47095,7 +47433,7 @@ var TouchpadOff = createLucideIcon("touchpad-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47119,7 +47457,7 @@ var Touchpad = createLucideIcon("touchpad", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47139,7 +47477,7 @@ var TowelRack = createLucideIcon("towel-rack", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47175,7 +47513,7 @@ var TowerControl = createLucideIcon("tower-control", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47199,31 +47537,7 @@ var ToyBrick = createLucideIcon("toy-brick", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TrafficCone = createLucideIcon("traffic-cone", [
-	["path", {
-		d: "M16.05 10.966a5 2.5 0 0 1-8.1 0",
-		key: "m5jpwb"
-	}],
-	["path", {
-		d: "m16.923 14.049 4.48 2.04a1 1 0 0 1 .001 1.831l-8.574 3.9a2 2 0 0 1-1.66 0l-8.574-3.91a1 1 0 0 1 0-1.83l4.484-2.04",
-		key: "rbg3g8"
-	}],
-	["path", {
-		d: "M16.949 14.14a5 2.5 0 1 1-9.9 0L10.063 3.5a2 2 0 0 1 3.874 0z",
-		key: "vap8c8"
-	}],
-	["path", {
-		d: "M9.194 6.57a5 2.5 0 0 0 5.61 0",
-		key: "15hn5c"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47271,7 +47585,31 @@ var Tractor = createLucideIcon("tractor", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TrafficCone = createLucideIcon("traffic-cone", [
+	["path", {
+		d: "M16.05 10.966a5 2.5 0 0 1-8.1 0",
+		key: "m5jpwb"
+	}],
+	["path", {
+		d: "m16.923 14.049 4.48 2.04a1 1 0 0 1 .001 1.831l-8.574 3.9a2 2 0 0 1-1.66 0l-8.574-3.91a1 1 0 0 1 0-1.83l4.484-2.04",
+		key: "rbg3g8"
+	}],
+	["path", {
+		d: "M16.949 14.14a5 2.5 0 1 1-9.9 0L10.063 3.5a2 2 0 0 1 3.874 0z",
+		key: "vap8c8"
+	}],
+	["path", {
+		d: "M9.194 6.57a5 2.5 0 0 0 5.61 0",
+		key: "15hn5c"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47307,7 +47645,7 @@ var TrainFrontTunnel = createLucideIcon("train-front-tunnel", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47339,7 +47677,7 @@ var TrainFront = createLucideIcon("train-front", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47375,7 +47713,7 @@ var TrainTrack = createLucideIcon("train-track", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47415,7 +47753,7 @@ var TramFront = createLucideIcon("tram-front", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47457,20 +47795,27 @@ var Transgender = createLucideIcon("transgender", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var TreeDeciduous = createLucideIcon("tree-deciduous", [["path", {
-	d: "M8 19a4 4 0 0 1-2.24-7.32A3.5 3.5 0 0 1 9 6.03V6a3 3 0 1 1 6 0v.04a3.5 3.5 0 0 1 3.24 5.65A4 4 0 0 1 16 19Z",
-	key: "oadzkq"
-}], ["path", {
-	d: "M12 19v3",
-	key: "npa21l"
-}]]);
+var Trash = createLucideIcon("trash", [
+	["path", {
+		d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6",
+		key: "miytrc"
+	}],
+	["path", {
+		d: "M3 6h18",
+		key: "d0wm0j"
+	}],
+	["path", {
+		d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2",
+		key: "e791ji"
+	}]
+]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47498,27 +47843,20 @@ var Trash2 = createLucideIcon("trash-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Trash = createLucideIcon("trash", [
-	["path", {
-		d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6",
-		key: "miytrc"
-	}],
-	["path", {
-		d: "M3 6h18",
-		key: "d0wm0j"
-	}],
-	["path", {
-		d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2",
-		key: "e791ji"
-	}]
-]);
+var TreeDeciduous = createLucideIcon("tree-deciduous", [["path", {
+	d: "M8 19a4 4 0 0 1-2.24-7.32A3.5 3.5 0 0 1 9 6.03V6a3 3 0 1 1 6 0v.04a3.5 3.5 0 0 1 3.24 5.65A4 4 0 0 1 16 19Z",
+	key: "oadzkq"
+}], ["path", {
+	d: "M12 19v3",
+	key: "npa21l"
+}]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47542,7 +47880,7 @@ var TreePalm = createLucideIcon("tree-palm", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47555,7 +47893,7 @@ var TreePine = createLucideIcon("tree-pine", [["path", {
 	key: "kmzjlo"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47579,7 +47917,7 @@ var Trees = createLucideIcon("trees", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47592,7 +47930,7 @@ var TrendingDown = createLucideIcon("trending-down", [["path", {
 	key: "x473p"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47616,7 +47954,7 @@ var TrendingUpDown = createLucideIcon("trending-up-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47629,7 +47967,7 @@ var TrendingUp = createLucideIcon("trending-up", [["path", {
 	key: "1t1m79"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47649,7 +47987,7 @@ var TriangleAlert = createLucideIcon("triangle-alert", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47693,7 +48031,7 @@ var TriangleDashed = createLucideIcon("triangle-dashed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47703,7 +48041,7 @@ var TriangleRight = createLucideIcon("triangle-right", [["path", {
 	key: "183wce"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47713,7 +48051,39 @@ var Triangle = createLucideIcon("triangle", [["path", {
 	key: "14u9p9"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Trophy = createLucideIcon("trophy", [
+	["path", {
+		d: "M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2",
+		key: "pwuv1l"
+	}],
+	["path", {
+		d: "M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2",
+		key: "1y54w1"
+	}],
+	["path", {
+		d: "M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3",
+		key: "e30mpu"
+	}],
+	["path", {
+		d: "M4 22h16",
+		key: "57wxv0"
+	}],
+	["path", {
+		d: "M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z",
+		key: "1mhfuq"
+	}],
+	["path", {
+		d: "M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3",
+		key: "i0yafy"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47753,39 +48123,7 @@ var TruckElectric = createLucideIcon("truck-electric", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Trophy = createLucideIcon("trophy", [
-	["path", {
-		d: "M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2",
-		key: "pwuv1l"
-	}],
-	["path", {
-		d: "M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2",
-		key: "1y54w1"
-	}],
-	["path", {
-		d: "M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3",
-		key: "e30mpu"
-	}],
-	["path", {
-		d: "M4 22h16",
-		key: "57wxv0"
-	}],
-	["path", {
-		d: "M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z",
-		key: "1mhfuq"
-	}],
-	["path", {
-		d: "M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3",
-		key: "i0yafy"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47817,7 +48155,7 @@ var Truck = createLucideIcon("truck", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47837,7 +48175,7 @@ var TurkishLira = createLucideIcon("turkish-lira", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47867,31 +48205,7 @@ var Turntable = createLucideIcon("turntable", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var TvMinimalPlay = createLucideIcon("tv-minimal-play", [
-	["path", {
-		d: "M15.033 9.44a.647.647 0 0 1 0 1.12l-4.065 2.352a.645.645 0 0 1-.968-.56V7.648a.645.645 0 0 1 .967-.56z",
-		key: "vbtd3f"
-	}],
-	["path", {
-		d: "M7 21h10",
-		key: "1b0cd5"
-	}],
-	["rect", {
-		width: "20",
-		height: "14",
-		x: "2",
-		y: "3",
-		rx: "2",
-		key: "48i651"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47915,7 +48229,31 @@ var Turtle = createLucideIcon("turtle", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var TvMinimalPlay = createLucideIcon("tv-minimal-play", [
+	["path", {
+		d: "M15.033 9.44a.647.647 0 0 1 0 1.12l-4.065 2.352a.645.645 0 0 1-.968-.56V7.648a.645.645 0 0 1 .967-.56z",
+		key: "vbtd3f"
+	}],
+	["path", {
+		d: "M7 21h10",
+		key: "1b0cd5"
+	}],
+	["rect", {
+		width: "20",
+		height: "14",
+		x: "2",
+		y: "3",
+		rx: "2",
+		key: "48i651"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47932,7 +48270,7 @@ var TvMinimal = createLucideIcon("tv-minimal", [["path", {
 	key: "48i651"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47949,7 +48287,7 @@ var Tv = createLucideIcon("tv", [["path", {
 	key: "1e6viu"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47959,7 +48297,7 @@ var TypeOutline = createLucideIcon("type-outline", [["path", {
 	key: "1reda3"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -47979,7 +48317,7 @@ var Type = createLucideIcon("type", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48007,23 +48345,7 @@ var UmbrellaOff = createLucideIcon("umbrella-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Underline = createLucideIcon("underline", [["path", {
-	d: "M6 4v6a6 6 0 0 0 12 0V4",
-	key: "9kb039"
-}], ["line", {
-	x1: "4",
-	x2: "20",
-	y1: "20",
-	y2: "20",
-	key: "nun2al"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48043,7 +48365,23 @@ var Umbrella = createLucideIcon("umbrella", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Underline = createLucideIcon("underline", [["path", {
+	d: "M6 4v6a6 6 0 0 0 12 0V4",
+	key: "9kb039"
+}], ["line", {
+	x1: "4",
+	x2: "20",
+	y1: "20",
+	y2: "20",
+	key: "nun2al"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48056,20 +48394,7 @@ var Undo2 = createLucideIcon("undo-2", [["path", {
 	key: "f3b9sd"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Undo = createLucideIcon("undo", [["path", {
-	d: "M3 7v6h6",
-	key: "1v2h90"
-}], ["path", {
-	d: "M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13",
-	key: "1r6uu6"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48091,7 +48416,20 @@ var UndoDot = createLucideIcon("undo-dot", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Undo = createLucideIcon("undo", [["path", {
+	d: "M3 7v6h6",
+	key: "1v2h90"
+}], ["path", {
+	d: "M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13",
+	key: "1r6uu6"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48131,7 +48469,7 @@ var UnfoldHorizontal = createLucideIcon("unfold-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48171,7 +48509,7 @@ var UnfoldVertical = createLucideIcon("unfold-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48192,7 +48530,7 @@ var Ungroup = createLucideIcon("ungroup", [["rect", {
 	key: "1ljebb"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48230,7 +48568,7 @@ var University = createLucideIcon("university", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48240,7 +48578,7 @@ var Unlink2 = createLucideIcon("unlink-2", [["path", {
 	key: "1re2ne"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48284,7 +48622,7 @@ var Unlink = createLucideIcon("unlink", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48316,7 +48654,7 @@ var Unplug = createLucideIcon("unplug", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48336,7 +48674,7 @@ var Upload = createLucideIcon("upload", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48376,7 +48714,7 @@ var Usb = createLucideIcon("usb", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48398,7 +48736,7 @@ var UserCheck = createLucideIcon("user-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48454,7 +48792,7 @@ var UserCog = createLucideIcon("user-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48486,7 +48824,7 @@ var UserKey = createLucideIcon("user-key", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48516,7 +48854,7 @@ var UserLock = createLucideIcon("user-lock", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48541,7 +48879,7 @@ var UserMinus = createLucideIcon("user-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48563,7 +48901,7 @@ var UserPen = createLucideIcon("user-pen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48595,7 +48933,7 @@ var UserPlus = createLucideIcon("user-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48621,7 +48959,7 @@ var UserRoundArrowLeft = createLucideIcon("user-round-arrow-left", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48643,7 +48981,7 @@ var UserRoundCheck = createLucideIcon("user-round-check", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48699,7 +49037,7 @@ var UserRoundCog = createLucideIcon("user-round-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48731,7 +49069,7 @@ var UserRoundKey = createLucideIcon("user-round-key", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48753,7 +49091,7 @@ var UserRoundMinus = createLucideIcon("user-round-minus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48775,7 +49113,7 @@ var UserRoundPen = createLucideIcon("user-round-pen", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48801,7 +49139,7 @@ var UserRoundPlus = createLucideIcon("user-round-plus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48829,7 +49167,7 @@ var UserRoundSearch = createLucideIcon("user-round-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48855,7 +49193,7 @@ var UserRoundX = createLucideIcon("user-round-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48870,7 +49208,7 @@ var UserRound = createLucideIcon("user-round", [["circle", {
 	key: "rfgkzh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48898,7 +49236,7 @@ var UserSearch = createLucideIcon("user-search", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48920,29 +49258,7 @@ var UserShield = createLucideIcon("user-shield", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var UserStar = createLucideIcon("user-star", [
-	["path", {
-		d: "M16.051 12.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.866l-1.156-1.153a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z",
-		key: "1m8t9f"
-	}],
-	["path", {
-		d: "M8 15H7a4 4 0 0 0-4 4v2",
-		key: "l9tmp8"
-	}],
-	["circle", {
-		cx: "10",
-		cy: "7",
-		r: "4",
-		key: "e45bow"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48974,7 +49290,29 @@ var UserX = createLucideIcon("user-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var UserStar = createLucideIcon("user-star", [
+	["path", {
+		d: "M16.051 12.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.866l-1.156-1.153a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z",
+		key: "1m8t9f"
+	}],
+	["path", {
+		d: "M8 15H7a4 4 0 0 0-4 4v2",
+		key: "l9tmp8"
+	}],
+	["circle", {
+		cx: "10",
+		cy: "7",
+		r: "4",
+		key: "e45bow"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -48989,7 +49327,29 @@ var User = createLucideIcon("user", [["path", {
 	key: "17ys0d"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var UsersRound = createLucideIcon("users-round", [
+	["path", {
+		d: "M18 21a8 8 0 0 0-16 0",
+		key: "3ypg7q"
+	}],
+	["circle", {
+		cx: "10",
+		cy: "8",
+		r: "5",
+		key: "o932ke"
+	}],
+	["path", {
+		d: "M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3",
+		key: "10s06x"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49015,7 +49375,27 @@ var Users = createLucideIcon("users", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Utensils = createLucideIcon("utensils", [
+	["path", {
+		d: "M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2",
+		key: "cjf0a3"
+	}],
+	["path", {
+		d: "M7 2v20",
+		key: "1473qp"
+	}],
+	["path", {
+		d: "M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7",
+		key: "j28e5"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49039,29 +49419,7 @@ var UtensilsCrossed = createLucideIcon("utensils-crossed", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var UsersRound = createLucideIcon("users-round", [
-	["path", {
-		d: "M18 21a8 8 0 0 0-16 0",
-		key: "3ypg7q"
-	}],
-	["circle", {
-		cx: "10",
-		cy: "8",
-		r: "5",
-		key: "o932ke"
-	}],
-	["path", {
-		d: "M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3",
-		key: "10s06x"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49097,27 +49455,7 @@ var UtilityPole = createLucideIcon("utility-pole", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Utensils = createLucideIcon("utensils", [
-	["path", {
-		d: "M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2",
-		key: "cjf0a3"
-	}],
-	["path", {
-		d: "M7 2v20",
-		key: "1473qp"
-	}],
-	["path", {
-		d: "M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7",
-		key: "j28e5"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49149,7 +49487,7 @@ var Van = createLucideIcon("van", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49179,7 +49517,63 @@ var Variable = createLucideIcon("variable", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var VectorSquare = createLucideIcon("vector-square", [
+	["path", {
+		d: "M19.5 7a24 24 0 0 1 0 10",
+		key: "8n60xe"
+	}],
+	["path", {
+		d: "M4.5 7a24 24 0 0 0 0 10",
+		key: "2lmadr"
+	}],
+	["path", {
+		d: "M7 19.5a24 24 0 0 0 10 0",
+		key: "1q94o2"
+	}],
+	["path", {
+		d: "M7 4.5a24 24 0 0 1 10 0",
+		key: "2z8ypa"
+	}],
+	["rect", {
+		x: "17",
+		y: "17",
+		width: "5",
+		height: "5",
+		rx: "1",
+		key: "1ac74s"
+	}],
+	["rect", {
+		x: "17",
+		y: "2",
+		width: "5",
+		height: "5",
+		rx: "1",
+		key: "1e7h5j"
+	}],
+	["rect", {
+		x: "2",
+		y: "17",
+		width: "5",
+		height: "5",
+		rx: "1",
+		key: "1t4eah"
+	}],
+	["rect", {
+		x: "2",
+		y: "2",
+		width: "5",
+		height: "5",
+		rx: "1",
+		key: "940dhs"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49245,63 +49639,7 @@ var Vault = createLucideIcon("vault", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var VectorSquare = createLucideIcon("vector-square", [
-	["path", {
-		d: "M19.5 7a24 24 0 0 1 0 10",
-		key: "8n60xe"
-	}],
-	["path", {
-		d: "M4.5 7a24 24 0 0 0 0 10",
-		key: "2lmadr"
-	}],
-	["path", {
-		d: "M7 19.5a24 24 0 0 0 10 0",
-		key: "1q94o2"
-	}],
-	["path", {
-		d: "M7 4.5a24 24 0 0 1 10 0",
-		key: "2z8ypa"
-	}],
-	["rect", {
-		x: "17",
-		y: "17",
-		width: "5",
-		height: "5",
-		rx: "1",
-		key: "1ac74s"
-	}],
-	["rect", {
-		x: "17",
-		y: "2",
-		width: "5",
-		height: "5",
-		rx: "1",
-		key: "1e7h5j"
-	}],
-	["rect", {
-		x: "2",
-		y: "17",
-		width: "5",
-		height: "5",
-		rx: "1",
-		key: "1t4eah"
-	}],
-	["rect", {
-		x: "2",
-		y: "2",
-		width: "5",
-		height: "5",
-		rx: "1",
-		key: "940dhs"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49321,7 +49659,7 @@ var Vegan = createLucideIcon("vegan", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49341,7 +49679,7 @@ var VenetianMask = createLucideIcon("venetian-mask", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49371,7 +49709,7 @@ var VenusAndMars = createLucideIcon("venus-and-mars", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49393,7 +49731,7 @@ var Venus = createLucideIcon("venus", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49424,7 +49762,7 @@ var VibrateOff = createLucideIcon("vibrate-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49448,7 +49786,7 @@ var Vibrate = createLucideIcon("vibrate", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49468,7 +49806,7 @@ var VideoOff = createLucideIcon("video-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49485,7 +49823,7 @@ var Video = createLucideIcon("video", [["path", {
 	key: "158x01"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49521,7 +49859,7 @@ var Videotape = createLucideIcon("videotape", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49547,7 +49885,7 @@ var View = createLucideIcon("view", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49574,7 +49912,7 @@ var Voicemail = createLucideIcon("voicemail", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49608,7 +49946,7 @@ var Volleyball = createLucideIcon("volleyball", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49628,7 +49966,20 @@ var Volume2 = createLucideIcon("volume-2", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Volume1 = createLucideIcon("volume-1", [["path", {
+	d: "M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z",
+	key: "uqj9uw"
+}], ["path", {
+	d: "M16 9a5 5 0 0 1 0 6",
+	key: "1q6k2b"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49656,20 +50007,7 @@ var VolumeOff = createLucideIcon("volume-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Volume1 = createLucideIcon("volume-1", [["path", {
-	d: "M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z",
-	key: "uqj9uw"
-}], ["path", {
-	d: "M16 9a5 5 0 0 1 0 6",
-	key: "1q6k2b"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49695,7 +50033,7 @@ var VolumeX = createLucideIcon("volume-x", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49705,7 +50043,27 @@ var Volume = createLucideIcon("volume", [["path", {
 	key: "uqj9uw"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Vote = createLucideIcon("vote", [
+	["path", {
+		d: "m9 12 2 2 4-4",
+		key: "dzmm74"
+	}],
+	["path", {
+		d: "M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z",
+		key: "1ezoue"
+	}],
+	["path", {
+		d: "M22 19H2",
+		key: "nuriw5"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49729,27 +50087,7 @@ var WalletCards = createLucideIcon("wallet-cards", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Vote = createLucideIcon("vote", [
-	["path", {
-		d: "m9 12 2 2 4-4",
-		key: "dzmm74"
-	}],
-	["path", {
-		d: "M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z",
-		key: "1ezoue"
-	}],
-	["path", {
-		d: "M22 19H2",
-		key: "nuriw5"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49762,20 +50100,7 @@ var WalletMinimal = createLucideIcon("wallet-minimal", [["path", {
 	key: "u1rqew"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Wallet = createLucideIcon("wallet", [["path", {
-	d: "M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1",
-	key: "18etb6"
-}], ["path", {
-	d: "M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4",
-	key: "xoc0q4"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49809,7 +50134,20 @@ var Wallpaper = createLucideIcon("wallpaper", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Wallet = createLucideIcon("wallet", [["path", {
+	d: "M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1",
+	key: "18etb6"
+}], ["path", {
+	d: "M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4",
+	key: "xoc0q4"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49849,7 +50187,7 @@ var WandSparkles = createLucideIcon("wand-sparkles", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49893,7 +50231,7 @@ var Wand = createLucideIcon("wand", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49917,7 +50255,7 @@ var Warehouse = createLucideIcon("warehouse", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49951,7 +50289,7 @@ var WashingMachine = createLucideIcon("washing-machine", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -49977,31 +50315,7 @@ var Watch = createLucideIcon("watch", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var WavesArrowUp = createLucideIcon("waves-arrow-up", [
-	["path", {
-		d: "M12 2v8",
-		key: "1q4o3n"
-	}],
-	["path", {
-		d: "M2 15c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",
-		key: "1p9f19"
-	}],
-	["path", {
-		d: "M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",
-		key: "vbxynw"
-	}],
-	["path", {
-		d: "m8 6 4-4 4 4",
-		key: "ybng9g"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50025,7 +50339,7 @@ var WavesArrowDown = createLucideIcon("waves-arrow-down", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50045,7 +50359,31 @@ var WavesHorizontal = createLucideIcon("waves-horizontal", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var WavesArrowUp = createLucideIcon("waves-arrow-up", [
+	["path", {
+		d: "M12 2v8",
+		key: "1q4o3n"
+	}],
+	["path", {
+		d: "M2 15c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",
+		key: "1p9f19"
+	}],
+	["path", {
+		d: "M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",
+		key: "vbxynw"
+	}],
+	["path", {
+		d: "m8 6 4-4 4 4",
+		key: "ybng9g"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50073,7 +50411,7 @@ var WavesLadder = createLucideIcon("waves-ladder", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50093,7 +50431,71 @@ var WavesVertical = createLucideIcon("waves-vertical", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var WebcamOff = createLucideIcon("webcam-off", [
+	["path", {
+		d: "M12 22v-4",
+		key: "1utk9m"
+	}],
+	["path", {
+		d: "M12.754 7.096a3 3 0 0 1 2.15 2.15",
+		key: "1v0qsm"
+	}],
+	["path", {
+		d: "M12.863 12.873a3 3 0 0 1-3.736-3.735",
+		key: "13aqxl"
+	}],
+	["path", {
+		d: "M16.566 16.57A8 8 0 0 1 5.43 5.433",
+		key: "1hliph"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}],
+	["path", {
+		d: "M7 22h10",
+		key: "10w4w3"
+	}],
+	["path", {
+		d: "M8.478 2.817a8 8 0 0 1 10.705 10.705",
+		key: "r097k8"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Webcam = createLucideIcon("webcam", [
+	["circle", {
+		cx: "12",
+		cy: "10",
+		r: "8",
+		key: "1gshiw"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "10",
+		r: "3",
+		key: "ilqhr7"
+	}],
+	["path", {
+		d: "M7 22h10",
+		key: "10w4w3"
+	}],
+	["path", {
+		d: "M12 22v-4",
+		key: "1utk9m"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50137,71 +50539,7 @@ var Waypoints = createLucideIcon("waypoints", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var WebcamOff = createLucideIcon("webcam-off", [
-	["path", {
-		d: "M12 22v-4",
-		key: "1utk9m"
-	}],
-	["path", {
-		d: "M12.754 7.096a3 3 0 0 1 2.15 2.15",
-		key: "1v0qsm"
-	}],
-	["path", {
-		d: "M12.863 12.873a3 3 0 0 1-3.736-3.735",
-		key: "13aqxl"
-	}],
-	["path", {
-		d: "M16.566 16.57A8 8 0 0 1 5.43 5.433",
-		key: "1hliph"
-	}],
-	["path", {
-		d: "m2 2 20 20",
-		key: "1ooewy"
-	}],
-	["path", {
-		d: "M7 22h10",
-		key: "10w4w3"
-	}],
-	["path", {
-		d: "M8.478 2.817a8 8 0 0 1 10.705 10.705",
-		key: "r097k8"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Webcam = createLucideIcon("webcam", [
-	["circle", {
-		cx: "12",
-		cy: "10",
-		r: "8",
-		key: "1gshiw"
-	}],
-	["circle", {
-		cx: "12",
-		cy: "10",
-		r: "3",
-		key: "ilqhr7"
-	}],
-	["path", {
-		d: "M7 22h10",
-		key: "10w4w3"
-	}],
-	["path", {
-		d: "M12 22v-4",
-		key: "1utk9m"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50237,7 +50575,7 @@ var WebhookOff = createLucideIcon("webhook-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50257,7 +50595,7 @@ var Webhook = createLucideIcon("webhook", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50279,7 +50617,7 @@ var WeightTilde = createLucideIcon("weight-tilde", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50294,7 +50632,7 @@ var Weight = createLucideIcon("weight", [["circle", {
 	key: "56o5sh"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50345,7 +50683,7 @@ var WheatOff = createLucideIcon("wheat-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50385,7 +50723,7 @@ var Wheat = createLucideIcon("wheat", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50417,7 +50755,7 @@ var WholeWord = createLucideIcon("whole-word", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50475,7 +50813,7 @@ var WifiCog = createLucideIcon("wifi-cog", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50495,7 +50833,7 @@ var WifiHigh = createLucideIcon("wifi-high", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50508,7 +50846,7 @@ var WifiLow = createLucideIcon("wifi-low", [["path", {
 	key: "1bycff"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50544,7 +50882,31 @@ var WifiOff = createLucideIcon("wifi-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var WifiPen = createLucideIcon("wifi-pen", [
+	["path", {
+		d: "M2 8.82a15 15 0 0 1 20 0",
+		key: "dnpr2z"
+	}],
+	["path", {
+		d: "M21.378 16.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z",
+		key: "1817ys"
+	}],
+	["path", {
+		d: "M5 12.859a10 10 0 0 1 10.5-2.222",
+		key: "rpb7oy"
+	}],
+	["path", {
+		d: "M8.5 16.429a5 5 0 0 1 3-1.406",
+		key: "r8bmzl"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50580,31 +50942,7 @@ var WifiSync = createLucideIcon("wifi-sync", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var WifiPen = createLucideIcon("wifi-pen", [
-	["path", {
-		d: "M2 8.82a15 15 0 0 1 20 0",
-		key: "dnpr2z"
-	}],
-	["path", {
-		d: "M21.378 16.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z",
-		key: "1817ys"
-	}],
-	["path", {
-		d: "M5 12.859a10 10 0 0 1 10.5-2.222",
-		key: "rpb7oy"
-	}],
-	["path", {
-		d: "M8.5 16.429a5 5 0 0 1 3-1.406",
-		key: "r8bmzl"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50614,31 +50952,7 @@ var WifiZero = createLucideIcon("wifi-zero", [["path", {
 	key: "zekei9"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var WindArrowDown = createLucideIcon("wind-arrow-down", [
-	["path", {
-		d: "M10 2v8",
-		key: "d4bbey"
-	}],
-	["path", {
-		d: "M12.8 21.6A2 2 0 1 0 14 18H2",
-		key: "19kp1d"
-	}],
-	["path", {
-		d: "M17.5 10a2.5 2.5 0 1 1 2 4H2",
-		key: "19kpjc"
-	}],
-	["path", {
-		d: "m6 6 4 4 4-4",
-		key: "k13n16"
-	}]
-]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50662,7 +50976,31 @@ var Wifi = createLucideIcon("wifi", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var WindArrowDown = createLucideIcon("wind-arrow-down", [
+	["path", {
+		d: "M10 2v8",
+		key: "d4bbey"
+	}],
+	["path", {
+		d: "M12.8 21.6A2 2 0 1 0 14 18H2",
+		key: "19kp1d"
+	}],
+	["path", {
+		d: "M17.5 10a2.5 2.5 0 1 1 2 4H2",
+		key: "19kpjc"
+	}],
+	["path", {
+		d: "m6 6 4 4 4-4",
+		key: "k13n16"
+	}]
+]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50682,7 +51020,7 @@ var Wind = createLucideIcon("wind", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50713,7 +51051,7 @@ var WineOff = createLucideIcon("wine-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50737,7 +51075,7 @@ var Wine = createLucideIcon("wine", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50765,7 +51103,7 @@ var Workflow = createLucideIcon("workflow", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50785,7 +51123,7 @@ var Worm = createLucideIcon("worm", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50805,7 +51143,7 @@ var WrenchOff = createLucideIcon("wrench-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50815,20 +51153,7 @@ var Wrench = createLucideIcon("wrench", [["path", {
 	key: "1ngwbx"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var X = createLucideIcon("x", [["path", {
-	d: "M18 6 6 18",
-	key: "1bl5f8"
-}], ["path", {
-	d: "m6 6 12 12",
-	key: "d8bk6v"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50848,7 +51173,20 @@ var XLineTop = createLucideIcon("x-line-top", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var X = createLucideIcon("x", [["path", {
+	d: "M18 6 6 18",
+	key: "1bl5f8"
+}], ["path", {
+	d: "m6 6 12 12",
+	key: "d8bk6v"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50872,7 +51210,7 @@ var ZapOff = createLucideIcon("zap-off", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50882,7 +51220,7 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1v7up4"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50895,7 +51233,20 @@ var ZodiacAquarius = createLucideIcon("zodiac-aquarius", [["path", {
 	key: "112qy7"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ZodiacAries = createLucideIcon("zodiac-aries", [["path", {
+	d: "M12 7.5a4.5 4.5 0 1 1 5 4.5",
+	key: "k987hv"
+}], ["path", {
+	d: "M7 12a4.5 4.5 0 1 1 5-4.5V21",
+	key: "mjup0w"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50923,20 +51274,7 @@ var ZodiacCancer = createLucideIcon("zodiac-cancer", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ZodiacAries = createLucideIcon("zodiac-aries", [["path", {
-	d: "M12 7.5a4.5 4.5 0 1 1 5 4.5",
-	key: "k987hv"
-}], ["path", {
-	d: "M7 12a4.5 4.5 0 1 1 5-4.5V21",
-	key: "mjup0w"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50958,7 +51296,7 @@ var ZodiacCapricorn = createLucideIcon("zodiac-capricorn", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50982,7 +51320,7 @@ var ZodiacGemini = createLucideIcon("zodiac-gemini", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -50997,7 +51335,20 @@ var ZodiacLeo = createLucideIcon("zodiac-leo", [["path", {
 	key: "yyv3zl"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ZodiacLibra = createLucideIcon("zodiac-libra", [["path", {
+	d: "M3 16h6.857c.162-.012.19-.323.038-.38a6 6 0 1 1 4.212 0c-.153.057-.125.368.038.38H21",
+	key: "1novf0"
+}], ["path", {
+	d: "M3 20h18",
+	key: "1l19wn"
+}]]);
+/**
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51010,7 +51361,7 @@ var ZodiacOphiuchus = createLucideIcon("zodiac-ophiuchus", [["path", {
 	key: "1jnivp"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51030,20 +51381,7 @@ var ZodiacPisces = createLucideIcon("zodiac-pisces", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var ZodiacLibra = createLucideIcon("zodiac-libra", [["path", {
-	d: "M3 16h6.857c.162-.012.19-.323.038-.38a6 6 0 1 1 4.212 0c-.153.057-.125.368.038.38H21",
-	key: "1novf0"
-}], ["path", {
-	d: "M3 20h18",
-	key: "1l19wn"
-}]]);
-/**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51063,7 +51401,7 @@ var ZodiacSagittarius = createLucideIcon("zodiac-sagittarius", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51087,7 +51425,7 @@ var ZodiacScorpio = createLucideIcon("zodiac-scorpio", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51102,7 +51440,7 @@ var ZodiacTaurus = createLucideIcon("zodiac-taurus", [["circle", {
 	key: "1p399e"
 }]]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51126,7 +51464,7 @@ var ZodiacVirgo = createLucideIcon("zodiac-virgo", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51161,7 +51499,7 @@ var ZoomIn = createLucideIcon("zoom-in", [
 	}]
 ]);
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -51233,8 +51571,7 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	Ampersands: () => Ampersands,
 	Amphora: () => Amphora,
 	Anchor: () => Anchor,
-	Angry: () => Angry,
-	Annoyed: () => Annoyed,
+	Angle: () => Angle,
 	Antenna: () => Antenna,
 	Anvil: () => Anvil,
 	Aperture: () => Aperture,
@@ -51293,6 +51630,7 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	AtSign: () => AtSign,
 	Atom: () => Atom,
 	AudioLines: () => AudioLines,
+	AudioLinesX: () => AudioLinesX,
 	AudioWaveform: () => AudioWaveform,
 	Award: () => Award,
 	Axe: () => Axe,
@@ -51435,6 +51773,8 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	BriefcaseMedical: () => BriefcaseMedical,
 	BringToFront: () => BringToFront,
 	Broccoli: () => Broccoli,
+	Broom: () => Broom,
+	BroomSparkles: () => BroomSparkles,
 	Brush: () => Brush,
 	BrushCleaning: () => BrushCleaning,
 	Bubbles: () => Bubbles,
@@ -51768,6 +52108,7 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	Egg: () => Egg,
 	EggFried: () => EggFried,
 	EggOff: () => EggOff,
+	Eject: () => Eject,
 	Ellipse: () => Ellipse,
 	Ellipsis: () => Ellipsis,
 	EllipsisVertical: () => EllipsisVertical,
@@ -51784,6 +52125,13 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	EyeClosed: () => EyeClosed,
 	EyeDashed: () => EyeDashed,
 	EyeOff: () => EyeOff,
+	FaceAngry: () => FaceAngry,
+	FaceExpressionless: () => FaceExpressionless,
+	FaceGrinning: () => FaceGrinning,
+	FaceNeutral: () => FaceNeutral,
+	FaceSlightlyFrowning: () => FaceSlightlyFrowning,
+	FaceSlightlySmiling: () => FaceSlightlySmiling,
+	FaceSlightlySmilingPlus: () => FaceSlightlySmilingPlus,
 	Factory: () => Factory,
 	Fan: () => Fan,
 	FastForward: () => FastForward,
@@ -51909,7 +52257,6 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	Form: () => Form,
 	Forward: () => Forward,
 	Frame: () => Frame,
-	Frown: () => Frown,
 	Fuel: () => Fuel,
 	Fullscreen: () => Fullscreen,
 	Funnel: () => Funnel,
@@ -52068,9 +52415,12 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	LaptopMinimalCheck: () => LaptopMinimalCheck,
 	Lasso: () => Lasso,
 	LassoSelect: () => LassoSelect,
-	Laugh: () => Laugh,
+	LayerArrowDown: () => LayerArrowDown,
+	LayerArrowUp: () => LayerArrowUp,
 	Layers: () => Layers,
 	Layers2: () => Layers2,
+	LayersArrowDown: () => LayersArrowDown,
+	LayersArrowUp: () => LayersArrowUp,
 	LayersMinus: () => LayersMinus,
 	LayersPlus: () => LayersPlus,
 	LayoutDashboard: () => LayoutDashboard,
@@ -52137,6 +52487,7 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	Luggage: () => Luggage,
 	Magnet: () => Magnet,
 	Mail: () => Mail,
+	MailBadge: () => MailBadge,
 	MailCheck: () => MailCheck,
 	MailMinus: () => MailMinus,
 	MailOpen: () => MailOpen,
@@ -52172,7 +52523,6 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	Medal: () => Medal,
 	Megaphone: () => Megaphone,
 	MegaphoneOff: () => MegaphoneOff,
-	Meh: () => Meh,
 	MemoryStick: () => MemoryStick,
 	Menu: () => Menu,
 	Merge: () => Merge,
@@ -52542,6 +52892,7 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	ShieldEllipsis: () => ShieldEllipsis,
 	ShieldHalf: () => ShieldHalf,
 	ShieldKeyhole: () => ShieldKeyhole,
+	ShieldLock: () => ShieldLock,
 	ShieldMinus: () => ShieldMinus,
 	ShieldOff: () => ShieldOff,
 	ShieldPlus: () => ShieldPlus,
@@ -52581,8 +52932,6 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	Smartphone: () => Smartphone,
 	SmartphoneCharging: () => SmartphoneCharging,
 	SmartphoneNfc: () => SmartphoneNfc,
-	Smile: () => Smile,
-	SmilePlus: () => SmilePlus,
 	Snail: () => Snail,
 	Snowflake: () => Snowflake,
 	SoapDispenserDroplet: () => SoapDispenserDroplet,
@@ -52949,7 +53298,7 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 	ZoomOut: () => ZoomOut
 });
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -52957,7 +53306,7 @@ var icons_exports = /* @__PURE__ */ __exportAll({
 //#endregion
 //#region node_modules/@lucide/vue/dist/esm/lucide-vue.mjs
 /**
-* @license @lucide/vue v1.27.0 - ISC
+* @license @lucide/vue v1.31.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -53069,10 +53418,12 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	AmphoraIcon: () => Amphora,
 	Anchor: () => Anchor,
 	AnchorIcon: () => Anchor,
-	Angry: () => Angry,
-	AngryIcon: () => Angry,
-	Annoyed: () => Annoyed,
-	AnnoyedIcon: () => Annoyed,
+	Angle: () => Angle,
+	AngleIcon: () => Angle,
+	Angry: () => FaceAngry,
+	AngryIcon: () => FaceAngry,
+	Annoyed: () => FaceExpressionless,
+	AnnoyedIcon: () => FaceExpressionless,
 	Antenna: () => Antenna,
 	AntennaIcon: () => Antenna,
 	Anvil: () => Anvil,
@@ -53241,6 +53592,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	AtomIcon: () => Atom,
 	AudioLines: () => AudioLines,
 	AudioLinesIcon: () => AudioLines,
+	AudioLinesX: () => AudioLinesX,
+	AudioLinesXIcon: () => AudioLinesX,
 	AudioWaveform: () => AudioWaveform,
 	AudioWaveformIcon: () => AudioWaveform,
 	Award: () => Award,
@@ -53551,6 +53904,10 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	BringToFrontIcon: () => BringToFront,
 	Broccoli: () => Broccoli,
 	BroccoliIcon: () => Broccoli,
+	Broom: () => Broom,
+	BroomIcon: () => Broom,
+	BroomSparkles: () => BroomSparkles,
+	BroomSparklesIcon: () => BroomSparkles,
 	Brush: () => Brush,
 	BrushCleaning: () => BrushCleaning,
 	BrushCleaningIcon: () => BrushCleaning,
@@ -54277,6 +54634,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	EggIcon: () => Egg,
 	EggOff: () => EggOff,
 	EggOffIcon: () => EggOff,
+	Eject: () => Eject,
+	EjectIcon: () => Eject,
 	Ellipse: () => Ellipse,
 	EllipseIcon: () => Ellipse,
 	Ellipsis: () => Ellipsis,
@@ -54311,6 +54670,20 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	EyeIcon: () => Eye,
 	EyeOff: () => EyeOff,
 	EyeOffIcon: () => EyeOff,
+	FaceAngry: () => FaceAngry,
+	FaceAngryIcon: () => FaceAngry,
+	FaceExpressionless: () => FaceExpressionless,
+	FaceExpressionlessIcon: () => FaceExpressionless,
+	FaceGrinning: () => FaceGrinning,
+	FaceGrinningIcon: () => FaceGrinning,
+	FaceNeutral: () => FaceNeutral,
+	FaceNeutralIcon: () => FaceNeutral,
+	FaceSlightlyFrowning: () => FaceSlightlyFrowning,
+	FaceSlightlyFrowningIcon: () => FaceSlightlyFrowning,
+	FaceSlightlySmiling: () => FaceSlightlySmiling,
+	FaceSlightlySmilingIcon: () => FaceSlightlySmiling,
+	FaceSlightlySmilingPlus: () => FaceSlightlySmilingPlus,
+	FaceSlightlySmilingPlusIcon: () => FaceSlightlySmilingPlus,
 	Factory: () => Factory,
 	FactoryIcon: () => Factory,
 	Fan: () => Fan,
@@ -54635,8 +55008,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	ForwardIcon: () => Forward,
 	Frame: () => Frame,
 	FrameIcon: () => Frame,
-	Frown: () => Frown,
-	FrownIcon: () => Frown,
+	Frown: () => FaceSlightlyFrowning,
+	FrownIcon: () => FaceSlightlyFrowning,
 	Fuel: () => Fuel,
 	FuelIcon: () => Fuel,
 	Fullscreen: () => Fullscreen,
@@ -55007,13 +55380,21 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LassoIcon: () => Lasso,
 	LassoSelect: () => LassoSelect,
 	LassoSelectIcon: () => LassoSelect,
-	Laugh: () => Laugh,
-	LaughIcon: () => Laugh,
+	Laugh: () => FaceGrinning,
+	LaughIcon: () => FaceGrinning,
+	LayerArrowDown: () => LayerArrowDown,
+	LayerArrowDownIcon: () => LayerArrowDown,
+	LayerArrowUp: () => LayerArrowUp,
+	LayerArrowUpIcon: () => LayerArrowUp,
 	Layers: () => Layers,
 	Layers2: () => Layers2,
 	Layers2Icon: () => Layers2,
 	Layers3: () => Layers,
 	Layers3Icon: () => Layers,
+	LayersArrowDown: () => LayersArrowDown,
+	LayersArrowDownIcon: () => LayersArrowDown,
+	LayersArrowUp: () => LayersArrowUp,
+	LayersArrowUpIcon: () => LayersArrowUp,
 	LayersIcon: () => Layers,
 	LayersMinus: () => LayersMinus,
 	LayersMinusIcon: () => LayersMinus,
@@ -55206,8 +55587,9 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideAmpersands: () => Ampersands,
 	LucideAmphora: () => Amphora,
 	LucideAnchor: () => Anchor,
-	LucideAngry: () => Angry,
-	LucideAnnoyed: () => Annoyed,
+	LucideAngle: () => Angle,
+	LucideAngry: () => FaceAngry,
+	LucideAnnoyed: () => FaceExpressionless,
 	LucideAntenna: () => Antenna,
 	LucideAnvil: () => Anvil,
 	LucideAperture: () => Aperture,
@@ -55292,6 +55674,7 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideAtSign: () => AtSign,
 	LucideAtom: () => Atom,
 	LucideAudioLines: () => AudioLines,
+	LucideAudioLinesX: () => AudioLinesX,
 	LucideAudioWaveform: () => AudioWaveform,
 	LucideAward: () => Award,
 	LucideAxe: () => Axe,
@@ -55447,6 +55830,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideBriefcaseMedical: () => BriefcaseMedical,
 	LucideBringToFront: () => BringToFront,
 	LucideBroccoli: () => Broccoli,
+	LucideBroom: () => Broom,
+	LucideBroomSparkles: () => BroomSparkles,
 	LucideBrush: () => Brush,
 	LucideBrushCleaning: () => BrushCleaning,
 	LucideBubbles: () => Bubbles,
@@ -55810,6 +56195,7 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideEgg: () => Egg,
 	LucideEggFried: () => EggFried,
 	LucideEggOff: () => EggOff,
+	LucideEject: () => Eject,
 	LucideEllipse: () => Ellipse,
 	LucideEllipsis: () => Ellipsis,
 	LucideEllipsisVertical: () => EllipsisVertical,
@@ -55827,6 +56213,13 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideEyeClosed: () => EyeClosed,
 	LucideEyeDashed: () => EyeDashed,
 	LucideEyeOff: () => EyeOff,
+	LucideFaceAngry: () => FaceAngry,
+	LucideFaceExpressionless: () => FaceExpressionless,
+	LucideFaceGrinning: () => FaceGrinning,
+	LucideFaceNeutral: () => FaceNeutral,
+	LucideFaceSlightlyFrowning: () => FaceSlightlyFrowning,
+	LucideFaceSlightlySmiling: () => FaceSlightlySmiling,
+	LucideFaceSlightlySmilingPlus: () => FaceSlightlySmilingPlus,
 	LucideFactory: () => Factory,
 	LucideFan: () => Fan,
 	LucideFastForward: () => FastForward,
@@ -55989,7 +56382,7 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideFormInput: () => RectangleEllipsis,
 	LucideForward: () => Forward,
 	LucideFrame: () => Frame,
-	LucideFrown: () => Frown,
+	LucideFrown: () => FaceSlightlyFrowning,
 	LucideFuel: () => Fuel,
 	LucideFullscreen: () => Fullscreen,
 	LucideFunctionSquare: () => SquareFunction,
@@ -56174,10 +56567,14 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideLaptopMinimalCheck: () => LaptopMinimalCheck,
 	LucideLasso: () => Lasso,
 	LucideLassoSelect: () => LassoSelect,
-	LucideLaugh: () => Laugh,
+	LucideLaugh: () => FaceGrinning,
+	LucideLayerArrowDown: () => LayerArrowDown,
+	LucideLayerArrowUp: () => LayerArrowUp,
 	LucideLayers: () => Layers,
 	LucideLayers2: () => Layers2,
 	LucideLayers3: () => Layers,
+	LucideLayersArrowDown: () => LayersArrowDown,
+	LucideLayersArrowUp: () => LayersArrowUp,
 	LucideLayersMinus: () => LayersMinus,
 	LucideLayersPlus: () => LayersPlus,
 	LucideLayout: () => PanelsTopLeft,
@@ -56251,6 +56648,7 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideMSquare: () => SquareM,
 	LucideMagnet: () => Magnet,
 	LucideMail: () => Mail,
+	LucideMailBadge: () => MailBadge,
 	LucideMailCheck: () => MailCheck,
 	LucideMailMinus: () => MailMinus,
 	LucideMailOpen: () => MailOpen,
@@ -56287,7 +56685,7 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideMedal: () => Medal,
 	LucideMegaphone: () => Megaphone,
 	LucideMegaphoneOff: () => MegaphoneOff,
-	LucideMeh: () => Meh,
+	LucideMeh: () => FaceNeutral,
 	LucideMemoryStick: () => MemoryStick,
 	LucideMenu: () => Menu,
 	LucideMenuSquare: () => SquareMenu,
@@ -56706,6 +57104,7 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideShieldEllipsis: () => ShieldEllipsis,
 	LucideShieldHalf: () => ShieldHalf,
 	LucideShieldKeyhole: () => ShieldKeyhole,
+	LucideShieldLock: () => ShieldLock,
 	LucideShieldMinus: () => ShieldMinus,
 	LucideShieldOff: () => ShieldOff,
 	LucideShieldPlus: () => ShieldPlus,
@@ -56752,8 +57151,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	LucideSmartphone: () => Smartphone,
 	LucideSmartphoneCharging: () => SmartphoneCharging,
 	LucideSmartphoneNfc: () => SmartphoneNfc,
-	LucideSmile: () => Smile,
-	LucideSmilePlus: () => SmilePlus,
+	LucideSmile: () => FaceSlightlySmiling,
+	LucideSmilePlus: () => FaceSlightlySmilingPlus,
 	LucideSnail: () => Snail,
 	LucideSnowflake: () => Snowflake,
 	LucideSoapDispenserDroplet: () => SoapDispenserDroplet,
@@ -57163,6 +57562,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	Magnet: () => Magnet,
 	MagnetIcon: () => Magnet,
 	Mail: () => Mail,
+	MailBadge: () => MailBadge,
+	MailBadgeIcon: () => MailBadge,
 	MailCheck: () => MailCheck,
 	MailCheckIcon: () => MailCheck,
 	MailIcon: () => Mail,
@@ -57236,8 +57637,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	MegaphoneIcon: () => Megaphone,
 	MegaphoneOff: () => MegaphoneOff,
 	MegaphoneOffIcon: () => MegaphoneOff,
-	Meh: () => Meh,
-	MehIcon: () => Meh,
+	Meh: () => FaceNeutral,
+	MehIcon: () => FaceNeutral,
 	MemoryStick: () => MemoryStick,
 	MemoryStickIcon: () => MemoryStick,
 	Menu: () => Menu,
@@ -58074,6 +58475,8 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	ShieldIcon: () => Shield,
 	ShieldKeyhole: () => ShieldKeyhole,
 	ShieldKeyholeIcon: () => ShieldKeyhole,
+	ShieldLock: () => ShieldLock,
+	ShieldLockIcon: () => ShieldLock,
 	ShieldMinus: () => ShieldMinus,
 	ShieldMinusIcon: () => ShieldMinus,
 	ShieldOff: () => ShieldOff,
@@ -58166,10 +58569,10 @@ var lucide_vue_exports = /* @__PURE__ */ __exportAll({
 	SmartphoneIcon: () => Smartphone,
 	SmartphoneNfc: () => SmartphoneNfc,
 	SmartphoneNfcIcon: () => SmartphoneNfc,
-	Smile: () => Smile,
-	SmileIcon: () => Smile,
-	SmilePlus: () => SmilePlus,
-	SmilePlusIcon: () => SmilePlus,
+	Smile: () => FaceSlightlySmiling,
+	SmileIcon: () => FaceSlightlySmiling,
+	SmilePlus: () => FaceSlightlySmilingPlus,
+	SmilePlusIcon: () => FaceSlightlySmilingPlus,
 	Snail: () => Snail,
 	SnailIcon: () => Snail,
 	Snowflake: () => Snowflake,
@@ -59498,12 +59901,13 @@ function downloadSaveAs(blob, name = "download", opts) {
 	a.rel = "noopener";
 	if (typeof blob === "string") {
 		a.href = blob;
-		if (a.origin !== location.origin) if (corsEnabled(a.href)) download(blob, name, opts);
-		else {
-			a.target = "_blank";
-			click(a);
-		}
-		else click(a);
+		if (a.origin !== location.origin) {
+			if (corsEnabled(a.href)) download(blob, name, opts);
+			else {
+				a.target = "_blank";
+				click(a);
+			}
+		} else click(a);
 	} else {
 		a.href = URL.createObjectURL(blob);
 		setTimeout(function() {
@@ -59515,16 +59919,17 @@ function downloadSaveAs(blob, name = "download", opts) {
 	}
 }
 function msSaveAs(blob, name = "download", opts) {
-	if (typeof blob === "string") if (corsEnabled(blob)) download(blob, name, opts);
-	else {
-		const a = document.createElement("a");
-		a.href = blob;
-		a.target = "_blank";
-		setTimeout(function() {
-			click(a);
-		});
-	}
-	else navigator.msSaveOrOpenBlob(bom(blob, opts), name);
+	if (typeof blob === "string") {
+		if (corsEnabled(blob)) download(blob, name, opts);
+		else {
+			const a = document.createElement("a");
+			a.href = blob;
+			a.target = "_blank";
+			setTimeout(function() {
+				click(a);
+			});
+		}
+	} else navigator.msSaveOrOpenBlob(bom(blob, opts), name);
 }
 function fileSaverSaveAs(blob, name, opts, popup) {
 	popup = popup || open("", "_blank");
@@ -59786,8 +60191,10 @@ function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) 
 		const prop = setupStore[key];
 		if (/* @__PURE__ */ isRef(prop) && !isComputed(prop) || /* @__PURE__ */ isReactive(prop)) {
 			if (!isOptionsStore) {
-				if (initialState && shouldHydrate(prop)) if (/* @__PURE__ */ isRef(prop)) prop.value = initialState[key];
-				else mergeReactiveObjects(prop, initialState[key]);
+				if (initialState && shouldHydrate(prop)) {
+					if (/* @__PURE__ */ isRef(prop)) prop.value = initialState[key];
+					else mergeReactiveObjects(prop, initialState[key]);
+				}
 				pinia.state.value[$id][key] = prop;
 			}
 		} else if (typeof prop === "function") {
@@ -59829,8 +60236,10 @@ function defineStore(id, setup, setupOptions) {
 		pinia = pinia || (hasContext ? inject(piniaSymbol, null) : null);
 		if (pinia) setActivePinia(pinia);
 		pinia = activePinia;
-		if (!pinia._s.has(id)) if (isSetupStore) createSetupStore(id, setup, options, pinia);
-		else createOptionsStore(id, options, pinia);
+		if (!pinia._s.has(id)) {
+			if (isSetupStore) createSetupStore(id, setup, options, pinia);
+			else createOptionsStore(id, options, pinia);
+		}
 		return pinia._s.get(id);
 	}
 	useStore.$id = id;
@@ -61362,9 +61771,7 @@ var Ge = /* @__PURE__ */ defineComponent({
 				if (t.popoverState.value === 1) return;
 				switch (e.key) {
 					case o$1.Space:
-					case o$1.Enter:
-						e.preventDefault(), (l = (r = e.target).click) == null || l.call(r), t.closePopover(), (g = o$2(t.button)) == null || g.focus();
-						break;
+					case o$1.Enter: e.preventDefault(), (l = (r = e.target).click) == null || l.call(r), t.closePopover(), (g = o$2(t.button)) == null || g.focus();
 				}
 			} else switch (e.key) {
 				case o$1.Space:
@@ -61490,7 +61897,6 @@ var je$1 = /* @__PURE__ */ defineComponent({
 				case o$1.Escape:
 					if (o.popoverState.value !== 0 || !o$2(o.panel) || y.value && !((p = o$2(o.panel)) != null && p.contains(y.value.activeElement))) return;
 					i.preventDefault(), i.stopPropagation(), o.closePopover(), (u = o$2(o.button)) == null || u.focus();
-					break;
 			}
 		}
 		function S(i) {
@@ -64404,14 +64810,16 @@ var VtToast_default = /* @__PURE__ */ defineComponent({
 			}
 		},
 		onDragEnd() {
-			if (this.beingDragged) if (Math.abs(this.dragDelta) >= this.removalDistance) {
-				this.disableTransitions = true;
-				this.$nextTick(() => this.closeToast());
-			} else setTimeout(() => {
-				this.beingDragged = false;
-				if (isDOMRect(this.dragRect) && this.pauseOnHover && this.dragRect.bottom >= this.dragPos.y && this.dragPos.y >= this.dragRect.top && this.dragRect.left <= this.dragPos.x && this.dragPos.x <= this.dragRect.right) this.isRunning = false;
-				else this.isRunning = true;
-			});
+			if (this.beingDragged) {
+				if (Math.abs(this.dragDelta) >= this.removalDistance) {
+					this.disableTransitions = true;
+					this.$nextTick(() => this.closeToast());
+				} else setTimeout(() => {
+					this.beingDragged = false;
+					if (isDOMRect(this.dragRect) && this.pauseOnHover && this.dragRect.bottom >= this.dragPos.y && this.dragPos.y >= this.dragRect.top && this.dragRect.left <= this.dragPos.x && this.dragPos.x <= this.dragRect.right) this.isRunning = false;
+					else this.isRunning = true;
+				});
+			}
 		}
 	}
 });
@@ -64813,15 +65221,17 @@ function createColumn(table, columnDef, depth, parent) {
 	let id = (_ref = (_resolvedColumnDef$id = resolvedColumnDef.id) != null ? _resolvedColumnDef$id : accessorKey ? typeof String.prototype.replaceAll === "function" ? accessorKey.replaceAll(".", "_") : accessorKey.replace(/\./g, "_") : void 0) != null ? _ref : typeof resolvedColumnDef.header === "string" ? resolvedColumnDef.header : void 0;
 	let accessorFn;
 	if (resolvedColumnDef.accessorFn) accessorFn = resolvedColumnDef.accessorFn;
-	else if (accessorKey) if (accessorKey.includes(".")) accessorFn = (originalRow) => {
-		let result = originalRow;
-		for (const key of accessorKey.split(".")) {
-			var _result;
-			result = (_result = result) == null ? void 0 : _result[key];
-		}
-		return result;
-	};
-	else accessorFn = (originalRow) => originalRow[resolvedColumnDef.accessorKey];
+	else if (accessorKey) {
+		if (accessorKey.includes(".")) accessorFn = (originalRow) => {
+			let result = originalRow;
+			for (const key of accessorKey.split(".")) {
+				var _result;
+				result = (_result = result) == null ? void 0 : _result[key];
+			}
+			return result;
+		};
+		else accessorFn = (originalRow) => originalRow[resolvedColumnDef.accessorKey];
+	}
 	if (!id) throw new Error();
 	let column = {
 		id: `${String(id)}`,
@@ -65355,11 +65765,13 @@ var extent = (columnId, _leafRows, childRows) => {
 	let max;
 	childRows.forEach((row) => {
 		const value = row.getValue(columnId);
-		if (value != null) if (min === void 0) {
-			if (value >= value) min = max = value;
-		} else {
-			if (min > value) min = value;
-			if (max < value) max = value;
+		if (value != null) {
+			if (min === void 0) {
+				if (value >= value) min = max = value;
+			} else {
+				if (min > value) min = value;
+				if (max < value) max = value;
+			}
 		}
 	});
 	return [min, max];
@@ -66611,8 +67023,10 @@ function isSubRowSelected(row, selection, table) {
 	let someSelected = false;
 	row.subRows.forEach((subRow) => {
 		if (someSelected && !allChildrenSelected) return;
-		if (subRow.getCanSelect()) if (isRowSelected(subRow, selection)) someSelected = true;
-		else allChildrenSelected = false;
+		if (subRow.getCanSelect()) {
+			if (isRowSelected(subRow, selection)) someSelected = true;
+			else allChildrenSelected = false;
+		}
 		if (subRow.subRows && subRow.subRows.length) {
 			const subRowChildrenSelected = isSubRowSelected(subRow, selection);
 			if (subRowChildrenSelected === "all") someSelected = true;
@@ -66748,9 +67162,10 @@ var builtInFeatures = [
 					let newSorting = [];
 					let sortAction;
 					let nextDesc = hasManualValue ? desc : nextSortingOrder === "desc";
-					if (old != null && old.length && column.getCanMultiSort() && multi) if (existingSorting) sortAction = "toggle";
-					else sortAction = "add";
-					else if (old != null && old.length && existingIndex !== old.length - 1) sortAction = "replace";
+					if (old != null && old.length && column.getCanMultiSort() && multi) {
+						if (existingSorting) sortAction = "toggle";
+						else sortAction = "add";
+					} else if (old != null && old.length && existingIndex !== old.length - 1) sortAction = "replace";
 					else if (existingSorting) sortAction = "toggle";
 					else sortAction = "replace";
 					if (sortAction === "toggle") {
@@ -68843,7 +69258,6 @@ function useDropZone(target, options = {}) {
 						files.value = currentFiles;
 						(_options$onDrop = _options.onDrop) === null || _options$onDrop === void 0 || _options$onDrop.call(_options, currentFiles, event);
 					}
-					break;
 			}
 		};
 		useEventListener(target, "dragenter", (event) => handleDragEvent(event, "enter"));
@@ -69191,9 +69605,10 @@ function styleInject(css, ref) {
 	var head = document.head || document.getElementsByTagName("head")[0];
 	var style = document.createElement("style");
 	style.type = "text/css";
-	if (insertAt === "top") if (head.firstChild) head.insertBefore(style, head.firstChild);
-	else head.appendChild(style);
-	else head.appendChild(style);
+	if (insertAt === "top") {
+		if (head.firstChild) head.insertBefore(style, head.firstChild);
+		else head.appendChild(style);
+	} else head.appendChild(style);
 	if (style.styleSheet) style.styleSheet.cssText = css;
 	else style.appendChild(document.createTextNode(css));
 }
@@ -69939,7 +70354,8 @@ var CSVImportButton_default = /* @__PURE__ */ defineComponent({
 				const csv = result["csv"];
 				const d = /* @__PURE__ */ new Date();
 				const filename = props.itemname + "_" + d.toLocaleString() + ".csv";
-				(0, import_FileSaver_min.saveAs)(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
+				const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+				(0, import_FileSaver_min.saveAs)(blob, filename);
 				waiting.value = false;
 			}).catch((error) => {
 				window.console.error(error);
@@ -71197,7 +71613,8 @@ var ExportCaptureButton_default = /* @__PURE__ */ defineComponent({
 				const csv = result["csv"];
 				const d = /* @__PURE__ */ new Date();
 				const filename = props.itemname + "_" + d.toLocaleString() + ".csv";
-				(0, import_FileSaver_min.saveAs)(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
+				const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+				(0, import_FileSaver_min.saveAs)(blob, filename);
 				showexportmodal.value = false;
 			}).catch((error) => {
 				window.console.error(error);
@@ -73563,7 +73980,8 @@ var ExportAggregationButton_default = /* @__PURE__ */ defineComponent({
 				form: paramform
 			}).then((result) => {
 				const csv = result["csv"];
-				(0, import_FileSaver_min.saveAs)(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename.value + ".csv");
+				const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+				(0, import_FileSaver_min.saveAs)(blob, filename.value + ".csv");
 				showexportmodal.value = false;
 			}).catch((error) => {
 				showexportmodal.value = false;
@@ -75424,10 +75842,14 @@ var EditMap_default = /* @__PURE__ */ defineComponent({
 			let inorder = true;
 			items.value.forEach((item) => {
 				if (item.band == "H") return;
-				if (item.boundpc) if (currentpercent >= Number(item.boundpc)) inorder = false;
-				else currentpercent = Number(item.boundpc);
-				if (item.boundpoints) if (currentpoints >= Number(item.boundpoints)) inorder = false;
-				else currentpoints = Number(item.boundpoints);
+				if (item.boundpc) {
+					if (currentpercent >= Number(item.boundpc)) inorder = false;
+					else currentpercent = Number(item.boundpc);
+				}
+				if (item.boundpoints) {
+					if (currentpoints >= Number(item.boundpoints)) inorder = false;
+					else currentpoints = Number(item.boundpoints);
+				}
 			});
 			return inorder;
 		});
@@ -75900,7 +76322,8 @@ var ManageMaps_default = /* @__PURE__ */ defineComponent({
 				const json = JSON.stringify(result, null, 4);
 				let filename = result.name + ".json";
 				filename = filename.replace(/[/\\?%*:|"<>]/g, "-");
-				(0, import_FileSaver_min.saveAs)(new Blob([json], { type: "text/json;charset=utf-8" }), filename);
+				const blob = new Blob([json], { type: "text/json;charset=utf-8" });
+				(0, import_FileSaver_min.saveAs)(blob, filename);
 				toast.success("Map exported");
 			}).catch((error) => {
 				window.console.error(error);
@@ -76219,7 +76642,8 @@ var AuditPage_default = /* @__PURE__ */ defineComponent({
 				csv += "\"" + item.time + "\", \"" + item.gradeitem + "\", \"" + item.username + "\", \"" + item.relatedusername + "\", \"" + item.message.replaceAll("\"", "") + "\"\n";
 			});
 			const filename = "Audit_" + (/* @__PURE__ */ new Date()).toLocaleString() + ".csv";
-			(0, import_FileSaver_min.saveAs)(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
+			const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+			(0, import_FileSaver_min.saveAs)(blob, filename);
 		}
 		onMounted(() => {
 			moodleFetch("local_gugrades_get_audit", {}).then((result) => {
@@ -77016,9 +77440,7 @@ var et = /* @__PURE__ */ defineComponent({
 				case "left":
 					B = a.top + a.height / 2 - v.height / 2 + G, H = a.left - v.width - ie + S;
 					break;
-				case "right":
-					B = a.top + a.height / 2 - v.height / 2 + G, H = a.right + ie + S;
-					break;
+				case "right": B = a.top + a.height / 2 - v.height / 2 + G, H = a.right + ie + S;
 			}
 			const ne = {
 				width: window.innerWidth,
@@ -77562,9 +77984,10 @@ function callVisitor(key, node, visitor, path) {
 function replaceNode(key, path, node) {
 	const parent = path[path.length - 1];
 	if (isCollection$1(parent)) parent.items[key] = node;
-	else if (isPair(parent)) if (key === "key") parent.key = node;
-	else parent.value = node;
-	else if (isDocument(parent)) parent.contents = node;
+	else if (isPair(parent)) {
+		if (key === "key") parent.key = node;
+		else parent.value = node;
+	} else if (isDocument(parent)) parent.contents = node;
 	else {
 		const pt = isAlias(parent) ? "alias" : "scalar";
 		throw new Error(`Cannot replace node with ${pt} parent`);
@@ -77615,7 +78038,6 @@ var Directives = class Directives {
 					version: "1.2"
 				};
 				this.tags = Object.assign({}, Directives.defaultTags);
-				break;
 		}
 		return res;
 	}
@@ -77799,30 +78221,32 @@ function createNodeAnchors(doc, prefix) {
 * Includes extensions for handling Map and Set objects.
 */
 function applyReviver(reviver, obj, key, val) {
-	if (val && typeof val === "object") if (Array.isArray(val)) for (let i = 0, len = val.length; i < len; ++i) {
-		const v0 = val[i];
-		const v1 = applyReviver(reviver, val, String(i), v0);
-		if (v1 === void 0) delete val[i];
-		else if (v1 !== v0) val[i] = v1;
-	}
-	else if (val instanceof Map) for (const k of Array.from(val.keys())) {
-		const v0 = val.get(k);
-		const v1 = applyReviver(reviver, val, k, v0);
-		if (v1 === void 0) val.delete(k);
-		else if (v1 !== v0) val.set(k, v1);
-	}
-	else if (val instanceof Set) for (const v0 of Array.from(val)) {
-		const v1 = applyReviver(reviver, val, v0, v0);
-		if (v1 === void 0) val.delete(v0);
-		else if (v1 !== v0) {
-			val.delete(v0);
-			val.add(v1);
+	if (val && typeof val === "object") {
+		if (Array.isArray(val)) for (let i = 0, len = val.length; i < len; ++i) {
+			const v0 = val[i];
+			const v1 = applyReviver(reviver, val, String(i), v0);
+			if (v1 === void 0) delete val[i];
+			else if (v1 !== v0) val[i] = v1;
 		}
-	}
-	else for (const [k, v0] of Object.entries(val)) {
-		const v1 = applyReviver(reviver, val, k, v0);
-		if (v1 === void 0) delete val[k];
-		else if (v1 !== v0) val[k] = v1;
+		else if (val instanceof Map) for (const k of Array.from(val.keys())) {
+			const v0 = val.get(k);
+			const v1 = applyReviver(reviver, val, k, v0);
+			if (v1 === void 0) val.delete(k);
+			else if (v1 !== v0) val.set(k, v1);
+		}
+		else if (val instanceof Set) for (const v0 of Array.from(val)) {
+			const v1 = applyReviver(reviver, val, v0, v0);
+			if (v1 === void 0) val.delete(v0);
+			else if (v1 !== v0) {
+				val.delete(v0);
+				val.add(v1);
+			}
+		}
+		else for (const [k, v0] of Object.entries(val)) {
+			const v1 = applyReviver(reviver, val, k, v0);
+			if (v1 === void 0) delete val[k];
+			else if (v1 !== v0) val[k] = v1;
+		}
 	}
 	return reviver.call(obj, key, val);
 }
@@ -78196,8 +78620,10 @@ function foldFlowLines(text, indent, mode = "flow", { indentAtStart, lineWidth =
 	const folds = [];
 	const escapedFolds = {};
 	let end = lineWidth - indent.length;
-	if (typeof indentAtStart === "number") if (indentAtStart > lineWidth - Math.max(2, minContentWidth)) folds.push(0);
-	else end = lineWidth - indentAtStart;
+	if (typeof indentAtStart === "number") {
+		if (indentAtStart > lineWidth - Math.max(2, minContentWidth)) folds.push(0);
+		else end = lineWidth - indentAtStart;
+	}
 	let split = void 0;
 	let prev = void 0;
 	let overflow = false;
@@ -78234,23 +78660,25 @@ function foldFlowLines(text, indent, mode = "flow", { indentAtStart, lineWidth =
 				const next = text[i + 1];
 				if (next && next !== " " && next !== "\n" && next !== "	") split = i;
 			}
-			if (i >= end) if (split) {
-				folds.push(split);
-				end = split + endStep;
-				split = void 0;
-			} else if (mode === "quoted") {
-				while (prev === " " || prev === "	") {
-					prev = ch;
-					ch = text[i += 1];
-					overflow = true;
-				}
-				const j = i > escEnd + 1 ? i - 2 : escStart - 1;
-				if (escapedFolds[j]) return text;
-				folds.push(j);
-				escapedFolds[j] = true;
-				end = j + endStep;
-				split = void 0;
-			} else overflow = true;
+			if (i >= end) {
+				if (split) {
+					folds.push(split);
+					end = split + endStep;
+					split = void 0;
+				} else if (mode === "quoted") {
+					while (prev === " " || prev === "	") {
+						prev = ch;
+						ch = text[i += 1];
+						overflow = true;
+					}
+					const j = i > escEnd + 1 ? i - 2 : escStart - 1;
+					if (escapedFolds[j]) return text;
+					folds.push(j);
+					escapedFolds[j] = true;
+					end = j + endStep;
+					split = void 0;
+				} else overflow = true;
+			}
 		}
 		prev = ch;
 	}
@@ -79415,11 +79843,12 @@ function createPairs(schema, iterable, ctx) {
 	if (iterable && Symbol.iterator in Object(iterable)) for (let it of iterable) {
 		if (typeof replacer === "function") it = replacer.call(iterable, String(i++), it);
 		let key, value;
-		if (Array.isArray(it)) if (it.length === 2) {
-			key = it[0];
-			value = it[1];
-		} else throw new TypeError(`Expected [key, value] tuple: ${it}`);
-		else if (it && it instanceof Object) {
+		if (Array.isArray(it)) {
+			if (it.length === 2) {
+				key = it[0];
+				value = it[1];
+			} else throw new TypeError(`Expected [key, value] tuple: ${it}`);
+		} else if (it && it instanceof Object) {
 			const keys = Object.keys(it);
 			if (keys.length === 1) {
 				key = keys[0];
@@ -79485,8 +79914,10 @@ var omap = {
 	resolve(seq, onError) {
 		const pairs = resolvePairs(seq, onError);
 		const seenKeys = [];
-		for (const { key } of pairs.items) if (isScalar$1(key)) if (seenKeys.includes(key.value)) onError(`Ordered maps must not include duplicate keys: ${key.value}`);
-		else seenKeys.push(key.value);
+		for (const { key } of pairs.items) if (isScalar$1(key)) {
+			if (seenKeys.includes(key.value)) onError(`Ordered maps must not include duplicate keys: ${key.value}`);
+			else seenKeys.push(key.value);
+		}
 		return Object.assign(new YAMLOMap(), pairs);
 	},
 	createNode: (schema, iterable, ctx) => YAMLOMap.from(schema, iterable, ctx)
@@ -79566,9 +79997,7 @@ function intResolve(str, offset, radix, { intAsBigInt }) {
 			case 8:
 				str = `0o${str}`;
 				break;
-			case 16:
-				str = `0x${str}`;
-				break;
+			case 16: str = `0x${str}`;
 		}
 		const n = BigInt(str);
 		return sign === "-" ? BigInt(-1) * n : n;
@@ -79674,9 +80103,10 @@ var set = {
 	tag: "tag:yaml.org,2002:set",
 	createNode: (schema, iterable, ctx) => YAMLSet.from(schema, iterable, ctx),
 	resolve(map, onError) {
-		if (isMap(map)) if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map);
-		else onError("Set items must all have null values");
-		else onError("Expected a mapping for this tag");
+		if (isMap(map)) {
+			if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map);
+			else onError("Set items must all have null values");
+		} else onError("Expected a mapping for this tag");
 		return map;
 	}
 };
@@ -79827,10 +80257,12 @@ function getTags(customTags, schemaName, addMergeTag) {
 	const schemaTags = schemas.get(schemaName);
 	if (schemaTags && !customTags) return addMergeTag && !schemaTags.includes(merge$1) ? schemaTags.concat(merge$1) : schemaTags.slice();
 	let tags = schemaTags;
-	if (!tags) if (Array.isArray(customTags)) tags = [];
-	else {
-		const keys = Array.from(schemas.keys()).filter((key) => key !== "yaml11").map((key) => JSON.stringify(key)).join(", ");
-		throw new Error(`Unknown schema "${schemaName}"; use one of ${keys} or define customTags array`);
+	if (!tags) {
+		if (Array.isArray(customTags)) tags = [];
+		else {
+			const keys = Array.from(schemas.keys()).filter((key) => key !== "yaml11").map((key) => JSON.stringify(key)).join(", ");
+			throw new Error(`Unknown schema "${schemaName}"; use one of ${keys} or define customTags array`);
+		}
 	}
 	if (Array.isArray(customTags)) for (const tag of customTags) tags = tags.concat(tag);
 	else if (typeof customTags === "function") tags = customTags(tags.slice());
@@ -79905,14 +80337,15 @@ function stringifyDocument(doc, options) {
 		if ((body[0] === "|" || body[0] === ">") && lines[lines.length - 1] === "---") lines[lines.length - 1] = `--- ${body}`;
 		else lines.push(body);
 	} else lines.push(stringify$2(doc.contents, ctx));
-	if (doc.directives?.docEnd) if (doc.comment) {
-		const cs = commentString(doc.comment);
-		if (cs.includes("\n")) {
-			lines.push("...");
-			lines.push(indentComment(cs, ""));
-		} else lines.push(`... ${cs}`);
-	} else lines.push("...");
-	else {
+	if (doc.directives?.docEnd) {
+		if (doc.comment) {
+			const cs = commentString(doc.comment);
+			if (cs.includes("\n")) {
+				lines.push("...");
+				lines.push(indentComment(cs, ""));
+			} else lines.push(`... ${cs}`);
+		} else lines.push("...");
+	} else {
 		let dc = doc.comment;
 		if (dc && chompKeep) dc = dc.replace(/^\n+/, "");
 		if (dc) {
@@ -80406,8 +80839,10 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError, ta
 			}
 			if (!keyProps.anchor && !keyProps.tag && !sep) {
 				commentEnd = keyProps.end;
-				if (keyProps.comment) if (map.comment) map.comment += "\n" + keyProps.comment;
-				else map.comment = keyProps.comment;
+				if (keyProps.comment) {
+					if (map.comment) map.comment += "\n" + keyProps.comment;
+					else map.comment = keyProps.comment;
+				}
 				continue;
 			}
 			if (keyProps.newlineAfterProp || containsNewline(key)) onError(key ?? start[start.length - 1], "MULTILINE_IMPLICIT_KEY", "Implicit keys need to be on a single line");
@@ -80440,8 +80875,10 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError, ta
 			map.items.push(pair);
 		} else {
 			if (implicitKey) onError(keyNode.range, "MISSING_CHAR", "Implicit map keys need to be followed by map values");
-			if (valueProps.comment) if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
-			else keyNode.comment = valueProps.comment;
+			if (valueProps.comment) {
+				if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
+				else keyNode.comment = valueProps.comment;
+			}
 			const pair = new Pair(keyNode);
 			if (ctx.options.keepSourceTokens) pair.srcToken = collItem;
 			map.items.push(pair);
@@ -80472,12 +80909,15 @@ function resolveBlockSeq({ composeNode, composeEmptyNode }, ctx, bs, onError, ta
 			parentIndent: bs.indent,
 			startOnNewline: true
 		});
-		if (!props.found) if (props.anchor || props.tag || value) if (value?.type === "block-seq") onError(props.end, "BAD_INDENT", "All sequence items must start at the same column");
-		else onError(offset, "MISSING_CHAR", "Sequence item without - indicator");
-		else {
-			commentEnd = props.end;
-			if (props.comment) seq.comment = props.comment;
-			continue;
+		if (!props.found) {
+			if (props.anchor || props.tag || value) {
+				if (value?.type === "block-seq") onError(props.end, "BAD_INDENT", "All sequence items must start at the same column");
+				else onError(offset, "MISSING_CHAR", "Sequence item without - indicator");
+			} else {
+				commentEnd = props.end;
+				if (props.comment) seq.comment = props.comment;
+				continue;
+			}
 		}
 		const node = value ? composeNode(ctx, value, props, onError) : composeEmptyNode(ctx, props.end, start, null, props, onError);
 		if (ctx.schema.compat) flowIndentCheck(bs.indent, value, onError);
@@ -80555,8 +80995,10 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
 			if (!props.anchor && !props.tag && !sep && !value) {
 				if (i === 0 && props.comma) onError(props.comma, "UNEXPECTED_TOKEN", `Unexpected , in ${fcName}`);
 				else if (i < fc.items.length - 1) onError(props.start, "UNEXPECTED_TOKEN", `Unexpected empty item in ${fcName}`);
-				if (props.comment) if (coll.comment) coll.comment += "\n" + props.comment;
-				else coll.comment = props.comment;
+				if (props.comment) {
+					if (coll.comment) coll.comment += "\n" + props.comment;
+					else coll.comment = props.comment;
+				}
 				offset = props.end;
 				continue;
 			}
@@ -80616,13 +81058,17 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
 					}
 					if (props.start < valueProps.found.offset - 1024) onError(valueProps.found, "KEY_OVER_1024_CHARS", "The : indicator must be at most 1024 chars after the start of an implicit flow sequence key");
 				}
-			} else if (value) if ("source" in value && value.source?.[0] === ":") onError(value, "MISSING_CHAR", `Missing space after : in ${fcName}`);
-			else onError(valueProps.start, "MISSING_CHAR", `Missing , or : between ${fcName} items`);
+			} else if (value) {
+				if ("source" in value && value.source?.[0] === ":") onError(value, "MISSING_CHAR", `Missing space after : in ${fcName}`);
+				else onError(valueProps.start, "MISSING_CHAR", `Missing , or : between ${fcName} items`);
+			}
 			const valueNode = value ? composeNode(ctx, value, valueProps, onError) : valueProps.found ? composeEmptyNode(ctx, valueProps.end, sep, null, valueProps, onError) : null;
 			if (valueNode) {
 				if (isBlock(value)) onError(valueNode.range, "BLOCK_IN_FLOW", blockMsg);
-			} else if (valueProps.comment) if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
-			else keyNode.comment = valueProps.comment;
+			} else if (valueProps.comment) {
+				if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
+				else keyNode.comment = valueProps.comment;
+			}
 			const pair = new Pair(keyNode, valueNode);
 			if (ctx.options.keepSourceTokens) pair.srcToken = collItem;
 			if (isMap) {
@@ -80656,8 +81102,10 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
 	}
 	if (ee.length > 0) {
 		const end = resolveEnd(ee, cePos, ctx.options.strict, onError);
-		if (end.comment) if (coll.comment) coll.comment += "\n" + end.comment;
-		else coll.comment = end.comment;
+		if (end.comment) {
+			if (coll.comment) coll.comment += "\n" + end.comment;
+			else coll.comment = end.comment;
+		}
 		coll.range = [
 			fc.offset,
 			cePos,
@@ -80791,9 +81239,10 @@ function resolveBlockScalar(ctx, scalar, onError) {
 			value += sep + indent.slice(trimIndent) + content;
 			sep = "\n";
 			prevMoreIndented = true;
-		} else if (content === "") if (sep === "\n") value += "\n";
-		else sep = "\n";
-		else {
+		} else if (content === "") {
+			if (sep === "\n") value += "\n";
+			else sep = "\n";
+		} else {
 			value += sep + content;
 			sep = " ";
 			prevMoreIndented = false;
@@ -80949,9 +81398,7 @@ function plainValue(source, onError) {
 			badChar = `block scalar indicator ${source[0]}`;
 			break;
 		case "@":
-		case "`":
-			badChar = `reserved character ${source[0]}`;
-			break;
+		case "`": badChar = `reserved character ${source[0]}`;
 	}
 	if (badChar) onError(0, "BAD_SCALAR_START", `Plain value cannot start with ${badChar}`);
 	return foldLines(source);
@@ -80983,9 +81430,10 @@ function foldLines(source) {
 	let pos = first.lastIndex;
 	line.lastIndex = pos;
 	while (match = line.exec(source)) {
-		if (match[1] === "") if (sep === "\n") res += sep;
-		else sep = "\n";
-		else {
+		if (match[1] === "") {
+			if (sep === "\n") res += sep;
+			else sep = "\n";
+		} else {
 			res += sep + match[1];
 			sep = " ";
 		}
@@ -81114,8 +81562,10 @@ function composeScalar(ctx, token, tagToken, onError) {
 function findScalarTagByName(schema, value, tagName, tagToken, onError) {
 	if (tagName === "!") return schema[SCALAR$1];
 	const matchWithTest = [];
-	for (const tag of schema.tags) if (!tag.collection && tag.tag === tagName) if (tag.default && tag.test) matchWithTest.push(tag);
-	else return tag;
+	for (const tag of schema.tags) if (!tag.collection && tag.tag === tagName) {
+		if (tag.default && tag.test) matchWithTest.push(tag);
+		else return tag;
+	}
 	for (const tag of matchWithTest) if (tag.test?.test(value)) return tag;
 	const kt = schema.knownTags[tagName];
 	if (kt && !kt.collection) {
@@ -81201,8 +81651,10 @@ function composeNode(ctx, token, props, onError) {
 	if (anchor && node.anchor === "") onError(anchor, "BAD_ALIAS", "Anchor cannot be an empty string");
 	if (atKey && ctx.options.stringKeys && (!isScalar$1(node) || typeof node.value !== "string" || node.tag && node.tag !== "tag:yaml.org,2002:str")) onError(tag ?? token, "NON_STRING_KEY", "With stringKeys, all keys must be strings");
 	if (spaceBefore) node.spaceBefore = true;
-	if (comment) if (token.type === "scalar" && token.source === "") node.comment = comment;
-	else node.commentBefore = comment;
+	if (comment) {
+		if (token.type === "scalar" && token.source === "") node.comment = comment;
+		else node.commentBefore = comment;
+	}
 	if (ctx.options.keepSourceTokens && isSrcToken) node.srcToken = token;
 	return node;
 }
@@ -82339,11 +82791,13 @@ var Lexer = class {
 			end = i;
 		} else if (isEmpty(ch)) {
 			let next = this.buffer[i + 1];
-			if (ch === "\r") if (next === "\n") {
-				i += 1;
-				ch = "\n";
-				next = this.buffer[i + 1];
-			} else end = i;
+			if (ch === "\r") {
+				if (next === "\n") {
+					i += 1;
+					ch = "\n";
+					next = this.buffer[i + 1];
+				} else end = i;
+			}
 			if (next === "#" || inFlow && flowIndicatorChars.has(next)) break;
 			if (ch === "\n") {
 				const cs = this.continueScalar(i + 1);
@@ -82551,9 +83005,10 @@ function fixFlowSeqItems(fc) {
 		for (const it of fc.items) if (it.sep && !it.value && !includesToken(it.start, "explicit-key-ind") && !includesToken(it.sep, "map-value-ind")) {
 			if (it.key) it.value = it.key;
 			delete it.key;
-			if (isFlowToken(it.value)) if (it.value.end) arrayPushArray(it.value.end, it.sep);
-			else it.value.end = it.sep;
-			else arrayPushArray(it.start, it.sep);
+			if (isFlowToken(it.value)) {
+				if (it.value.end) arrayPushArray(it.value.end, it.sep);
+				else it.value.end = it.sep;
+			} else arrayPushArray(it.start, it.sep);
 			delete it.sep;
 		}
 	}
@@ -82987,13 +83442,31 @@ var Parser = class {
 					this.onKeyLine = true;
 					return;
 				case "map-value-ind":
-					if (it.explicitKey) if (!it.sep) if (includesToken(it.start, "newline")) Object.assign(it, {
-						key: null,
-						sep: [this.sourceToken]
-					});
-					else {
-						const start = getFirstKeyStartProps(it.start);
-						this.stack.push({
+					if (it.explicitKey) {
+						if (!it.sep) {
+							if (includesToken(it.start, "newline")) Object.assign(it, {
+								key: null,
+								sep: [this.sourceToken]
+							});
+							else {
+								const start = getFirstKeyStartProps(it.start);
+								this.stack.push({
+									type: "block-map",
+									offset: this.offset,
+									indent: this.indent,
+									items: [{
+										start,
+										key: null,
+										sep: [this.sourceToken]
+									}]
+								});
+							}
+						} else if (it.value) map.items.push({
+							start: [],
+							key: null,
+							sep: [this.sourceToken]
+						});
+						else if (includesToken(it.sep, "map-value-ind")) this.stack.push({
 							type: "block-map",
 							offset: this.offset,
 							indent: this.indent,
@@ -83003,42 +83476,26 @@ var Parser = class {
 								sep: [this.sourceToken]
 							}]
 						});
-					}
-					else if (it.value) map.items.push({
-						start: [],
-						key: null,
-						sep: [this.sourceToken]
-					});
-					else if (includesToken(it.sep, "map-value-ind")) this.stack.push({
-						type: "block-map",
-						offset: this.offset,
-						indent: this.indent,
-						items: [{
-							start,
-							key: null,
-							sep: [this.sourceToken]
-						}]
-					});
-					else if (isFlowToken(it.key) && !includesToken(it.sep, "newline")) {
-						const start = getFirstKeyStartProps(it.start);
-						const key = it.key;
-						const sep = it.sep;
-						sep.push(this.sourceToken);
-						delete it.key;
-						delete it.sep;
-						this.stack.push({
-							type: "block-map",
-							offset: this.offset,
-							indent: this.indent,
-							items: [{
-								start,
-								key,
-								sep
-							}]
-						});
-					} else if (start.length > 0) it.sep = it.sep.concat(start, this.sourceToken);
-					else it.sep.push(this.sourceToken);
-					else if (!it.sep) Object.assign(it, {
+						else if (isFlowToken(it.key) && !includesToken(it.sep, "newline")) {
+							const start = getFirstKeyStartProps(it.start);
+							const key = it.key;
+							const sep = it.sep;
+							sep.push(this.sourceToken);
+							delete it.key;
+							delete it.sep;
+							this.stack.push({
+								type: "block-map",
+								offset: this.offset,
+								indent: this.indent,
+								items: [{
+									start,
+									key,
+									sep
+								}]
+							});
+						} else if (start.length > 0) it.sep = it.sep.concat(start, this.sourceToken);
+						else it.sep.push(this.sourceToken);
+					} else if (!it.sep) Object.assign(it, {
 						key: null,
 						sep: [this.sourceToken]
 					});
@@ -83401,8 +83858,10 @@ function parse(src, reviver, options) {
 	const doc = parseDocument(src, options);
 	if (!doc) return null;
 	doc.warnings.forEach((warning) => warn$1(doc.options.logLevel, warning));
-	if (doc.errors.length > 0) if (doc.options.logLevel !== "silent") throw doc.errors[0];
-	else doc.errors = [];
+	if (doc.errors.length > 0) {
+		if (doc.options.logLevel !== "silent") throw doc.errors[0];
+		else doc.errors = [];
+	}
 	return doc.toJS(Object.assign({ reviver: _reviver }, options));
 }
 function stringify(value, replacer, options) {
@@ -83907,9 +84366,10 @@ var AccessibilityPanel_default = /* @__PURE__ */ defineComponent({
 			moodleFetch("local_gugrades_get_accessibility_enabled", {}).then((result) => {
 				enabled.value = !!result.enabled;
 				setAccessibilityEnabledCache(enabled.value);
-				if (enabled.value) if (!hasStoredAccessibilitySettings() && result.hillhead?.hassettings) importFromHillhead(result.hillhead);
-				else activate();
-				else clearAppliedAccessibility();
+				if (enabled.value) {
+					if (!hasStoredAccessibilitySettings() && result.hillhead?.hassettings) importFromHillhead(result.hillhead);
+					else activate();
+				} else clearAppliedAccessibility();
 			}).catch((error) => {
 				console.error(error);
 				enabled.value = false;
@@ -85007,9 +85467,7 @@ function validateInput(node, value) {
 		case "group":
 			if (!value || typeof value !== "object") error(107, [node, value]);
 			break;
-		case "list":
-			if (!Array.isArray(value)) error(108, [node, value]);
-			break;
+		case "list": if (!Array.isArray(value)) error(108, [node, value]);
 	}
 	return value;
 }
@@ -85059,9 +85517,11 @@ function hydrate(node, context) {
 				name: child.name,
 				value: child.value
 			});
-			if (!_value.__init) if (child.type === "group") child.input({}, false);
-			else if (child.type === "list") child.input([], false);
-			else child.input(void 0, false);
+			if (!_value.__init) {
+				if (child.type === "group") child.input({}, false);
+				else if (child.type === "list") child.input([], false);
+				else child.input(void 0, false);
+			}
 		}
 	});
 	return node;
@@ -85871,14 +86331,15 @@ function compile(expr) {
 				if (p === 0) error(103, [operation, expression]);
 				p += operation.length - 1;
 				if (p === expression.length - 1) error(104, [operation, expression]);
-				if (!op) if (left) {
-					op = operators[operation].bind(null, evaluate(left, step));
-					left = null;
-				} else {
-					op = operators[operation].bind(null, evaluate(operand, step));
-					operand = "";
-				}
-				else if (operand) {
+				if (!op) {
+					if (left) {
+						op = operators[operation].bind(null, evaluate(left, step));
+						left = null;
+					} else {
+						op = operators[operation].bind(null, evaluate(operand, step));
+						operand = "";
+					}
+				} else if (operand) {
 					left = op.bind(null, evaluate(operand, step));
 					op = operators[operation].bind(null, left);
 					operand = "";
@@ -86528,11 +86989,12 @@ function run(current, validations, state, removeImmediately, complete) {
 			run(current + 1, validations, state, removeImmediately || async, complete);
 		} else complete();
 	}
-	if ((!empty(node.value) || !validation.skipEmpty) && (state.isPassing || validation.force)) if (validation.queued) runRule(validation, node, (result) => {
-		result instanceof Promise ? result.then((r) => next(true, r)) : next(false, result);
-	});
-	else run(current + 1, validations, state, removeImmediately, complete);
-	else if (empty(node.value) && validation.skipEmpty && state.isPassing) {
+	if ((!empty(node.value) || !validation.skipEmpty) && (state.isPassing || validation.force)) {
+		if (validation.queued) runRule(validation, node, (result) => {
+			result instanceof Promise ? result.then((r) => next(true, r)) : next(false, result);
+		});
+		else run(current + 1, validations, state, removeImmediately, complete);
+	} else if (empty(node.value) && validation.skipEmpty && state.isPassing) {
 		node.observe();
 		node.value;
 		next(false, state.isPassing);
@@ -87192,12 +87654,14 @@ function shouldSelect(valueA, valueB) {
 function options(node) {
 	node.hook.prop((prop, next) => {
 		var _a;
-		if (prop.prop === "options") if (typeof prop.value === "function") {
-			node.props.optionsLoader = prop.value;
-			prop.value = [];
-		} else {
-			(_a = node.props)._normalizeCounter ?? (_a._normalizeCounter = { count: 1 });
-			prop.value = normalizeOptions(prop.value, node.props._normalizeCounter);
+		if (prop.prop === "options") {
+			if (typeof prop.value === "function") {
+				node.props.optionsLoader = prop.value;
+				prop.value = [];
+			} else {
+				(_a = node.props)._normalizeCounter ?? (_a._normalizeCounter = { count: 1 });
+				prop.value = normalizeOptions(prop.value, node.props._normalizeCounter);
+			}
 		}
 		return next(prop);
 	});
@@ -87539,10 +88003,12 @@ function normalizeBoxes(node) {
 				if (!option2.attrs?.id) return /* @__PURE__ */ extend$1(option2, { attrs: { id: `${node.props.id}-option-${slugify(String(option2.value))}` } });
 				return option2;
 			});
-			if (node.props.type === "checkbox" && !Array.isArray(node.value)) if (node.isCreated) node.input([], false);
-			else node.on("created", () => {
-				if (!Array.isArray(node.value)) node.input([], false);
-			});
+			if (node.props.type === "checkbox" && !Array.isArray(node.value)) {
+				if (node.isCreated) node.input([], false);
+				else node.on("created", () => {
+					if (!Array.isArray(node.value)) node.input([], false);
+				});
+			}
 		}
 		return next(prop);
 	};
@@ -87551,10 +88017,11 @@ function toggleChecked(node, e) {
 	const el = e.target;
 	if (el instanceof HTMLInputElement) {
 		const value = Array.isArray(node.props.options) ? optionValue(node.props.options, el.value) : el.value;
-		if (Array.isArray(node.props.options) && node.props.options.length) if (!Array.isArray(node._value)) node.input([value]);
-		else if (!node._value.some((existingValue) => shouldSelect(value, existingValue))) node.input([...node._value, value]);
-		else node.input(node._value.filter((existingValue) => !shouldSelect(value, existingValue)));
-		else if (el.checked) node.input(node.props.onValue);
+		if (Array.isArray(node.props.options) && node.props.options.length) {
+			if (!Array.isArray(node._value)) node.input([value]);
+			else if (!node._value.some((existingValue) => shouldSelect(value, existingValue))) node.input([...node._value, value]);
+			else node.input(node._value.filter((existingValue) => !shouldSelect(value, existingValue)));
+		} else if (el.checked) node.input(node.props.onValue);
 		else node.input(node.props.offValue);
 	}
 }
@@ -88881,14 +89348,16 @@ var init_bindings = __esm({ "packages/vue/src/bindings.ts"() {
 			node.emit("modelUpdated");
 		});
 		node.on("commit", ({ payload }) => {
-			if ((!context.state.dirty || context.dirtyBehavior === "compare") && node.isCreated && hasTicked) if (!node.store.validating?.value) context.handlers.touch();
-			else {
-				const receipt = node.on("message-removed", ({ payload: message3 }) => {
-					if (message3.key === "validating") {
-						context.handlers.touch();
-						node.off(receipt);
-					}
-				});
+			if ((!context.state.dirty || context.dirtyBehavior === "compare") && node.isCreated && hasTicked) {
+				if (!node.store.validating?.value) context.handlers.touch();
+				else {
+					const receipt = node.on("message-removed", ({ payload: message3 }) => {
+						if (message3.key === "validating") {
+							context.handlers.touch();
+							node.off(receipt);
+						}
+					});
+				}
 			}
 			if (isComplete && node.type === "input" && hasErrors.value && !undefine(node.props.preserveErrors)) node.store.filter((message3) => !(message3.type === "error" && message3.meta?.autoClear === true));
 			if (node.type === "list" && node.sync) items.value = node.children.map((child) => child.uid);
@@ -89036,9 +89505,11 @@ function parseSchema(library, schema, memoKey) {
 		if (typeof attr.then === "object") a = parseAttrs(attr.then, void 0);
 		else if (typeof attr.then === "string" && attr.then?.startsWith("$")) a = provider(compile(attr.then));
 		else a = () => attr.then;
-		if (has(attr, "else")) if (typeof attr.else === "object") b = parseAttrs(attr.else);
-		else if (typeof attr.else === "string" && attr.else?.startsWith("$")) b = provider(compile(attr.else));
-		else b = () => attr.else;
+		if (has(attr, "else")) {
+			if (typeof attr.else === "object") b = parseAttrs(attr.else);
+			else if (typeof attr.else === "string" && attr.else?.startsWith("$")) b = provider(compile(attr.else));
+			else b = () => attr.else;
+		}
 		return () => condition() ? a() : b();
 	}
 	function parseAttrs(unparsedAttrs, bindExp, _default = {}) {
@@ -89085,48 +89556,54 @@ function parseSchema(library, schema, memoKey) {
 			element = node.$el;
 			attrs = node.$el !== "text" ? parseAttrs(node.attrs, node.bind) : () => null;
 		} else if (isComponent(node)) {
-			if (typeof node.$cmp === "string") if (has(library2, node.$cmp)) element = library2[node.$cmp];
-			else {
-				element = node.$cmp;
-				resolve = true;
-			}
-			else element = node.$cmp;
+			if (typeof node.$cmp === "string") {
+				if (has(library2, node.$cmp)) element = library2[node.$cmp];
+				else {
+					element = node.$cmp;
+					resolve = true;
+				}
+			} else element = node.$cmp;
 			attrs = parseAttrs(node.props, node.bind);
 		} else if (isConditional(node)) [condition, children, alternate] = parseCondition(library2, node);
 		if (!isConditional(node) && "if" in node) condition = provider(compile(node.if));
 		else if (!isConditional(node) && element === null) condition = () => true;
-		if ("children" in node && node.children) if (typeof node.children === "string") if (node.children.startsWith("$slots.")) {
-			element = element === "text" ? "slot" : element;
-			children = provider(compile(node.children));
-		} else if (node.children.startsWith("$") && node.children.length > 1) {
-			const value = provider(compile(node.children));
-			children = () => String(value());
-		} else children = () => String(node.children);
-		else if (Array.isArray(node.children)) children = createElements(library2, node.children);
-		else {
-			const [childCondition, c, a] = parseCondition(library2, node.children);
-			children = (iterationData) => childCondition && childCondition() ? c && c(iterationData) : a && a(iterationData);
+		if ("children" in node && node.children) {
+			if (typeof node.children === "string") {
+				if (node.children.startsWith("$slots.")) {
+					element = element === "text" ? "slot" : element;
+					children = provider(compile(node.children));
+				} else if (node.children.startsWith("$") && node.children.length > 1) {
+					const value = provider(compile(node.children));
+					children = () => String(value());
+				} else children = () => String(node.children);
+			} else if (Array.isArray(node.children)) children = createElements(library2, node.children);
+			else {
+				const [childCondition, c, a] = parseCondition(library2, node.children);
+				children = (iterationData) => childCondition && childCondition() ? c && c(iterationData) : a && a(iterationData);
+			}
 		}
-		if (isComponent(node)) if (children) {
-			const produceChildren = children;
-			children = (iterationData) => {
-				return { default(slotData2, key, capturedScope) {
-					const currentKey = instanceKey;
-					if (key) instanceKey = key;
-					const scopeItemsAdded = capturedScope?.length || 0;
-					if (capturedScope) for (let i = capturedScope.length - 1; i >= 0; i--) instanceScopes.get(instanceKey)?.unshift(capturedScope[i]);
-					if (iterationData) instanceScopes.get(instanceKey)?.unshift(iterationData);
-					if (slotData2) instanceScopes.get(instanceKey)?.unshift(slotData2);
-					const c = produceChildren(iterationData);
-					if (slotData2) instanceScopes.get(instanceKey)?.shift();
-					if (iterationData) instanceScopes.get(instanceKey)?.shift();
-					for (let i = 0; i < scopeItemsAdded; i++) instanceScopes.get(instanceKey)?.shift();
-					instanceKey = currentKey;
-					return c;
-				} };
-			};
-			children.slot = true;
-		} else children = () => ({});
+		if (isComponent(node)) {
+			if (children) {
+				const produceChildren = children;
+				children = (iterationData) => {
+					return { default(slotData2, key, capturedScope) {
+						const currentKey = instanceKey;
+						if (key) instanceKey = key;
+						const scopeItemsAdded = capturedScope?.length || 0;
+						if (capturedScope) for (let i = capturedScope.length - 1; i >= 0; i--) instanceScopes.get(instanceKey)?.unshift(capturedScope[i]);
+						if (iterationData) instanceScopes.get(instanceKey)?.unshift(iterationData);
+						if (slotData2) instanceScopes.get(instanceKey)?.unshift(slotData2);
+						const c = produceChildren(iterationData);
+						if (slotData2) instanceScopes.get(instanceKey)?.shift();
+						if (iterationData) instanceScopes.get(instanceKey)?.shift();
+						for (let i = 0; i < scopeItemsAdded; i++) instanceScopes.get(instanceKey)?.shift();
+						instanceKey = currentKey;
+						return c;
+					} };
+				};
+				children.slot = true;
+			} else children = () => ({});
+		}
 		if ("for" in node && node.for) {
 			const values = node.for.length === 3 ? node.for[2] : node.for[1];
 			iterator = [
