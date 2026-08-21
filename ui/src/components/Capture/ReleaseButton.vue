@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton @click="release_button_clicked" :disabled="!enable" iconName="LockKeyholeOpen">
+    <MenuButton @click="release_button_clicked" :disabled="!enable" :disabledReason="disabledReason" iconName="LockKeyholeOpen">
         <span v-if="props.released">
             <span v-if="grouprelease">{{ mstrings['unreleasegradesgroup'] }}</span>
             <span v-else>{{ mstrings['unreleasegrades'] }}</span>
@@ -81,6 +81,10 @@
         enable: {
             type: Boolean,
             default: true,
+        },
+        disabledReason: {
+            type: String,
+            default: '',
         },
         gradeitemid: Number,
         groupid: {

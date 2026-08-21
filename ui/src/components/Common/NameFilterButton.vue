@@ -1,5 +1,5 @@
 <template>
-    <MenuButton @click="filteropen" :disabled="props.usershidden" iconName="Funnel">
+    <MenuButton @click="filteropen" :disabled="props.usershidden" :disabledReason="filterDisabledReason" iconName="Funnel">
         {{ mstrings.filterbyname }}
     </MenuButton>
 
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { computed, ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import HeadlessModal from '../Tailwind/HeadlessModal.vue';
@@ -28,6 +28,10 @@
             type: Boolean,
             required: true,
         }
+    });
+
+    const filterDisabledReason = computed(() => {
+        return props.usershidden ? mstringstore.getMstring('tooltipfilterhiddennames') : '';
     });
 
     const showfiltermodal = ref(false);

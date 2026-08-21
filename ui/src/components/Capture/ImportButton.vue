@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton @click="import_button_click" :disabled="!enable" iconName="Download">
+    <MenuButton @click="import_button_click" :disabled="!enable" :disabledReason="disabledReason" iconName="Download">
         <span v-if="groupimport">{{ mstrings['importgradesgroup'] }}</span>
         <span v-else>{{ mstrings['importgrades'] }}</span>
     </MenuButton>
@@ -143,6 +143,10 @@
         enable: {
             type: Boolean,
             default: false,
+        },
+        disabledReason: {
+            type: String,
+            default: '',
         },
         userids: Array,
         itemid: Number,

@@ -68888,6 +68888,28 @@ var CaptureMenu_default = /* @__PURE__ */ defineComponent({
 	}
 });
 //#endregion
+//#region src/components/Common/UTooltip.vue
+var UTooltip_default = /* @__PURE__ */ defineComponent({
+	inheritAttrs: false,
+	__name: "UTooltip",
+	props: {
+		text: {},
+		hasUnderline: {
+			type: Boolean,
+			default: false
+		},
+		position: { default: "above" }
+	},
+	setup(__props) {
+		return (_ctx, _cache) => {
+			return !__props.text || __props.text.trim() === "" ? (openBlock(), createElementBlock("div", normalizeProps(mergeProps$1({ key: 0 }, _ctx.$attrs)), [renderSlot(_ctx.$slots, "default")], 16)) : (openBlock(), createElementBlock("div", mergeProps$1({
+				key: 1,
+				class: ["group relative inline-block transition-all", [__props.hasUnderline ? "cursor-help border-b border-dashed border-brand-light-purple/60 hover:border-brand-light-purple" : "cursor-default"]]
+			}, _ctx.$attrs), [renderSlot(_ctx.$slots, "default"), createBaseVNode("div", { class: normalizeClass(["invisible absolute left-1/2 z-50 w-max max-w-xs -translate-x-1/2 rounded-lg bg-brand-dark-purple px-3 py-2 text-sm font-medium normal-case tracking-normal whitespace-normal text-left text-white opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 pointer-events-none", [__props.position === "above" ? "bottom-full mb-3" : "top-full mt-3"]]) }, [createTextVNode(toDisplayString(__props.text) + " ", 1), createBaseVNode("div", { class: normalizeClass(["absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-brand-dark-purple", [__props.position === "above" ? "top-full -translate-y-[5px]" : "bottom-full translate-y-[5px]"]]) }, null, 2)], 2)], 16));
+		};
+	}
+});
+//#endregion
 //#region src/components/Common/MenuButton.vue
 var MenuButton_default = /* @__PURE__ */ defineComponent({
 	__name: "MenuButton",
@@ -68897,6 +68919,7 @@ var MenuButton_default = /* @__PURE__ */ defineComponent({
 			type: Boolean,
 			default: false
 		},
+		disabledReason: { default: "" },
 		warning: { type: Boolean },
 		wide: {
 			type: Boolean,
@@ -68908,28 +68931,44 @@ var MenuButton_default = /* @__PURE__ */ defineComponent({
 	setup(__props, { emit: __emit }) {
 		const props = __props;
 		const emit = __emit;
+		const disabledTooltip = computed(() => {
+			if (!props.disabled) return "";
+			return props.disabledReason?.trim() || "";
+		});
 		const resolvedIcon = computed(() => {
 			return lucide_vue_exports[props.iconName] || CircleQuestionMark;
 		});
 		return (_ctx, _cache) => {
-			return openBlock(), createBlock(resolveDynamicComponent(props.href ? "a" : "button"), {
-				href: props.href || void 0,
-				type: props.href ? void 0 : "button",
-				disabled: props.href ? void 0 : __props.disabled,
-				onClick: _cache[0] || (_cache[0] = ($event) => emit("click", $event)),
-				class: normalizeClass(["inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed shadow-sm font-semibold text-xs gap-2 transition-all duration-150 no-underline", props.wide ? "w-full min-w-36" : "w-36"])
+			return openBlock(), createBlock(UTooltip_default, {
+				class: "inline-flex rounded-md focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark-blue",
+				tabindex: disabledTooltip.value ? 0 : void 0,
+				text: disabledTooltip.value,
+				position: "above"
 			}, {
-				default: withCtx(() => [(openBlock(), createBlock(resolveDynamicComponent(resolvedIcon.value), {
-					size: 16,
-					class: normalizeClass(["shrink-0 opacity-70", props.warning ? "!text-brand-dark-pink" : ""])
-				}, null, 8, ["class"])), createBaseVNode("span", { class: normalizeClass(props.wide ? "whitespace-nowrap" : "truncate") }, [renderSlot(_ctx.$slots, "default")], 2)]),
+				default: withCtx(() => [(openBlock(), createBlock(resolveDynamicComponent(props.href ? "a" : "button"), {
+					href: props.href || void 0,
+					type: props.href ? void 0 : "button",
+					disabled: props.href ? void 0 : __props.disabled,
+					"aria-disabled": __props.disabled || void 0,
+					"aria-label": disabledTooltip.value || void 0,
+					onClick: _cache[0] || (_cache[0] = ($event) => emit("click", $event)),
+					class: normalizeClass(["inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed disabled:pointer-events-none shadow-sm font-semibold text-xs gap-2 transition-all duration-150 no-underline", props.wide ? "w-full min-w-36" : "w-36"])
+				}, {
+					default: withCtx(() => [(openBlock(), createBlock(resolveDynamicComponent(resolvedIcon.value), {
+						size: 16,
+						class: normalizeClass(["shrink-0 opacity-70", props.warning ? "!text-brand-dark-pink" : ""])
+					}, null, 8, ["class"])), createBaseVNode("span", { class: normalizeClass(props.wide ? "whitespace-nowrap" : "truncate") }, [renderSlot(_ctx.$slots, "default")], 2)]),
+					_: 3
+				}, 8, [
+					"href",
+					"type",
+					"disabled",
+					"aria-disabled",
+					"aria-label",
+					"class"
+				]))]),
 				_: 3
-			}, 8, [
-				"href",
-				"type",
-				"disabled",
-				"class"
-			]);
+			}, 8, ["tabindex", "text"]);
 		};
 	}
 });
@@ -69752,6 +69791,10 @@ var ImportButton_default = /* @__PURE__ */ defineComponent({
 			type: Boolean,
 			default: false
 		},
+		disabledReason: {
+			type: String,
+			default: ""
+		},
 		userids: Array,
 		itemid: Number,
 		groupid: Number,
@@ -69948,11 +69991,12 @@ var ImportButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(MenuButton_default, {
 					onClick: import_button_click,
 					disabled: !__props.enable,
+					disabledReason: __props.disabledReason,
 					iconName: "Download"
 				}, {
 					default: withCtx(() => [groupimport.value ? (openBlock(), createElementBlock("span", _hoisted_1$48, toDisplayString(unref(mstrings)["importgradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_2$34, toDisplayString(unref(mstrings)["importgrades"]), 1))]),
 					_: 1
-				}, 8, ["disabled"]),
+				}, 8, ["disabled", "disabledReason"]),
 				createVNode(_component_VueModal, {
 					modelValue: showimportmodal.value,
 					"onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => showimportmodal.value = $event),
@@ -70306,6 +70350,10 @@ var CSVImportButton_default = /* @__PURE__ */ defineComponent({
 			type: Boolean,
 			default: true
 		},
+		disabledReason: {
+			type: String,
+			default: ""
+		},
 		itemid: Number,
 		groupid: Number,
 		itemname: String,
@@ -70477,11 +70525,12 @@ var CSVImportButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(MenuButton_default, {
 					onClick: _cache[0] || (_cache[0] = ($event) => showcsvmodal.value = true),
 					disabled: !props.show || !__props.enable,
+					disabledReason: __props.disabledReason,
 					iconName: "BetweenVerticalStart"
 				}, {
 					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).csvimport), 1)]),
 					_: 1
-				}, 8, ["disabled"]),
+				}, 8, ["disabled", "disabledReason"]),
 				createVNode(_component_VueModal, {
 					modelValue: showcsvmodal.value,
 					"onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => showcsvmodal.value = $event),
@@ -70643,6 +70692,10 @@ var ReleaseButton_default = /* @__PURE__ */ defineComponent({
 			type: Boolean,
 			default: true
 		},
+		disabledReason: {
+			type: String,
+			default: ""
+		},
 		gradeitemid: Number,
 		groupid: {
 			type: Number,
@@ -70716,11 +70769,12 @@ var ReleaseButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(MenuButton_default, {
 					onClick: release_button_clicked,
 					disabled: !__props.enable,
+					disabledReason: __props.disabledReason,
 					iconName: "LockKeyholeOpen"
 				}, {
 					default: withCtx(() => [props.released ? (openBlock(), createElementBlock("span", _hoisted_1$45, [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_2$31, toDisplayString(unref(mstrings)["unreleasegradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_3$24, toDisplayString(unref(mstrings)["unreleasegrades"]), 1))])) : createCommentVNode("", true), !props.released ? (openBlock(), createElementBlock("span", _hoisted_4$22, [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_5$21, toDisplayString(unref(mstrings)["releasegradesgroup"]), 1)) : (openBlock(), createElementBlock("span", _hoisted_6$17, toDisplayString(unref(mstrings)["releasegrades"]), 1))])) : createCommentVNode("", true)]),
 					_: 1
-				}, 8, ["disabled"]),
+				}, 8, ["disabled", "disabledReason"]),
 				createVNode(_component_VueModal, {
 					modelValue: showreleasemodal.value,
 					"onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => showreleasemodal.value = $event),
@@ -70845,6 +70899,10 @@ var AddMultipleButton_default = /* @__PURE__ */ defineComponent({
 			type: Boolean,
 			default: true
 		},
+		disabledReason: {
+			type: String,
+			default: ""
+		},
 		itemid: Number
 	},
 	emits: ["openmultiple"],
@@ -70908,11 +70966,12 @@ var AddMultipleButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(MenuButton_default, {
 					onClick: _cache[0] || (_cache[0] = ($event) => add_multiple_button_click()),
 					disabled: !__props.enable,
+					disabledReason: __props.disabledReason,
 					iconName: "BetweenVerticalStart"
 				}, {
 					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings)["addmultiple"]), 1)]),
 					_: 1
-				}, 8, ["disabled"]),
+				}, 8, ["disabled", "disabledReason"]),
 				createVNode(_component_VueModal, {
 					modelValue: showaddmultiplemodal.value,
 					"onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => showaddmultiplemodal.value = $event),
@@ -71366,27 +71425,6 @@ var HeadlessModal_default = /* @__PURE__ */ defineComponent({
 				}, 8, ["initial-focus"])]),
 				_: 3
 			}, 8, ["show"]);
-		};
-	}
-});
-//#endregion
-//#region src/components/Common/UTooltip.vue
-var UTooltip_default = /* @__PURE__ */ defineComponent({
-	__name: "UTooltip",
-	props: {
-		text: {},
-		hasUnderline: {
-			type: Boolean,
-			default: false
-		},
-		position: { default: "above" }
-	},
-	setup(__props) {
-		return (_ctx, _cache) => {
-			return !__props.text || __props.text.trim() === "" ? (openBlock(), createElementBlock("div", normalizeProps(mergeProps$1({ key: 0 }, _ctx.$attrs)), [renderSlot(_ctx.$slots, "default")], 16)) : (openBlock(), createElementBlock("div", mergeProps$1({
-				key: 1,
-				class: ["group relative inline-block transition-all", [__props.hasUnderline ? "cursor-help border-b border-dashed border-brand-light-purple/60 hover:border-brand-light-purple" : "cursor-default"]]
-			}, _ctx.$attrs), [renderSlot(_ctx.$slots, "default"), createBaseVNode("div", { class: normalizeClass(["invisible absolute left-1/2 z-50 w-max max-w-xs -translate-x-1/2 rounded-lg bg-brand-dark-purple px-3 py-2 text-sm font-medium normal-case tracking-normal text-white opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 pointer-events-none", [__props.position === "above" ? "bottom-full mb-3" : "top-full mt-3"]]) }, [createTextVNode(toDisplayString(__props.text) + " ", 1), createBaseVNode("div", { class: normalizeClass(["absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-brand-dark-purple", [__props.position === "above" ? "top-full -translate-y-[5px]" : "bottom-full translate-y-[5px]"]]) }, null, 2)], 2)], 16));
 		};
 	}
 });
@@ -72051,8 +72089,12 @@ var NameFilterButton_default = /* @__PURE__ */ defineComponent({
 		required: true
 	} },
 	setup(__props) {
-		const { mstrings } = storeToRefs(useMstrings());
+		const mstringstore = useMstrings();
+		const { mstrings } = storeToRefs(mstringstore);
 		const props = __props;
+		const filterDisabledReason = computed(() => {
+			return props.usershidden ? mstringstore.getMstring("tooltipfilterhiddennames") : "";
+		});
 		const showfiltermodal = /* @__PURE__ */ ref(false);
 		const firstletter = /* @__PURE__ */ ref("");
 		const lastletter = /* @__PURE__ */ ref("");
@@ -72073,11 +72115,12 @@ var NameFilterButton_default = /* @__PURE__ */ defineComponent({
 			return openBlock(), createElementBlock(Fragment, null, [createVNode(MenuButton_default, {
 				onClick: filteropen,
 				disabled: props.usershidden,
+				disabledReason: filterDisabledReason.value,
 				iconName: "Funnel"
 			}, {
 				default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).filterbyname), 1)]),
 				_: 1
-			}, 8, ["disabled"]), createVNode(HeadlessModal_default, {
+			}, 8, ["disabled", "disabledReason"]), createVNode(HeadlessModal_default, {
 				isopen: showfiltermodal.value,
 				onClosed: filterclose
 			}, {
@@ -72140,6 +72183,25 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 	setup(__props, { emit: __emit }) {
 		const props = __props;
 		const emit = __emit;
+		const mstringstore = useMstrings();
+		const cannotEditReason = computed(() => {
+			return props.caneditgrades ? "" : mstringstore.getMstring("tooltipcannoteditgrades");
+		});
+		const importDisabledReason = computed(() => {
+			if (!props.caneditgrades) return mstringstore.getMstring("tooltipcannoteditgrades");
+			if (props.converted) return mstringstore.getMstring("tooltipimportconverted");
+			return "";
+		});
+		const csvDisabledReason = computed(() => {
+			if (!props.caneditgrades) return mstringstore.getMstring("tooltipcannoteditgrades");
+			if (!props.showcsvimport) return mstringstore.getMstring("tooltipcsvnoidnumber");
+			return "";
+		});
+		const releaseDisabledReason = computed(() => {
+			if (!props.caneditgrades) return mstringstore.getMstring("tooltipcannoteditgrades");
+			if (!props.gradesimported) return mstringstore.getMstring("tooltipreleasenotimported");
+			return "";
+		});
 		/**
 		* Handle viewfullnames
 		* @param bool toggleview
@@ -72164,6 +72226,7 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 			return !__props.loaded ? (openBlock(), createElementBlock("div", _hoisted_1$33)) : (openBlock(), createElementBlock("div", _hoisted_2$23, [
 				createVNode(ImportButton_default, {
 					enable: !__props.converted && __props.caneditgrades,
+					disabledReason: importDisabledReason.value,
 					itemid: props.itemid,
 					groupid: props.groupid,
 					userids: props.userids,
@@ -72171,6 +72234,7 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 					onImported: _cache[0] || (_cache[0] = ($event) => emit("refreshtable"))
 				}, null, 8, [
 					"enable",
+					"disabledReason",
 					"itemid",
 					"groupid",
 					"userids",
@@ -72178,6 +72242,7 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 				]),
 				createVNode(CSVImportButton_default, {
 					enable: __props.caneditgrades,
+					disabledReason: csvDisabledReason.value,
 					itemid: props.itemid,
 					groupid: props.groupid,
 					itemname: props.itemname,
@@ -72186,6 +72251,7 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 					onUploaded: _cache[1] || (_cache[1] = ($event) => emit("refreshtable"))
 				}, null, 8, [
 					"enable",
+					"disabledReason",
 					"itemid",
 					"groupid",
 					"itemname",
@@ -72194,17 +72260,24 @@ var CaptureButtons_default = /* @__PURE__ */ defineComponent({
 				]),
 				createVNode(AddMultipleButton_default, {
 					enable: __props.caneditgrades,
+					disabledReason: cannotEditReason.value,
 					itemid: props.itemid,
 					onOpenmultiple: multipleclicked
-				}, null, 8, ["enable", "itemid"]),
+				}, null, 8, [
+					"enable",
+					"disabledReason",
+					"itemid"
+				]),
 				createVNode(ReleaseButton_default, {
 					enable: props.gradesimported && __props.caneditgrades,
+					disabledReason: releaseDisabledReason.value,
 					gradeitemid: props.itemid,
 					groupid: props.groupid,
 					released: props.released,
 					onReleased: _cache[2] || (_cache[2] = ($event) => emit("refreshtable"))
 				}, null, 8, [
 					"enable",
+					"disabledReason",
 					"gradeitemid",
 					"groupid",
 					"released"
@@ -73478,7 +73551,17 @@ var _hoisted_10$6 = { class: "mt-1 mb-4 flex gap-2" };
 //#region src/components/Aggregation/ConversionButton.vue
 var ConversionButton_default = /* @__PURE__ */ defineComponent({
 	__name: "ConversionButton",
-	props: { categoryid: Number },
+	props: {
+		categoryid: Number,
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		disabledReason: {
+			type: String,
+			default: ""
+		}
+	},
 	emits: ["converted"],
 	setup(__props, { emit: __emit }) {
 		const maps = /* @__PURE__ */ ref([]);
@@ -73596,11 +73679,13 @@ var ConversionButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
 				createVNode(MenuButton_default, {
 					onClick: conversion_clicked,
+					disabled: props.disabled,
+					disabledReason: props.disabledReason,
 					iconName: "Rotate3d"
 				}, {
 					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).convertgrades), 1)]),
 					_: 1
-				}),
+				}, 8, ["disabled", "disabledReason"]),
 				createVNode(_component_VueModal, {
 					modelValue: showselectmodal.value,
 					"onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => showselectmodal.value = $event),
@@ -73714,7 +73799,11 @@ var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
 			required: true
 		},
 		released: Boolean,
-		disabled: Boolean
+		disabled: Boolean,
+		disabledReason: {
+			type: String,
+			default: ""
+		}
 	},
 	emits: ["released"],
 	setup(__props, { emit: __emit }) {
@@ -73779,11 +73868,13 @@ var ReleaseCategoryButton_default = /* @__PURE__ */ defineComponent({
 				createVNode(DebugDisplay_default, { debug: debug.value }, null, 8, ["debug"]),
 				createVNode(MenuButton_default, {
 					onClick: _cache[0] || (_cache[0] = ($event) => showreleasemodal.value = true),
+					disabled: props.disabled,
+					disabledReason: props.disabledReason,
 					iconName: "Rocket"
 				}, {
 					default: withCtx(() => [grouprelease.value ? (openBlock(), createElementBlock("span", _hoisted_1$24, [props.released ? (openBlock(), createElementBlock("span", _hoisted_2$17, "(Un-)")) : createCommentVNode("", true), createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedgroup), 1)])) : (openBlock(), createElementBlock("span", _hoisted_3$13, [props.released ? (openBlock(), createElementBlock("span", _hoisted_4$12, "(Un-)")) : createCommentVNode("", true), createTextVNode(toDisplayString(unref(mstrings).releaseaggregatedgrade), 1)]))]),
 					_: 1
-				}),
+				}, 8, ["disabled", "disabledReason"]),
 				createVNode(_component_VueModal, {
 					modelValue: showreleasemodal.value,
 					"onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => showreleasemodal.value = $event),
@@ -74139,6 +74230,16 @@ var AggregationButtons_default = /* @__PURE__ */ defineComponent({
 	setup(__props, { emit: __emit }) {
 		const props = __props;
 		const emits = __emit;
+		const mstringstore = useMstrings();
+		const conversionDisabledReason = computed(() => {
+			if (props.allowconversion) return "";
+			return mstringstore.getMstring("tooltipconversionnotpoints");
+		});
+		const releaseDisabledReason = computed(() => {
+			if (props.allowrelease) return "";
+			if (props.atype === "E") return mstringstore.getMstring("tooltipreleaseerror");
+			return mstringstore.getMstring("tooltipreleasepoints");
+		});
 		/**
 		* Redraw the main table
 		*/
@@ -74157,17 +74258,24 @@ var AggregationButtons_default = /* @__PURE__ */ defineComponent({
 					key: 1,
 					categoryid: props.categoryid,
 					disabled: !__props.allowconversion,
+					disabledReason: conversionDisabledReason.value,
 					onConverted: refreshtable
-				}, null, 8, ["categoryid", "disabled"])) : createCommentVNode("", true),
+				}, null, 8, [
+					"categoryid",
+					"disabled",
+					"disabledReason"
+				])) : createCommentVNode("", true),
 				!props.toplevel && __props.caneditgrades ? (openBlock(), createBlock(ReleaseCategoryButton_default, {
 					key: 2,
 					disabled: !props.allowrelease,
+					disabledReason: releaseDisabledReason.value,
 					gradeitemid: props.gradeitemid,
 					groupid: props.groupid,
 					released: props.released,
 					onReleased: refreshtable
 				}, null, 8, [
 					"disabled",
+					"disabledReason",
 					"gradeitemid",
 					"groupid",
 					"released"
@@ -76157,16 +76265,22 @@ var ConversionActionButtons_default = /* @__PURE__ */ defineComponent({
 					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).view), 1)]),
 					_: 1
 				})) : createCommentVNode("", true),
-				__props.caneditgrades ? (openBlock(), createBlock(UButton_default, {
+				__props.caneditgrades ? (openBlock(), createBlock(UTooltip_default, {
 					key: 2,
-					variant: "error",
-					size: "sm",
-					disabled: __props.inuse,
-					onClick: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("delete", __props.id))
+					text: __props.inuse ? unref(mstrings).tooltipmapinuse : "",
+					position: "above"
 				}, {
-					default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).delete), 1)]),
+					default: withCtx(() => [createVNode(UButton_default, {
+						variant: "error",
+						size: "sm",
+						disabled: __props.inuse,
+						onClick: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("delete", __props.id))
+					}, {
+						default: withCtx(() => [createTextVNode(toDisplayString(unref(mstrings).delete), 1)]),
+						_: 1
+					}, 8, ["disabled"])]),
 					_: 1
-				}, 8, ["disabled"])) : createCommentVNode("", true),
+				}, 8, ["text"])) : createCommentVNode("", true),
 				createVNode(UButton_default, {
 					variant: "success",
 					size: "sm",
