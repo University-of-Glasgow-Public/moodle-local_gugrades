@@ -563,8 +563,9 @@ class aggregation {
         $item = self::get_check_category($courseid, $gradecatitem->id, $user->id);
         $user->rawgrade = $item->rawgrade;
         $user->total = $item->convertedgrade;
-        $user->displaygrade =
-            $converted && empty($item->admingrade) ? $item->displaygrade . ' (' . $item->rawgrade . ')' : $item->displaygrade;
+        // MGU-1505: I have no idea why converted grades had (wrong) numeric values. 
+        $user->displaygrade = $item->displaygrade;
+            //$converted && empty($item->admingrade) ? $item->displaygrade . ' (' . $item->rawgrade . ')' : $item->displaygrade;
         $user->releasegrade = $releasegrade;
         $user->mismatch = $released && ($item->displaygrade != $releasegrade);
         $user->admingrade = $item->admingrade;
@@ -588,7 +589,7 @@ class aggregation {
     /**
      * Add aggregation data to users.
      * Each user record contains list based on columns
-     * Formatted to survive web services (will need reformatted for EasyDataTable)
+     * Formatted to survive web services 
      * @param int $courseid
      * @param int $gradecategoryid
      * @param array $users
