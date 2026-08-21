@@ -1,6 +1,6 @@
 <template>
     <!-- 1. Added h-full to fill the header cell height -->
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col flex-between self-stretch">
         
         <!-- 2. Wrapped upper content in flex-grow to push the bottom elements down -->
         <div class="flex-grow">
@@ -24,7 +24,6 @@
             <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
         </div>
 
-        <!-- 3. Added mt-auto to guarantee this stays at the bottom -->
         <div v-if="column.categoryid" class="mt-auto">
             <UButton class="mt-2 cursor-pointer" size="xs" @click="expand_clicked" aria-label="Drill down into grade category.">
                 <ArrowBigRight :size="18" :stroke-width="1" />

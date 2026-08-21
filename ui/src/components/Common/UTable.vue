@@ -11,11 +11,11 @@
             <th 
               v-for="header in headerGroup.headers" 
               :key="header.id" 
-              class="font-semibold align-middle h-full p-0"
+              class="font-semibold p-0"
               :class="dense ? 'text-xs' : ''"
             >
               <div
-                class="inline-flex items-center gap-1.5 w-full h-full transition-colors duration-150"
+                class="flex items-center gap-1.5 w-full items-stretch transition-colors duration-150"
                 :class="[
                   dense ? 'px-3 py-1.5' : 'px-6 py-2.5',
                   header.column.getCanSort() ? 'cursor-pointer hover:bg-white/10' : ''

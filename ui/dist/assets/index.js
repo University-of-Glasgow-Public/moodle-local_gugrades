@@ -67894,9 +67894,9 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 				return openBlock(), createElementBlock("tr", { key: headerGroup.id }, [(openBlock(true), createElementBlock(Fragment, null, renderList(headerGroup.headers, (header) => {
 					return openBlock(), createElementBlock("th", {
 						key: header.id,
-						class: normalizeClass(["font-semibold align-middle h-full p-0", __props.dense ? "text-xs" : ""])
+						class: normalizeClass(["font-semibold p-0", __props.dense ? "text-xs" : ""])
 					}, [createBaseVNode("div", {
-						class: normalizeClass(["inline-flex items-center gap-1.5 w-full h-full transition-colors duration-150", [__props.dense ? "px-3 py-1.5" : "px-6 py-2.5", header.column.getCanSort() ? "cursor-pointer hover:bg-white/10" : ""]]),
+						class: normalizeClass(["flex items-center gap-1.5 w-full items-stretch transition-colors duration-150", [__props.dense ? "px-3 py-1.5" : "px-6 py-2.5", header.column.getCanSort() ? "cursor-pointer hover:bg-white/10" : ""]]),
 						onClick: ($event) => header.column.getToggleSortingHandler()?.($event)
 					}, [createVNode(unref(FlexRender), {
 						render: header.column.columnDef.header,
@@ -67982,7 +67982,7 @@ var UTable_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE_
 			])], 2)]);
 		};
 	}
-}), [["__scopeId", "data-v-ce3326a2"]]);
+}), [["__scopeId", "data-v-f34d9ed0"]]);
 //#endregion
 //#region src/js/GradeColors.ts
 var gradecolors = {
@@ -74184,7 +74184,7 @@ var AggregationButtons_default = /* @__PURE__ */ defineComponent({
 });
 //#endregion
 //#region src/components/Aggregation/AggregationTableHeader.vue?vue&type=script&setup=true&lang.ts
-var _hoisted_1$21 = { class: "flex flex-col h-full" };
+var _hoisted_1$21 = { class: "flex flex-col flex-between self-stretch" };
 var _hoisted_2$15 = { class: "flex-grow" };
 var _hoisted_3$11 = { class: "inline-flex gap-2" };
 var _hoisted_4$10 = { key: 0 };
