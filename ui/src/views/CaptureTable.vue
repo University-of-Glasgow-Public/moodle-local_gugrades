@@ -199,7 +199,7 @@
 
             // Displayname (not hidden)
             cols.push(columnHelper.accessor('displayname', {
-                header: mstringstore.getMstring('firstnamelastname')
+                header: mstringstore.getMstring('name')
             }));
         } else {
 

@@ -73001,7 +73001,7 @@ var CaptureTable_default = /* @__PURE__ */ defineComponent({
 						});
 					}
 				}));
-				cols.push(columnHelper.accessor("displayname", { header: mstringstore.getMstring("firstnamelastname") }));
+				cols.push(columnHelper.accessor("displayname", { header: mstringstore.getMstring("name") }));
 			} else cols.push(columnHelper.accessor("displayname", { header: mstringstore.getMstring("participant") }));
 			cols.push(columnHelper.accessor("idnumber", { header: mstringstore.getMstring("idnumber") }));
 			cols.push(columnHelper.display({
@@ -75421,7 +75421,7 @@ var AggregationTable_default = /* @__PURE__ */ defineComponent({
 			const cols = [];
 			cols.push(columnHelper.accessor("firstinitial", { header: "firstinitial" }));
 			cols.push(columnHelper.accessor("lastinitial", { header: "lastinitial" }));
-			cols.push(columnHelper.accessor("displayname", { header: mstringstore.getMstring("firstnamelastname") }));
+			cols.push(columnHelper.accessor("displayname", { header: mstringstore.getMstring("name") }));
 			cols.push(columnHelper.accessor("idnumber", { header: mstringstore.getMstring("idnumber") }));
 			if (!toplevel.value) cols.push(columnHelper.display({
 				id: "back",
