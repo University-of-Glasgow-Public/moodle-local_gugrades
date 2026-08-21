@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton @click="showcsvmodal = true" :disabled="!props.show || !enable" iconName="BetweenVerticalStart">
+    <MenuButton @click="showcsvmodal = true" :disabled="!props.show || !enable" :disabledReason="disabledReason" iconName="BetweenVerticalStart">
         {{ mstrings.csvimport }}
     </MenuButton>
 
@@ -152,6 +152,10 @@
         enable: {
             type: Boolean,
             default: true,
+        },
+        disabledReason: {
+            type: String,
+            default: '',
         },
         itemid: Number,
         groupid: Number,

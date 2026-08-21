@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton @click="showreleasemodal=true" iconName="Rocket">
+    <MenuButton @click="showreleasemodal=true" :disabled="props.disabled" :disabledReason="props.disabledReason" iconName="Rocket">
         <span v-if="grouprelease"><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgroup }}</span>
         <span v-else><span v-if="props.released">(Un-)</span>{{ mstrings.releaseaggregatedgrade }}</span>
     </MenuButton>
@@ -81,6 +81,10 @@
         },
         released: Boolean,
         disabled: Boolean,
+        disabledReason: {
+            type: String,
+            default: '',
+        },
     });
 
     const grouprelease = computed(() => {

@@ -1,10 +1,10 @@
 <template>
     <div v-if="!loaded" class="w-full h-[40px] skeleton"></div>
     <div v-else class="flex justify-start gap-2">
-        <ImportButton :enable="!converted && caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :userids="props.userids" :staffuserid="props.staffuserid" @imported="emit('refreshtable')"></ImportButton>
-        <CSVImportButton :enable="caneditgrades" :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :show="props.showcsvimport" :staffuserid="props.staffuserid" @uploaded="emit('refreshtable')"></CSVImportButton>
-        <AddMultipleButton :enable="caneditgrades" :itemid="props.itemid"  @openmultiple="multipleclicked"></AddMultipleButton>
-        <ReleaseButton :enable="props.gradesimported && caneditgrades" :gradeitemid="props.itemid" :groupid="props.groupid" :released="props.released" @released="emit('refreshtable')"></ReleaseButton>
+        <ImportButton :enable="!converted && caneditgrades" :disabledReason="importDisabledReason" :itemid="props.itemid" :groupid="props.groupid" :userids="props.userids" :staffuserid="props.staffuserid" @imported="emit('refreshtable')"></ImportButton>
+        <CSVImportButton :enable="caneditgrades" :disabledReason="csvDisabledReason" :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :show="props.showcsvimport" :staffuserid="props.staffuserid" @uploaded="emit('refreshtable')"></CSVImportButton>
+        <AddMultipleButton :enable="caneditgrades" :disabledReason="cannotEditReason" :itemid="props.itemid"  @openmultiple="multipleclicked"></AddMultipleButton>
+        <ReleaseButton :enable="props.gradesimported && caneditgrades" :disabledReason="releaseDisabledReason" :gradeitemid="props.itemid" :groupid="props.groupid" :released="props.released" @released="emit('refreshtable')"></ReleaseButton>
         <ViewFullNamesButton v-if="props.usershidden" :revealnames="props.revealnames" @viewfullnames="viewfullnames"></ViewFullNamesButton>
         <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" @converted="emit('refreshtable')"></ConversionButton>
         <ExportCaptureButton :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :revealnames="revealnames"></ExportCaptureButton>
@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+    import { computed } from 'vue';
     import ImportButton from '@/components/Capture/ImportButton.vue';
     import CSVImportButton from '@/components/Capture/CSVImportButton.vue';
     import ReleaseButton from '@/components/Capture/ReleaseButton.vue';
@@ -30,6 +31,7 @@
     import HelpButton from '../Common/HelpButton.vue';
     import type { IEmitEditColumn } from '@/js/Interfaces';
     import NameFilterButton from '../Common/NameFilterButton.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const props = defineProps({
         loaded: {
@@ -63,6 +65,42 @@
     });
 
     const emit = defineEmits(['viewfullnames', 'refreshtable', 'openmultiple']);
+
+    const mstringstore = useMstrings();
+
+    const cannotEditReason = computed(() => {
+        return props.caneditgrades ? '' : mstringstore.getMstring('tooltipcannoteditgrades');
+    });
+
+    const importDisabledReason = computed(() => {
+        if (!props.caneditgrades) {
+            return mstringstore.getMstring('tooltipcannoteditgrades');
+        }
+        if (props.converted) {
+            return mstringstore.getMstring('tooltipimportconverted');
+        }
+        return '';
+    });
+
+    const csvDisabledReason = computed(() => {
+        if (!props.caneditgrades) {
+            return mstringstore.getMstring('tooltipcannoteditgrades');
+        }
+        if (!props.showcsvimport) {
+            return mstringstore.getMstring('tooltipcsvnoidnumber');
+        }
+        return '';
+    });
+
+    const releaseDisabledReason = computed(() => {
+        if (!props.caneditgrades) {
+            return mstringstore.getMstring('tooltipcannoteditgrades');
+        }
+        if (!props.gradesimported) {
+            return mstringstore.getMstring('tooltipreleasenotimported');
+        }
+        return '';
+    });
 
     /**
      * Handle viewfullnames

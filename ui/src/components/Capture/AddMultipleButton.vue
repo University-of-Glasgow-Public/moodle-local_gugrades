@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton @click="add_multiple_button_click()" :disabled="!enable" iconName="BetweenVerticalStart">
+    <MenuButton @click="add_multiple_button_click()" :disabled="!enable" :disabledReason="disabledReason" iconName="BetweenVerticalStart">
         {{ mstrings['addmultiple'] }}
     </MenuButton>
 
@@ -76,6 +76,10 @@
         enable: {
             type: Boolean,
             default: true,
+        },
+        disabledReason: {
+            type: String,
+            default: '',
         },
         itemid: Number,
     });

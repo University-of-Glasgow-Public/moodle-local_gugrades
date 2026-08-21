@@ -21,7 +21,7 @@
 
     <!-- 1. DYNAMIC FLOATING SPEECH BUBBLE CONTAINER -->
     <div 
-      class="invisible absolute left-1/2 z-50 w-max max-w-xs -translate-x-1/2 rounded-lg bg-brand-dark-purple px-3 py-2 text-sm font-medium normal-case tracking-normal text-white opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 pointer-events-none"
+      class="invisible absolute left-1/2 z-50 w-max max-w-xs -translate-x-1/2 rounded-lg bg-brand-dark-purple px-3 py-2 text-sm font-medium normal-case tracking-normal whitespace-normal text-left text-white opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 pointer-events-none"
       :class="[
         position === 'above' ? 'bottom-full mb-3' : 'top-full mt-3'
       ]"
@@ -44,6 +44,8 @@
 </template>
 
 <script setup lang="ts">
+    defineOptions({ inheritAttrs: false });
+
     withDefaults(
       defineProps<{ 
         text?: string | null

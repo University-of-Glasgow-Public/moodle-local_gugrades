@@ -1,7 +1,7 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton @click="conversion_clicked" iconName="Rotate3d">
+    <MenuButton @click="conversion_clicked" :disabled="props.disabled" :disabledReason="props.disabledReason" iconName="Rotate3d">
         {{ mstrings.convertgrades }}
     </MenuButton>
 
@@ -104,6 +104,14 @@
 
     const props = defineProps({
         categoryid: Number,
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        disabledReason: {
+            type: String,
+            default: '',
+        },
     });
 
     const emits = defineEmits(['converted']);

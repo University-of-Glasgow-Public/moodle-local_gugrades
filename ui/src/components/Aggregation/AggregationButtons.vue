@@ -1,9 +1,10 @@
 <template>
     <div class="flex gap-2 mt-2">
         <RecalculateButton v-if="caneditgrades" :categoryid="props.categoryid" :staffuserid="props.staffuserid" @recalculated="refreshtable"></RecalculateButton>
-        <ConversionButton v-if="!props.toplevel && caneditgrades" :categoryid="props.categoryid" :disabled="!allowconversion" @converted="refreshtable"></ConversionButton>
+        <ConversionButton v-if="!props.toplevel && caneditgrades" :categoryid="props.categoryid" :disabled="!allowconversion" :disabledReason="conversionDisabledReason" @converted="refreshtable"></ConversionButton>
         <ReleaseCategoryButton v-if="!props.toplevel && caneditgrades"
             :disabled="!props.allowrelease"
+            :disabledReason="releaseDisabledReason"
             :gradeitemid="props.gradeitemid"
             :groupid="props.groupid"
             :released="props.released"
@@ -15,11 +16,13 @@
 </template>
 
 <script setup lang="ts">
+    import { computed } from 'vue';
     import RecalculateButton from '@/components/Aggregation/RecalculateButton.vue';
     import ConversionButton from '@/components/Aggregation/ConversionButton.vue';
     import ReleaseCategoryButton from '@/components/Aggregation/ReleaseCategoryButton.vue';
     import ExportAggregationButton from '@/components/Aggregation/ExportAggregationButton.vue';
     import NameFilterButton from '../Common/NameFilterButton.vue';
+    import { useMstrings } from '@/stores/mstrings.js';
 
     const props = defineProps({
         categoryid: Number,
@@ -40,6 +43,25 @@
     const emits = defineEmits([
         'refreshtable'
     ]);
+
+    const mstringstore = useMstrings();
+
+    const conversionDisabledReason = computed(() => {
+        if (props.allowconversion) {
+            return '';
+        }
+        return mstringstore.getMstring('tooltipconversionnotpoints');
+    });
+
+    const releaseDisabledReason = computed(() => {
+        if (props.allowrelease) {
+            return '';
+        }
+        if (props.atype === 'E') {
+            return mstringstore.getMstring('tooltipreleaseerror');
+        }
+        return mstringstore.getMstring('tooltipreleasepoints');
+    });
 
     /**
      * Redraw the main table
