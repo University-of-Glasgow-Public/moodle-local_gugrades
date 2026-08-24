@@ -75226,13 +75226,41 @@ var TotalCell_default = /* @__PURE__ */ defineComponent({
 	},
 	emits: ["gradeadded"],
 	setup(__props, { emit: __emit }) {
+		const props = __props;
 		const emits = __emit;
+		const mstringstore = useMstrings();
 		/**
 		* Grade changed in override function
 		*/
 		function grade_changed(userid) {
 			emits("gradeadded", userid);
 			console.log("CHANGED", userid);
+		}
+		/**
+		* Get tooltip text for bordered items
+		*/
+		function itemtooltip(item) {
+			if (item.overridden) return mstringstore.getMstring("tooltipoverridden");
+			if (item.hidden) return mstringstore.getMstring("tooltiphidden");
+			return "";
+		}
+		/**
+		* Work out border classes for item
+		*/
+		function itemclasses(item) {
+			if (item.overridden) return [
+				"border-2",
+				"border-solid",
+				"border-red-600",
+				"rounded-lg"
+			];
+			if (item.hidden) return [
+				"border-2",
+				"border-solid",
+				"border-brand-light-yellow",
+				"rounded-lg"
+			];
+			return [];
 		}
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock("div", _hoisted_1$14, [
@@ -75264,10 +75292,19 @@ var TotalCell_default = /* @__PURE__ */ defineComponent({
 					"caneditgrades",
 					"position"
 				]),
-				__props.user.error ? (openBlock(), createElementBlock("span", _hoisted_2$9, toDisplayString(__props.user.error), 1)) : (openBlock(), createBlock(GradeColor_default, {
+				__props.user.error ? (openBlock(), createElementBlock("span", _hoisted_2$9, toDisplayString(__props.user.error), 1)) : (openBlock(), createBlock(UTooltip_default, {
 					key: 1,
-					grade: __props.user.displaygrade
-				}, null, 8, ["grade"])),
+					class: normalizeClass([itemclasses(props.user), "p-0.5"]),
+					text: itemtooltip(__props.user),
+					position: __props.beforehalfway ? "below" : "above"
+				}, {
+					default: withCtx(() => [createVNode(GradeColor_default, { grade: __props.user.displaygrade }, null, 8, ["grade"])]),
+					_: 1
+				}, 8, [
+					"class",
+					"text",
+					"position"
+				])),
 				__props.user.alteredweight ? (openBlock(), createElementBlock("span", _hoisted_3$6, [_cache[2] || (_cache[2] = createBaseVNode("span", { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-light-yellow text-university-blue" }, " ALTERED ", -1)), createVNode(UBadge_default, {
 					variant: "warning",
 					class: "mt-1"
