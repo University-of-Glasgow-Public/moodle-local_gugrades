@@ -582,7 +582,7 @@ class aggregate {
             if ($item->admingrade != 'GOODCAUSE_NR') {
                 $newitems[] = $item;
             } else {
-                if (($level == 1) && ($eccweight >= 10)) {
+                if (($level == 1) && ($eccweight > 10)) {
                     return ['GOODCAUSE_NR', []];
                 }
                 $this->mv0found = true;
