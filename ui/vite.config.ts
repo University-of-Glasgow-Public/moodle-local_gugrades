@@ -13,11 +13,11 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     tailwindcss(),
-    //viteCompression({
-    //  algorithm: 'gzip',
-    //  ext: '.gz',
-    //  deleteOriginFile: false // Crucial: Keeps your standard app.js for development
-    //})
+    viteCompression({
+      algorithm: 'gzip',
+      ext: '.gz',
+      deleteOriginFile: false // Crucial: Keeps your standard app.js for development
+    }),
     webUpdateNotice({
       checkInterval: 60 * 1000 * 5, // Check every 5 minutes
       hiddenDismissButton: true,
@@ -37,7 +37,8 @@ export default defineConfig({
     dedupe: ['vue']
   },
   build: {
-    minify: false,
+    //minify: false,
+    minify: true,
     sourcemap: true,
     cssMinify: 'esbuild',
     commonjsOptions: {
