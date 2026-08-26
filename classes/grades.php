@@ -1280,7 +1280,8 @@ class grades {
         }
 
         // If the grade has neither admin or raw grade then also do not skip.
-        if (($provisional->rawgrade == null) && ($provisional->admingrade == '')) {
+        $missinggrade = ($provisional->rawgrade == null) || ($provisional->rawgrade < 0);
+        if ($missinggrade && ($provisional->admingrade == '')) {
             return false;
         }
 

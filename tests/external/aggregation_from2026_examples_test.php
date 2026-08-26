@@ -740,7 +740,7 @@ final class aggregation_from2026_examples_test extends \local_gugrades\external\
         );
 
         $fred = $page['users'][0];
-        $this->assertEquals('ECC', $fred['displaygrade']);
+        $this->assertEquals('B1 (17.11111)', $fred['displaygrade']);
     }
 
     /**

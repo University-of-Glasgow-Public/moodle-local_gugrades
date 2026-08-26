@@ -294,7 +294,7 @@ final class mgu_1424_test extends \local_gugrades\external\gugrades_aggregation_
 
         // G1 returned here (which is wrong).
         $fred = $page['users'][0];
-        $this->assertEquals('F3 (4.40000)', $fred['displaygrade']);
+        $this->assertEquals('F3', $fred['displaygrade']);
 
         // Write grade 12 for ItemA.
         $itemaid = $this->get_gradeitemid('ItemA');
@@ -360,6 +360,6 @@ final class mgu_1424_test extends \local_gugrades\external\gugrades_aggregation_
         );
 
         $fred = $page['users'][0];
-        $this->assertEquals('F3 (4.40000)', $fred['displaygrade']);
+        $this->assertEquals('F3', $fred['displaygrade']);
     }
 }

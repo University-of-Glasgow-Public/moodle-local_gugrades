@@ -75234,7 +75234,6 @@ var TotalCell_default = /* @__PURE__ */ defineComponent({
 		*/
 		function grade_changed(userid) {
 			emits("gradeadded", userid);
-			console.log("CHANGED", userid);
 		}
 		/**
 		* Get tooltip text for bordered items
