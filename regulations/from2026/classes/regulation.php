@@ -129,7 +129,7 @@ class regulation implements \local_gugrades\IRegulation {
         $cats = array_map('trim', explode(',', $nursingcat));
 
         foreach ($cats as $cat) {
-            if (self::is_in_cat($course->category, $cat)) {
+            if (self::is_in_cat($course->category, (int)$cat)) {
                 $options[] = 'nursing';
 
                 self::$options = $options;
