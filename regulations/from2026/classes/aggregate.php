@@ -119,15 +119,14 @@ class aggregate {
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         $options = $regulation->get_options($courseid);
         $isengineering = in_array('engineering', $options);
-        $isnursingug = in_array('nursingug', $options);
-        $isnursingpgt = in_array('nursingpgt', $options);
+        $isnursing = in_array('nursing', $options);
 
         // If it's not nursing, it doesn't matter what this is set to.
-        // UG is D3:9, PGT is C3:12.
-        $lowestnursinggrade = $isnursingug ? 9 : 12;
+        // MGU-1506: This is always D3:9
+        $lowestnursinggrade = 9;
 
         // If it is nursing, check for nursing conditions.
-        if ($isnursingug || $isnursingpgt) {
+        if ($isnursing) {
             if ($this->nursing_check($items, $lowestnursinggrade)) {
                 $conditionmet = true;
             }
@@ -321,7 +320,8 @@ class aggregate {
             );
 
             // MGU-1442: Is this nursing? Do we need to apply an X?
-            if (($level == 1) && ($isnursingug || $isnursingpgt) && $conditionmet) {
+            // MGU-1506: If aggregatedgrade < 13 then DO NOT apply the X (cf. any individual grade < D3:9)
+            if (($level == 1) && $isnursing && $conditionmet && ($aggregatedgrade >= 9)) {
 
                 $displaygrade = 'X' . $displaygrade;
             }

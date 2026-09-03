@@ -124,24 +124,17 @@ class regulation implements \local_gugrades\IRegulation {
             return $options;
         }
 
-        // Check if Nursing UG
-        $nursingugcat = get_config('local_gugrades', 'nursingugcat');
+        // Check if Nursing
+        $nursingcat = get_config('local_gugrades', 'nursingcat');
+        $cats = array_map('trim', explode(',', $nursingcat));
 
-        if (self::is_in_cat($course->category, $nursingugcat)) {
-            $options[] = 'nursingug';
+        foreach ($cats as $cat) {
+            if (self::is_in_cat($course->category, $cat)) {
+                $options[] = 'nursing';
 
-            self::$options = $options;
-            return $options;
-        }
-
-        // Check if Nursing PGT
-        $nursingpgtcat = get_config('local_gugrades', 'nursingpgtcat');
-
-        if (self::is_in_cat($course->category, $nursingpgtcat)) {
-            $options[] = 'nursingpgt';
-
-            self::$options = $options;
-            return $options;
+                self::$options = $options;
+                return $options;
+            }
         }
 
         return $options;
@@ -190,7 +183,7 @@ class regulation implements \local_gugrades\IRegulation {
 
         // Nursing does NOT have GOODCAUSE_NR (ECC).
         $options = $this->get_options($courseid);
-        $isnursing = in_array('nursingug', $options) || in_array('nursingpgt', $options);
+        $isnursing = in_array('nursing', $options);
 
         if ($level == 0) {
             return [

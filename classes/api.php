@@ -553,10 +553,8 @@ class api {
         // Check options for extra regulation information. Hard coded right now.
         if (in_array('engineering', $options)) {
             $regulationextra = 'Engineering';
-        } else if (in_array('nursingug', $options)) {
-            $regulationextra = 'Nursing UG';
-        } else if (in_array('nursingpgt', $options)) {
-            $regulationextra = 'Nursing PGT';
+        } else if (in_array('nursing', $options)) {
+            $regulationextra = 'Nursing';
         } else {
             $regulationextra = '';
         }
@@ -2994,10 +2992,8 @@ class api {
         // Check options for extra regulation information. Hard coded right now.
         if (in_array('engineering', $options)) {
             $regulationextra = 'Engineering';
-        } else if (in_array('nursingug', $options)) {
-            $regulationextra = 'Nursing UG';
-        } else if (in_array('nursingpgt', $options)) {
-            $regulationextra = 'Nursing PGT';
+        } else if (in_array('nursing', $options)) {
+            $regulationextra = 'Nursing';
         } else {
             $regulationextra = '';
         }

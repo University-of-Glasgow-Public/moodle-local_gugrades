@@ -53,13 +53,13 @@ final class mgu_1442_nursing_test extends \local_gugrades\external\gugrades_aggr
 
         parent::setUp();
 
-        // Create new category for engineering.
+        // Create new category for Nursing.
         $category = $this->getDataGenerator()->create_category([
             'name' => 'Nursing Undergraduate',
         ]);
 
         // Change config to this category.
-        set_config('nursingugcat', $category->id, 'local_gugrades');
+        set_config('nursingcat', $category->id, 'local_gugrades');
 
         // Switch test course into this category and new regs.
         $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
@@ -87,7 +87,7 @@ final class mgu_1442_nursing_test extends \local_gugrades\external\gugrades_aggr
         );
 
         $this->assertEquals('Academic Regs from 2026/27', $l1categories['regulation']);
-        $this->assertEquals('Nursing UG', $l1categories['regulationextra']);
+        $this->assertEquals('Nursing', $l1categories['regulationextra']);
     }
 
     /**

@@ -223,16 +223,9 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    $settingspage->add(new admin_setting_configtext('local_gugrades/nursingugcat',
-        new lang_string('nursingugcat', 'local_gugrades'),
-        new lang_string('nursingugcat_help', 'local_gugrades'),
-        0,
-        PARAM_INT
-    ));
-
-    $settingspage->add(new admin_setting_configtext('local_gugrades/nursingpgtcat',
-        new lang_string('nursingpgtcat', 'local_gugrades'),
-        new lang_string('nursingpgtcat_help', 'local_gugrades'),
+    $settingspage->add(new admin_setting_configtext('local_gugrades/nursingcat',
+        new lang_string('nursingcat', 'local_gugrades'),
+        new lang_string('nursingcat_help', 'local_gugrades'),
         0,
         PARAM_INT
     ));
