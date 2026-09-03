@@ -227,7 +227,7 @@ if ($hassiteconfig) {
         new lang_string('nursingcat', 'local_gugrades'),
         new lang_string('nursingcat_help', 'local_gugrades'),
         0,
-        PARAM_INT
+        PARAM_TEXT
     ));
 
     // User tour
