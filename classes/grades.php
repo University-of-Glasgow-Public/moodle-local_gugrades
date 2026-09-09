@@ -2191,7 +2191,7 @@ class grades {
         $errors = [];
 
         // Find any grade items with grademax = 22
-        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22])) {
+        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22, 'iscurrent' => 1])) {
             return [];
         }
 
@@ -2245,7 +2245,7 @@ class grades {
 
             // There cannot be FIRST items in points as they should have been imported
             // as a scale. 
-            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'gradetype' => 'FIRST', 'points' => true])) {
+            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'gradetype' => 'FIRST', 'points' => true, 'iscurrent' => 1])) {
                 $errors[] = [
                     'gradeitemid' => $item->id,
                     'itemname' => $item->itemname,
@@ -2337,7 +2337,7 @@ class grades {
             }
 
             // If this scale / points have to agree
-            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => !$points])) {
+            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => !$points, 'admingrade' => '', 'iscurrent' => 1])) {
                 $errors[] = [
                     'gradeitemid' => $item->id,
                     'itemname' => $item->itemname,
