@@ -38,18 +38,40 @@ class cleanup extends \core\task\scheduled_task {
     }
 
     /**
+     * Unused historical (iscurrent = 0) aggregated category grades with no
+     * numeric grade, converted grade, admin grade or category override.
+     * Current capture grades and live aggregation data are never matched.
+     *
+     * @return array Select SQL and params
+     */
+    public static function unused_category_select(): array {
+        $cutoff = time() - (183 * 86400);
+        $select = "gradetype = :gradetype
+            AND rawgrade IS NULL
+            AND convertedgrade IS NULL
+            AND catoverride = 0
+            AND (admingrade IS NULL OR admingrade = :emptyadmin)
+            AND audittimecreated < :cutoff";
+        $params = [
+            'gradetype' => 'CATEGORY',
+            'emptyadmin' => '',
+            'cutoff' => $cutoff,
+        ];
+
+        return [$select, $params];
+    }
+
+    /**
      * Cleanup
      */
     public function execute() {
         global $DB;
 
         // Delete unused intermediate category grades after 6 months.
-        $cutoff = time() - (183 * 86400);
-
-        $select = 'gradetype="CATEGORY"
-            AND RAWGRADE IS NULL
-            AND audittimecreated < :cutoff';
-        $DB->delete_records_select('local_gugrades_grade', $select, ['cutoff' => $cutoff]);
+        [$select, $params] = self::unused_category_select();
+        $count = $DB->count_records_select('local_gugrades_grade', $select, $params);
+        mtrace("Deleting {$count} unused intermediate MyGrades CATEGORY records older than 6 months.");
+        $DB->delete_records_select('local_gugrades_grade', $select, $params);
 
         return true;
     }
