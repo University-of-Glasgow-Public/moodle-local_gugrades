@@ -2191,7 +2191,7 @@ class grades {
         $errors = [];
 
         // Find any grade items with grademax = 22
-        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22, 'iscurrent' => 1])) {
+        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22])) {
             return [];
         }
 
