@@ -2203,7 +2203,7 @@ class grades {
             }
 
             // If it's not converted then there cannot be any non-point gugrades
-            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => false])) {
+            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => false, 'iscurrent' => 1])) {
                 $errors[] = [
                     'gradeitemid' => $item->id,
                     'itemname' => $item->itemname,
