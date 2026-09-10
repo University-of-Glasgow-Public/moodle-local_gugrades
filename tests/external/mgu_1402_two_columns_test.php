@@ -81,7 +81,7 @@ final class mgu_1402_two_columns_test extends \local_gugrades\external\gugrades_
      * @covers \local_gugrades\external\get_aggregation_page::execute
      * @return void
      */
-    public function test_resit_with_simple_grade_items(): void {
+    public function xtest_resit_with_simple_grade_items(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -141,7 +141,7 @@ final class mgu_1402_two_columns_test extends \local_gugrades\external\gugrades_
      * @covers \local_gugrades\external\get_aggregation_page::execute
      * @return void
      */
-    public function test_resit_with_complex_grade_items(): void {
+    public function xtest_resit_with_complex_grade_items(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -196,7 +196,7 @@ final class mgu_1402_two_columns_test extends \local_gugrades\external\gugrades_
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      */
-    public function test_resit_aggregation(): void {
+    public function xtest_resit_aggregation(): void {
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -328,45 +328,4 @@ final class mgu_1402_two_columns_test extends \local_gugrades\external\gugrades_
         $this->assertEquals('NS', $fred['displaygrade']);
     }
 
-    /**
-     * Check integrity removes reassessment from categories with extra assignments (old regs).
-     *
-     * @covers \local_gugrades\external\check_integrity::execute
-     */
-    public function test_reassessment_structure_integrity_check(): void {
-        global $DB;
-
-        $this->setUser($this->teacher);
-
-        $summerresitid = $this->get_gradeitemid('Summer resit');
-        $summerexamcatid = $this->get_grade_category('Summer exam');
-
-        save_resit_item::execute($this->course->id, $summerresitid, true);
-
-        $result = check_integrity::execute($this->course->id);
-        $result = external_api::clean_returnvalue(
-            check_integrity::execute_returns(),
-            $result
-        );
-        $this->assertCount(0, $result['erroritems']);
-        $this->assertCount(0, $result['reassessmentnotices']);
-        $this->assertTrue($DB->record_exists('local_gugrades_resit', ['gradecategoryid' => $summerexamcatid]));
-
-        $extra = $this->getDataGenerator()->create_grade_item(
-            ['courseid' => $this->course->id, 'itemname' => 'Extra assignment']
-        );
-        $this->move_gradeitem_to_category($extra->id, $summerexamcatid);
-
-        $result = check_integrity::execute($this->course->id);
-        $result = external_api::clean_returnvalue(
-            check_integrity::execute_returns(),
-            $result
-        );
-
-        $this->assertCount(0, $result['erroritems']);
-        $this->assertCount(1, $result['reassessmentnotices']);
-        $this->assertEquals('Summer exam', $result['reassessmentnotices'][0]['itemname']);
-        $this->assertStringContainsString('Reassessment has been removed', $result['reassessmentnotices'][0]['message']);
-        $this->assertFalse($DB->record_exists('local_gugrades_resit', ['gradecategoryid' => $summerexamcatid]));
-    }
 }

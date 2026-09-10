@@ -1,0 +1,86 @@
+local_gugrades plugin notes
+===========================
+
+Purpose
+-------
+MyGrades stores and presents grade information for Moodle courses. It adds
+course grade workflows, regulation-specific handling, provisional/current
+grades, conversions, administrative grades, reassessment/resit handling,
+and external API endpoints used by the UI. The business logic is written
+in PHP and accessible through standard Moodle web service calls. The user 
+interface is a standalone Vue.js application.
+
+Main entry points
+-----------------
+- classes/api.php: service-level application operations and integrity checks.
+- classes/grades.php: grade records, gradebook lookups, grade trees,
+  provisional/current grades, integrity checks, and resit helpers.
+- classes/aggregation.php: calculates category and course results.
+- classes/conversion.php: converts grades between regulation formats and tracks
+  whether conversion has been applied.
+- classes/regulations.php: selects the active regulation for a course.
+- classes/admingrades.php: defines and validates administrative grade codes.
+- classes/users.php: finds users who can be graded.
+- classes/external/: Moodle webservice/external API functions.
+- classes/activities/: activity-specific grade import and reading behaviour.
+
+Important data
+--------------
+- local_gugrades_grade: grade history and current/provisional grade values.
+- local_gugrades_latest: identifies the current grade record for a course,
+  grade item, and user.
+- local_gugrades_column: imported or captured grade columns.
+- local_gugrades_resit: old-regulation reassessment/resit configuration.
+- local_gugrades_resitrequired: users requiring a resit.
+- local_gugrades_hidden: hidden grade selections.
+- local_gugrades_flag: new-regulation flags, where applicable.
+
+Grade concepts
+--------------
+- A grade record has a gradetype such as FIRST or SECOND, and may contain a
+  numeric rawgrade, a scale value, or an admingrade.
+- points indicates whether the grade is numeric points; false indicates a
+  scale-style value.
+- iscurrent identifies the active record in grade history.
+- Provisional/current lookup and latest-grade maintenance are separate concerns;
+  inspect both local_gugrades_grade and local_gugrades_latest when changing
+  grade lifecycle behaviour.
+- Gradebook grade_items and grade_categories remain Moodle-owned structures.
+  local_gugrades refers to them by ID and must account for deleted or changed
+  gradebook objects.
+
+Regulations
+-----------
+The active regulation is selected from the course. Existing code commonly
+refers to the original regulation and the from2026 regulation. Do not infer
+regulation behaviour from dates alone; use regulations.php and the regulation
+classes under regulations/.
+
+Old and new regulation behaviour can differ for:
+- exactly-out-of-22 grade items;
+- administrative grade codes;
+- conversion and display values;
+- reassessment/resit configuration.
+
+Tests
+-----
+Tests are mainly under tests/external and use the advanced test case helpers.
+Relevant tests often change course start dates to select a regulation, create
+Moodle grade items/categories, write grades through external functions, and
+then inspect cleaned external API results.
+
+For a focused PHPUnit run, use the repository's Moodle PHPUnit setup and the
+component test filter, for example:
+
+vendor/bin/phpunit --testsuite local_gugrades_testsuite
+
+If that suite is not configured in the local environment, run the specific
+file or test class using the repository's normal Moodle PHPUnit command.
+
+Working method
+--------------
+1. Find the external API or UI entry point.
+2. Follow it to the class that computes or mutates the behaviour.
+3. Read the nearest test and the relevant database definition.
+4. Make the smallest change consistent with existing Moodle patterns.
+5. Run the focused test, then broaden validation if the change is shared.
