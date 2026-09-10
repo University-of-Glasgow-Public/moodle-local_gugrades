@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -89,6 +89,7 @@
     const allnone = ref(false);
     const pleasewait = ref(false);
     const plugins = ref< IMenuItem[] >([]);
+    const pluginfilenames = ref< Record<string, string> >({});
     const selectedplugin = ref('custom');
     const debug = ref({});
     const step = ref('selectplugin');
@@ -107,6 +108,12 @@
         itemname: String,
     });
 
+    watch(selectedplugin, (name) => {
+        if (name && pluginfilenames.value[name]) {
+            filename.value = pluginfilenames.value[name];
+        }
+    });
+
     /**
      * Load initial plugin options
      */
@@ -119,18 +126,21 @@
             'local_gugrades_get_aggregation_export_plugins',
             {
                 gradecategoryid: props.categoryid,
+                groupid: props.groupid || 0,
             }
         )
         .then((result: any) => {
             const options: IAggregationExportPlugin[] = result.plugins;
             plugins.value = [];
+            pluginfilenames.value = {};
             options.forEach(option => {
                 plugins.value.push({
                     label: option.description,
                     value: option.name,
                 });
+                pluginfilenames.value[option.name] = option.filename;
             });
-            filename.value = result.filename;
+            filename.value = pluginfilenames.value[selectedplugin.value] || result.filename;
             pleasewait.value = false;
         })
         .catch((error) => {

@@ -42,6 +42,7 @@ class get_aggregation_export_plugins extends external_api {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'gradecategoryid' => new external_value(PARAM_INT, 'Selected grade category ID (in case needed).'),
+            'groupid' => new external_value(PARAM_INT, 'Group id. 0 for everybody', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -49,9 +50,10 @@ class get_aggregation_export_plugins extends external_api {
      * Execute function
      * @param int $courseid
      * @param int $gradecategoryid
+     * @param int $groupid
      * @return array
      */
-    public static function execute($courseid, $gradecategoryid) {
+    public static function execute($courseid, $gradecategoryid, $groupid = 0) {
 
         \local_gugrades\development::increase_debugging();
 
@@ -59,13 +61,14 @@ class get_aggregation_export_plugins extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'gradecategoryid' => $gradecategoryid,
+            'groupid' => $groupid,
         ]);
 
         // Security.
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        return \local_gugrades\api::get_aggregation_export_plugins($courseid, $gradecategoryid);
+        return \local_gugrades\api::get_aggregation_export_plugins($courseid, $gradecategoryid, $groupid);
     }
 
     /**
@@ -78,6 +81,7 @@ class get_aggregation_export_plugins extends external_api {
                 new external_single_structure([
                     'name' => new external_value(PARAM_ALPHA, 'Plugin class name'),
                     'description' => new external_value(PARAM_TEXT, 'Description of plugin'),
+                    'filename' => new external_value(PARAM_TEXT, 'Proposed filename for this plugin'),
                 ])
             ),
             'filename' => new external_value(PARAM_TEXT, 'Proposed filename'),

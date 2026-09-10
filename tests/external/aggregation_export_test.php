@@ -73,6 +73,10 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         $this->assertEquals('mycampus', $plugins[1]['name']);
         $this->assertEquals('MyCampus export', $plugins[1]['description']);
         $this->assertStringStartsWith('MyGrades_', $filename);
+
+        // UPAS is only for courses starting on/after 1 August 2026.
+        $pluginnames = array_column($plugins, 'name');
+        $this->assertNotContains('upas', $pluginnames);
     }
 
     /**
@@ -298,6 +302,125 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         $expected = '"EMPLID","Name","Grade"
 "1234567","Bloggs,Fred","EC"
 "1234560","Perez,Juan",""
+';
+        $this->assertEquals($expected, $data['csv']);
+    }
+
+    /**
+     * Tests for UPAS plugin
+     *
+     * @covers \local_gugrades\external\get_aggregation_export_plugins::execute
+     */
+    public function test_upas_export(): void {
+        global $DB;
+
+        // UPAS is only for courses starting on/after 1 August 2026.
+        $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
+        $course->startdate = strtotime('2026-08-01');
+        $course->shortname = 'BIOL1001';
+        $course->fullname = 'Biology 1';
+        $DB->update_record('course', $course);
+
+        $courseid = $this->course->id;
+        $categoryid = $this->get_grade_category('Summative');
+
+        // Get plugins - UPAS should now be listed.
+        $exportplugins = get_aggregation_export_plugins::execute($courseid, $categoryid);
+        $exportplugins = external_api::clean_returnvalue(
+            get_aggregation_export_plugins::execute_returns(),
+            $exportplugins
+        );
+
+        $pluginnames = array_column($exportplugins['plugins'], 'name');
+        $this->assertContains('upas', $pluginnames);
+
+        $pluginsbyname = array_column($exportplugins['plugins'], 'description', 'name');
+        $this->assertEquals('UPAS Export', $pluginsbyname['upas']);
+
+        $filenames = array_column($exportplugins['plugins'], 'filename', 'name');
+        $this->assertEquals('BIOL_1001_UPAS_2026-27', $filenames['upas']);
+
+        // Install test data for student.
+        $userlist = [
+            $this->student->id,
+        ];
+        $this->load_data('data2c', $this->student->id);
+        foreach ($this->gradeitemids as $gradeitemid) {
+            $this->import_grades($this->course->id, $gradeitemid, $userlist);
+        }
+
+        // Get form for 'upas' plugin (which doesn't have a form).
+        $form = get_aggregation_export_form::execute($courseid, $categoryid, 'upas');
+        $form = external_api::clean_returnvalue(
+            get_aggregation_export_form::execute_returns(),
+            $form
+        );
+
+        $this->assertFalse($form['hasform']);
+        $this->assertCount(0, $form['form']);
+
+        // Get CSV data.
+        $data = get_aggregation_export_data::execute($courseid, $categoryid, 0, 'upas', []);
+        $data = external_api::clean_returnvalue(
+            get_aggregation_export_data::execute_returns(),
+            $data
+        );
+
+        $expected = '"Student Number","Last Name","First Name","Subject","Catalog Nbr","Descr Course Name","First Attempt Grade","Award Grade"
+"1234567","Bloggs","Fred","BIOL","1001","Biology 1","D1","D1"
+"1234560","Perez","Juan","BIOL","1001","Biology 1","",""
+';
+        $this->assertEquals($expected, $data['csv']);
+        $this->assertEquals('BIOL_1001_UPAS_2026-27', $data['filename']);
+
+        // Group selected - filename should include the group name.
+        $group = $this->getDataGenerator()->create_group([
+            'courseid' => $courseid,
+            'name' => 'Lab A',
+        ]);
+        $exportplugins = get_aggregation_export_plugins::execute($courseid, $categoryid, $group->id);
+        $exportplugins = external_api::clean_returnvalue(
+            get_aggregation_export_plugins::execute_returns(),
+            $exportplugins
+        );
+        $filenames = array_column($exportplugins['plugins'], 'filename', 'name');
+        $this->assertEquals('BIOL_1001_UPAS_2026-27_Lab_A', $filenames['upas']);
+
+        $data = get_aggregation_export_data::execute($courseid, $categoryid, $group->id, 'upas', []);
+        $data = external_api::clean_returnvalue(
+            get_aggregation_export_data::execute_returns(),
+            $data
+        );
+        $this->assertEquals('BIOL_1001_UPAS_2026-27_Lab_A', $data['filename']);
+
+        // Override the award. Initial grade should remain the first attempt.
+        $itemid = $this->get_gradeitemid_for_category('Summative');
+        $nothing = write_additional_grade::execute(
+            courseid:       $this->course->id,
+            gradeitemid:    $itemid,
+            userid:         $this->student->id,
+            reason:         'CATEGORY',
+            other:          '',
+            admingrade:     'GOODCAUSE_NR',
+            scale:          0,
+            grade:          0,
+            notes:          'Test notes'
+        );
+        $nothing = external_api::clean_returnvalue(
+            write_additional_grade::execute_returns(),
+            $nothing
+        );
+
+        // Get CSV data: initial remains first attempt, current is the award.
+        $data = get_aggregation_export_data::execute($courseid, $categoryid, 0, 'upas', []);
+        $data = external_api::clean_returnvalue(
+            get_aggregation_export_data::execute_returns(),
+            $data
+        );
+
+        $expected = '"Student Number","Last Name","First Name","Subject","Catalog Nbr","Descr Course Name","First Attempt Grade","Award Grade"
+"1234567","Bloggs","Fred","BIOL","1001","Biology 1","D1","EC"
+"1234560","Perez","Juan","BIOL","1001","Biology 1","",""
 ';
         $this->assertEquals($expected, $data['csv']);
     }
