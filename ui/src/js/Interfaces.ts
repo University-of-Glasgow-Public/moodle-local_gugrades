@@ -198,6 +198,7 @@ export interface ISetting {
 export interface IAggregationExportPlugin {
     name: string;
     description: string;
+    filename: string;
 }
 
 /**

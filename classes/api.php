@@ -2767,11 +2767,12 @@ class api {
      * Get list of aggregation export plugins
      * @param int $courseid
      * @param int $gradecategoryid
+     * @param int $groupid
      * @return array
      */
-    public static function get_aggregation_export_plugins(int $courseid, int $gradecategoryid) {
+    public static function get_aggregation_export_plugins(int $courseid, int $gradecategoryid, int $groupid = 0) {
 
-        return \local_gugrades\export::get_aggregation_export_plugins($courseid, $gradecategoryid);
+        return \local_gugrades\export::get_aggregation_export_plugins($courseid, $gradecategoryid, $groupid);
     }
 
     /**

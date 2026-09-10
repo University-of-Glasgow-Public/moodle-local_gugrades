@@ -38,6 +38,26 @@ abstract class base {
     }
 
     /**
+     * Is this export available for the given course?
+     * @param int $courseid
+     * @return bool
+     */
+    public function is_available(int $courseid) {
+        return true;
+    }
+
+    /**
+     * Proposed download filename (without .csv)
+     * Empty string means use the default MyGrades filename.
+     * @param int $courseid
+     * @param int $groupid
+     * @return string
+     */
+    public function get_filename(int $courseid, int $groupid = 0) {
+        return '';
+    }
+
+    /**
      * Does the plugin define optional fields?
      * @return boolean
      */

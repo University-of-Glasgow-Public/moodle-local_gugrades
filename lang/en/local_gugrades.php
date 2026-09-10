@@ -499,6 +499,7 @@ $string['type'] = 'Type';
 $string['unreleasegrades'] = 'Unrelease grades';
 $string['unreleasegradesgroup'] = 'Unrelease grades for group';
 $string['unsupportedweight'] = 'Unsupported weight strategy';
+$string['upasexport'] = 'UPAS Export';
 $string['upload'] = 'Upload';
 $string['username'] = 'User name';
 $string['userpicture'] = 'Pic';

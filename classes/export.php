@@ -103,9 +103,10 @@ class export {
      * Get list of aggregation export plugins
      * @param int $courseid
      * @param int $gradecategoryid
+     * @param int $groupid
      * @return array
      */
-    public static function get_aggregation_export_plugins(int $courseid, int $gradecategoryid) {
+    public static function get_aggregation_export_plugins(int $courseid, int $gradecategoryid, int $groupid = 0) {
         global $CFG;
 
         // Get all the php files in export directory.
@@ -127,11 +128,22 @@ class export {
                     // Instantiate class.
                     $classname = 'local_gugrades\\export\\' . $name;
                     $export = new $classname();
+
+                    // Skip plugins that are not available for this course.
+                    if (!$export->is_available($courseid)) {
+                        continue;
+                    }
+
                     $description = $export->get_name();
+                    $pluginfilename = $export->get_filename($courseid, $groupid);
+                    if ($pluginfilename === '') {
+                        $pluginfilename = self::get_filename($courseid);
+                    }
 
                     $plugins[] = [
                         'name' => $name,
                         'description' => $description,
+                        'filename' => $pluginfilename,
                     ];
                 }
             }
@@ -193,8 +205,11 @@ class export {
         // Get bulk database data.
         \local_gugrades\grades::build_bulk_data($courseid, []);
 
-        $course = get_course($courseid);
-        $filename = $course->shortname . '_' . date('Y-m-d_G:i:s');
+        $filename = $plugin->get_filename($courseid, $groupid);
+        if ($filename === '') {
+            $course = get_course($courseid);
+            $filename = $course->shortname . '_' . date('Y-m-d_G:i:s');
+        }
 
         $data = $plugin->get_form_data($courseid, $gradecategoryid, $groupid, $form);
 
