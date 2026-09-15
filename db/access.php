@@ -112,4 +112,25 @@ $capabilities = [
         'archetypes' => [
         ],
     ],
+    'local/gugrades:resetassessment' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+        ],
+    ],
+    'local/gugrades:removeremovedassessment' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+        ],
+    ],
+    'local/gugrades:removeuserdata' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+        ],
+    ],
 ];

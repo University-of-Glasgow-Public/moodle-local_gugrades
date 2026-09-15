@@ -59,7 +59,7 @@ class reset_user_grades extends external_api {
         ]);
         $context = \context_course::instance($courseid);
         self::validate_context($context);
-        require_capability('local/gugrades:resetcourse', $context);
+        require_capability('local/gugrades:removeuserdata', $context);
 
         \local_gugrades\api::reset_user_grades($courseid, $userid);
         \local_gugrades\audit::write($courseid, $userid, 0, 'Removed user MyGrades data.');

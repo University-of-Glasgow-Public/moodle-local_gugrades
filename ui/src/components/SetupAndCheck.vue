@@ -11,26 +11,14 @@
                 <div v-for="error in errors" :key="errorKey(error)" class="table-row items-center">
                     <div class="table-cell whitespace-nowrap font-bold align-middle">{{ error.itemname }}</div>
                     <div class="table-cell align-middle text-slate-600">{{ error.error }}</div>
-                    <div class="table-cell align-middle text-right w-44">
-                        <ResetUserGradesButton
-                            v-if="error.errortype === 'unenrolled_user' && error.userid"
-                            :userid="error.userid"
-                            :small="true"
-                            @reset="reload"
-                        />
-                        <ResetAssessmentButton
-                            v-else-if="error.gradeitemid"
-                            :itemid="error.gradeitemid"
-                            :small="true"
-                            @reset="reload"
-                        />
-                    </div>
                 </div>
-                <div v-if="courseurl" class="table-row">
+                <div class="table-row">
                     <div class="table-cell"></div>
-                    <div class="table-cell"></div>
+                    <div class="table-cell align-middle text-right">
+                        <CleanupIntegrityButton :errors="errors" @cleaned="onCleanupComplete" />
+                    </div>
                     <div class="table-cell align-middle text-right w-44">
-                        <MenuButton :href="courseurl" :wide="true" iconName="MoveLeft">
+                        <MenuButton v-if="courseurl" :href="courseurl" :wide="true" iconName="MoveLeft">
                             {{ returnToCourseLabel }}
                         </MenuButton>
                     </div>
@@ -64,8 +52,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import { usePopulateTrees } from '@/js/setuptrees.ts';
-    import ResetAssessmentButton from './Capture/ResetAssessmentButton.vue';
-    import ResetUserGradesButton from './Capture/ResetUserGradesButton.vue';
+    import CleanupIntegrityButton from './Capture/CleanupIntegrityButton.vue';
     import MenuButton from './Common/MenuButton.vue';
     import { useToast } from 'vue-toastification';
 
@@ -171,8 +158,17 @@
         }
     });
 
-    function reload() {
-        window.location.reload();
+    async function onCleanupComplete(payload: { cleaned: number; erroritems: iError[] }) {
+        errors.value = payload.erroritems || [];
+
+        if (errors.value.length === 0) {
+            showerrors.value = false;
+            if (notices.value.length > 0) {
+                shownotices.value = true;
+                return;
+            }
+            await continueSetup();
+        }
     }
 
     function errorKey(error: iError) {

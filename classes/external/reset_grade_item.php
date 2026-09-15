@@ -51,6 +51,8 @@ class reset_grade_item extends external_api {
      * @return array
      */
     public static function execute($courseid, $gradeitemid) {
+        global $DB;
+
         \local_gugrades\development::increase_debugging();
 
         // Security.
@@ -60,10 +62,20 @@ class reset_grade_item extends external_api {
         ]);
         $context = \context_course::instance($courseid);
         self::validate_context($context);
-        require_capability('local/gugrades:resetcourse', $context);
+
+        $gradeitem = $DB->get_record('grade_items', ['id' => $gradeitemid]);
+        $isremoved = !$gradeitem || ((int) $gradeitem->courseid !== (int) $courseid);
+
+        if ($isremoved) {
+            require_capability('local/gugrades:removeremovedassessment', $context);
+            $auditmessage = 'Removed deleted assessment MyGrades data.';
+        } else {
+            require_capability('local/gugrades:resetassessment', $context);
+            $auditmessage = 'Reset assessment.';
+        }
 
         \local_gugrades\api::reset_grade_item($courseid, $gradeitemid);
-        \local_gugrades\audit::write($courseid, $gradeitemid, 0, 'Reset assessment.');
+        \local_gugrades\audit::write($courseid, $gradeitemid, 0, $auditmessage);
 
         return [];
     }

@@ -3110,4 +3110,62 @@ class api {
             'reassessmentnotices' => $reassessmentnotices,
         ];
     }
+
+    /**
+     * Clean unenrolled-user and removed-assessment integrity errors the current user may remove.
+     * Other integrity issues must be resolved manually.
+     * @param int $courseid
+     * @return array
+     */
+    public static function cleanup_integrity_errors(int $courseid) {
+        $context = \context_course::instance($courseid);
+        $result = self::check_integrity($courseid);
+        $errors = $result['erroritems'];
+
+        $canremoveuser = has_capability('local/gugrades:removeuserdata', $context);
+        $canremoveremoved = has_capability('local/gugrades:removeremovedassessment', $context);
+
+        $cleanedusers = [];
+        $cleanedremoved = [];
+
+        foreach ($errors as $error) {
+            $errortype = $error['errortype'] ?? '';
+
+            if ($errortype === 'unenrolled_user') {
+                if (!$canremoveuser) {
+                    continue;
+                }
+                $userid = (int) ($error['userid'] ?? 0);
+                if (!$userid || isset($cleanedusers[$userid])) {
+                    continue;
+                }
+                self::reset_user_grades($courseid, $userid);
+                \local_gugrades\audit::write($courseid, $userid, 0, 'Removed user MyGrades data.');
+                $cleanedusers[$userid] = true;
+                continue;
+            }
+
+            if ($errortype === 'removed_gradeitem') {
+                if (!$canremoveremoved) {
+                    continue;
+                }
+                $gradeitemid = (int) ($error['gradeitemid'] ?? 0);
+                if (!$gradeitemid || isset($cleanedremoved[$gradeitemid])) {
+                    continue;
+                }
+                self::reset_grade_item($courseid, $gradeitemid);
+                \local_gugrades\audit::write($courseid, $gradeitemid, 0, 'Removed deleted assessment MyGrades data.');
+                $cleanedremoved[$gradeitemid] = true;
+            }
+        }
+
+        $cleaned = count($cleanedusers) + count($cleanedremoved);
+        $remaining = self::check_integrity($courseid);
+
+        return [
+            'cleaned' => $cleaned,
+            'erroritems' => $remaining['erroritems'],
+            'reassessmentnotices' => $remaining['reassessmentnotices'],
+        ];
+    }
 }

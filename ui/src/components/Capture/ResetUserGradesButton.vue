@@ -63,7 +63,7 @@
         moodleFetch(
             'local_gugrades_has_capability',
             {
-                capability: 'local/gugrades:resetcourse',
+                capability: 'local/gugrades:removeuserdata',
             }
         )
         .then((result: any) => {

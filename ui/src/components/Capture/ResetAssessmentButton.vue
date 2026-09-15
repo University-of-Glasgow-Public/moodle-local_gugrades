@@ -1,16 +1,16 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <MenuButton  v-if="hascapability" @click="showconfirm = true" :disabled="processing" :warning="true" iconName="Bomb">
-        {{ mstrings.resetassessment }}
+    <MenuButton v-if="hascapability" @click="showconfirm = true" :disabled="processing" :warning="true" :wide="removed" iconName="Bomb">
+        {{ buttonLabel }}
     </MenuButton>
 
-    <ConfirmModal :show="showconfirm" :message="mstrings.resetassessmentconfirm" @confirm="confirmreset"></ConfirmModal>
+    <ConfirmModal :show="showconfirm" :message="confirmMessage" @confirm="confirmreset"></ConfirmModal>
     <PleaseWait v-if="processing"></PleaseWait>
 </template>
 
 <script setup lang="ts">
-    import {ref, onMounted} from 'vue';
+    import {ref, onMounted, computed} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -20,10 +20,14 @@
     import MenuButton from '../Common/MenuButton.vue';
     import { useToast } from "vue-toastification";
 
-    const props = defineProps<{
+    const props = withDefaults(defineProps<{
         itemid: number;
         small?: boolean;
-    }>();
+        /** True when cleaning MyGrades data for a grade item deleted from the course. */
+        removed?: boolean;
+    }>(), {
+        removed: false,
+    });
 
     const emits = defineEmits(['reset']);
 
@@ -34,6 +38,32 @@
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
     const toast = useToast();
+
+    const capability = computed(() =>
+        props.removed
+            ? 'local/gugrades:removeremovedassessment'
+            : 'local/gugrades:resetassessment'
+    );
+
+    const buttonLabel = computed(() =>
+        props.removed
+            ? (mstrings.value.removeremovedassessment || 'Remove assessment data')
+            : mstrings.value.resetassessment
+    );
+
+    const confirmMessage = computed(() =>
+        props.removed
+            ? (mstrings.value.removeremovedassessmentconfirm
+                || 'This will delete all MyGrades data for this removed assessment and cannot be undone.')
+            : mstrings.value.resetassessmentconfirm
+    );
+
+    const successMessage = computed(() =>
+        props.removed
+            ? (mstrings.value.removeremovedassessmentsuccess
+                || 'MyGrades data for the removed assessment has been deleted.')
+            : mstrings.value.resetassessmentsuccess
+    );
 
     /**
      * Reset this assessment
@@ -54,7 +84,7 @@
             }
         )
         .then(() => {
-            toast.success(mstrings.value.resetassessmentsuccess);
+            toast.success(successMessage.value);
             emits('reset');
         })
         .catch((error) => {
@@ -70,7 +100,7 @@
         moodleFetch(
             'local_gugrades_has_capability',
             {
-                capability: 'local/gugrades:resetcourse',
+                capability: capability.value,
             }
         )
         .then((result: any) => {
