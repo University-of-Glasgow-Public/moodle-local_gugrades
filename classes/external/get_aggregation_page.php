@@ -133,7 +133,7 @@ class get_aggregation_page extends external_api {
                     'resitrequired' => new external_value(PARAM_BOOL, 'Is resit required?'),
                     'completed' => new external_value(PARAM_FLOAT, '%age of course completed'),
                     'displaygrade' => new external_value(PARAM_TEXT, 'Content for total column'),
-                    'displaygrade1st' => new external_value(PARAM_TEXT, 'Content for total column - 1st attempt'),
+                    //'displaygrade1st' => new external_value(PARAM_TEXT, 'Content for total column - 1st attempt'),
                     'releasegrade' => new external_value(PARAM_TEXT, 'Grade to show in the released column (if any)'),
                     'mismatch' => new external_value(PARAM_BOOL, 'Released and display grades do not match'),
                     'rawgrade' => new external_value(PARAM_FLOAT, 'Aggregated grade before any conversion'),
