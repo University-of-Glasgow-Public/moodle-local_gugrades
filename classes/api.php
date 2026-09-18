@@ -2256,6 +2256,7 @@ class api {
                 'debug' => [],
                 'staffuserid' => $USER->id,
                 'completionused' => false,
+                'isreassessment' => false,
             ];
         }
 
@@ -2317,6 +2318,11 @@ class api {
         // Is 'exclude empty grades' ticked?
         $excludeempty = \local_gugrades\grades::is_exclude_empty_grades($gradecategoryid);
 
+        // Is this a reassessment category?
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid); 
+        $aggregation = $regulation->get_aggregation($courseid, $atype);
+        $isreassessment = $aggregation->is_reassessment($gradecategoryid); 
+
         return [
             'aggregationsupported' => $aggregationsupported,
             'toplevel' => $istoplevel,
@@ -2336,6 +2342,7 @@ class api {
             'debug' => [],
             'staffuserid' => $USER->id,
             'completionused' => $regulation->is_completion_supported(),
+            'isreassessment' => $isreassessment,
         ];
     }
 

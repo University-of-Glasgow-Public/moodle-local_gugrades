@@ -80,6 +80,18 @@ class aggregate {
     }
 
     /**
+     * Is reassessment?
+     * Does this category have the reassessment flag set?
+     * This is not used in original regs and returns false always.
+     * @param int $categoryid
+     * @return bool
+     */
+    public function is_reassessment(int $categoryid): bool {
+        
+        return false;
+    }
+
+    /**
      * Use the array of items for a given gradecategory and produce
      * an aggregated grade (or not).
      * The category object is provided to identify aggregation settings

@@ -76,6 +76,75 @@ final class mgu_1402_two_columns_test extends \local_gugrades\external\gugrades_
     }
 
     /**
+     * Check basic two grade items returns twin grades
+     * 
+     * @return void
+     */
+    public function xtest_basic_two_grade_items(): void {
+        global $DB;
+
+        // Make sure that we're a teacher
+        $this->setUser($this->teacher);
+
+        // Import grades only for one student (so far).
+        $userlist = [
+            $this->student->id,
+        ];
+
+        // Ensure new regs.
+        $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
+        $course->startdate = strtotime('2027-01-01');
+        $DB->update_record('course', $course);
+
+        // Install test data for student.
+        $this->load_data('data12b', $this->student->id);
+        foreach ($this->gradeitemids as $gradeitemid) {
+            $this->import_grades($this->course->id, $gradeitemid, $userlist);
+        }
+
+        // Get summer exam
+        $gradecatsummer = $DB->get_record('grade_categories', ['fullname' => 'Summer exam'], '*', MUST_EXIST);
+
+        // Get aggregation page for category.
+        $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+
+        // No reassessment set, so 1st attempt grade should be empty
+        $this->assertFalse($page['isreassessment']);
+        $this->assertEmpty($fred['displaygrade1st']);
+
+        // Mark as resit (set resit flag for category)
+        $flags = [
+            [
+                'gradecategoryid' => $gradecatsummer->id,
+                'gradeitemid' => 0,
+                'engexam' => false,
+                'resit' => true,
+            ]
+        ];
+        $nothing = write_flags::execute($this->course->id, $flags);
+        $nothing = external_api::clean_returnvalue(
+            write_flags::execute_returns(),
+            $nothing,
+        );
+
+        // Get aggregation page for category.
+        $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, true);
+        $page = external_api::clean_returnvalue(
+            get_aggregation_page::execute_returns(),
+            $page
+        );
+
+        $fred = $page['users'][0];
+        $this->assertTrue($page['isreassessment']);
+    }
+
+    /**
      * Checking getting tree structure for summative and simple case of setting grade item as resit.
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute

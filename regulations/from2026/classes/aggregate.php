@@ -85,6 +85,19 @@ class aggregate {
     }
 
     /**
+     * Is reassessment?
+     * Does this category have the reassessment flag set?
+     * @param int $categoryid
+     * @return bool
+     */
+    public function is_reassessment(int $categoryid): bool {
+        global $DB;
+
+        $resit = $DB->get_field('local_gugrades_flag', 'resit', ['gradecategoryid' => $categoryid]);
+        return $resit ?? false;
+    }
+
+    /**
      * Use the array of items for a given gradecategory and produce
      * an aggregated grade (or not).
      * The category object is provided to identify aggregation settings

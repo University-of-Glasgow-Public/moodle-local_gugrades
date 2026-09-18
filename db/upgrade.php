@@ -489,5 +489,35 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026070101, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026091700) {
+
+        // Define fields first_rawgrade, first_convertedgrade, first_admingrade, first_displaygrade to be dropped from local_gugrades_grade.
+        // Abandoned approach: superseded by separate grade records for resit stages.
+        $table = new xmldb_table('local_gugrades_grade');
+
+        $field = new xmldb_field('first_rawgrade');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('first_convertedgrade');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('first_admingrade');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('first_displaygrade');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026091700, 'local', 'gugrades');
+    }
+
     return true;
 }

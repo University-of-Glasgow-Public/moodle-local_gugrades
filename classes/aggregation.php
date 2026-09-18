@@ -351,23 +351,6 @@ class aggregation {
     }
 
     /**
-     * Is grade hidden in MyGrades?
-     * @param int $gradeitemid
-     * @param int $userid
-     */
-    /*
-    private static function is_grade_hidden(int $gradeitemid, int $userid) {
-        global $DB;
-
-        if ($DB->get_record('local_gugrades_hidden', ['gradeitemid' => $gradeitemid, 'userid' => $userid])) {
-            return true;
-        }
-
-        return false;
-    }
-        */
-
-    /**
      * Get cachetag for aggdata
      * @param int $courseid
      * @param int $gradecategoryid
@@ -494,6 +477,7 @@ class aggregation {
                 'itemname' => $column->shortname, // Required by WS.
                 'fullname' => $column->fullname,
                 'display' => '', // Required by WS.
+                'display1st' => '', // MGU-1402
                 'schedule' => $column->schedule,
                 'weight' => $column->weight,
                 'grademissing' => true,
@@ -513,6 +497,7 @@ class aggregation {
             if ($provisional) {
                 $data['rawgrade'] = $provisional->rawgrade;
                 $data['display'] = $provisional->displaygrade;
+                $data['display1st'] = ''; // MGU-1402: 1st attempt display not yet sourced.
                 $data['grademissing'] = is_null($provisional->rawgrade);
                 $data['admingrade'] = $provisional->admingrade;
                 $data['dropped'] = $provisional->dropped;
@@ -566,6 +551,8 @@ class aggregation {
         // MGU-1505: I have no idea why converted grades had (wrong) numeric values. 
         $user->displaygrade = $item->displaygrade;
             //$converted && empty($item->admingrade) ? $item->displaygrade . ' (' . $item->rawgrade . ')' : $item->displaygrade;
+        // MGU-1402: Display first attempt grade. (TODO: Not in $item right now)
+        $user->displaygrade1st = '';
         $user->releasegrade = $releasegrade;
         $user->mismatch = $released && ($item->displaygrade != $releasegrade);
         $user->admingrade = $item->admingrade;
@@ -687,7 +674,7 @@ class aggregation {
      * 3. If all Schedule A then result is Schedule A
      * 4. If all Schedule B then result is Schedule B
      * 5. If mix of Schedule A/B then Schedule A if >=50% by weight is Sched A, otherwise Sched B (see MGU-812)
-     * 6. If sum of weights is zro then its an error
+     * 6. If sum of weights is zero then it's an error
      * TODO: More finely grained error control.
      * Also checks for some possible error conditions
      * a. Error in any child
@@ -795,6 +782,7 @@ class aggregation {
             'atype' => $atype,
             'warnings' => [],
         ];
+
         return [$atype, []];
     }
 
@@ -1227,6 +1215,7 @@ class aggregation {
      * @param int $userid
      * @param int $level
      * @param bool $skipdroplow
+     * @param bool &$nursingcondmet 
      * @return object
      */
     protected static function aggregate_user(

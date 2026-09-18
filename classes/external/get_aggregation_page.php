@@ -108,6 +108,7 @@ class get_aggregation_page extends external_api {
             'excludeempty' => new external_value(PARAM_BOOL, 'True when exclude empty grades checked, effects NS interpretation.'),
             'staffuserid' => new external_value(PARAM_INT, 'UserID of person running MyGrades ($USER->id'),
             'completionused' => new external_value(PARAM_BOOL, 'Is the completion % in use?'),
+            'isreassessment' => new external_value(PARAM_BOOL, 'Is this category a reassessment?'),
             'debug' => new external_multiple_structure(
                 new external_single_structure([
                     'line' => new external_value(PARAM_RAW, 'Line of debug info, available when DEBUG_DEVELOPER is enabled'),
@@ -132,6 +133,7 @@ class get_aggregation_page extends external_api {
                     'resitrequired' => new external_value(PARAM_BOOL, 'Is resit required?'),
                     'completed' => new external_value(PARAM_FLOAT, '%age of course completed'),
                     'displaygrade' => new external_value(PARAM_TEXT, 'Content for total column'),
+                    'displaygrade1st' => new external_value(PARAM_TEXT, 'Content for total column - 1st attempt'),
                     'releasegrade' => new external_value(PARAM_TEXT, 'Grade to show in the released column (if any)'),
                     'mismatch' => new external_value(PARAM_BOOL, 'Released and display grades do not match'),
                     'rawgrade' => new external_value(PARAM_FLOAT, 'Aggregated grade before any conversion'),
@@ -144,6 +146,7 @@ class get_aggregation_page extends external_api {
                             'fieldname' => new external_value(PARAM_TEXT, 'Identifier for column'),
                             'itemname' => new external_value(PARAM_TEXT, 'Shortened item name (for debugging, mostly)'),
                             'display' => new external_value(PARAM_TEXT, 'Grade for display'),
+                            'display1st' => new external_value(PARAM_TEXT, 'Grade for display - 1st attempt'),
                             'dropped' => new external_value(PARAM_BOOL, 'Has this grade been dropped?'),
                             'isadmin' => new external_value(PARAM_BOOL, 'Is this an admin grade (for styling purposes)?'),
                             'hidden' => new external_value(PARAM_BOOL, 'Is grade hidden?'),

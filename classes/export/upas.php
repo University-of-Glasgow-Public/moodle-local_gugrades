@@ -186,15 +186,7 @@ class upas extends base {
             'gradetype' => 'CATEGORY',
         ];
 
-        // Prefer first-sitting fields stored on the aggregated CATEGORY grade.
         $category = $DB->get_record('local_gugrades_grade', $categoryparams + ['iscurrent' => 1]);
-        if ($category && ($category->first_admingrade || $category->first_displaygrade)) {
-            return $this->sanitise_grade_value(
-                $category->first_admingrade,
-                $category->first_rawgrade,
-                $category->first_displaygrade
-            );
-        }
 
         // If this category has a designated resit item, use the first sitting item.
         $resititemid = \local_gugrades\grades::get_resit_itemid($gradecategoryid);
