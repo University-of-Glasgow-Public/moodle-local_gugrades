@@ -1,59 +1,22 @@
 <template>
   <div class="w-full flex flex-col gap-4">
     <!-- Main Scrollable Table Containment Frame -->
-    <div class="w-full overflow-x-auto overflow-y-visible rounded-lg border border-brand-light-purple/30 bg-white shadow-md pb-12">
-      
-      <table class="w-full text-left border-collapse text-sm">
+    <div class="w-full rounded-lg border border-brand-light-purple/30 bg-white shadow-md">
+      <div
+        :id="tableScrollId"
+        ref="tableScrollEl"
+        class="utable-scroll w-full overflow-x-auto overflow-y-visible"
+        @scroll="onTableScroll"
+      >
+        <table ref="tableEl" class="w-full text-left border-collapse text-sm">
         
         <!-- HEADER ROW GROUP -->
-        <thead class="bg-university-blue text-white uppercase text-xs tracking-wider">
-          <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-            <th 
-              v-for="header in headerGroup.headers" 
-              :key="header.id" 
-              class="font-semibold p-0"
-              :class="dense ? 'text-xs' : ''"
-            >
-              <div
-                class="flex items-center gap-1.5 w-full items-stretch transition-colors duration-150"
-                :class="[
-                  dense ? 'px-3 py-1.5' : 'px-6 py-2.5',
-                  header.column.getCanSort() ? 'cursor-pointer hover:bg-white/10' : ''
-                ]"
-                @click="header.column.getToggleSortingHandler()?.($event)"
-              >          
-                <FlexRender 
-                  :render="header.column.columnDef.header" 
-                  :props="header.getContext()" 
-                />
-                <span v-if="header.column.getIsSorted() === 'asc'">🔼</span>
-                <span v-else-if="header.column.getIsSorted() === 'desc'">🔽</span>
-                <span v-else-if="header.column.getCanSort()" class="opacity-30">↕️</span>
-              </div>
-            </th> 
-          </tr>
-
-          <!-- FILTER ROW -->
-          <template v-if="filterable">
-            <tr v-for="headerGroup in table.getHeaderGroups()" :key="`filter-${headerGroup.id}`" class="bg-university-blue/90">
-              <th 
-                v-for="header in headerGroup.headers" 
-                :key="`filter-${header.id}`"
-                class="font-normal p-1"
-              >
-                <input
-                  v-if="header.column.getCanFilter()"
-                  type="text"
-                  :value="(header.column.getFilterValue() as string) ?? ''"
-                  @input="header.column.setFilterValue(($event.target as HTMLInputElement).value)"
-                  placeholder="Filter..."
-                  class="w-full rounded-sm border border-white/30 bg-white/10 text-white placeholder-white/50 text-xs px-2 py-1 focus:outline-none focus:border-white/60"
-                  @click.stop
-                />
-              </th>
-            </tr>
-          </template>
-        </thead>
+        <UTableHead
+          :table="table"
+          :dense="dense"
+          :filterable="filterable"
+          :is-scrolled-x="isScrolledX"
+        />
 
         <!-- BODY ROWS GROUP -->
         <tbody class="divide-y divide-brand-light-purple/20 text-brand-dark-purple">
@@ -66,7 +29,11 @@
               v-for="cell in row.getVisibleCells()" 
               :key="cell.id" 
               class="transition-all duration-150"
-              :class="dense ? 'px-3 py-1 text-xs' : 'px-6 py-2'"
+              :class="[
+                dense ? 'px-3 py-1 text-xs' : 'px-6 py-2',
+                isPinnedColumn(cell.column.id) ? 'utable-pin-name' : '',
+                isScrolledX && isPinnedColumn(cell.column.id) ? 'utable-pin-name--scrolled' : '',
+              ]"
             >
               <FlexRender 
                 :render="cell.column.columnDef.cell" 
@@ -76,8 +43,51 @@
           </tr>
         </tbody>
 
-      </table>
+        </table>
+      </div>
     </div>
+
+    <!-- Follows the page as the original header leaves the viewport. -->
+    <Teleport to="body">
+      <div
+        v-show="showStickyHeader"
+        ref="stickyHeaderEl"
+        class="utable-sticky-header"
+        :style="stickyHeaderStyle"
+      >
+        <div ref="stickyHeaderScrollEl" class="utable-sticky-header-scroll">
+          <table class="text-left border-collapse text-sm" :style="{ width: contentWidth + 'px' }">
+            <UTableHead
+              :table="table"
+              :dense="dense"
+              :filterable="filterable"
+              :is-scrolled-x="isScrolledX"
+            />
+          </table>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Stays at the bottom of the viewport while the native table scrollbar
+         is off-screen, so wide tables can be panned without scrolling down. -->
+    <Teleport to="body">
+      <div
+        v-show="showFloatingScrollbar"
+        ref="floatingScrollEl"
+        class="utable-floating-scroll"
+        :style="floatingScrollStyle"
+        role="scrollbar"
+        aria-orientation="horizontal"
+        aria-label="Scroll table horizontally"
+        :aria-controls="tableScrollId"
+        :aria-valuemin="0"
+        :aria-valuenow="scrollLeft"
+        :aria-valuemax="maxScrollLeft"
+        @scroll="onFloatingScroll"
+      >
+        <div class="utable-floating-scroll-spacer" :style="{ width: contentWidth + 'px' }"></div>
+      </div>
+    </Teleport>
 
     <!-- Branded Pagination Controls Footer -->
     <div 
@@ -155,7 +165,9 @@
 
 
 <script setup lang="ts" generic="TData">
-    import { ref, watch } from 'vue' // 1. Import watch from vue
+    import { computed, nextTick, onMounted, ref, useId, watch, type CSSProperties } from 'vue'
+    import UTableHead from '@/components/Common/UTableHead.vue'
+    import { useEventListener, useResizeObserver } from '@vueuse/core'
     import { 
         useVueTable, 
         getCoreRowModel, 
@@ -226,6 +238,218 @@
         },
     });
 
+    const tableScrollId = useId();
+    const tableScrollEl = ref<HTMLElement | null>(null);
+    const tableEl = ref<HTMLElement | null>(null);
+    const floatingScrollEl = ref<HTMLElement | null>(null);
+    const stickyHeaderEl = ref<HTMLElement | null>(null);
+    const stickyHeaderScrollEl = ref<HTMLElement | null>(null);
+    const contentWidth = ref(0);
+    const scrollLeft = ref(0);
+    const isScrolledX = ref(false);
+    const showFloatingScrollbar = ref(false);
+    const showStickyHeader = ref(false);
+    const floatingScrollStyle = ref<CSSProperties>({});
+    const stickyHeaderStyle = ref<CSSProperties>({});
+    let syncingScroll = false;
+    let measureRaf = 0;
+
+    const maxScrollLeft = computed(() => {
+        const clientWidth = tableScrollEl.value?.clientWidth ?? 0;
+        return Math.max(contentWidth.value - clientWidth, 0);
+    });
+
+    function isPinnedColumn(columnId: string) {
+        return columnId === 'displayname';
+    }
+
+    function onTableScroll() {
+        const el = tableScrollEl.value;
+        if (!el) {
+            return;
+        }
+
+        scrollLeft.value = el.scrollLeft;
+        isScrolledX.value = el.scrollLeft > 0;
+
+        if (stickyHeaderScrollEl.value) {
+            stickyHeaderScrollEl.value.scrollLeft = el.scrollLeft;
+        }
+
+        if (syncingScroll || !floatingScrollEl.value) {
+            return;
+        }
+
+        syncingScroll = true;
+        floatingScrollEl.value.scrollLeft = el.scrollLeft;
+        if (stickyHeaderScrollEl.value) {
+            stickyHeaderScrollEl.value.scrollLeft = el.scrollLeft;
+        }
+        requestAnimationFrame(() => {
+            syncingScroll = false;
+        });
+    }
+
+    function onFloatingScroll() {
+        const el = tableScrollEl.value;
+        const floating = floatingScrollEl.value;
+        if (!el || !floating || syncingScroll) {
+            return;
+        }
+
+        syncingScroll = true;
+        el.scrollLeft = floating.scrollLeft;
+        scrollLeft.value = el.scrollLeft;
+        isScrolledX.value = el.scrollLeft > 0;
+        if (stickyHeaderScrollEl.value) {
+            stickyHeaderScrollEl.value.scrollLeft = el.scrollLeft;
+        }
+        requestAnimationFrame(() => {
+            syncingScroll = false;
+        });
+    }
+
+    function getStickyTopOffset() {
+        const candidates = document.querySelectorAll('.navbar, header.navbar, .fixed-top, #page-header');
+        let offset = 0;
+
+        candidates.forEach((node) => {
+            const style = window.getComputedStyle(node);
+            if (style.position !== 'fixed' && style.position !== 'sticky') {
+                return;
+            }
+
+            const rect = node.getBoundingClientRect();
+            if (rect.height > 0 && rect.top <= 8 && rect.bottom > offset && rect.bottom < 200) {
+                offset = rect.bottom;
+            }
+        });
+
+        return offset;
+    }
+
+    function syncStickyHeaderWidths() {
+        const sourceHead = tableEl.value?.querySelector('thead');
+        const destHead = stickyHeaderScrollEl.value?.querySelector('thead');
+        if (!sourceHead || !destHead) {
+            return;
+        }
+
+        const sourceRows = sourceHead.querySelectorAll('tr');
+        const destRows = destHead.querySelectorAll('tr');
+
+        sourceRows.forEach((row: Element, rowIndex: number) => {
+            const destRow = destRows[rowIndex];
+            if (!destRow) {
+                return;
+            }
+
+            Array.from(row.children).forEach((cell, cellIndex) => {
+                const destCell = destRow.children[cellIndex] as HTMLElement | undefined;
+                if (!destCell) {
+                    return;
+                }
+
+                const width = (cell as HTMLElement).getBoundingClientRect().width;
+                destCell.style.width = `${width}px`;
+                destCell.style.minWidth = `${width}px`;
+                destCell.style.maxWidth = `${width}px`;
+            });
+        });
+    }
+
+    function updateStickyHeader() {
+        const el = tableScrollEl.value;
+        const tableNode = tableEl.value;
+        if (props.dense || !el || !tableNode) {
+            showStickyHeader.value = false;
+            return;
+        }
+
+        const thead = tableNode.querySelector('thead');
+        if (!thead) {
+            showStickyHeader.value = false;
+            return;
+        }
+
+        const tableRect = el.getBoundingClientRect();
+        const theadRect = thead.getBoundingClientRect();
+        const topOffset = getStickyTopOffset();
+        const stillOverTable = tableRect.bottom > topOffset + 48;
+
+        showStickyHeader.value = theadRect.top < topOffset && stillOverTable;
+        stickyHeaderStyle.value = {
+            top: `${topOffset}px`,
+            left: `${tableRect.left}px`,
+            width: `${tableRect.width}px`,
+        };
+
+        nextTick(() => {
+            syncStickyHeaderWidths();
+            if (stickyHeaderScrollEl.value && tableScrollEl.value) {
+                stickyHeaderScrollEl.value.scrollLeft = tableScrollEl.value.scrollLeft;
+            }
+        });
+    }
+
+    function measureAndPlace() {
+        updateStickyHeader();
+
+        const el = tableScrollEl.value;
+        if (!el || props.dense) {
+            showFloatingScrollbar.value = false;
+            return;
+        }
+
+        contentWidth.value = el.scrollWidth;
+        scrollLeft.value = el.scrollLeft;
+        isScrolledX.value = el.scrollLeft > 0;
+
+        const overflowsX = el.scrollWidth - el.clientWidth > 1;
+        if (!overflowsX) {
+            showFloatingScrollbar.value = false;
+            return;
+        }
+
+        const rect = el.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const nativeBarSize = 18;
+        const nativeBarVisible = rect.bottom - nativeBarSize < viewportHeight - 2 && rect.bottom > 8;
+        const tableVisible = rect.top < viewportHeight && rect.bottom > 40;
+
+        showFloatingScrollbar.value = tableVisible && !nativeBarVisible;
+        floatingScrollStyle.value = {
+            left: `${rect.left}px`,
+            width: `${rect.width}px`,
+        };
+
+        nextTick(() => {
+            if (floatingScrollEl.value && tableScrollEl.value && !syncingScroll) {
+                floatingScrollEl.value.scrollLeft = tableScrollEl.value.scrollLeft;
+            }
+        });
+    }
+
+    function scheduleMeasure() {
+        if (measureRaf) {
+            return;
+        }
+
+        measureRaf = requestAnimationFrame(() => {
+            measureRaf = 0;
+            measureAndPlace();
+        });
+    }
+
+    useEventListener(window, 'scroll', scheduleMeasure, { capture: true, passive: true });
+    useEventListener(window, 'resize', scheduleMeasure, { passive: true });
+    useResizeObserver(tableScrollEl, scheduleMeasure);
+    useResizeObserver(tableEl, scheduleMeasure);
+
+    onMounted(() => {
+        nextTick(scheduleMeasure);
+    });
+
     /**
      * 3. Deep watch incoming data changes from parents.
      * Whenever any child component spot-updates a row, this intercepts it
@@ -238,6 +462,7 @@
                 ...prev,
                 data: newData,
             }))
+            nextTick(scheduleMeasure);
         },
         { deep: true } // Tells Vue to scan deep properties inside the rows
     )
@@ -247,6 +472,15 @@
         (newFilters) => {
             columnFilters.value = newFilters;
         }
+    );
+
+    watch(
+        () => [
+            table.getState().pagination.pageIndex,
+            table.getState().pagination.pageSize,
+            table.getRowModel().rows.length,
+        ],
+        () => nextTick(scheduleMeasure)
     );
 </script>
 
@@ -274,5 +508,95 @@
   */
   tbody td {
     background-color: transparent !important;
+  }
+
+  .utable-scroll {
+    overscroll-behavior-x: contain;
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-university-blue) color-mix(in srgb, var(--color-brand-light-purple) 30%, white);
+  }
+
+  .utable-scroll::-webkit-scrollbar {
+    height: 12px;
+  }
+
+  .utable-scroll::-webkit-scrollbar-thumb {
+    background: var(--color-university-blue);
+    border-radius: 6px;
+  }
+
+  .utable-scroll::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--color-brand-light-purple) 20%, white);
+  }
+
+  .utable-pin-name {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+  }
+
+  tbody td.utable-pin-name {
+    background-color: white !important;
+  }
+
+  tbody tr:nth-child(odd) td.utable-pin-name {
+    background-color: color-mix(in srgb, var(--color-brand-light-purple) 5%, white) !important;
+  }
+
+  tbody tr:hover td.utable-pin-name {
+    background-color: color-mix(in srgb, var(--color-brand-light-purple) 15%, white) !important;
+  }
+
+  .utable-pin-name--scrolled {
+    box-shadow: 6px 0 8px -6px rgba(1, 20, 81, 0.35);
+  }
+
+  .utable-floating-scroll {
+    position: fixed;
+    bottom: 0;
+    z-index: 40;
+    height: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: color-mix(in srgb, white 92%, var(--color-brand-light-purple));
+    border-top: 1px solid color-mix(in srgb, var(--color-brand-light-purple) 45%, white);
+    box-shadow: 0 -2px 8px rgba(1, 20, 81, 0.08);
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-university-blue) color-mix(in srgb, var(--color-brand-light-purple) 30%, white);
+  }
+
+  .utable-floating-scroll::-webkit-scrollbar {
+    height: 14px;
+  }
+
+  .utable-floating-scroll::-webkit-scrollbar-thumb {
+    background: var(--color-university-blue);
+    border-radius: 7px;
+  }
+
+  .utable-floating-scroll::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--color-brand-light-purple) 20%, white);
+  }
+
+  .utable-floating-scroll-spacer {
+    height: 1px;
+  }
+
+  .utable-sticky-header {
+    position: fixed;
+    z-index: 35;
+    overflow: hidden;
+    background-color: var(--color-university-blue);
+    box-shadow: 0 4px 12px rgba(1, 20, 81, 0.22);
+  }
+
+  .utable-sticky-header-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .utable-sticky-header-scroll::-webkit-scrollbar {
+    display: none;
   }
 </style>
