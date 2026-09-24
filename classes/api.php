@@ -2281,6 +2281,13 @@ class api {
             $warnings[] = ['message' => get_string('categorynothighest', 'local_gugrades')];
         }
 
+        // Check if warning for reassessment category not set to highest level.
+        if (\local_gugrades\grades::is_reassessment_category_set($courseid, $gradecategoryid)) {
+            if (\local_gugrades\aggregation::get_aggregation_strategy($courseid, $gradecategoryid) != \GRADE_AGGREGATE_MAX) {
+                $warnings[] = ['message' => get_string('categorynothighest', 'local_gugrades')];
+            }
+        }
+
         // Don't have duplicate warnings.
         $warnings = array_intersect_key($warnings, array_unique(array_map('serialize', $warnings)));
 

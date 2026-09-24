@@ -114,6 +114,19 @@ class aggregation {
     }
 
     /**
+     * Get aggregation strategy for gradecategoryid
+     * @param int $courseid
+     * @param int $gradecategoryid
+     * @return string   
+     */ 
+    public static function get_aggregation_strategy(int $courseid, int $gradecategoryid) {
+        global $DB;
+
+        $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
+        return $gcat->aggregation;
+    }
+
+    /**
      * Is the strategy weighted (or not)
      * @param int $gradecategoryid
      * @return boolean

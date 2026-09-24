@@ -2210,6 +2210,21 @@ class grades {
     }
 
     /**
+     * Check for reassessment category set
+     * @param int $courseid
+     * @param int $gradecategoryid
+     * @return bool
+     */
+    public static function is_reassessment_category_set(int $courseid, int $gradecategoryid) {
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        if ($regulation->shortname() != 'from2026') {
+            return false;
+        }
+        $aggregation = $regulation->get_aggregation($courseid, '');
+        return $aggregation->is_reassessment($gradecategoryid);
+    }
+
+    /**
      * Check grademax=22 in new regs. 
      * If new regs apply
      * AND there are any grade items with grademax=22
