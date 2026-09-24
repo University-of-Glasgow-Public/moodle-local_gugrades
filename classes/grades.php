@@ -1025,6 +1025,45 @@ class grades {
     }
 
     /**
+     * Get first timestamp for given gradeitemid / userid
+     * @param int $gradeitemid
+     * @param int $userid
+     * @return int|null
+     */ 
+    public static function get_first_timestamp(int $gradeitemid, int $userid) {
+        global $DB;
+
+        $record = $DB->get_record('local_gugrades_grade', [
+            'gradeitemid' => $gradeitemid,
+            'userid' => $userid
+        ], 'id, audittimecreated', IGNORE_MULTIPLE);
+
+        return $record ? $record->audittimecreated : null;
+    }
+
+    /**
+     * Get the ID of the first grade for a gradeitem/user pair.
+     * @param int $gradeitemid
+     * @param int $userid
+     * @return int|null
+     */
+    public static function get_first_grade_id(int $gradeitemid, int $userid): ?int {
+        global $DB;
+
+        $record = $DB->get_record_sql(
+            'SELECT id
+               FROM {local_gugrades_grade}
+              WHERE gradeitemid = :gradeitemid
+                AND userid = :userid
+              ORDER BY id ASC',
+            ['gradeitemid' => $gradeitemid, 'userid' => $userid],
+            IGNORE_MULTIPLE
+        );
+
+        return $record ? (int)$record->id : null;
+    }
+
+    /**
      * Get grade from array by reason
      * @param array $grades
      * @param string $reason

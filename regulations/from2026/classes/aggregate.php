@@ -149,7 +149,7 @@ class aggregate {
         $explain = '';
 
         // Logic will be different if this category is for resits.
-        $isresitcategory = \local_gugrades\grades::is_resit_category($category->categoryid);
+        $isresitcategory = $this->is_reassessment($category->categoryid);
 
         // 0 based keys, please.
         $items = array_values($items);
@@ -210,21 +210,20 @@ class aggregate {
             return [0, 0, $admingrade, $displaygrade, 0, '', $explain, false];
         }
 
-        // Quick check - all items must have a grade.
-        foreach ($items as $item) {
-            if ($item->grademissing) {
-                $explain = get_string('explain_gradesmissing', 'local_gugrades');
-
-                return [null, null, '', null, 0, get_string('gradesmissing', 'local_gugrades'), $explain, false];
-            }
-        }
-
         // If this is a resit category then we may be able to resolve aggregation before doing anything else.
         if ($isresitcategory) {
-            // Find the resit item id (must exist).
-            $resititemid = \local_gugrades\grades::get_resit_itemid($category->categoryid, true);
 
-            [$rawgrade, $admingrade, $explain] = $this->resit($items, $resititemid);
+            // Resit categories don't care about missing grades.
+            $items = array_filter($items, function($item) {
+                return !$item->grademissing;
+            });
+
+            // If that results in no grades...
+            if (count($items) == 0) {
+                return [null, null, '', null, 0, get_string('gradesmissing', 'local_gugrades'), '', false];
+            }
+
+            [$rawgrade, $admingrade, $explain, $items] = $this->resit($items, $userid);
             if ($explain != '') {
                 if ($admingrade) {
                     [$displaygrade, ] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
@@ -246,6 +245,15 @@ class aggregate {
                         return [$roundpoints, $roundpoints, '', $roundpoints, 0, '', $explain, false];
                     }
                 }
+            }
+        }
+
+        // Quick check - all items must have a grade.
+        foreach ($items as $item) {
+            if ($item->grademissing) {
+                $explain = get_string('explain_gradesmissing', 'local_gugrades');
+
+                return [null, null, '', null, 0, get_string('gradesmissing', 'local_gugrades'), $explain, false];
             }
         }
 
@@ -751,18 +759,23 @@ class aggregate {
     }
 
     /**
-     * MGU-1351:
+     * MGU-1560:
      * Handle resit grade.
+     * - Discard no/missing grades. If there is nothing left then result is no grade (already done)
+     * - If there is only a single grade or single admin grade (not NS) then that is the result. (for efficiency)
+     * - If there is one or more admin grades AND no substantive grades are newer, the latest admin grade is the result.
+     * - If any substantive grade (or NS) is the latest grade, any admin grades are removed and the remaining grades are aggregated normally.
+     * 
      * - If there is only one item, then that's the grade (or admingrade)
      * - If there are any admingrade then the resit grade is the grade (or admingrade)
      * - If there are two valid grades then aggregation completes 'normally'
      * Return the item that will be aggregated result or null if not.
      * Return the appropriate explain.
      * @param array $items
-     * @param int $resititemid
-     * @return array  [rawgrade, admingrade, explain]
+     * @param int $userid
+     * @return array  [rawgrade, admingrade, explain, items]
      */
-    public function resit(array $items, $resititemid) {
+    public function resit(array $items, int $userid) {
 
         // Make very sure array is index 0.
         $items = array_values($items);
@@ -777,51 +790,43 @@ class aggregate {
 
             // Normalise grade.
             $norm = $maxgrade * $item->grade / $item->grademax;
-            return [$norm, $item->admingrade, $explain];
+            return [$norm, $item->admingrade, $explain, $items];
         }
 
-        // Which item (index) is the resit item.
-        $resitindex = false;
-        $firstindex = false;
-        foreach ($items as $index => $item) {
-            if ($item->itemid == $resititemid) {
-                $resitindex = $index;
-            }
-            if ($item->itemid != $resititemid) {
-                $firstindex = $index;
-            }
-        }
-        if ($resitindex === false) {
-            throw new \moodle_exception('Resit itemid was not in list of aggregation items. ResititemID = ' . $resititemid);
+        // If there are no admingrades then we can just aggregate "normally".
+        if (!array_filter($items, function($item) {
+            return !empty($item->admingrade);
+        })) {
+            return [0, '', '', $items];
         }
 
-        // If the resit grade is NS/NS0 then the first grade is taken,
-        // unless it too is admin. (This is 'rule 8').
-        $resit = $items[$resitindex];
-        if ($resit->admingrade == 'NOSUBMISSION') {
-            $first = $items[$firstindex];
-            if ($first->admingrade == '') {
-                $explain = get_string('explain_resitnosubmission', 'local_gugrades');
+        // Establish which is the "newest" item.
+        $items = array_map(function($item) use ($userid) {
+            $item->gradeid = \local_gugrades\grades::get_first_grade_id($item->itemid, $userid);
+            return $item;
+        }, $items);
+        usort($items, function($item1, $item2) {
+            return $item1->gradeid <=> $item2->gradeid;
+        });
+        $lastitem = $items[array_key_last($items)];
 
-                // Normalise grade.
-                $norm = $maxgrade * $first->grade / $first->grademax;
-                return [$norm, $first->admingrade, $explain];
-            }
+        // If the $lastitem is an admingrade then it's the category total.
+        // An NC is a substantive grade for reassessment purposes. 
+        if (!empty($lastitem->admingrade) && ($lastitem->admingrade != 'NOSUBMISSION')) {
+            return [0, $lastitem->admingrade, get_string('explain_resitlastadmin', 'local_gugrades'), $items];
         }
 
-        // If there are any admin grades, then the resit item is the result.
-        if ($items[0]->admingrade || $items[1]->admingrade) {
-            $explain = get_string('explain_resitadmingrade', 'local_gugrades');
-            $item = $items[$resitindex];
+        // In which case, last grade must be substantive grade. 
+        // Remove admin grades.
+        $items = array_filter($items, function($item) {
+            return empty($item->admingrade) || ($item->admingrade == 'NOSUBMISSION');
+        });
+        $items = array_values($items);
 
-            // Normalise grade.
-            $norm = $maxgrade * $item->grade / $item->grademax;
-            return [$norm, $item->admingrade, $explain];
-        }
 
         // In which case, we must have two grades and can allow normal aggregation to procede.
         // Signified by empty explain.
-        return [0, '', ''];
+        return [0, '', '', $items];
     }
 
 
