@@ -42,6 +42,7 @@ class get_gradetypes extends external_api {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'gradeitemid' => new external_value(PARAM_INT, 'Grade item id'),
+            'first' => new external_value(PARAM_BOOL, 'Include the FIRST grade type in the menu', VALUE_DEFAULT, false),
         ]);
     }
 
@@ -51,7 +52,7 @@ class get_gradetypes extends external_api {
      * @param int $gradeitemid
      * @return array
      */
-    public static function execute($courseid, $gradeitemid) {
+    public static function execute($courseid, $gradeitemid, $first = false) {
         global $DB;
 
         \local_gugrades\development::increase_debugging();
@@ -60,13 +61,14 @@ class get_gradetypes extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'gradeitemid' => $gradeitemid,
+            'first' => $first,
         ]);
 
         // More security.
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        [$gradetypes, $admingrades] = \local_gugrades\api::get_gradetypes($courseid, $gradeitemid);
+        [$gradetypes, $admingrades] = \local_gugrades\api::get_gradetypes($courseid, $gradeitemid, $first);
 
         return [
             'gradetypes' => $gradetypes,

@@ -250,6 +250,7 @@
             'local_gugrades_get_gradetypes',
             {
                 gradeitemid: props.itemid,
+                first: true,
             }
         )
         .then((result: any) => {

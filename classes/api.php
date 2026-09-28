@@ -1320,12 +1320,13 @@ class api {
      * Get menu of gradetypes and admin grades in menu format
      * @param int $courseid
      * @param int $gradeitemid
+     * @param bool $first - include the FIRST grade type in the menu
      * @return array [$gradetypes, $admingrades]
      */
-    public static function get_gradetypes(int $courseid, int $gradeitemid) {
+    public static function get_gradetypes(int $courseid, int $gradeitemid, bool $first = false) {
         global $DB;
 
-        $gradetypes = \local_gugrades\gradetype::get_menu($gradeitemid, LOCAL_GUGRADES_FORMENU);
+        $gradetypes = \local_gugrades\gradetype::get_menu($gradeitemid, LOCAL_GUGRADES_FORMENU, $first);
 
         // If converted then we can't change existing points columns.
         $converted = \local_gugrades\conversion::is_conversion_applied($courseid, $gradeitemid);

@@ -150,15 +150,18 @@ class gradetype {
      * Get gradetypes for menu
      * @param int $gradeitemid
      * @param bool $menu - return truncated list for menu
+     * @param bool $first - include the FIRST grade type in the menu
      * @return array
      */
-    public static function get_menu(int $gradeitemid, bool $menu = LOCAL_GUGRADES_NOTFORMENU) {
+    public static function get_menu(int $gradeitemid, bool $menu = LOCAL_GUGRADES_NOTFORMENU, bool $first = false) {
         global $DB;
 
         $gradetypes = self::define($menu);
 
         // The menu doesn't include FIRST grades.
-        unset($gradetypes['FIRST']);
+        if (!$first) {
+            unset($gradetypes['FIRST']);
+        }
 
         // Add 'other' gradetypes by name.
         $others = $DB->get_records('local_gugrades_column', ['gradeitemid' => $gradeitemid, 'gradetype' => 'OTHER']);
