@@ -47,6 +47,7 @@ Feature: Testing import_grades_mygrades in local_gugrades
     And I navigate to "MyGrades" in current page administration
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
+    And the field "importfillns" matches value "fillns"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     Then I should see "A4"

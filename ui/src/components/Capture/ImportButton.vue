@@ -170,7 +170,7 @@
     const recursiveselect = ref<'single' | 'recursive'>('single');
     const reason = ref('SECOND');
     const importadditional = ref<'admin' | 'missing' | 'update'>('admin');
-    const importfillns = ref<'none' | 'fillns'>('none');
+    const importfillns = ref<'none' | 'fillns'>('fillns');
     const allgradesvalid = ref(false);
     const gradetypes = ref< IGradetype[] >([]);
     const other = ref('');
@@ -360,7 +360,7 @@
         showimportmodal.value = true;
         importadditional.value = 'admin';
         recursiveselect.value = 'single';
-        importfillns.value = 'none';
+        importfillns.value = 'fillns';
         reason.value='SECOND';
         other.value='';
         dryruncount.value = 0;
