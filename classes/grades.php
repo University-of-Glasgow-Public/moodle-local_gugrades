@@ -2432,11 +2432,14 @@ class grades {
     public static function check_integrity_unenrolled_users(int $courseid) {
         global $DB;
 
+        // Calculated CATEGORY rows are written for every enrolled user when aggregation is viewed,
+        // so they don't indicate real MyGrades data. Overridden category grades still count.
         $userids = $DB->get_fieldset_sql(
-            'SELECT DISTINCT userid
+            "SELECT DISTINCT userid
                FROM {local_gugrades_grade}
               WHERE courseid = :courseid
-                AND iscurrent = 1',
+                AND iscurrent = 1
+                AND (gradetype <> 'CATEGORY' OR catoverride = 1)",
             ['courseid' => $courseid]
         );
         if (!$userids) {
