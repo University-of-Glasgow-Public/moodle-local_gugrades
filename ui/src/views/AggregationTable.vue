@@ -170,6 +170,7 @@
     const completionused = ref(false);
     const filterstore = useFilter();
     const issetupcomplete = ref(false);
+    const isreassessment = ref(false);
     const { firstname, lastname } = storeToRefs( filterstore );
 
     type GradeRow = Record<string, any>;
@@ -307,6 +308,7 @@
                         shortname: mstringstore.getMstring('coursetotal'),
                         strategy: strategy.value,
                         headercontext: context,
+                        reassessment: isreassessment.value,
                         formattedatype: formattedatype.value,
                     });
                 },
@@ -344,6 +346,7 @@
                         shortname: mstringstore.getMstring('subcattotal'),
                         strategy: strategy.value,
                         headercontext: context,
+                        reassessment: isreassessment.value,
                         formattedatype: formattedatype.value,
                     });
                 },
@@ -592,6 +595,7 @@
             excludeempty.value = result.excludeempty;
             staffuserid.value = result.staffuserid;
             completionused.value = result.completionused;
+            isreassessment.value = result.isreassessment;
 
             if (aggregationsupported.value) {
 
