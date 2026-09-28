@@ -324,6 +324,16 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         $courseid = $this->course->id;
         $categoryid = $this->get_grade_category('Summative');
 
+        // UPAS is hidden until enabled.
+        $exportplugins = get_aggregation_export_plugins::execute($courseid, $categoryid);
+        $exportplugins = external_api::clean_returnvalue(
+            get_aggregation_export_plugins::execute_returns(),
+            $exportplugins
+        );
+        $this->assertNotContains('upas', array_column($exportplugins['plugins'], 'name'));
+
+        set_config('enableupasexport', 1, 'local_gugrades');
+
         // Get plugins - UPAS should now be listed.
         $exportplugins = get_aggregation_export_plugins::execute($courseid, $categoryid);
         $exportplugins = external_api::clean_returnvalue(

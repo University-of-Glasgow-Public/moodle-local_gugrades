@@ -37,11 +37,16 @@ class upas extends base {
     }
 
     /**
-     * Only available for courses starting on or after 1 August 2026
+     * Only available for courses starting on or after 1 August 2026,
+     * and only when enabled via the 'enableupasexport' plugin config
      * @param int $courseid
      * @return bool
      */
     public function is_available(int $courseid) {
+        if (!get_config('local_gugrades', 'enableupasexport')) {
+            return false;
+        }
+
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
 
         return $regulation->shortname() === 'from2026';
