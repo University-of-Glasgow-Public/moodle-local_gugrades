@@ -4,8 +4,7 @@
     <VueModal :model-value="showModalOpen" :enableClose="false" modalClass="rounded max-w-3xl" :title="modalTitle" @update:modelValue="() => {}">
         <UAlert v-if="showerrors" variant="error">
             <div class="mb-4">
-                A data integrity check has found invalid data in MyGrades. This is probably due to changing the course start
-                date or manipulating Gradebook settings AFTER grades have already been imported. MyGrades cannot continue.
+                A data integrity check has found invalid data in MyGrades. MyGrades cannot continue.
             </div>
             <div class="table w-full border-separate border-spacing-y-2 border-spacing-x-4">
                 <div v-for="error in errors" :key="errorKey(error)" class="table-row items-center">
