@@ -3150,13 +3150,14 @@ class api {
                 if (!$canremoveuser) {
                     continue;
                 }
-                $userid = (int) ($error['userid'] ?? 0);
-                if (!$userid || isset($cleanedusers[$userid])) {
-                    continue;
+                foreach (\local_gugrades\grades::get_unenrolled_userids($courseid) as $userid) {
+                    if (isset($cleanedusers[$userid])) {
+                        continue;
+                    }
+                    self::reset_user_grades($courseid, $userid);
+                    \local_gugrades\audit::write($courseid, $userid, 0, 'Removed user MyGrades data.');
+                    $cleanedusers[$userid] = true;
                 }
-                self::reset_user_grades($courseid, $userid);
-                \local_gugrades\audit::write($courseid, $userid, 0, 'Removed user MyGrades data.');
-                $cleanedusers[$userid] = true;
                 continue;
             }
 

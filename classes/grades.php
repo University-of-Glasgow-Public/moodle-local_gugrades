@@ -2334,15 +2334,38 @@ class grades {
             return [];
         }
 
-        $itemids = array_unique(array_column($grades, 'gradeitemid'));
+        // Distinct students per item and admin grade.
+        $found = [];
+        foreach ($grades as $grade) {
+            $found[$grade->gradeitemid][$grade->admingrade][$grade->userid] = true;
+        }
+
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+
         $errors = [];
-        foreach ($itemids as $id) {
+        foreach ($found as $id => $admingradeusers) {
             $gradeitem = $DB->get_record('grade_items', ['id' => $id], '*', MUST_EXIST);
+            $details = [];
+            foreach ($admingradeusers as $admingrade => $users) {
+                try {
+                    [$code, $description] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
+                    $label = "$code ($description)";
+                } catch (\moodle_exception $e) {
+                    $label = $admingrade;
+                }
+                $details[] = get_string('integrity_invalid_admingrade_detail', 'local_gugrades', (object) [
+                    'admingrade' => $label,
+                    'count' => count($users),
+                ]);
+            }
             $errors[] = [
                 'gradeitemid' => $id,
                 'itemname' => $gradeitem->itemname,
-                'error' => 'Invalid Admin grade found',
-            ];           
+                'error' => get_string('integrity_invalid_admingrade', 'local_gugrades', (object) [
+                    'details' => implode('; ', $details),
+                    'regulation' => $regulation->displayname(),
+                ]),
+            ];
         }
 
         return $errors;
@@ -2391,12 +2414,30 @@ class grades {
             }
 
             // If this scale / points have to agree
-            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => !$points, 'admingrade' => '', 'iscurrent' => 1])) {
+            $mismatched = $DB->count_records_select(
+                'local_gugrades_grade',
+                'gradeitemid = :gradeitemid AND points = :points AND admingrade = :admingrade AND iscurrent = 1',
+                ['gradeitemid' => $item->id, 'points' => (int) !$points, 'admingrade' => ''],
+                'COUNT(DISTINCT userid)'
+            );
+            if ($mismatched) {
+                if (!$points && is_null($item->scaleid)) {
+                    $expected = get_string('integrity_expected_22scale', 'local_gugrades');
+                } else if (!$points) {
+                    $scalename = $DB->get_field('scale', 'name', ['id' => $item->scaleid]);
+                    $expected = get_string('integrity_expected_scale', 'local_gugrades', $scalename ?: $item->scaleid);
+                } else {
+                    $expected = get_string('integrity_expected_points', 'local_gugrades', format_float($item->grademax, -1));
+                }
                 $errors[] = [
                     'gradeitemid' => $item->id,
                     'itemname' => $item->itemname,
-                    'error' => 'Scale/points do not match',
-                ];  
+                    'error' => get_string('integrity_scale_points_mismatch', 'local_gugrades', (object) [
+                        'expected' => $expected,
+                        'stored' => get_string($points ? 'integrity_stored_scale' : 'integrity_stored_points', 'local_gugrades'),
+                        'count' => $mismatched,
+                    ]),
+                ];
 
                 continue;
             }
@@ -2432,6 +2473,35 @@ class grades {
     public static function check_integrity_unenrolled_users(int $courseid) {
         global $DB;
 
+        if (!$userids = self::get_unenrolled_userids($courseid)) {
+            return [];
+        }
+
+        $names = [];
+        foreach ($userids as $userid) {
+            $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
+            $names[] = $user ? fullname($user) : 'User ' . $userid;
+        }
+        sort($names);
+
+        return [[
+            'gradeitemid' => 0,
+            'itemname' => get_string('integrity_unenrolled_users_name', 'local_gugrades', count($names)),
+            'error' => get_string('integrity_unenrolled_users', 'local_gugrades', implode(', ', $names)),
+            'errortype' => 'unenrolled_user',
+            'userid' => 0,
+            'usernames' => $names,
+        ]];
+    }
+
+    /**
+     * Get ids of users with current MyGrades data who are no longer enrolled.
+     * @param int $courseid
+     * @return array
+     */
+    public static function get_unenrolled_userids(int $courseid) {
+        global $DB;
+
         // Calculated CATEGORY rows are written for every enrolled user when aggregation is viewed,
         // so they don't indicate real MyGrades data. Overridden category grades still count.
         $userids = $DB->get_fieldset_sql(
@@ -2452,23 +2522,9 @@ class grades {
             return (int) $user->id;
         }, $enrolledusers);
 
-        $errors = [];
-        foreach ($userids as $userid) {
-            if (in_array((int) $userid, $enrolledids, true)) {
-                continue;
-            }
+        $userids = array_map('intval', $userids);
 
-            $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
-            $errors[] = [
-                'gradeitemid' => 0,
-                'itemname' => $user ? fullname($user) : 'User ' . $userid,
-                'error' => get_string('integrity_unenrolled_user', 'local_gugrades'),
-                'errortype' => 'unenrolled_user',
-                'userid' => (int) $userid,
-            ];
-        }
-
-        return $errors;
+        return array_values(array_diff($userids, $enrolledids));
     }
 
     /**

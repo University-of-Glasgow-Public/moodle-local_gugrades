@@ -79,6 +79,12 @@ class cleanup_integrity_errors extends external_api {
                     'error' => new external_value(PARAM_TEXT, 'Error condition'),
                     'errortype' => new external_value(PARAM_ALPHANUMEXT, 'Error type', VALUE_DEFAULT, ''),
                     'userid' => new external_value(PARAM_INT, 'User id', VALUE_DEFAULT, 0),
+                    'usernames' => new external_multiple_structure(
+                        new external_value(PARAM_TEXT, 'User full name'),
+                        'Names of users referred to in the error',
+                        VALUE_DEFAULT,
+                        []
+                    ),
                 ])
             ),
             'reassessmentnotices' => new external_multiple_structure(

@@ -70,7 +70,7 @@
 
     function canCleanError(error: iError): boolean {
         if (error.errortype === 'unenrolled_user') {
-            return caps.value.removeuserdata && !!error.userid;
+            return caps.value.removeuserdata;
         }
         if (error.errortype === 'removed_gradeitem') {
             return caps.value.removeremovedassessment && !!error.gradeitemid;

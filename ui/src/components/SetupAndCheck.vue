@@ -1,26 +1,30 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <VueModal :model-value="showModalOpen" :enableClose="false" modalClass="rounded max-w-3xl" :title="modalTitle" @update:modelValue="() => {}">
+    <VueModal :model-value="showModalOpen" :enableClose="false" modalClass="rounded max-w-4xl" :title="modalTitle" @update:modelValue="() => {}">
         <UAlert v-if="showerrors" variant="error">
             <div class="mb-4">
                 A data integrity check has found invalid data in MyGrades. MyGrades cannot continue.
             </div>
-            <div class="table w-full border-separate border-spacing-y-2 border-spacing-x-4">
-                <div v-for="error in errors" :key="errorKey(error)" class="table-row items-center">
-                    <div class="table-cell whitespace-nowrap font-bold align-middle">{{ error.itemname }}</div>
-                    <div class="table-cell align-middle text-slate-600">{{ error.error }}</div>
+            <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-x-4 gap-y-2 items-center">
+                <template v-for="error in errors" :key="errorKey(error)">
+                    <div class="font-bold break-words">{{ error.itemname }}</div>
+                    <div class="text-slate-600">
+                        <template v-for="(part, index) in errorParts(error)" :key="index">
+                            <strong v-if="part.bold" class="text-slate-800">{{ part.text }}</strong>
+                            <template v-else>{{ part.text }}</template>
+                        </template>
+                    </div>
+                </template>
+            </div>
+            <div class="flex justify-end items-center gap-4 mt-4">
+                <div class="w-44">
+                    <CleanupIntegrityButton :errors="errors" @cleaned="onCleanupComplete" />
                 </div>
-                <div class="table-row">
-                    <div class="table-cell"></div>
-                    <div class="table-cell align-middle text-right">
-                        <CleanupIntegrityButton :errors="errors" @cleaned="onCleanupComplete" />
-                    </div>
-                    <div class="table-cell align-middle text-right w-44">
-                        <MenuButton v-if="courseurl" :href="courseurl" :wide="true" iconName="MoveLeft">
-                            {{ returnToCourseLabel }}
-                        </MenuButton>
-                    </div>
+                <div class="w-44">
+                    <MenuButton v-if="courseurl" :href="courseurl" :wide="true" iconName="MoveLeft">
+                        {{ returnToCourseLabel }}
+                    </MenuButton>
                 </div>
             </div>
         </UAlert>
@@ -61,6 +65,7 @@
         error: string;
         errortype?: string;
         userid?: number;
+        usernames?: string[];
     }
 
     interface iNotice {
@@ -170,10 +175,27 @@
         }
     }
 
-    function errorKey(error: iError) {
-        if (error.errortype === 'unenrolled_user') {
-            return `user-${error.userid}`;
+    function errorParts(error: iError): { text: string; bold: boolean }[] {
+        const names = error.usernames || [];
+        const joined = names.join(', ');
+        const start = joined ? error.error.indexOf(joined) : -1;
+        if (start === -1) {
+            return [{ text: error.error, bold: false }];
         }
+
+        const parts = [{ text: error.error.slice(0, start), bold: false }];
+        names.forEach((name, index) => {
+            if (index > 0) {
+                parts.push({ text: ', ', bold: false });
+            }
+            parts.push({ text: name, bold: true });
+        });
+        parts.push({ text: error.error.slice(start + joined.length), bold: false });
+
+        return parts;
+    }
+
+    function errorKey(error: iError) {
         return `item-${error.gradeitemid}-${error.errortype || 'default'}`;
     }
 </script>
