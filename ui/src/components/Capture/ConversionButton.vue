@@ -29,7 +29,7 @@
             <div v-if="!selection">
 
                 <!-- if there are no grades then don't try to convert -->
-                <UAlert v-if="!anygrades">
+                <UAlert v-if="!anygrades && loaded">
                     {{ mstrings['nogradestoconvert'] }}
                     <UButton @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
                 </UAlert>

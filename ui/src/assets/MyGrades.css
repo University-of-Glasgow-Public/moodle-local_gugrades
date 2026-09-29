@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+/* dist is committed (not gitignored); scanning it makes vite --watch rebuild endlessly */
+@source not "../../dist";
 
 :root {
   /* Primary Identity */

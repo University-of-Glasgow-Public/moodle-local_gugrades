@@ -172,6 +172,8 @@
                 categoryname.value = tree.category.fullname;
             }
             showresitoption.value = tree.anyresitcandidates;
+
+            console.log(activitytree.value);
         }
 
         loaded.value = true;

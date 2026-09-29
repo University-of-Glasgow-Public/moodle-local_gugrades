@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import viteCompression from 'vite-plugin-compression';
+import { compression } from 'vite-plugin-compression2';
 import { webUpdateNotice } from '@plugin-web-update-notification/vite';
 
 // https://vite.dev/config/
@@ -13,10 +13,9 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     tailwindcss(),
-    viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
-      deleteOriginFile: false // Crucial: Keeps your standard app.js for development
+    compression({
+      algorithms: ['gzip'],
+      deleteOriginalAssets: false // Crucial: Keeps your standard app.js for development
     }),
     webUpdateNotice({
       checkInterval: 60 * 1000 * 5, // Check every 5 minutes
