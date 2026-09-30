@@ -1,7 +1,7 @@
 <!-- GradeAlert.vue -->
 <template>
   <div 
-    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold tracking-wide border shadow-sm select-none"
+    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold tracking-wide border shadow-sm select-none whitespace-nowrap"
     :class="activeClasses"
   >
     <!-- Dynamic Indicator Icon -->
