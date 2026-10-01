@@ -7,7 +7,7 @@
     
     <template v-else>
 
-        <div class="bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm">
+        <div class="bg-brand-light-purple/10 border rounded-md mt-2 border-gray-300 shadow-sm p-3">
 
 
             <div class="mt-5">
@@ -19,7 +19,7 @@
             <div v-if="(showresitoption || engineering) && caneditgrades &&!newregs" class="my-2">
                 <UButton v-if="!configuringresits" variant="accent" @click="click_configure">{{ mstrings['configurereassessments'] }}</UButton>
                 <div v-else>
-                    <UAlert v-html="mstrings['resit_help']"></UAlert>
+                    <UAlert class="mb-2" v-html="mstrings['resit_help']"></UAlert>
                     <UButton variant="success" @click="click_finish">{{ mstrings['finish'] }}</UButton>
                 </div>
             </div>

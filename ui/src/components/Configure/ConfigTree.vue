@@ -1,28 +1,27 @@
 <template>
-    <tr v-for="item in props.nodes.items" :key="item.id" :class="resitclass">
+    <tr v-for="item in props.nodes.items" :key="item.id" :class="resitclass" class="border-b border-gray-200 [&>td]:py-1.5">
         <td v-if="resitconfig" class="px-2 resit_select border-none">
             <ResitCheckbox  v-if="!resitfade" :itemid="item.id" :checkeditemid="resititemid" @checked="resit_clicked" :depth="depth"></ResitCheckbox>
         </td>
-        <td :style="indentstyle" class="flex justify-start">
-            <ConfigTreeIcon :gradeitem="item"></ConfigTreeIcon>
-            {{ item.itemname }}
-        </td>
-        <td class="resit_select px-2" >
-            <UBadge v-if="item.id == resititemid" variant="success">{{ mstrings['resitselected'] }}</UBadge>
+        <td :style="indentstyle">
+            <div class="flex items-center gap-1">
+                <ConfigTreeIcon :gradeitem="item"></ConfigTreeIcon>
+                {{ item.itemname }}
+                <UBadge v-if="item.id == resititemid" variant="success" class="ml-2">{{ mstrings['resitselected'] }}</UBadge>
+            </div>
         </td>
         <td>&nbsp;</td> <!-- holder for strategy -->
         <td>
             {{ item.info.scalename }}
             <span v-if="!item.info.isscale">&nbsp;({{ parseFloat(item.grademax) }})</span>
         </td>
-        <td>
-            <span v-if="showeights" :style="indentstyle">{{ item.info.weight }}%</span>
+        <td class="text-right pr-3">
+            <span v-if="showeights">{{ item.info.weight }}%</span>
         </td>
     </tr>
     <template v-for="category in props.nodes.categories" :key="category.id">
-        <tr class="pb-2" :class="{ 'bg-light': category.category.even }">
+        <tr class="bg-gray-100 border-b border-gray-200 [&>td]:py-1.5">
             <td v-if="resitconfig" class="px-2 resit_select">
-                {{ depth }}
                 <ResitCheckbox v-if="!resitfade" :itemid="category.category.itemid" :checkeditemid="resititemid" @checked="resit_clicked" :depth="depth"></ResitCheckbox>
             </td>
             <td :style="indentstyle">
@@ -32,15 +31,13 @@
                     {{ category.category.fullname }}
                     <!-- <span v-if="engineering"><input type="checkbox" /></span> -->
                 </b>
-            </td>
-            <td class="resit_select px-2" >
-                <UBadge v-if="category.category.itemid == resititemid" variant="success">{{ mstrings['resitselected'] }}</UBadge>
+                <UBadge v-if="category.category.itemid == resititemid" variant="success" class="ml-2">{{ mstrings['resitselected'] }}</UBadge>
             </td>
             <td>
                 {{ category.category.strategy }}
             </td>
             <td></td> <!-- Holder for scale -->
-            <td>
+            <td class="text-right pr-3">
                 <span v-if="showeights">{{ category.category.info.weight }}%</span>
             </td>
         </tr>
@@ -169,7 +166,7 @@
 
 <style>
     .resit_fade {
-        opacity: 0.2;
+        opacity: 0.45;
     }
 
     .resit_nofade {
