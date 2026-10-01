@@ -5,12 +5,16 @@
 
 import { generateClasses } from '@formkit/themes'
 
+// $reset strips FormKit's default disabled look, so restore it explicitly.
+const disabledInput = 'disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-200 disabled:cursor-not-allowed'
+const disabledOuter = 'data-[disabled]:opacity-60 data-[disabled]:cursor-not-allowed'
+
 const config = {
   config: {
     classes: generateClasses({
       global: {
-        outer: '$reset my-1 font-sans',
-        input: 'w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:outline-none focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue',
+        outer: `$reset my-1 font-sans ${disabledOuter}`,
+        input: `w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:outline-none focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue ${disabledInput}`,
         label: '$reset text-sm font-medium text-brand-dark-purple mb-1 block',
         legend: '$reset text-sm font-medium text-brand-dark-purple mb-1 block',
         help: 'text-xs text-brand-dark-blue/60 mt-1',
@@ -24,15 +28,15 @@ const config = {
         input: '$reset w-full accent-brand-dark-blue',
       },
       submit: {
-        outer: '$reset mt-3',
-        input: '$reset px-4 py-2 bg-brand-dark-blue text-white font-medium rounded-md hover:bg-brand-dark-purple transition-colors cursor-pointer'
+        outer: `$reset mt-3 ${disabledOuter}`,
+        input: '$reset px-4 py-2 bg-brand-dark-blue text-white font-medium rounded-md hover:bg-brand-dark-purple transition-colors cursor-pointer disabled:cursor-not-allowed disabled:hover:bg-brand-dark-blue'
       },
       number: {
-        input: '$reset w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue'
+        input: `$reset w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue ${disabledInput}`
       },
       checkbox: {
         // Layout wrapper for multi-option groups
-        outer: '$reset my-3 flex flex-col gap-2.5',
+        outer: `$reset my-3 flex flex-col gap-2.5 ${disabledOuter}`,
         // Structure for a single checkbox layout context
         wrapper: '$reset flex items-start gap-3 cursor-pointer',
         // Strips "block" layout entirely to ensure the label locks side-by-side with the square
@@ -46,7 +50,7 @@ const config = {
         inner: '$reset inline-flex items-center shrink-0'
       },
       radio: {
-        outer: '$reset my-3',
+        outer: `$reset my-3 ${disabledOuter}`,
         legend: '$reset mb-1.5 font-medium text-brand-dark-purple',
         // Individual wrapping option container for radio alignment
         wrapper: '$reset flex items-start gap-3 cursor-pointer',
@@ -57,13 +61,13 @@ const config = {
         inner: '$reset inline-flex items-center shrink-0'
       },
       select: {
-        input: "$reset w-full max-w-full pl-3 pr-10 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue bg-no-repeat truncate appearance-none bg-[right_0.75rem_center] bg-[length:16px] bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%236b7280%22%20stroke-width=%222%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')]",
+        input: `$reset w-full max-w-full pl-3 pr-10 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue ${disabledInput} bg-no-repeat truncate appearance-none bg-[right_0.75rem_center] bg-[length:16px] bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%236b7280%22%20stroke-width=%222%22%3E%3Cpath%20d=%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')]`,
       },
       text: {
-        input: '$reset w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue',
+        input: `$reset w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue ${disabledInput}`,
       },
       textarea: {
-        input: '$reset w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue min-h-[80px]',
+        input: `$reset w-full px-3 py-2 border border-brand-dark-blue/20 rounded-md focus:border-brand-dark-blue focus:ring-1 focus:ring-brand-dark-blue min-h-[80px] ${disabledInput}`,
       }
     })
   }
