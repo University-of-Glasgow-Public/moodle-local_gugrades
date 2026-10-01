@@ -2,7 +2,7 @@
     <DebugDisplay :debug="debug"></DebugDisplay>
 
     <div class="bg-base-100 border border-base-300 rounded-md mt-4 p-6">
-        <FormKit v-if="loaded" type="form" submit-label="Save" :actions="caneditgrades" :disabled="!caneditgrades" @submit="submit_form">
+        <FormKit v-if="loaded" type="form" :actions="false" :disabled="!caneditgrades" @submit="submit_form">
 
             <div class="flex gap-2 mb-5">
 
@@ -178,9 +178,14 @@
             <div v-if="!ordervalidated" class="alert alert-danger my-3">
                 {{ mstrings.mapnotinorder }}
             </div>
+
+            <div class="flex gap-2 mt-3">
+                <UButton v-if="caneditgrades" variant="primary" type="submit">Save</UButton>
+                <UButton variant="warning" @click="cancel_button">{{ caneditgrades ? mstrings.cancel : mstrings.close }}</UButton>
+            </div>
         </FormKit>
 
-        <div class="flex justify-start mt-2">
+        <div v-else class="flex justify-start mt-2">
             <UButton variant="warning" @click="cancel_button">{{ caneditgrades ? mstrings.cancel : mstrings.close }}</UButton>
         </div>
 
