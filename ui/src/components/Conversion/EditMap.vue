@@ -101,7 +101,7 @@
                                     between: 'Percentage must be between 0 and 100',
                                 }"
                                 :model-value="item.boundpc?.toString() ?? ''"
-                                @input="(event) => handleInput(item, event)"
+                                @input="(event) => handleInput(item, 'percentage', event)"
                                 :aria-label="item.band + ' ' + mstrings.percentage"
                             ></FormKit>
                         </div>
@@ -118,7 +118,7 @@
                                     validate_points: 'Number must be between 0 and ' + maxgrade,
                                 }"
                                 :model-value="item.boundpoints?.toString() ?? ''"
-                                @input="(event) => handleInput(item, event)"
+                                @input="(event) => handleInput(item, 'points', event)"
                                 :aria-label="item.band + ' ' + mstrings.points"
                             ></FormKit>
                         </div>
@@ -150,7 +150,7 @@
                                     between: 'Percentage must be between 0 and 100',
                                 }"
                                 :model-value="item.boundpc?.toString() ?? ''"
-                                @input="(event) => handleInput(item, event)"
+                                @input="(event) => handleInput(item, 'percentage', event)"
                                 :aria-label="item.band + ' ' + mstrings.percentage"
                             ></FormKit>
                         </div>
@@ -167,7 +167,7 @@
                                     validate_points: 'Number must be between 0 and ' + maxgrade,
                                 }"
                                 :model-value="item.boundpoints?.toString() ?? ''"
-                                @input="(event) => handleInput(item, event)"
+                                @input="(event) => handleInput(item, 'points', event)"
                                 :aria-label="item.band + ' ' + mstrings.points"
                             ></FormKit>
                         </div>
@@ -267,7 +267,12 @@
 
     // Method to handle input changes and convert string to number.
     // Write to the field matching the active entry type; recalculate() syncs the other.
-    const handleInput = (item: IBandItem, newValue: unknown) => {
+    const handleInput = (item: IBandItem, field: string, newValue: unknown) => {
+        // FormKit also emits input when recalculate() updates the inactive field; writing that back loops.
+        if (field !== entrytype.value) {
+            return;
+        }
+
         let value = 0;
         if (typeof newValue === 'string') {
             value = parseFloat(newValue) || 0;
