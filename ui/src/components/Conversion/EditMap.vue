@@ -51,17 +51,22 @@
                     v-model="maxgrade"
                 ></FormKit>
 
-                <!-- Scale type -->
+                <!-- Scale type (fixed once the map exists) -->
                 <FormKit
+                    v-if="props.mapid == 0"
                     type="select"
                     outer-class="w-60"
                     :label="mstrings.scaletype"
-                    :disabled="(props.mapid != 0) || !caneditgrades"
+                    :disabled="!caneditgrades"
                     name="scaletype"
                     v-model="scaletype"
                     value="schedulea"
                     :options="scaletypeoptions"
                 ></FormKit>
+                <div v-else class="w-60 my-1 font-sans">
+                    <span class="text-sm font-medium text-brand-dark-purple mb-1 block">{{ mstrings.scaletype }}</span>
+                    <span class="block py-2 leading-6 text-brand-dark-purple">{{ scaletypelabel }}</span>
+                </div>
 
                 <HelpButton class="mt-11" title="Help with editing maps" subject="editmap"/>
 
@@ -235,6 +240,10 @@
     const emits = defineEmits(['close']);
 
     const isScheduleA = computed(() => scaletype.value === 'schedulea');
+
+    const scaletypelabel = computed(() =>
+        scaletypeoptions.find((option) => option.value === scaletype.value)?.label ?? scaletype.value
+    );
 
     function headerclass(type: string) {
         return entrytype.value === type ? 'font-bold text-brand-dark-blue' : 'font-normal text-gray-400';
