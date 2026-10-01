@@ -19,6 +19,25 @@
                     v-model="mapname"
                 ></FormKit>
 
+                <!-- Entry type (segmented toggle) -->
+                <FormKit
+                    type="radio"
+                    :label="mstrings.entrytype"
+                    v-model="entrytype"
+                    :options="entrytypeoptions"
+                    :disabled="!caneditgrades"
+                    outer-class="$reset my-1 font-sans shrink-0 data-[disabled]:opacity-60"
+                    fieldset-class="$reset border-0 p-0 m-0"
+                    legend-class="$reset text-sm font-medium text-brand-dark-purple mb-1 block"
+                    options-class="$reset inline-flex rounded-md border border-brand-dark-blue/20 overflow-hidden list-none p-0 m-0"
+                    option-class="$reset [&+&]:border-l [&+&]:border-brand-dark-blue/20"
+                    wrapper-class="$reset flex items-center px-4 py-2 leading-6 text-sm font-medium cursor-pointer select-none text-brand-dark-purple hover:bg-brand-dark-blue/5 has-checked:bg-brand-dark-blue has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-inset has-focus-visible:ring-brand-dark-blue has-disabled:cursor-not-allowed"
+                    inner-class="$reset"
+                    input-class="$reset sr-only"
+                    decorator-class="$reset hidden"
+                    label-class="$reset cursor-[inherit]"
+                ></FormKit>
+
                 <!-- Max point grade -->
                 <FormKit
                     type="text"
@@ -48,21 +67,6 @@
 
             </div>
 
-            <div class="mt-3"></div>
-
-            <FormKit
-                class="mb-4"
-                :label="mstrings.entrytype"
-                v-model="entrytype"
-                type="radio"
-                :options="entrytypeoptions"
-                :disabled="!caneditgrades"
-                options-class="flex flex-row gap-4 list-none p-0 m-0"
-                option-class="flex items-center"
-                input-class="appearance-none w-4 h-4 rounded-full border-2 border-solid border-gray-400 mr-2 shrink-0 cursor-pointer checked:border-gray-800 checked:bg-[radial-gradient(circle,_#2C2C2A_40%,_transparent_41%)]"
-                label-class="text-[13px] text-gray-400 cursor-pointer"
-            />
-
             <div class="divider"></div>
 
             <div :class="isScheduleA ? 'grid grid-cols-2 gap-x-6' : 'flex flex-col'">
@@ -71,8 +75,8 @@
                 <div>
                     <div class="flex">
                         <div class="w-24 font-bold"><h3>{{ mstrings.band }}</h3></div>
-                        <div class="w-60 mr-5 font-bold"><h3>{{ mstrings.percentage }}</h3></div>
-                        <div class="w-60 font-bold"><h3>{{ mstrings.points }}</h3></div>
+                        <div class="w-60 mr-5" :class="headerclass('percentage')"><h3>{{ mstrings.percentage }}</h3></div>
+                        <div class="w-60" :class="headerclass('points')"><h3>{{ mstrings.points }}</h3></div>
                     </div>
                     <div  class="flex" v-for="item in leftItems" :key="item.band">
                         <div class="pt-2">
@@ -120,8 +124,8 @@
                 <div v-if="isScheduleA">
                     <div class="flex">
                         <div class="w-24 font-bold"><h3>{{ mstrings.band }}</h3></div>
-                        <div class="w-60 mr-5 font-bold"><h3>{{ mstrings.percentage }}</h3></div>
-                        <div class="w-60 font-bold"><h3>{{ mstrings.points }}</h3></div>
+                        <div class="w-60 mr-5" :class="headerclass('percentage')"><h3>{{ mstrings.percentage }}</h3></div>
+                        <div class="w-60" :class="headerclass('points')"><h3>{{ mstrings.points }}</h3></div>
                     </div>
                     <div class="flex" v-for="item in rightItems" :key="item.band">
                         <div class="pt-2">
@@ -231,6 +235,10 @@
     const emits = defineEmits(['close']);
 
     const isScheduleA = computed(() => scaletype.value === 'schedulea');
+
+    function headerclass(type: string) {
+        return entrytype.value === type ? 'font-bold text-brand-dark-blue' : 'font-normal text-gray-400';
+    }
 
     // Split items array into two columns (or just the left one if ScheduleB)
     const leftItems = computed(() =>
