@@ -4,7 +4,7 @@
     <div class="bg-base-100 border border-base-300 rounded-md mt-4 p-6">
         <FormKit v-if="loaded" type="form" submit-label="Save" :actions="caneditgrades" :disabled="!caneditgrades" @submit="submit_form">
 
-            <div class="flex gap-2">
+            <div class="flex gap-2 mb-5">
 
                 <!-- Map name -->
                 <FormKit
