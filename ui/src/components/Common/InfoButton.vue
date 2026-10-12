@@ -1,15 +1,20 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <!-- info button -->
-    <UTooltip v-if="!props.text" @click="info_clicked" :text="mstrings['gradeiteminfo']">
-        <button class="inline-flex items-center justify-center h-8 px-3 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-300 cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed shadow-sm font-semibold text-xs gap-2 transition-all duration-150" aria-label="Show grade item info">
-            <Info :size="18"></Info>
+    <UTooltip :text="infolabel" position="below" class="shrink-0">
+        <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-md border cursor-pointer shadow-sm transition-colors"
+            :class="props.text
+                ? 'h-7 w-7 border-white/70 bg-brand-light-yellow text-university-blue hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
+                : 'h-8 px-3 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-university-blue'"
+            :aria-label="infolabel"
+            aria-haspopup="dialog"
+            @click.stop="info_clicked"
+        >
+            <Info :size="18" :stroke-width="2" aria-hidden="true"></Info>
         </button>
     </UTooltip>
-
-    <!-- info link -->
-    <i><a v-if="props.text" class="mt-1 text-white cursor-pointer hover:bg-brand-light-blue normal-case font-light inline-flex" @click="info_clicked"><Info :size="14" />&nbsp;info</a></i>
 
     <HeadlessModal :isopen="showinfomodal" @closed="showinfomodal = false">
         <template #title>
@@ -48,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { computed, ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
@@ -78,6 +83,8 @@
         color: String,
         text: String,
     });
+
+    const infolabel = computed(() => mstringstore.getMstring('gradeiteminfo') + (props.text ? ': ' + props.text : ''));
 
     const toast = useToast();
 

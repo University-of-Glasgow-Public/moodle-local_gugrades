@@ -84,6 +84,14 @@ Grade concepts
   A shared tint and outer borders visually join each first-sitting/award pair,
   without an internal divider. Grade cells retain narrow padding and compact
   filters. Other shared-table layouts keep their usual sizing.
+  Drillable category titles are high-contrast buttons with a chevron; the whole
+  title activates navigation, with keyboard support and a category-specific label.
+  Title text is truncated visually on one line using the full name, not wrapped
+  server-shortened text; the tooltip retains the full name. Space below the title
+  row separates the button from grade metadata.
+  Assessment information uses a contrasting yellow info button at the top right
+  of each item/category header, separate from metadata and navigation. It has a
+  descriptive tooltip and accessible label and opens the existing details dialog.
   First-sitting cells are read-only. Award cells retain the existing override,
   visibility, dropped-grade and release behaviour. Sorting and filtering apply
   independently to the displayed result columns. Exports and release continue
