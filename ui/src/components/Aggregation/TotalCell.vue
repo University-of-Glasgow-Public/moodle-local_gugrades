@@ -1,8 +1,9 @@
 <template>
-    <div class="inline-flex gap-2">
+    <div class="inline-flex" :class="dualgrades ? 'gap-0.5 items-center' : 'gap-2'">
 
         <!-- add/override for total grade -->
         <OverrideGrade
+            v-if="!firstsitting"
             :toplevel="toplevel"
             :itemid = "gradeitemid"
             :selectedcategoryid = "level1category"
@@ -19,11 +20,12 @@
             @gradeadded = "grade_changed(user.id)"
         ></OverrideGrade>
 
-        <span v-if="user.error">{{ user.error }}</span>
-        <UTooltip v-else :class="itemclasses(props.user)" class="p-0.5" :text="itemtooltip(user)" :position="beforehalfway ? 'below' : 'above'">
-            <GradeColor  :grade="user.displaygrade"></GradeColor>
+        <span v-if="firstsitting ? user.error1st : user.error">{{ firstsitting ? user.error1st : user.error }}</span>
+        <UTooltip v-else :class="firstsitting ? [] : itemclasses(props.user)" class="p-0.5" :text="firstsitting ? '' : itemtooltip(user)" :position="beforehalfway ? 'below' : 'above'">
+            <b v-if="firstsitting && user.isadmin1st">{{ user.displaygrade1st }}</b>
+            <GradeColor v-else :grade="firstsitting ? user.displaygrade1st : user.displaygrade"></GradeColor>
         </UTooltip>
-        <span v-if="user.alteredweight">
+        <span v-if="!firstsitting && user.alteredweight">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-light-yellow text-university-blue">
                 ALTERED
             </span>
@@ -49,6 +51,8 @@
         showweights: boolean;
         caneditgrades: boolean;
         beforehalfway: boolean;
+        firstsitting?: boolean;
+        dualgrades?: boolean;
     }
 
     const props = defineProps< IProps >();

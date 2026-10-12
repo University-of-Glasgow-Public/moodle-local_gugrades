@@ -1,9 +1,9 @@
 <template>
-    <div class="inline-flex gap-2 align-middle">
+    <div class="inline-flex align-middle" :class="column.dualgrades ? 'gap-0.5 items-center' : 'gap-2'">
 
         <!-- add/override grade -->
         <OverrideGrade
-            v-if="gradeobject.available"
+            v-if="!firstsitting && gradeobject.available"
             :itemid = "column.gradeitemid"
             :categoryid = "column.categoryid"
             :selectedcategoryid = "level1category"
@@ -23,7 +23,7 @@
         <!-- bold if admin -->
         <UTooltip :class="itemclasses(gradeobject)" class="p-0.5" :text="itemtooltip(gradeobject)" :position="beforehalfway ? 'below' : 'above'">
             <s v-if="gradeobject.dropped">
-                <b v-if="user.isadmin">{{ displaygrade }}</b>
+                <b v-if="gradeobject.isadmin">{{ displaygrade }}</b>
                 <GradeColor v-else :grade="displaygrade" :strikethrough="true"></GradeColor>
             </s>
             <span v-else>
@@ -50,6 +50,7 @@
         level1category: number;
         caneditgrades: boolean;
         beforehalfway: boolean;
+        firstsitting?: boolean;
     }
 
     const props = defineProps< IProps >();
@@ -60,12 +61,19 @@
      * 
      */
     const gradeobject = computed(() => {
-        return props.user[props.column.fieldname];
+        const grade = props.user[props.column.fieldname];
+        return props.firstsitting ? {
+            ...grade,
+            data: grade.data1st,
+            isadmin: grade.isadmin1st,
+            dropped: false,
+            hidden: false,
+            overridden: false,
+        } : grade;
     });
 
     const displaygrade = computed(() => {
-        const index = props.column.fieldname;
-        return props.user[index].data;
+        return gradeobject.value.data;
     });
 
     const mstringstore = useMstrings();

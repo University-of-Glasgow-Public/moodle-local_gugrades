@@ -116,9 +116,18 @@ class aggregate {
      * @param int $level
      * @param int $userid
      * @param bool &$conditionmet
+     * @param bool $firstsitting Select the earliest-assigned current substantive reassessment grade.
      * @return array ['rounded' grade, grade val, admingrade, grade disp, completion, error, explain, not available]
      */
-    public function aggregate_user_category(int $courseid, object $category, array $items, int $level, int $userid, bool &$conditionmet = false) {
+    public function aggregate_user_category(
+        int $courseid,
+        object $category,
+        array $items,
+        int $level,
+        int $userid,
+        bool &$conditionmet = false,
+        bool $firstsitting = false,
+    ) {
 
         // Get basic data about aggregation
         // (this is also a check that it actually exists).
@@ -138,8 +147,8 @@ class aggregate {
         // MGU-1506: This is always D3:9
         $lowestnursinggrade = 9;
 
-        // If it is nursing, check for nursing conditions.
-        if ($isnursing) {
+        // The first-sitting check runs after selecting its substantive item.
+        if ($isnursing && !$firstsitting) {
             if ($this->nursing_check($items, $lowestnursinggrade)) {
                 $conditionmet = true;
             }
@@ -160,6 +169,18 @@ class aggregate {
         // Populate lists of available users.
         // Used to drop unavailable.
         $items = $this->availability($items, $userid);
+
+        if ($firstsitting && $isresitcategory && $items) {
+            $items = $this->first_sitting_items($items, $userid);
+            $conditionmet = $items ? ($items[0]->nursingcondmet ?? false) : false;
+            if (!$items) {
+                return [null, null, '', null, 0, get_string('gradesmissing', 'local_gugrades'),
+                    get_string('explain_gradesmissing', 'local_gugrades'), false];
+            }
+        }
+        if ($isnursing && $firstsitting && $this->nursing_check($items, $lowestnursinggrade)) {
+            $conditionmet = true;
+        }
 
         // MGU-1446. If only one grade then that's the aggregated result (whatever it is)
         // MGU-1511. But ONLY if an admin grade. Normal grades still need to be converted to percentage. 
@@ -273,7 +294,9 @@ class aggregate {
             // NOTE: droplow is NOT supported for level 1.
             if (($droplow > 0) && ($level > 1)) {
                 [$items, $droppeditems] = $this->droplow($items, $droplow);
-                \local_gugrades\aggregation::flag_dropped_items($droppeditems, $userid);
+                if (!$firstsitting) {
+                    \local_gugrades\aggregation::flag_dropped_items($droppeditems, $userid);
+                }
             }
 
             // If we've got here and there are no grades to aggregate (possibly due to drop lowest)
@@ -303,7 +326,9 @@ class aggregate {
         }
 
         // Record normalised weights.
-        \local_gugrades\aggregation::record_weights($items, $userid);
+        if (!$firstsitting) {
+            \local_gugrades\aggregation::record_weights($items, $userid);
+        }
 
         // Check for zero weights with whatever items remain.
         if ($this->weight_error($items, $aggmethod)) {
@@ -829,6 +854,28 @@ class aggregate {
         return [0, '', '', $items];
     }
 
+
+    /**
+     * Select the current substantive grade of the earliest-assigned eligible item.
+     * @param array $items
+     * @param int $userid
+     * @return array
+     */
+    private function first_sitting_items(array $items, int $userid): array {
+        $firstitem = null;
+        $firstid = null;
+        foreach ($items as $item) {
+            if ($item->grademissing || (!empty($item->admingrade) && $item->admingrade != 'NOSUBMISSION')) {
+                continue;
+            }
+            $id = \local_gugrades\grades::get_first_assignment_id($item->itemid, $userid);
+            if ($id !== null && ($firstid === null || $id < $firstid)) {
+                $firstid = $id;
+                $firstitem = $item;
+            }
+        }
+        return $firstitem ? [$firstitem] : [];
+    }
 
     /**
      * Dummy completion

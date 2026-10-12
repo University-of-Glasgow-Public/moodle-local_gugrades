@@ -1,28 +1,15 @@
 <template>
-    <div>
-        <div>
-            <span @click="toggleSorting" class="cursor-pointer">{{ shortname  }}</span>
-        </div>
-
-        <div>
-            {{ formattedatype }}
-        </div>
-
-        <div class="py-1 font-light normal-case" v-if="strategy">
-            <i>{{ strategy }}</i>
-        </div>
-
-        <div class="py-1 font-light normal-case" v-if="reassessment">
-            <UBadge variant="success">{{ mstrings.reassessment }}</UBadge>
-        </div>
+    <div class="w-full max-w-44 text-[11px] leading-tight">
+        <div>{{ shortname }}</div>
+        <div class="font-normal text-white/80">{{ formattedatype }}</div>
+        <div class="font-normal text-white/80" v-if="strategy"><i>{{ strategy }}</i></div>
+        <div class="font-normal text-white/80" v-if="reassessment">{{ mstrings.reassessment }}</div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { computed } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
-    import UBadge from '@/components/Common/UBadge.vue';
     import type { HeaderContext } from '@tanstack/vue-table';
 
     interface iProps {
@@ -37,7 +24,5 @@
 
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
-
-    const toggleSorting = computed(() => props.headercontext.column.getToggleSortingHandler());
 
 </script>

@@ -80,6 +80,7 @@
             :filters="tablefilters"
             :visibility="{firstinitial: false, lastinitial: false}"
             :initial-sort="[{ id: 'displayname', desc: false }]" 
+            bottom-grade-labels
             class="my-8"
         />
     </div>
@@ -171,6 +172,7 @@
     const filterstore = useFilter();
     const issetupcomplete = ref(false);
     const isreassessment = ref(false);
+    const dualgrades = ref(false);
     const { firstname, lastname } = storeToRefs( filterstore );
 
     type GradeRow = Record<string, any>;
@@ -239,7 +241,27 @@
 
         // Iterate over grade item columns.
         columns.value.forEach(column => {
-            cols.push(columnHelper.accessor(column.fieldname, {
+            const gradeColumns = (column.dualgrades ? [true, false] : [false]).map(firstsitting =>
+                columnHelper.accessor(row => row[column.fieldname]?.[firstsitting ? 'data1st' : 'data'] ?? '', {
+                    id: column.fieldname + (firstsitting ? '_1ST' : ''),
+                    header: mstringstore.getMstring(firstsitting ? 'firstsitting' : column.dualgrades ? 'award' : 'grade'),
+                    cell: ({row, table}) => {
+                        const rows = table.getRowModel().rows;
+                        return h(AggregationGradeCell, {
+                            user: row.original,
+                            column,
+                            firstsitting,
+                            level1category: level1category.value,
+                            caneditgrades: caneditgrades.value,
+                            beforehalfway: rows.findIndex(r => r.id === row.id) < rows.length / 2,
+                            onGradeadded: (userid: number) => grade_changed(userid),
+                        });
+                    },
+                    filterFn: 'includesString',
+                }),
+            );
+            cols.push(columnHelper.group({
+                id: 'GROUP_' + column.fieldname,
                 header: (context) => {
                     return h(AggregationTableHeader, {
                         column: column,
@@ -247,27 +269,7 @@
                         onExpandclicked: () => expand_clicked(column.categoryid),
                     });
                 },
-                cell: ({row, table}) => {
-                    const user = row.original;
-                    const rows = table.getRowModel().rows;
-                    const indexOnPage = rows.findIndex(r => r.id === row.id);
-                    const isBeforeHalfway = indexOnPage < rows.length / 2;
-                    return h(AggregationGradeCell, {
-                        user: user,
-                        column: column,
-                        level1category: level1category.value,
-                        caneditgrades: caneditgrades.value,
-                        beforehalfway: isBeforeHalfway,
-                        onGradeadded: (userid) => grade_changed(userid),
-                    });
-                },
-                filterFn: (row, columnId, filterValue) => {
-                    const user = row.original; 
-                    const rawValue = user[column.fieldname]?.data ?? ''; 
-                    return String(rawValue)
-                        .toLowerCase()
-                        .includes(String(filterValue).toLowerCase());
-                }
+                columns: gradeColumns,
             }));
         });
 
@@ -301,74 +303,43 @@
                 }));
             }
 
-            // "Grand" Total
-            cols.push(columnHelper.accessor('coursetotal', {
-                header: (context) => {
-                    return h(TotalHeader, {
-                        shortname: mstringstore.getMstring('coursetotal'),
-                        strategy: strategy.value,
-                        headercontext: context,
-                        reassessment: isreassessment.value,
-                        formattedatype: formattedatype.value,
-                    });
-                },
-                cell: ({row, table}) => {
-                    const user = row.original;
-                    const rows = table.getRowModel().rows;
-                    const indexOnPage = rows.findIndex(r => r.id === row.id);
-                    const isBeforeHalfway = indexOnPage < rows.length / 2;
-                    return h(TotalCell, {
-                        user: user,
-                        toplevel: toplevel.value,
-                        gradeitemid: gradeitemid.value,
-                        level1category: level1category.value,
-                        categoryid: categoryid.value,
-                        showweights: showweights.value,
-                        caneditgrades: caneditgrades.value,
-                        beforehalfway: isBeforeHalfway,
-                        onGradeadded: (userid) => grade_changed(userid),
-                    });
-                },
-                filterFn: (row, columnId, filterValue) => {
-                    const user = row.original; 
-                    const rawValue = user.displaygrade ?? ''; 
-                    return String(rawValue)
-                        .toLowerCase()
-                        .includes(String(filterValue).toLowerCase());
-                }
-            }));
-        } else {
-
-            // Subcategory total
-            cols.push(columnHelper.accessor('total', {
-                header: (context) => {
-                    return h(TotalHeader, {
-                        shortname: mstringstore.getMstring('subcattotal'),
-                        strategy: strategy.value,
-                        headercontext: context,
-                        reassessment: isreassessment.value,
-                        formattedatype: formattedatype.value,
-                    });
-                },
-                cell: ({row, table}) => {
-                    const user = row.original;
-                    const rows = table.getRowModel().rows;
-                    const indexOnPage = rows.findIndex(r => r.id === row.id);
-                    const isBeforeHalfway = indexOnPage < rows.length / 2;
-                    return h(TotalCell, {
-                        user: user,
-                        toplevel: toplevel.value,
-                        gradeitemid: gradeitemid.value,
-                        level1category: level1category.value,
-                        categoryid: categoryid.value,
-                        showweights: showweights.value,
-                        caneditgrades: caneditgrades.value,
-                        beforehalfway: isBeforeHalfway,
-                        onGradeadded: (userid) => grade_changed(userid),
-                    });
-                }
-            }));
         }
+        const totalColumns = (dualgrades.value ? [true, false] : [false]).map(firstsitting =>
+            columnHelper.accessor(firstsitting ? 'displaygrade1st' : 'displaygrade', {
+                id: firstsitting ? 'total_1ST' : toplevel.value ? 'coursetotal' : 'total',
+                header: mstringstore.getMstring(firstsitting ? 'firstsitting' : dualgrades.value ? 'award' : 'grade'),
+                cell: ({row, table}) => {
+                    const rows = table.getRowModel().rows;
+                    return h(TotalCell, {
+                        user: row.original,
+                        firstsitting,
+                        toplevel: toplevel.value,
+                        dualgrades: dualgrades.value,
+                        gradeitemid: gradeitemid.value,
+                        level1category: level1category.value,
+                        categoryid: categoryid.value,
+                        showweights: showweights.value,
+                        caneditgrades: caneditgrades.value,
+                        beforehalfway: rows.findIndex(r => r.id === row.id) < rows.length / 2,
+                        onGradeadded: (userid: number) => grade_changed(userid),
+                    });
+                },
+                filterFn: 'includesString',
+            }),
+        );
+        cols.push(columnHelper.group({
+                id: 'GROUP_total',
+                header: (context) => {
+                    return h(TotalHeader, {
+                        shortname: mstringstore.getMstring(toplevel.value ? 'coursetotal' : 'subcattotal'),
+                        strategy: strategy.value,
+                        headercontext: context,
+                        reassessment: isreassessment.value,
+                        formattedatype: formattedatype.value,
+                    });
+                },
+                columns: totalColumns,
+        }));
 
         // Released grade
         if (released.value && !toplevel.value) {
@@ -453,6 +424,8 @@
                 user[field.fieldname] = {
                     userid: user.id,
                     data: field.display,
+                    data1st: field.display1st,
+                    isadmin1st: field.isadmin1st,
                     dropped: field.dropped,
                     isadmin: field.isadmin,
                     hidden: field.hidden,
@@ -473,6 +446,8 @@
                 user[field.fieldname] = {
                     userid: user.id,
                     data: field.display,
+                    data1st: field.display1st,
+                    isadmin1st: field.isadmin1st,
                     dropped: field.dropped,
                     isadmin: field.isadmin,
                     hidden: field.hidden,
@@ -596,6 +571,7 @@
             staffuserid.value = result.staffuserid;
             completionused.value = result.completionused;
             isreassessment.value = result.isreassessment;
+            dualgrades.value = result.dualgrades;
 
             if (aggregationsupported.value) {
 

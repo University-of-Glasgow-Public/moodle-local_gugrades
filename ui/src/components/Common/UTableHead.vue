@@ -1,20 +1,32 @@
 <template>
-  <thead class="bg-university-blue text-white uppercase text-xs tracking-wider">
-    <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+  <thead class="bg-university-blue text-white uppercase text-xs tracking-wider" :class="{ 'utable-grade-head': bottomGradeLabels }">
+    <template v-for="(headerGroup, index) in headerRows" :key="headerGroup.id">
+    <tr v-if="!headerGroup.filter">
       <th
         v-for="header in headerGroup.headers"
         :key="header.id"
+        :colspan="header.colSpan"
+        :scope="header.column.columns.length ? 'colgroup' : 'col'"
         class="font-semibold p-0"
         :class="[
           dense ? 'text-xs' : '',
           isPinnedColumn(header.column.id) ? 'utable-pin-name' : '',
           isScrolledX && isPinnedColumn(header.column.id) ? 'utable-pin-name--scrolled' : '',
+          header.column.columns.length ? (bottomGradeLabels ? 'border-r border-white/30 text-center' : 'border-x border-white/30 bg-white/10 text-center') : '',
+          header.column.parent ? (bottomGradeLabels ? 'normal-case tracking-normal' : 'border-x border-white/20 normal-case tracking-normal') : '',
+          bottomGradeLabels && isGroupEnd(header.column) ? 'border-r border-white/30' : '',
+          bottomGradeLabels && header.column.parent?.columns.length === 2 ? 'utable-dual-grade' : '',
+          bottomGradeLabels && isDualGroupStart(header.column) ? 'border-l border-white/30' : '',
+          bottomGradeLabels && header.column.columns.length === 2 ? 'border-l border-white/30' : '',
         ]"
       >
         <div
+          v-if="bottomGradeLabels ? (index === 0 || !!header.column.parent) : !header.isPlaceholder"
           class="flex items-center gap-1.5 w-full items-stretch transition-colors duration-150"
           :class="[
-            dense ? 'px-3 py-1.5' : 'px-6 py-2.5',
+            bottomGradeLabels ? 'px-2 py-1 gap-1' : dense ? 'px-3 py-1.5' : 'px-6 py-2.5',
+            header.column.columns.length ? 'justify-center' : '',
+            bottomGradeLabels && header.column.parent ? 'justify-center whitespace-nowrap' : '',
             header.column.getCanSort() ? 'cursor-pointer hover:bg-white/10' : ''
           ]"
           @click="header.column.getToggleSortingHandler()?.($event)"
@@ -23,29 +35,40 @@
             :render="header.column.columnDef.header"
             :props="header.getContext()"
           />
-          <span v-if="header.column.getIsSorted() === 'asc'">🔼</span>
+          <component
+            v-if="bottomGradeLabels && header.column.getCanSort()"
+            :is="header.column.getIsSorted() === 'asc' ? ArrowUp : header.column.getIsSorted() === 'desc' ? ArrowDown : ArrowUpDown"
+            :size="11"
+            class="shrink-0 self-center"
+            :class="header.column.getIsSorted() ? '' : 'opacity-40'"
+            aria-hidden="true"
+          />
+          <span v-else-if="header.column.getIsSorted() === 'asc'">🔼</span>
           <span v-else-if="header.column.getIsSorted() === 'desc'">🔽</span>
           <span v-else-if="header.column.getCanSort()" class="opacity-30">↕️</span>
         </div>
       </th>
     </tr>
 
-    <template v-if="filterable">
-      <tr v-for="headerGroup in table.getHeaderGroups()" :key="`filter-${headerGroup.id}`" class="bg-university-blue/90">
+      <tr v-else :class="bottomGradeLabels ? '' : 'bg-university-blue/90'">
         <th
-          v-for="header in headerGroup.headers"
-          :key="`filter-${header.id}`"
+          v-for="column in table.getVisibleLeafColumns()"
+          :key="`filter-${column.id}`"
           class="font-normal p-1"
           :class="[
-            isPinnedColumn(header.column.id) ? 'utable-pin-name utable-pin-name--filter' : '',
-            isScrolledX && isPinnedColumn(header.column.id) ? 'utable-pin-name--scrolled' : '',
+            isPinnedColumn(column.id) ? 'utable-pin-name utable-pin-name--filter' : '',
+            isScrolledX && isPinnedColumn(column.id) ? 'utable-pin-name--scrolled' : '',
+            column.parent ? (bottomGradeLabels ? 'utable-grade-filter' : 'border-x border-white/20') : '',
+            bottomGradeLabels && isGroupEnd(column) ? 'border-r border-white/30' : '',
+            bottomGradeLabels && column.parent?.columns.length === 2 ? 'utable-dual-grade' : '',
+            bottomGradeLabels && isDualGroupStart(column) ? 'border-l border-white/30' : '',
           ]"
         >
           <input
-            v-if="header.column.getCanFilter()"
+            v-if="column.getCanFilter()"
             type="text"
-            :value="(header.column.getFilterValue() as string) ?? ''"
-            @input="header.column.setFilterValue(($event.target as HTMLInputElement).value)"
+            :value="(column.getFilterValue() as string) ?? ''"
+            @input="column.setFilterValue(($event.target as HTMLInputElement).value)"
             placeholder="Filter..."
             class="w-full rounded-sm border border-white/30 bg-white/10 text-white placeholder-white/50 text-xs px-2 py-1 focus:outline-none focus:border-white/60"
             @click.stop
@@ -57,21 +80,70 @@
 </template>
 
 <script setup lang="ts">
-    import { FlexRender, type Table } from '@tanstack/vue-table'
+    import { computed } from 'vue'
+    import { FlexRender, type Column, type Table } from '@tanstack/vue-table'
+    import { ArrowUp, ArrowDown, ArrowUpDown } from '@lucide/vue'
 
-    defineProps<{
+    const props = defineProps<{
         table: Table<any>;
         dense?: boolean;
         filterable?: boolean;
         isScrolledX?: boolean;
+        bottomGradeLabels?: boolean;
     }>();
+
+    const headerRows = computed(() => {
+        const groups = props.table.getHeaderGroups().map(group => ({ ...group, filter: false }));
+        if (props.filterable) {
+            const filterRow = { id: 'filters', headers: [], depth: 0, filter: true };
+            groups.splice(props.bottomGradeLabels ? Math.max(0, groups.length - 1) : groups.length, 0, filterRow);
+        }
+        return groups;
+    });
 
     function isPinnedColumn(columnId: string) {
         return columnId === 'displayname';
     }
+
+    function isGroupEnd(column: Column<any>) {
+        return column.parent?.columns.at(-1)?.id === column.id;
+    }
+
+    function isDualGroupStart(column: Column<any>) {
+        return column.parent?.columns.length === 2 && column.parent.columns[0]?.id === column.id;
+    }
 </script>
 
 <style scoped>
+  .utable-grade-head {
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 11px;
+  }
+
+  .utable-grade-head th {
+    vertical-align: top;
+  }
+
+  .utable-dual-grade {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .utable-grade-filter input {
+    width: 0;
+    min-width: 100%;
+  }
+
+  .utable-grade-head input {
+    padding: 2px 4px;
+    font-size: 11px;
+  }
+
+  .utable-grade-head .utable-pin-name--filter {
+    background-color: var(--color-university-blue) !important;
+  }
+
   .utable-pin-name {
     position: sticky;
     left: 0;

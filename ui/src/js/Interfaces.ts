@@ -241,6 +241,9 @@ export interface IUserField {
     itemname: string;
     fullname: string;
     display: string;
+    display1st?: string;
+    isadmin1st?: boolean;
+    error1st?: string;
     dropped: boolean;
     isadmin: boolean;
     hidden: boolean;
@@ -263,6 +266,9 @@ export interface IUser {
     resitrequired: boolean;
     completed: number;
     displaygrade: string;
+    displaygrade1st?: string;
+    isadmin1st?: boolean;
+    error1st?: string;
     releasedgrade: string;
     mismatch: boolean;
     rawgrade: number;
@@ -293,6 +299,7 @@ export interface IColumn {
     fieldname: string;
     gradeitemid: number;
     categoryid: number;
+    dualgrades?: boolean;
     shortname: string;
     fullname: string;
     weight: number;

@@ -1,44 +1,34 @@
 <template>
-    <!-- 1. Added h-full to fill the header cell height -->
-    <div class="flex flex-col flex-between self-stretch">
-        
-        <!-- 2. Wrapped upper content in flex-grow to push the bottom elements down -->
-        <div class="flex-grow">
-            <UTooltip :text="column.fullname" position="below" class="block">
-                <div>
-                    <span @click="toggleSorting" class="cursor-pointer">{{ column.shortname ?? '' }}</span>
-                </div>
-                <div class="inline-flex gap-2">
-                    <div v-if="!infocol && column.showweights">{{ column.weight }}%</div>
-                    <div v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></div>
-                </div>
+    <div class="w-full max-w-44 text-[11px] leading-tight">
+        <div class="flex items-center justify-center gap-1">
+            <UTooltip :text="column.fullname" position="below" class="min-w-0">
+                <span class="break-words">{{ column.shortname ?? '' }}</span>
             </UTooltip>
-            <div class="font-light normal-case py-1" v-if="column.strategy">
-                <i>{{ column.strategy }}</i>
-            </div>
-            <div v-if="totaltype">
-                ({{ totaltype }})
-            </div>
-            <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.shortname ?? ''" size="lg" color="text-warning"></InfoButton>
-
-            <div v-if="column.isresitgradeitem" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-success text-success-content">{{ mstrings.reassessment}}</div>
+            <button
+                v-if="column.categoryid"
+                class="shrink-0 cursor-pointer rounded p-0.5 hover:bg-white/10"
+                @click.stop="expand_clicked"
+                aria-label="Drill down into grade category."
+            >
+                <ArrowBigRight :size="16" :stroke-width="1.5" />
+            </button>
         </div>
-
-        <div v-if="column.categoryid" class="mt-auto">
-            <UButton class="mt-2 cursor-pointer" size="xs" @click="expand_clicked" aria-label="Drill down into grade category.">
-                <ArrowBigRight :size="18" :stroke-width="1" />
-            </UButton>
+        <div class="flex flex-wrap items-center justify-center gap-x-2 font-normal text-white/80">
+            <span v-if="!infocol && column.showweights">{{ column.weight }}%</span>
+            <span v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></span>
+            <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.shortname ?? ''"></InfoButton>
         </div>
+        <div class="font-normal text-white/80" v-if="column.strategy"><i>{{ column.strategy }}</i></div>
+        <div v-if="totaltype" class="font-normal text-white/80">({{ totaltype }})</div>
+        <div v-if="column.isresitgradeitem" class="font-normal text-white/80">{{ mstrings.reassessment }}</div>
     </div>
 </template>
 
 
 <script setup lang="ts">
-    import { computed } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import UTooltip from '../Common/UTooltip.vue';
-    import UButton from '../Common/UButton.vue';
     import InfoButton from '../Common/InfoButton.vue';
     import type { IColumn } from '@/js/Interfaces';
     import type { HeaderContext } from '@tanstack/vue-table';
@@ -57,8 +47,6 @@
 
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
-
-    const toggleSorting = computed(() => props.headercontext.column.getToggleSortingHandler());
 
     /**
      * Drill down

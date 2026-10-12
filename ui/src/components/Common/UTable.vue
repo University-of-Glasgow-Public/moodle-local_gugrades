@@ -16,6 +16,7 @@
           :dense="dense"
           :filterable="filterable"
           :is-scrolled-x="isScrolledX"
+          :bottom-grade-labels="bottomGradeLabels"
         />
 
         <!-- BODY ROWS GROUP -->
@@ -30,9 +31,13 @@
               :key="cell.id" 
               class="transition-all duration-150"
               :class="[
-                dense ? 'px-3 py-1 text-xs' : 'px-6 py-2',
+                bottomGradeLabels && cell.column.parent ? 'px-2 py-1' : dense ? 'px-3 py-1 text-xs' : 'px-6 py-2',
                 isPinnedColumn(cell.column.id) ? 'utable-pin-name' : '',
                 isScrolledX && isPinnedColumn(cell.column.id) ? 'utable-pin-name--scrolled' : '',
+                cell.column.parent ? (bottomGradeLabels ? 'text-center' : 'border-x border-brand-light-purple/20') : '',
+                bottomGradeLabels && cell.column.parent?.columns.at(-1)?.id === cell.column.id ? 'border-r border-brand-light-purple/40' : '',
+                bottomGradeLabels && cell.column.parent?.columns.length === 2 ? 'utable-dual-grade' : '',
+                bottomGradeLabels && cell.column.parent?.columns.length === 2 && cell.column.parent.columns[0]?.id === cell.column.id ? 'border-l border-brand-light-purple/40' : '',
               ]"
             >
               <FlexRender 
@@ -56,12 +61,13 @@
         :style="stickyHeaderStyle"
       >
         <div ref="stickyHeaderScrollEl" class="utable-sticky-header-scroll">
-          <table class="text-left border-collapse text-sm" :style="{ width: contentWidth + 'px' }">
+          <table class="text-left border-collapse text-sm" :style="{ width: tableWidth + 'px' }">
             <UTableHead
               :table="table"
               :dense="dense"
               :filterable="filterable"
               :is-scrolled-x="isScrolledX"
+              :bottom-grade-labels="bottomGradeLabels"
             />
           </table>
         </div>
@@ -190,6 +196,7 @@
         initialSort?: SortingState;
         sortable?: boolean;
         filterable?: boolean;
+        bottomGradeLabels?: boolean;
     }
 
     const props = withDefaults(defineProps<BaseTableProps>(), {
@@ -199,6 +206,7 @@
         initialSort: () => [],
         sortable: true,
         filterable: true,
+        bottomGradeLabels: false,
     });
 
     // This allows users to click and change sorting later if needed
@@ -245,6 +253,7 @@
     const stickyHeaderEl = ref<HTMLElement | null>(null);
     const stickyHeaderScrollEl = ref<HTMLElement | null>(null);
     const contentWidth = ref(0);
+    const tableWidth = ref(0);
     const scrollLeft = ref(0);
     const isScrolledX = ref(false);
     const showFloatingScrollbar = ref(false);
@@ -393,6 +402,7 @@
     }
 
     function measureAndPlace() {
+        tableWidth.value = tableEl.value?.getBoundingClientRect().width ?? 0;
         updateStickyHeader();
 
         const el = tableScrollEl.value;
@@ -508,6 +518,12 @@
   */
   tbody td {
     background-color: transparent !important;
+  }
+
+  tbody td.utable-dual-grade {
+    width: 1%;
+    white-space: nowrap;
+    background-color: color-mix(in srgb, var(--color-brand-light-purple) 12%, transparent) !important;
   }
 
   .utable-scroll {

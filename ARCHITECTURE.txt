@@ -45,6 +45,49 @@ Grade concepts
 - Provisional/current lookup and latest-grade maintenance are separate concerns;
   inspect both local_gugrades_grade and local_gugrades_latest when changing
   grade lifecycle behaviour.
+- CATEGORY is the ordinary aggregated result. CATEGORY1 is an independent
+  first-sitting calculation for new-regulation reassessment categories and
+  their ancestors. It is current within its own column, but is never selected
+  as the latest/provisional grade or released in place of CATEGORY.
+- Aggregation carries both results up the category tree. Parents use CATEGORY1
+  from children that have it, and the ordinary result from other children.
+  Category overrides affect CATEGORY only. Conversion applies independently
+  to both results; Nursing conditions are tracked separately. Only the ordinary
+  calculation updates displayed drop-low and normalised-weight metadata.
+- Single-user recalculation and explanation validate enrolment without loading
+  user-display data or requesting external programme/profile synchronisation.
+  Repairing missing CATEGORY1 results on page load uses the same calculation path.
+- The regulation aggregation method receives a firstsitting boolean after the
+  Nursing condition argument. At a reassessment category CATEGORY1 selects the
+  earliest-assigned item whose current grade is numeric (including zero) or NS
+  (NOSUBMISSION). Order uses the earliest actual assignment ID, including
+  historical records and administrative grades such as EC, not the ID of the
+  current revision. An early EC becomes eligible if changed to a grade or NS.
+  For child categories, order comes from the earliest actual assessment
+  assignment in their subtree, never generated category rows. If no available
+  current substantive grade exists, CATEGORY1 reports missing grades. Ancestors
+  aggregate the selected results normally. Removing reassessment flags retires unneeded CATEGORY1 rows on the
+  next aggregation. CATEGORY1 is excluded from existing capture and history
+  views.
+- The aggregation page exposes dualgrades for the total and each child column,
+  based on the included category tree rather than an individual user's grades.
+  Both the page and row-refresh APIs expose displaygrade1st/isadmin1st/error1st
+  for totals and display1st/isadmin1st/error1st for children. Missing or
+  administrative first-sitting outcomes keep their own display and status.
+- Aggregation table headers use TanStack column groups: category/item details
+  span Grade for a single result, or 1st Sitting and Award for dual results.
+  Identity and category details occupy the top row, filters the middle row,
+  and Grade/1st Sitting/Award labels a distinct bottom row above the grades.
+  The aggregation header uses one blue background with compact metadata and
+  controls. The table fills the available width; dual-grade columns stay
+  content-sized while names and single-grade columns take the remaining space.
+  A shared tint and outer borders visually join each first-sitting/award pair,
+  without an internal divider. Grade cells retain narrow padding and compact
+  filters. Other shared-table layouts keep their usual sizing.
+  First-sitting cells are read-only. Award cells retain the existing override,
+  visibility, dropped-grade and release behaviour. Sorting and filtering apply
+  independently to the displayed result columns. Exports and release continue
+  to use the ordinary CATEGORY result.
 - Gradebook grade_items and grade_categories remain Moodle-owned structures.
   local_gugrades refers to them by ID and must account for deleted or changed
   gradebook objects.

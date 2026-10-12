@@ -260,6 +260,9 @@ class usercapture {
             'userid' => $this->userid,
             'iscurrent' => 1,
         ], 'id ASC');
+        $grades = array_filter($grades, function ($grade) {
+            return $grade->gradetype != 'CATEGORY1';
+        });
 
         // Work out / add provisional grade.
         if ($grades) {

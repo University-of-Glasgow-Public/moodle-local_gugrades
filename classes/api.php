@@ -764,6 +764,7 @@ class api {
             JOIN {local_gugrades_column} gc ON gc.id = gg.columnid
             WHERE gg.userid = :userid
             AND gg.gradeitemid = :gradeitemid
+            AND gg.gradetype <> 'CATEGORY1'
             ORDER BY gg.id DESC";
         if (!$grades = $DB->get_records_sql($sql, ['userid' => $userid, 'gradeitemid' => $gradeitemid])) {
             return [];
@@ -2258,6 +2259,7 @@ class api {
                 'staffuserid' => $USER->id,
                 'completionused' => false,
                 'isreassessment' => false,
+                'dualgrades' => false,
             ];
         }
 
@@ -2351,6 +2353,7 @@ class api {
             'staffuserid' => $USER->id,
             'completionused' => $regulation->is_completion_supported(),
             'isreassessment' => $isreassessment,
+            'dualgrades' => \local_gugrades\aggregation::has_dual_grades($courseid, $gradecategoryid),
         ];
     }
 

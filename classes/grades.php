@@ -804,6 +804,10 @@ class grades {
     public static function set_latest_grade(int $courseid, int $gradeitemid, int $userid, object $newgrade = null) {
         global $DB;
 
+        if ($newgrade && $newgrade->gradetype == 'CATEGORY1') {
+            return null;
+        }
+
         // If we have a grade that we know is the latest (because we'ev just written it)...
         if (!is_null($newgrade)) {
             $grade = $newgrade;
@@ -816,6 +820,7 @@ class grades {
                     WHERE gradeitemid = :gradeitemid
                     AND userid = :userid
                     AND gradetype<>"RELEASED"
+                    AND gradetype<>"CATEGORY1"
                     AND iscurrent = 1)';
             if (!$grade = $DB->get_record_sql($sql, ['gradeitemid' => $gradeitemid, 'userid' => $userid])) {
                 return null;
@@ -1061,6 +1066,44 @@ class grades {
         );
 
         return $record ? (int)$record->id : null;
+    }
+
+    /**
+     * Get the earliest actual assignment, retaining historical ordering after edits.
+     * Category ordering comes from assessment grades, not calculated category rows.
+     * @param int $gradeitemid
+     * @param int $userid
+     * @return int|null
+     */
+    public static function get_first_assignment_id(int $gradeitemid, int $userid): ?int {
+        global $DB;
+
+        $item = self::get_gradeitem($gradeitemid);
+        $itemids = [$gradeitemid];
+        if ($item->itemtype == 'category' || $item->itemtype == 'course') {
+            $items = self::get_gradeitems_recursive((int)$item->iteminstance);
+            $items = array_filter($items, function ($child) {
+                return $child->itemtype == 'mod' || $child->itemtype == 'manual';
+            });
+            $itemids = array_keys($items);
+        }
+        if (!$itemids) {
+            return null;
+        }
+        [$insql, $params] = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
+        $params['userid'] = $userid;
+        $id = $DB->get_field_sql(
+            "SELECT MIN(id)
+               FROM {local_gugrades_grade}
+              WHERE gradeitemid $insql
+                AND userid = :userid
+                AND gradetype NOT IN ('CATEGORY', 'CATEGORY1', 'RELEASED')
+                AND iserror = 0
+                AND ((rawgrade IS NOT NULL AND rawgrade <> -1) OR admingrade <> '')",
+            $params,
+        );
+
+        return $id === null || $id === false ? null : (int)$id;
     }
 
     /**
@@ -2202,6 +2245,7 @@ class grades {
             WHERE gl.id IS NULL
             AND gr.courseid = :courseid
             AND gradetype <> "RELEASED"
+            AND gradetype <> "CATEGORY1"
             AND iscurrent = 1';
         $missinggrades = $DB->get_records_sql($sql, ['courseid' => $courseid]);
         foreach ($missinggrades as $grade) {
@@ -2502,14 +2546,14 @@ class grades {
     public static function get_unenrolled_userids(int $courseid) {
         global $DB;
 
-        // Calculated CATEGORY rows are written for every enrolled user when aggregation is viewed,
+        // Calculated CATEGORY/CATEGORY1 rows are written for every enrolled user when aggregation is viewed,
         // so they don't indicate real MyGrades data. Overridden category grades still count.
         $userids = $DB->get_fieldset_sql(
             "SELECT DISTINCT userid
                FROM {local_gugrades_grade}
               WHERE courseid = :courseid
                 AND iscurrent = 1
-                AND (gradetype <> 'CATEGORY' OR catoverride = 1)",
+                AND (gradetype NOT IN ('CATEGORY', 'CATEGORY1') OR catoverride = 1)",
             ['courseid' => $courseid]
         );
         if (!$userids) {
