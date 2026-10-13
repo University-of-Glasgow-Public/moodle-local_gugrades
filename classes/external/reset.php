@@ -49,6 +49,7 @@ class reset extends external_api {
      * @param int $courseid
      */
     public static function execute($courseid) {
+        global $DB;
 
         \local_gugrades\development::increase_debugging();
 
@@ -59,6 +60,10 @@ class reset extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
+        $userids = $DB->get_fieldset_sql(
+            "SELECT DISTINCT userid FROM {local_gugrades_grade} WHERE courseid = :courseid",
+            ['courseid' => $courseid]
+        );
         \local_gugrades\api::reset($courseid);
 
         // Log.
@@ -71,7 +76,12 @@ class reset extends external_api {
         $event->trigger();
 
         // Audit.
-        \local_gugrades\audit::write($courseid, 0, 0, 'Reset.');
+        \local_gugrades\audit::write(
+            $courseid,
+            \local_gugrades\audit::relateduserid_for($userids),
+            0,
+            'Reset.'
+        );
 
         return [];
     }

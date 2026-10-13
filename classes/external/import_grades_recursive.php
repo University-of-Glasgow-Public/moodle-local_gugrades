@@ -95,7 +95,7 @@ class import_grades_recursive extends external_api {
             throw new \moodle_exception('Import is not permitted after conversion applied.');
         }
 
-        [$itemcount, $gradecount] = \local_gugrades\api::import_grades_recursive(
+        [$itemcount, $gradecount, $userids] = \local_gugrades\api::import_grades_recursive(
             $courseid,
             $gradeitemid,
             $groupid,
@@ -118,7 +118,8 @@ class import_grades_recursive extends external_api {
 
         // Audit.
         $dryrunaudit = $dryrun ? " (Dry run)" : "";
-        \local_gugrades\audit::write($courseid, 0, $gradeitemid, 'Grades imported - recursive' . $dryrunaudit);
+        $relateduserid = $dryrun ? 0 : \local_gugrades\audit::relateduserid_for($userids);
+        \local_gugrades\audit::write($courseid, $relateduserid, $gradeitemid, 'Grades imported - recursive' . $dryrunaudit);
 
         return ['itemcount' => $itemcount, 'gradecount' => $gradecount];
     }

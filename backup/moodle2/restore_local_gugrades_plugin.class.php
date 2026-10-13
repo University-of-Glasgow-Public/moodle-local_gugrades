@@ -192,7 +192,12 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $data = (object) $data;
         $data->courseid = $this->task->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->relateduserid = $this->get_mappingid('user', $data->relateduserid);
+        // RELATED_MULTIPLE is not a user id, so keep it through restore.
+        if ((int) $data->relateduserid === \local_gugrades\audit::RELATED_MULTIPLE) {
+            $data->relateduserid = \local_gugrades\audit::RELATED_MULTIPLE;
+        } else {
+            $data->relateduserid = $this->get_mappingid('user', $data->relateduserid);
+        }
 
         $DB->insert_record('local_gugrades_audit', $data);
     }

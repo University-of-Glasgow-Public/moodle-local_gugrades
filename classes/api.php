@@ -314,6 +314,7 @@ class api {
         // Count success and misery (not all errors are fatal).
         $addcount = 0;
         $errorcount = 0;
+        $affecteduserids = [];
 
         // Specific errors.
         $errors = [
@@ -425,6 +426,7 @@ class api {
                     ispoints:       !$mapping->is_scale(),
                 );
                 $addcount++;
+                $affecteduserids[$user->id] = (int) $user->id;
             }
         }
 
@@ -447,7 +449,7 @@ class api {
             self::recalculate($courseid, $gradecategoryid);
         }
 
-        return [$testrunlines, $errorcount, $addcount, $errorlist];
+        return [$testrunlines, $errorcount, $addcount, $errorlist, array_values($affecteduserids)];
     }
 
     /**
@@ -886,6 +888,7 @@ class api {
         $usercount = \local_gugrades\users::count_enrolled_users($courseid);
         $transactioncount = $itemcount * $usercount;
         $gradecount = 0;
+        $affecteduserids = [];
 
         // Counts are to track progress.
         $iitems = 0;
@@ -917,6 +920,9 @@ class api {
                     )
                 ) {
                     $gradecount++;
+                    if (!$dryrun) {
+                        $affecteduserids[$user->id] = (int) $user->id;
+                    }
                 }
                 $iusers++;
 
@@ -939,7 +945,7 @@ class api {
             self::recalculate($courseid, $categoryid);
         }
 
-        return [$itemcount, $gradecount];
+        return [$itemcount, $gradecount, array_values($affecteduserids)];
     }
 
         /**
@@ -1791,6 +1797,7 @@ class api {
      * @param int $gradeitemid
      * @param int $groupid
      * @param bool $revert
+     * @return int[] User ids the release or unrelease was applied to
      */
     public static function release_grades(int $courseid, int $gradeitemid, int $groupid, bool $revert) {
         global $DB;
@@ -1814,7 +1821,9 @@ class api {
         }     
 
         // Iterate over users releasing/reverting grades.
+        $userids = [];
         foreach ($users as $user) {
+            $userids[] = (int) $user->id;
             if ($revert) {
 
                 // Activity action.
@@ -1828,6 +1837,8 @@ class api {
             $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
             \local_gugrades\aggregation::aggregate($courseid, $gradecategoryid, $users);
         }
+
+        return $userids;
     }
 
     /**
@@ -1933,6 +1944,7 @@ class api {
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $columnid
+     * @return int[] User ids that had grades in the deleted column
      */
     public static function delete_capture_column(int $courseid, int $gradeitemid, int $columnid) {
         global $DB;
@@ -1981,6 +1993,8 @@ class api {
         // Cleanup and recalculate.
         \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
         self::recalculate($courseid, $gradecategoryid);
+
+        return $userids;
     }
 
     /**
@@ -3136,6 +3150,8 @@ class api {
      * @return array
      */
     public static function cleanup_integrity_errors(int $courseid) {
+        global $DB;
+
         $context = \context_course::instance($courseid);
         $result = self::check_integrity($courseid);
         $errors = $result['erroritems'];
@@ -3172,8 +3188,18 @@ class api {
                 if (!$gradeitemid || isset($cleanedremoved[$gradeitemid])) {
                     continue;
                 }
+                $userids = $DB->get_fieldset_sql(
+                    "SELECT DISTINCT userid FROM {local_gugrades_grade}
+                      WHERE courseid = :courseid AND gradeitemid = :gradeitemid",
+                    ['courseid' => $courseid, 'gradeitemid' => $gradeitemid]
+                );
                 self::reset_grade_item($courseid, $gradeitemid);
-                \local_gugrades\audit::write($courseid, $gradeitemid, 0, 'Removed deleted assessment MyGrades data.');
+                \local_gugrades\audit::write(
+                    $courseid,
+                    \local_gugrades\audit::relateduserid_for($userids),
+                    $gradeitemid,
+                    'Removed deleted assessment MyGrades data.'
+                );
                 $cleanedremoved[$gradeitemid] = true;
             }
         }

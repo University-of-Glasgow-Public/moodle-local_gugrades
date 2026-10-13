@@ -30,10 +30,43 @@ namespace local_gugrades;
  */
 class audit {
     /**
+     * relateduserid value stored when an action affects more than one user.
+     * Zero means the action is not tied to a user.
+     */
+    public const RELATED_MULTIPLE = -1;
+
+    /**
+     * Related user id to store for an action.
+     * Zero when nobody is affected, the user id when one user is affected,
+     * or RELATED_MULTIPLE when more than one user is affected.
+     * @param int[] $userids
+     * @return int
+     */
+    public static function relateduserid_for(array $userids): int {
+        $ids = [];
+        foreach ($userids as $userid) {
+            $userid = (int) $userid;
+            if ($userid > 0) {
+                $ids[$userid] = true;
+            }
+        }
+
+        $count = count($ids);
+        if ($count === 0) {
+            return 0;
+        }
+        if ($count === 1) {
+            return (int) array_key_first($ids);
+        }
+
+        return self::RELATED_MULTIPLE;
+    }
+
+    /**
      * Write audit
      * Utility function to add stuff to the audit trail
      * @param int $courseid
-     * @param int $relateduserid // 0 if not required.
+     * @param int $relateduserid User the action was done to, 0 if none, or RELATED_MULTIPLE.
      * @param int $gradeitemid
      * @param string $message
      */
@@ -114,7 +147,9 @@ class audit {
 
             // Get related user.
             $item->relatedusername = '-';
-            if ($item->relateduserid) {
+            if ((int) $item->relateduserid === self::RELATED_MULTIPLE) {
+                $item->relatedusername = get_string('multipleusersaffected', 'local_gugrades');
+            } else if ($item->relateduserid) {
                 if ($relateduser = $DB->get_record('user', ['id' => $item->relateduserid])) {
                     $item->relatedusername = fullname($relateduser);
                 }

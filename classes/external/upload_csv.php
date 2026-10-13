@@ -81,7 +81,7 @@ class upload_csv extends external_api {
         self::validate_context($context);
         require_capability('local/gugrades:editgrades', $context);
 
-        [$lines, $errorcount, $addcount, $errorlist] = \local_gugrades\api::csv_upload(
+        [$lines, $errorcount, $addcount, $errorlist, $userids] = \local_gugrades\api::csv_upload(
             $courseid,
             $gradeitemid,
             $groupid,
@@ -102,7 +102,8 @@ class upload_csv extends external_api {
         $event->trigger();
 
         // Audit.
-        \local_gugrades\audit::write($courseid, 0, $gradeitemid, 'Grades uploaded from CSV.');
+        $relateduserid = $testrun ? 0 : \local_gugrades\audit::relateduserid_for($userids);
+        \local_gugrades\audit::write($courseid, $relateduserid, $gradeitemid, 'Grades uploaded from CSV.');
 
         return [
             'lines' => $lines,
