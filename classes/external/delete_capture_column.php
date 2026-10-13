@@ -66,8 +66,13 @@ class delete_capture_column extends external_api {
         // Admin-only feature.
         require_capability('local/gugrades:resetcourse', $context);
 
-        \local_gugrades\api::delete_capture_column($courseid, $gradeitemid, $columnid);
-        \local_gugrades\audit::write($courseid, $gradeitemid, 0, 'Deleted capture column.');
+        $userids = \local_gugrades\api::delete_capture_column($courseid, $gradeitemid, $columnid);
+        \local_gugrades\audit::write(
+            $courseid,
+            \local_gugrades\audit::relateduserid_for($userids),
+            $gradeitemid,
+            'Deleted capture column.'
+        );
 
         return [];
     }

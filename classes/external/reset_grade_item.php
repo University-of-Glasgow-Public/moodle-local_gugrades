@@ -74,8 +74,18 @@ class reset_grade_item extends external_api {
             $auditmessage = 'Reset assessment.';
         }
 
+        $userids = $DB->get_fieldset_sql(
+            "SELECT DISTINCT userid FROM {local_gugrades_grade}
+              WHERE courseid = :courseid AND gradeitemid = :gradeitemid",
+            ['courseid' => $courseid, 'gradeitemid' => $gradeitemid]
+        );
         \local_gugrades\api::reset_grade_item($courseid, $gradeitemid);
-        \local_gugrades\audit::write($courseid, $gradeitemid, 0, $auditmessage);
+        \local_gugrades\audit::write(
+            $courseid,
+            \local_gugrades\audit::relateduserid_for($userids),
+            $gradeitemid,
+            $auditmessage
+        );
 
         return [];
     }

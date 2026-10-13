@@ -68,7 +68,7 @@ class release_grades extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        \local_gugrades\api::release_grades($courseid, $gradeitemid, $groupid, $revert);
+        $userids = \local_gugrades\api::release_grades($courseid, $gradeitemid, $groupid, $revert);
 
         // Log.
         $event = \local_gugrades\event\release_grades::create([
@@ -82,10 +82,11 @@ class release_grades extends external_api {
         $event->trigger();
 
         // Audit.
+        $relateduserid = \local_gugrades\audit::relateduserid_for($userids);
         if ($revert) {
-            \local_gugrades\audit::write($courseid, 0, $gradeitemid, 'Grades un-released.');
+            \local_gugrades\audit::write($courseid, $relateduserid, $gradeitemid, 'Grades un-released.');
         } else {
-            \local_gugrades\audit::write($courseid, 0, $gradeitemid, 'Grades released.');
+            \local_gugrades\audit::write($courseid, $relateduserid, $gradeitemid, 'Grades released.');
         }
 
         return [];

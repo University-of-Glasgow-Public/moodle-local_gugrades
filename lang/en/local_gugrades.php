@@ -431,6 +431,7 @@ $string['refreshpage'] = 'Refresh page';
 $string['regulationssettings'] = 'Regulations settings';
 $string['regulationssettings_help'] = 'Configure regulations related settings';
 $string['relateduser'] = 'Related user';
+$string['multipleusersaffected'] = 'Multiple Users Impacted';
 $string['releaseaggregatedconfirm'] = 'WARNING: You are about to release the aggregated grade to students. Do you wish to continue?';
 $string['releaseaggregatedconfirmstern'] = 'WARNING: You are about to release aggregated grades to students. One or more grades has already been released. Do you wish to continue?';
 $string['releaseaggregatedgrade'] = 'Release aggregated grades';

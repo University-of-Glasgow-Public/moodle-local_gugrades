@@ -106,6 +106,7 @@ class import_grades_users extends external_api {
 
         $userids = $userlist;
         $importcount = 0;
+        $importeduserids = [];
 
         // Track progress.
         $count = 0;
@@ -127,6 +128,7 @@ class import_grades_users extends external_api {
                 )
             ) {
                 $importcount++;
+                $importeduserids[] = intval($userid);
             }
 
             // Record progress.
@@ -151,7 +153,12 @@ class import_grades_users extends external_api {
             $event->trigger();
 
             // Audit.
-            \local_gugrades\audit::write($courseid, 0, $gradeitemid, 'Grades imported.');
+            \local_gugrades\audit::write(
+                $courseid,
+                \local_gugrades\audit::relateduserid_for($importeduserids),
+                $gradeitemid,
+                'Grades imported.'
+            );
         }
 
         return ['importcount' => $importcount];
