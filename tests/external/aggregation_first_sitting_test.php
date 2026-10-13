@@ -396,9 +396,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * An administrative-only category has no substantive first-sitting result.
+     * EC-only categories use EC for both results until a substantive grade exists.
      */
-    public function test_no_substantive_grade_reports_missing(): void {
+    public function test_ec_only_category_totals(): void {
         global $DB;
 
         foreach (['Attempt one', 'Attempt two'] as $name) {
@@ -408,10 +408,50 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         }
         $this->set_reassessment(true);
         $this->aggregate();
-        $first = $this->result('Dual reassessment', 'CATEGORY1');
-        $this->assertTrue((bool)$first->iserror);
-        $this->assertNull($first->convertedgrade);
-        $this->assertEquals('Grades missing', $first->displaygrade);
+        foreach (['CATEGORY1', 'CATEGORY'] as $type) {
+            $result = $this->result('Dual reassessment', $type);
+            $this->assertFalse((bool)$result->iserror);
+            $this->assertEquals('GOODCAUSE_FO', $result->admingrade);
+            $this->assertEquals('EC', $result->displaygrade);
+            $this->assertEquals('GOODCAUSE_FO', $this->result('Dual middle', $type)->admingrade);
+        }
+    }
+
+    /**
+     * A single EC becomes a substantive first sitting, followed by a higher award.
+     */
+    public function test_ec_then_substantive_then_third_attempt(): void {
+        global $DB;
+
+        $firstid = $this->get_gradeitemid('Attempt one');
+        $secondid = $this->get_gradeitemid('Attempt two');
+        foreach ([$firstid, $secondid] as $itemid) {
+            $DB->delete_records('local_gugrades_grade', ['gradeitemid' => $itemid]);
+        }
+        write_additional_grade::execute(
+            courseid: $this->course->id, gradeitemid: $firstid, userid: $this->student->id,
+            reason: 'SECOND', other: '', admingrade: 'GOODCAUSE_FO', scale: 0, grade: 0, notes: '',
+        );
+        $this->set_reassessment(true);
+        $this->aggregate();
+        foreach (['CATEGORY1', 'CATEGORY'] as $type) {
+            $this->assertEquals('EC', $this->result('Dual reassessment', $type)->displaygrade);
+            $this->assertFalse((bool)$this->result('Dual reassessment', $type)->iserror);
+        }
+        $this->write_result($secondid, 12);
+        $this->aggregate();
+        foreach (['CATEGORY1', 'CATEGORY'] as $type) {
+            $this->assertEquals(12, $this->result('Dual reassessment', $type)->convertedgrade);
+        }
+        $this->build_schema([
+            (object)['name' => 'Attempt three', 'category' => false, 'type' => 'schedulea'],
+        ], $this->categories['Dual reassessment']->id);
+        $this->write_result($this->get_gradeitemid('Attempt three'), 18);
+        $this->aggregate();
+        $this->assertEquals(12, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
+        $this->assertEquals(18, $this->result('Dual reassessment', 'CATEGORY')->convertedgrade);
+        $this->assertEquals(13, $this->result('Dual total', 'CATEGORY1')->convertedgrade);
+        $this->assertEquals(16, $this->result('Dual total', 'CATEGORY')->convertedgrade);
     }
 
     /**

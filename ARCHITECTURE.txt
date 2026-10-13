@@ -65,7 +65,11 @@ Grade concepts
   current revision. An early EC becomes eligible if changed to a grade or NS.
   For child categories, order comes from the earliest actual assessment
   assignment in their subtree, never generated category rows. If no available
-  current substantive grade exists, CATEGORY1 reports missing grades. Ancestors
+  current substantive grade exists but EC grades are available, CATEGORY1 uses
+  the existing reassessment EC rules as a fallback. A single EC therefore gives
+  EC in both totals; once a numeric/NS grade exists it takes precedence over EC
+  for first-sitting selection. With neither substantive grades nor EC, CATEGORY1
+  reports missing grades. Ancestors
   aggregate the selected results normally. Removing reassessment flags retires unneeded CATEGORY1 rows on the
   next aggregation. CATEGORY1 is excluded from existing capture and history
   views.

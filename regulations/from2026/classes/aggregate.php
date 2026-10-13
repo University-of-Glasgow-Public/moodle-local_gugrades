@@ -864,7 +864,11 @@ class aggregate {
     private function first_sitting_items(array $items, int $userid): array {
         $firstitem = null;
         $firstid = null;
+        $ecitems = [];
         foreach ($items as $item) {
+            if (!$item->grademissing && in_array($item->admingrade, ['GOODCAUSE_FO', 'GOODCAUSE_NR'])) {
+                $ecitems[] = $item;
+            }
             if ($item->grademissing || (!empty($item->admingrade) && $item->admingrade != 'NOSUBMISSION')) {
                 continue;
             }
@@ -874,7 +878,7 @@ class aggregate {
                 $firstitem = $item;
             }
         }
-        return $firstitem ? [$firstitem] : [];
+        return $firstitem ? [$firstitem] : $ecitems;
     }
 
     /**
