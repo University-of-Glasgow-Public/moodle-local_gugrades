@@ -94,8 +94,12 @@ Grade concepts
   descriptive tooltip and accessible label and opens the existing details dialog.
   First-sitting cells are read-only. Award cells retain the existing override,
   visibility, dropped-grade and release behaviour. Sorting and filtering apply
-  independently to the displayed result columns. Exports and release continue
-  to use the ordinary CATEGORY result.
+  independently to the displayed result columns. Release and award exports use
+  CATEGORY. UPAS uses CATEGORY1 for its First Attempt Grade when dual results
+  exist (blank for missing/error outcomes); its Award Grade remains CATEGORY.
+  Single-result categories retain the existing UPAS first-attempt rules.
+  Duplicate-result read repair, empty-result cleanup and grade-type descriptions
+  cover both calculated category types. CATEGORY1 remains non-editable.
 - Gradebook grade_items and grade_categories remain Moodle-owned structures.
   local_gugrades refers to them by ID and must account for deleted or changed
   gradebook objects.

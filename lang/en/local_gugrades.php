@@ -241,6 +241,7 @@ $string['gradetype'] = 'Grade type';
 $string['gradetypeagreed'] = 'Agreed grade';
 $string['gradetypecapped'] = 'Capped grade';
 $string['gradetypecategory'] = 'Category';
+$string['gradetypecategory1'] = 'Category (1st Sitting)';
 $string['gradetypeconduct'] = 'Conduct penalty';
 $string['gradetypefirst'] = '1st grade';
 $string['gradetypegoodcause'] = 'Extenuating circumstances';

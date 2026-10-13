@@ -404,14 +404,17 @@ class aggregation {
     }
 
     /**
-     * Get CATEGORY grade and check/fix any duplication that's crept in
+     * Get a category result and check/fix any duplication that's crept in.
      * Yes - this is a terrible bodge
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
+     * @param string $gradetype
      * @return object
      */
-    private static function get_check_category(int $courseid, int $gradeitemid, int $userid) {
+    private static function get_check_category(
+        int $courseid, int $gradeitemid, int $userid, string $gradetype = 'CATEGORY',
+    ) {
         global $DB;
 
         $items = $DB->get_records(
@@ -419,7 +422,7 @@ class aggregation {
             [
                 'courseid' => $courseid,
                 'gradeitemid' => $gradeitemid,
-                'gradetype' => 'CATEGORY',
+                'gradetype' => $gradetype,
                 'userid' => $userid,
                 'iscurrent' => 1,
             ]
@@ -428,7 +431,7 @@ class aggregation {
         // There must be at least one.
         $nitems = count($items);
         if ($nitems == 0) {
-            throw new \moodle_exception('No CATEGORY record found. gradeitemid = ' . $gradeitemid . ' userid = ' . $userid);
+            throw new \moodle_exception('No ' . $gradetype . ' record found. gradeitemid = ' . $gradeitemid . ' userid = ' . $userid);
         }
 
         // Get the item we are going to return.
@@ -1486,11 +1489,7 @@ class aggregation {
      * @return object
      */
     private static function get_first_sitting_grade(int $courseid, int $gradeitemid, int $userid): object {
-        global $DB;
-        return $DB->get_record('local_gugrades_grade', [
-            'courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'userid' => $userid,
-            'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
-        ], '*', MUST_EXIST);
+        return self::get_check_category($courseid, $gradeitemid, $userid, 'CATEGORY1');
     }
 
     /**

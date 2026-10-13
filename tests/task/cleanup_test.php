@@ -180,6 +180,10 @@ final class cleanup_test extends \local_gugrades\external\gugrades_advanced_test
         $overrideid = $this->insert_grade(['catoverride' => 1, 'audittimecreated' => $old]);
         $firstid = $this->insert_grade(['gradetype' => 'FIRST', 'audittimecreated' => $old]);
         $recentid = $this->insert_grade(['audittimecreated' => $recent]);
+        $firstsittingemptyid = $this->insert_grade(['gradetype' => 'CATEGORY1', 'audittimecreated' => $old]);
+        $firstsittinggradeid = $this->insert_grade(['gradetype' => 'CATEGORY1', 'rawgrade' => 16, 'audittimecreated' => $old]);
+        $firstsittingadminid = $this->insert_grade(['gradetype' => 'CATEGORY1', 'admingrade' => 'NOSUBMISSION']);
+        $firstsittingrecentid = $this->insert_grade(['gradetype' => 'CATEGORY1', 'audittimecreated' => $recent]);
 
         $this->run_cleanup();
 
@@ -191,6 +195,10 @@ final class cleanup_test extends \local_gugrades\external\gugrades_advanced_test
         $this->assertTrue($DB->record_exists('local_gugrades_grade', ['id' => $overrideid]));
         $this->assertTrue($DB->record_exists('local_gugrades_grade', ['id' => $firstid]));
         $this->assertTrue($DB->record_exists('local_gugrades_grade', ['id' => $recentid]));
+        $this->assertFalse($DB->record_exists('local_gugrades_grade', ['id' => $firstsittingemptyid]));
+        foreach ([$firstsittinggradeid, $firstsittingadminid, $firstsittingrecentid] as $id) {
+            $this->assertTrue($DB->record_exists('local_gugrades_grade', ['id' => $id]));
+        }
     }
 
     /**

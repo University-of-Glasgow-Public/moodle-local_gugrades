@@ -184,6 +184,18 @@ class upas extends base {
 
         $gradecatitem = \local_gugrades\grades::get_gradeitem_from_gradecategoryid($gradecategoryid);
 
+        if (\local_gugrades\aggregation::has_dual_grades($courseid, $gradecategoryid)) {
+            $first = $DB->get_record('local_gugrades_grade', [
+                'courseid' => $courseid,
+                'gradeitemid' => $gradecatitem->id,
+                'userid' => $user->id,
+                'gradetype' => 'CATEGORY1',
+                'iscurrent' => 1,
+            ], '*', MUST_EXIST);
+            return $first->iserror ? '' :
+                $this->sanitise_grade_value($first->admingrade, $first->rawgrade, $first->displaygrade);
+        }
+
         $categoryparams = [
             'courseid' => $courseid,
             'gradeitemid' => $gradecatitem->id,

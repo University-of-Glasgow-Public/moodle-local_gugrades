@@ -46,7 +46,7 @@ class cleanup extends \core\task\scheduled_task {
      */
     public static function unused_category_select(): array {
         $cutoff = time() - (183 * 86400);
-        $select = "gradetype = :gradetype
+        $select = "gradetype IN (:gradetype, :firstsitting)
             AND rawgrade IS NULL
             AND convertedgrade IS NULL
             AND catoverride = 0
@@ -54,6 +54,7 @@ class cleanup extends \core\task\scheduled_task {
             AND audittimecreated < :cutoff";
         $params = [
             'gradetype' => 'CATEGORY',
+            'firstsitting' => 'CATEGORY1',
             'emptyadmin' => '',
             'cutoff' => $cutoff,
         ];
@@ -70,7 +71,7 @@ class cleanup extends \core\task\scheduled_task {
         // Delete unused intermediate category grades after 6 months.
         [$select, $params] = self::unused_category_select();
         $count = $DB->count_records_select('local_gugrades_grade', $select, $params);
-        mtrace("Deleting {$count} unused intermediate MyGrades CATEGORY records older than 6 months.");
+        mtrace("Deleting {$count} unused intermediate MyGrades CATEGORY/CATEGORY1 records older than 6 months.");
         $DB->delete_records_select('local_gugrades_grade', $select, $params);
 
         return true;

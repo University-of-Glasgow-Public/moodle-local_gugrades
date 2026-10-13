@@ -137,7 +137,10 @@ class gradetype {
             return $description;
         }
 
-        // Just handle CATEGORY on its own for simplicity.
+        // Calculated category types are not selectable capture reasons.
+        if ($gradetype == 'CATEGORY1') {
+            return get_string('gradetypecategory1', 'local_gugrades');
+        }
         if ($gradetype == 'CATEGORY') {
             return get_string('gradetypecategory', 'local_gugrades');
         } else {

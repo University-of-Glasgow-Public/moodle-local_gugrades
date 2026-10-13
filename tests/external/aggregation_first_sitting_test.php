@@ -582,6 +582,93 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * Duplicate first-sitting rows receive the same read repair as award rows.
+     */
+    public function test_first_sitting_duplicate_read_repair(): void {
+        global $DB;
+
+        $this->set_reassessment(true);
+        $this->aggregate();
+        foreach (['Dual total', 'Dual middle'] as $name) {
+            $first = $this->result($name, 'CATEGORY1');
+            unset($first->id);
+            $DB->insert_record('local_gugrades_grade', $first);
+        }
+        $page = get_aggregation_page::execute(
+            $this->course->id, $this->categories['Dual total']->id, '', '', 0, false,
+        );
+        $this->assertTrue($page['dualgrades']);
+        foreach (['Dual total', 'Dual middle'] as $name) {
+            $first = $this->result($name, 'CATEGORY1');
+            $this->assertEquals(1, $DB->count_records('local_gugrades_grade', [
+                'gradeitemid' => $first->gradeitemid, 'userid' => $this->student->id,
+                'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
+            ]));
+        }
+    }
+
+    /**
+     * First-sitting descriptions are translated without making them editable.
+     */
+    public function test_first_sitting_description(): void {
+        $this->assertSame('Category (1st Sitting)', \local_gugrades\gradetype::get_description('CATEGORY1'));
+        $this->assertFalse(\local_gugrades\gradetype::can_gradetype_be_edited('CATEGORY1'));
+        $this->assertArrayNotHasKey('CATEGORY1',
+            \local_gugrades\gradetype::get_menu($this->get_gradeitemid('Attempt one')));
+    }
+
+    /**
+     * UPAS exports each dual category's first-sitting result, not its award.
+     */
+    public function test_upas_first_sitting_export(): void {
+        global $DB;
+
+        $this->set_reassessment(true);
+        $this->aggregate();
+        $export = new \local_gugrades\export\upas();
+        foreach (array_keys($this->categories) as $name) {
+            $csv = $export->get_form_data($this->course->id, $this->categories[$name]->id, 0, []);
+            $rows = array_map('str_getcsv', explode("\n", trim($csv)));
+            $row = array_values(array_filter(array_slice($rows, 1), function ($row) {
+                return $row[0] == $this->student->idnumber;
+            }))[0];
+            $this->assertSame(explode(' ', $this->result($name, 'CATEGORY1')->displaygrade)[0], $row[6]);
+            $this->assertSame(explode(' ', $this->result($name, 'CATEGORY')->displaygrade)[0], $row[7]);
+            $this->assertNotSame($row[6], $row[7]);
+        }
+        $itemid = $this->result('Dual reassessment', 'CATEGORY')->gradeitemid;
+        $this->write_result($itemid, 10, 'CATEGORY', true);
+        $this->aggregate();
+        $csv = $export->get_form_data($this->course->id, $this->categories['Dual reassessment']->id, 0, []);
+        $rows = array_map('str_getcsv', explode("\n", trim($csv)));
+        $row = array_values(array_filter(array_slice($rows, 1), function ($row) {
+            return $row[0] == $this->student->idnumber;
+        }))[0];
+        $this->assertSame('B2', $row[6]);
+        $this->assertSame('10', $row[7]);
+
+        $first = $this->result('Dual reassessment', 'CATEGORY1');
+        foreach ([
+            ['admingrade' => 'NOSUBMISSION', 'displaygrade' => 'NS', 'iserror' => 0, 'expected' => 'NS'],
+            ['admingrade' => '', 'displaygrade' => 'Grades missing', 'iserror' => 1, 'expected' => ''],
+        ] as $case) {
+            $first->rawgrade = null;
+            $first->convertedgrade = null;
+            $first->admingrade = $case['admingrade'];
+            $first->displaygrade = $case['displaygrade'];
+            $first->iserror = $case['iserror'];
+            $DB->update_record('local_gugrades_grade', $first);
+            $csv = $export->get_form_data($this->course->id, $this->categories['Dual reassessment']->id, 0, []);
+            $rows = array_map('str_getcsv', explode("\n", trim($csv)));
+            $row = array_values(array_filter(array_slice($rows, 1), function ($row) {
+                return $row[0] == $this->student->idnumber;
+            }))[0];
+            $this->assertSame($case['expected'], $row[6]);
+            $this->assertSame('10', $row[7]);
+        }
+    }
+
+    /**
      * Single-grade categories remain single in both page and row APIs.
      */
     public function test_single_grade_display(): void {
