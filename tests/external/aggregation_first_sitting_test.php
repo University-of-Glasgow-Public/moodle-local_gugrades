@@ -538,6 +538,137 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * A missing child result is repaired even when both parent results already exist.
+     */
+    public function test_page_repairs_only_user_with_missing_child_result(): void {
+        global $DB;
+
+        $this->set_reassessment(true);
+        \local_gugrades\aggregation::aggregate($this->course->id, $this->categories['Dual total']->id,
+            [$this->student->id, $this->student2->id]);
+        $otherfirst = $DB->get_record('local_gugrades_grade', [
+            'gradeitemid' => \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($this->categories['Dual middle']->id),
+            'userid' => $this->student2->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        $missing = $this->result('Dual middle', 'CATEGORY1');
+        $DB->delete_records('local_gugrades_grade', ['id' => $missing->id]);
+        [$columns] = \local_gugrades\aggregation::get_columns($this->course->id, $this->categories['Dual total']->id);
+        $users = \local_gugrades\aggregation::get_users($this->course->id, $this->categories['Dual total']->id, '', '', 0);
+        [$users, $debug] = \local_gugrades\aggregation::add_aggregation_fields_to_users(
+            $this->course->id, $this->categories['Dual total']->id, $users, $columns);
+        $this->assertCount(2, $users);
+        $this->assertSame('1 User helper calls count.', $debug[0]['line']);
+        $this->assertEquals(16, $this->result('Dual middle', 'CATEGORY1')->convertedgrade);
+        $this->assertTrue($DB->record_exists('local_gugrades_grade', ['id' => $otherfirst->id, 'iscurrent' => 1]));
+    }
+
+    /**
+     * Bulk runs reload altered-weight existence, including zero weights and later removal.
+     */
+    public function test_bulk_aggregation_reloads_altered_weights(): void {
+        global $DB;
+
+        $this->set_reassessment(true);
+        $totalid = $this->categories['Dual total']->id;
+        $aggregate = fn() => \local_gugrades\aggregation::aggregate($this->course->id, $totalid, [$this->student->id]);
+        $aggregate();
+        $this->assertEquals(15, $this->result('Dual total', 'CATEGORY1')->rawgrade);
+        $middleid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($this->categories['Dual middle']->id);
+        $weightid = $DB->insert_record('local_gugrades_altered_weight', (object)[
+            'courseid' => $this->course->id, 'categoryid' => $totalid, 'gradeitemid' => $middleid,
+            'userid' => $this->student->id, 'weight' => 0, 'timealtered' => time(),
+        ]);
+        $aggregate();
+        $this->assertEquals(14, $this->result('Dual total', 'CATEGORY1')->rawgrade);
+        $this->assertEquals(14, $this->result('Dual total', 'CATEGORY')->rawgrade);
+        $DB->delete_records('local_gugrades_altered_weight', ['id' => $weightid]);
+        $aggregate();
+        $this->assertEquals(15, $this->result('Dual total', 'CATEGORY1')->rawgrade);
+        $this->assertEquals(16, $this->result('Dual total', 'CATEGORY')->rawgrade);
+    }
+
+    /**
+     * Preloaded invalidation deletes every subtree entry without more database reads.
+     */
+    public function test_preloaded_cache_invalidation(): void {
+        global $DB;
+
+        $categories = \local_gugrades\grades::get_gradecategories_recursive($this->categories['Dual total']->id);
+        $cache = \cache::make('local_gugrades', 'useraggdata');
+        foreach ($categories as $category) {
+            $cache->set('AGGDATA_' . $category->id . '_' . $this->student->id, (object)['cached' => true]);
+            $cache->set('AGGDATA_' . $category->id . '_' . $this->student2->id, (object)['cached' => true]);
+        }
+        $reads = $DB->perf_get_reads();
+        \local_gugrades\aggregation::invalidate_aggdata(
+            $this->course->id, $this->categories['Dual total']->id, $this->student->id, $categories);
+        $this->assertSame($reads, $DB->perf_get_reads());
+        foreach ($categories as $category) {
+            $this->assertFalse($cache->get('AGGDATA_' . $category->id . '_' . $this->student->id));
+            $this->assertNotFalse($cache->get('AGGDATA_' . $category->id . '_' . $this->student2->id));
+        }
+    }
+
+    /**
+     * Bulk capture preserves current-ID selection, released/admin grades and CATEGORY1 exclusion.
+     */
+    public function test_bulk_capture_matches_individual_reads(): void {
+        global $DB;
+
+        $itemid = $this->get_gradeitemid('Attempt one');
+        $base = $DB->get_record('local_gugrades_grade', [
+            'gradeitemid' => $itemid, 'userid' => $this->student->id, 'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        foreach ([
+            ['gradetype' => 'SECOND', 'rawgrade' => 0, 'convertedgrade' => 0, 'displaygrade' => 'H:0'],
+            ['gradetype' => 'RELEASED', 'admingrade' => 'NOSUBMISSION', 'rawgrade' => 0,
+                'convertedgrade' => 0, 'displaygrade' => 'NS'],
+            ['gradetype' => 'THIRD', 'iscurrent' => 0, 'rawgrade' => 22],
+            ['gradetype' => 'CATEGORY1', 'rawgrade' => 20],
+        ] as $values) {
+            $grade = clone $base;
+            unset($grade->id);
+            foreach ($values as $field => $value) {
+                $grade->$field = $value;
+            }
+            $DB->insert_record('local_gugrades_grade', $grade);
+            $individual = \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id);
+            $data = \local_gugrades\usercapture::load_aggregation_data(
+                $this->course->id, [$this->student->id, $this->student2->id]);
+            $bulk = \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id, $data);
+            $this->assertEquals($individual->get_provisional(), $bulk->get_provisional());
+            $this->assertEquals($individual->get_grades(), $bulk->get_grades());
+            $this->assertSame($individual->alert(), $bulk->alert());
+            $this->assertNull(\local_gugrades\usercapture::create(
+                $this->course->id, $itemid, $this->student2->id, $data)->get_provisional());
+        }
+        $data = \local_gugrades\usercapture::load_aggregation_data($this->course->id, [$this->student->id]);
+        \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id, $data);
+        $reads = $DB->perf_get_reads();
+        \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id, $data);
+        $this->assertSame($reads, $DB->perf_get_reads());
+        $this->write_result($itemid, 10, 'AGREED');
+        $fresh = \local_gugrades\usercapture::load_aggregation_data($this->course->id, [$this->student->id]);
+        $this->assertEquals(10, \local_gugrades\usercapture::create(
+            $this->course->id, $itemid, $this->student->id, $fresh)->get_provisional()->rawgrade);
+    }
+
+    /**
+     * Bulk assessment reads retain the existing out-of-range validation.
+     */
+    public function test_bulk_capture_rejects_out_of_range_points(): void {
+        global $DB;
+
+        $itemid = $this->get_gradeitemid('Attempt one');
+        $DB->set_field('local_gugrades_grade', 'points', 1, ['gradeitemid' => $itemid]);
+        $DB->set_field('grade_items', 'grademax', 10, ['id' => $itemid]);
+        $data = \local_gugrades\usercapture::load_aggregation_data($this->course->id, [$this->student->id]);
+        $this->expectException(\moodle_exception::class);
+        $this->expectExceptionMessage('Out of range grade detected');
+        \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id, $data);
+    }
+
+    /**
      * Calculation and explanation do not need programme/profile display data.
      */
     public function test_calculation_and_explanation_without_programme_lookup(): void {

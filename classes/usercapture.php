@@ -73,13 +73,56 @@ class usercapture {
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
+     * @param object|null $bulkdata Current assessment snapshot for this aggregation run.
      * @return \local_gugrades\usercapture
      */
-    public static function create(int $courseid, int $gradeitemid, int $userid) {
+    public static function create(int $courseid, int $gradeitemid, int $userid, ?object $bulkdata = null) {
 
-        $usercapture = new usercapture($courseid, $gradeitemid, $userid);
+        $usercapture = new usercapture($courseid, $gradeitemid, $userid, $bulkdata);
 
         return $usercapture;
+    }
+
+    /**
+     * Load current assessment grades once, preserving ID ordering used by capture.
+     * The snapshot is local to one calculation; subsequent runs always reload it.
+     * @param int $courseid
+     * @param array $userids
+     * @return object
+     */
+    public static function load_aggregation_data(int $courseid, array $userids): object {
+        global $DB;
+
+        if (!$userids) {
+            throw new \coding_exception('An aggregation snapshot requires at least one user.');
+        }
+        $data = (object)[
+            'courseid' => $courseid,
+            'userids' => array_fill_keys($userids, true),
+            'items' => $DB->get_records_select('grade_items',
+                "courseid = :courseid AND itemtype IN ('mod', 'manual')", ['courseid' => $courseid]),
+            'grades' => [],
+            'columns' => [],
+        ];
+        [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $params['courseid'] = $courseid;
+        $records = $DB->get_recordset_sql(
+            "SELECT gr.*
+               FROM {local_gugrades_grade} gr
+               JOIN {grade_items} gi ON gi.id = gr.gradeitemid
+              WHERE gi.courseid = :courseid AND gi.itemtype IN ('mod', 'manual')
+                AND gr.userid $insql AND gr.iscurrent = 1
+              ORDER BY gr.id ASC",
+            $params,
+        );
+        try {
+            foreach ($records as $grade) {
+                $data->grades[$grade->userid][$grade->gradeitemid][$grade->id] = $grade;
+            }
+        } finally {
+            $records->close();
+        }
+        return $data;
     }
 
     /**
@@ -87,14 +130,15 @@ class usercapture {
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
+     * @param object|null $bulkdata
      */
-    private function __construct(int $courseid, int $gradeitemid, int $userid) {
+    private function __construct(int $courseid, int $gradeitemid, int $userid, ?object $bulkdata = null) {
 
         $this->courseid = $courseid;
         $this->gradeitemid = $gradeitemid;
         $this->userid = $userid;
 
-        $this->read_grades();
+        $this->read_grades($bulkdata);
         $this->get_gradesbygradetype();
     }
 
@@ -244,22 +288,28 @@ class usercapture {
      * Acquire and check grades in database
      *
      */
-    private function read_grades() {
+    private function read_grades(?object $bulkdata = null) {
         global $DB;
 
         $this->provisional = null;
 
         // Get the gradeitem to sanity check grade, MGU-1344.
-        $gradeitem = \local_gugrades\grades::get_gradeitem($this->gradeitemid);
-
-        // ...id is a proxy for time added.
-        // Cannot use the timestamp as the unit tests write the test grades all in the
-        // same second (potentially).
-        $grades = $DB->get_records('local_gugrades_grade', [
-            'gradeitemid' => $this->gradeitemid,
-            'userid' => $this->userid,
-            'iscurrent' => 1,
-        ], 'id ASC');
+        if ($bulkdata !== null) {
+            if ($bulkdata->courseid != $this->courseid || !isset($bulkdata->userids[$this->userid]) ||
+                    !isset($bulkdata->items[$this->gradeitemid])) {
+                throw new \coding_exception('Capture request is outside the aggregation snapshot.');
+            }
+            $gradeitem = $bulkdata->items[$this->gradeitemid];
+            $grades = $bulkdata->grades[$this->userid][$this->gradeitemid] ?? [];
+        } else {
+            $gradeitem = \local_gugrades\grades::get_gradeitem($this->gradeitemid);
+            // IDs preserve assignment order even when timestamps are identical.
+            $grades = $DB->get_records('local_gugrades_grade', [
+                'gradeitemid' => $this->gradeitemid,
+                'userid' => $this->userid,
+                'iscurrent' => 1,
+            ], 'id ASC');
+        }
         $grades = array_filter($grades, function ($grade) {
             return $grade->gradetype != 'CATEGORY1';
         });
@@ -276,13 +326,20 @@ class usercapture {
                     ', rawgrade = ' . $provisional->rawgrade . ', grademax = ' . $gradeitem->grademax
                 );
             }
-            $provisionalcolumn = \local_gugrades\grades::get_column(
-                $this->courseid,
-                $this->gradeitemid,
-                'PROVISIONAL',
-                '',
-                $provisional->points
-            );
+            $columnkey = $this->gradeitemid . '_' . (int)$provisional->points;
+            $provisionalcolumn = $bulkdata === null ? null : ($bulkdata->columns[$columnkey] ?? null);
+            if ($provisionalcolumn === null) {
+                $provisionalcolumn = \local_gugrades\grades::get_column(
+                    $this->courseid,
+                    $this->gradeitemid,
+                    'PROVISIONAL',
+                    '',
+                    $provisional->points
+                );
+                if ($bulkdata !== null) {
+                    $bulkdata->columns[$columnkey] = $provisionalcolumn;
+                }
+            }
 
             $provisional->columnid = $provisionalcolumn->id;
             $this->provisional = $provisional;

@@ -24,6 +24,152 @@ Main entry points
 - classes/external/: Moodle webservice/external API functions.
 - classes/activities/: activity-specific grade import and reading behaviour.
 
+Aggregation performance benchmark
+---------------------------------
+tests/external/aggregation_performance_test.php is opt-in and uses only the
+isolated PHPUnit database, reset after each case. It creates 100, 400 and 800
+students, five calculated categories, twelve Schedule A assessments and two
+grade revisions per assessment. Scenarios are original, from2026 single-result,
+and from2026 dual-result (also with drop-low and 10% altered-weight users).
+It measures initial/unchanged recalculation, page/repeated-page loading and a
+single-student edit. JSON lines prefixed GUGRADES_BENCHMARK report elapsed and
+database time, read/write counts, peak memory and page response bytes. Fixture
+creation, assertions and response encoding are outside elapsed measurements.
+
+Run with the existing PHPUnit installation:
+GUGRADES_BENCHMARK=1 vendor/bin/phpunit local/gugrades/tests/external/aggregation_performance_test.php
+Optional GUGRADES_BENCHMARK_SIZES=100 (or 100,400,800) limits case sizes.
+Without the opt-in variable, these tests are skipped. There are no timing
+thresholds; correctness assertions check result counts and independent streams.
+In this development Compose environment (from the Moodle root):
+docker compose exec -T -e XDEBUG_MODE=off -e GUGRADES_BENCHMARK=1 -w /app/html php /usr/local/bin/php vendor/bin/phpunit local/gugrades/tests/external/aggregation_performance_test.php
+
+IMPORTANT: PHPUnit bypasses production regulation, availability, tree and
+user-result caches. Repeated-page measurements are NOT warm production-cache
+timings. Use the same environment and fixture for before/after comparisons,
+and profile a staging request before extrapolating to live response times.
+Dual and single scenarios have different optional features, so their timing
+difference must not be attributed solely to dual calculation. PHP process
+memory includes fixture/cache allocations and is not per-request isolation.
+
+Initial baseline, 2026-10-14, PHP 8.3.35 / MariaDB 12.3.2 / Moodle 4.5.12+:
+                              Initial recalculation seconds
+Scenario                      100 students    400 students    800 students
+original                      5.30            39.32           131.77
+from2026                      5.42            40.33           135.65
+from2026-dual                  6.82            52.17           171.54
+
+At 800 students:
+Scenario          Unchanged seconds   Reads     Writes    Page seconds   Edit seconds
+original          122.77              134512    24800     8.68           0.23
+from2026          128.28              146512    24800     8.70           0.24
+from2026-dual      162.03              188912    37601     9.23           0.31
+Reads/writes above refer to unchanged recalculation, not page loading.
+Page responses were approximately 1.1 MB (uncompressed JSON). The nine cases
+passed 75 assertions. This is one local run, not a production SLA or a median.
+Elapsed recalculation grew faster than query count; investigate PHP/framework
+overhead as well as database work before attributing the scaling to SQL alone.
+
+Low-risk aggregation optimisations
+---------------------------------
+Full-course aggregation loads the level-one subtree's category list once and
+invalidates each student's result cache once, rather than rediscovering and
+deleting the same subtree twice per student. Altered-weight existence is read
+once per calculation run and passed through recursion, not cached between runs.
+Page repair checks load current CATEGORY1 presence for the total and dual child
+columns in one query and use keyed user/item lookups. Missing child results still
+trigger full per-user repair even when parent results exist.
+These changes leave grade reads/selection, duplicate repair, result writes,
+audit timestamps, drop-low and regulation calculations unchanged.
+Measured after this pass (same fixture/environment, one run):
+- At 100 students, recalculation reads fell by 1097 in each scenario: original
+  16912 -> 15815, from2026 18412 -> 17315, dual 23712 -> 22615 (unchanged runs).
+- At 800 students, dual recalculation reads fell 188912 -> 180115 (4.7%).
+  Writes stayed at 37601. Unchanged recalculation time was 162.87s versus 162.03s
+  in the baseline; there is no demonstrated elapsed-time improvement.
+- At 800 students, dual page-after-recalculation reads fell 88505 -> 87705;
+  elapsed time was 9.16s versus 9.23s. Repeated-page timing varied upward.
+- Single-user edit reads fell by four; grade writes remained unchanged.
+The query reduction is deterministic for this fixture, but timing is noisy.
+The dominant assessment reads and unconditional result writes remain for a
+separately reviewed optimisation pass. Regression coverage passed 114 tests /
+394 assertions; benchmark follow-ups passed four cases / 34 assertions.
+
+Assessment bulk-read pass
+-------------------------
+Aggregation loads grade items and current assessment grades for its users in
+two queries. A run-local snapshot is passed through recursion into usercapture;
+capture still applies the same ID ordering, CATEGORY1 exclusion, provisional
+selection, alert and out-of-range checks. PROVISIONAL column lookup/creation is
+reused per item/points combination within that run. Normal capture-page calls
+continue using individual reads. Each calculation/edit/explanation gets a fresh
+snapshot; no persistent cache or latest-pointer selection replaces grade reads.
+Result writes and audit behaviour are unchanged. Memory grows with current
+assessment rows for the selected users (historical rows are not loaded).
+Measured against the preceding low-risk pass, at 800 students in the dual
+scenario, unchanged recalculation reads fell 180115 -> 151329 (16.0%).
+Initial recalculation time fell 172.82s -> 167.94s; unchanged recalculation was
+162.87s -> 161.17s. These single-run timings demonstrate only a modest benefit,
+not a large speedup. Writes stayed at 37601 and page-read counts were unchanged.
+At 100 students unchanged timings were 3.93s original, 4.03s from2026 and 5.41s
+dual, versus 4.72s / 4.71s / 6.28s in the preceding pass.
+The isolated 800-student process peak increased from 141 MiB to 155 MiB.
+Bulk data trades additional memory for fewer queries; recordset iteration avoids
+an additional flat copy of all grade rows. PHPUnit cache bypass still applies.
+Regression coverage passed 116 tests / 414 assertions, with four benchmark
+follow-up cases / 34 assertions. Profile SQL plans and PHP call time before
+further optimisation; repeated writes/settings and test-framework overhead
+remain outside this pass.
+
+Function/SQL profiling findings (2026-10-14)
+------------------------------------------
+The benchmark supports optional GUGRADES_BENCHMARK_TRACE_PHASE, e.g.
+unchanged_recalculation, with XDEBUG_MODE=trace. Only the selected phase is
+traced; /tmp/gugrades-SCENARIO-SIZE-PHASE.xt[.gz] is reported on stdout. Traces
+are limited to 100 students and suppress nested argument arrays. Xdebug tracing
+has substantial overhead: use call counts/path attribution, not traced seconds
+as benchmark results. Keep raw traces private (they include SQL and arguments).
+Example in the development Compose environment:
+docker compose exec -T -e XDEBUG_MODE=trace -e GUGRADES_BENCHMARK=1 -e GUGRADES_BENCHMARK_SIZES=20 -e GUGRADES_BENCHMARK_TRACE_PHASE=unchanged_recalculation -w /app/html php /usr/local/bin/php -d xdebug.start_with_request=no vendor/bin/phpunit --filter from2026-dual local/gugrades/tests/external/aggregation_performance_test.php
+
+Traces of the dual scenario at 20 and 100 students identified the main cause
+of superlinear PHPUnit timing:
+                                      20 students       100 students
+availability list loads               300               1500
+fullname calls                        6020              150100
+mysqli query calls                    4850              23730
+mysqli query inclusive time           1.02s             5.53s
+activity get_users inclusive time      10.74s            246.82s
+total traced recalculation             17.42s            279.62s
+Inclusive recursive timings overlap and must not be added together.
+
+get_valid_userids() explicitly bypasses GUGRADES_VALIDUSERS during PHPUnit.
+Each availability lookup consequently obtains ALL students, formats names and
+initials and sorts them in activities/base.php. Five times as many students
+gave about 25 times as many fullname calls. At 100 students, this path accounted
+for about 88% of the instrumented request, while mysqli query execution was
+about 2%. Instrumentation especially inflates paths with many small PHP calls.
+Production already reuses availability lists per assessment within a request,
+so this quadratic test path is NOT evidence of equivalent live behaviour.
+The earlier 800-student times substantially exaggerate this availability cost.
+The production cache was not disabled, enabled specially or changed for this
+investigation; no new optimisation was made based on these distorted timings.
+
+Normalised SQL totals at 100 students showed many inexpensive repeated queries:
+- grade_items by ID: 4824 calls / 0.71s.
+- resit existence by item: 1500 calls / 0.41s.
+- course by ID: 2600 calls / 0.39s.
+- role/capability checks: 1501 calls / 0.38s.
+- clearing dropped flags: 1600 calls / 0.25s.
+- altered-weight lookup: 1600 calls / 0.18s.
+These are trace driver timings, not pure database-server execution timings.
+No individual SQL family explained the superlinear growth in this fixture.
+This does not rule out production slow queries or poor plans with larger
+historical tables. The next reliable measurement is a staging request with
+normal production caches and representative data, separately measuring a
+new request/page refresh, recalculation and single-user updates. Do not infer
+production elapsed time by subtracting inclusive traced costs from the baseline.
+
 Important data
 --------------
 - local_gugrades_grade: grade history and current/provisional grade values.

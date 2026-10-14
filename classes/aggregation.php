@@ -385,15 +385,15 @@ class aggregation {
      * @param int $courseid
      * @param int $gradecategoryid
      * @param int $userid
+     * @param array|null $categories Preloaded categories in the level-one subtree.
      */
-    public static function invalidate_aggdata(int $courseid, int $gradecategoryid, int $userid) {
-        global $DB;
-
-        // Get 'top level' for this category.
-        $level1 = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
-
-        // Get all the items.
-        $categories = \local_gugrades\grades::get_gradecategories_recursive($level1);
+    public static function invalidate_aggdata(
+        int $courseid, int $gradecategoryid, int $userid, ?array $categories = null,
+    ) {
+        if ($categories === null) {
+            $level1 = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
+            $categories = \local_gugrades\grades::get_gradecategories_recursive($level1);
+        }
 
         // Find all the categories.
         $cache = \cache::make('local_gugrades', 'useraggdata');
@@ -642,24 +642,34 @@ class aggregation {
             AND gradetype = 'CATEGORY'
             AND iscurrent = 1";
         $existing = $DB->get_records_sql($sql, ['gradeitemid' => $gradecatitem->id]);
-        $existingids = array_column($existing, 'userid');
+        $existingids = array_fill_keys(array_column($existing, 'userid'), true);
         $dualgrades = self::has_dual_grades($courseid, $gradecategoryid);
-        $firstids = $DB->get_fieldset_select('local_gugrades_grade', 'userid',
-            "gradeitemid = :gradeitemid AND gradetype = 'CATEGORY1' AND iscurrent = 1",
-            ['gradeitemid' => $gradecatitem->id]);
+        $dualitemids = [];
+        foreach ($columns as $column) {
+            if ($column->dualgrades) {
+                $dualitemids[] = $column->gradeitemid;
+            }
+        }
+        $firstitemids = array_unique(array_merge([$gradecatitem->id], $dualitemids));
+        [$insql, $params] = $DB->get_in_or_equal($firstitemids, SQL_PARAMS_NAMED);
+        $firstrecords = $DB->get_records_select('local_gugrades_grade',
+            "gradeitemid $insql AND gradetype = 'CATEGORY1' AND iscurrent = 1",
+            $params, '', 'id, gradeitemid, userid');
+        $firstids = [];
+        foreach ($firstrecords as $first) {
+            $firstids[$first->gradeitemid][$first->userid] = true;
+        }
 
         foreach ($users as $id => $user) {
             $missingfirst = false;
-            foreach ($columns as $column) {
-                if ($column->dualgrades && !$DB->record_exists('local_gugrades_grade', [
-                    'gradeitemid' => $column->gradeitemid, 'userid' => $user->id,
-                    'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
-                ])) {
+            foreach ($dualitemids as $itemid) {
+                if (!isset($firstids[$itemid][$user->id])) {
                     $missingfirst = true;
                     break;
                 }
             }
-            if (!in_array($user->id, $existingids) || ($dualgrades != in_array($user->id, $firstids)) || $missingfirst) {
+            if (!isset($existingids[$user->id]) ||
+                    ($dualgrades != isset($firstids[$gradecatitem->id][$user->id])) || $missingfirst) {
                 self::aggregate_user_helper($courseid, $gradecategoryid, $user->id);
                 $userhelpercount++;
             }
@@ -1278,6 +1288,8 @@ class aggregation {
      * @param bool $skipdroplow
      * @param bool &$nursingcondmet 
      * @param bool &$firstnursingcondmet
+     * @param bool|null $anyalteredweights Whether this run has any altered weights.
+     * @param object|null $capturedata Current assessment snapshot for this run.
      * @return object
      */
     protected static function aggregate_user(
@@ -1288,6 +1300,8 @@ class aggregation {
         bool $skipdroplow = false,
         bool &$nursingcondmet = false,
         bool &$firstnursingcondmet = false,
+        ?bool $anyalteredweights = null,
+        ?object $capturedata = null,
     ) {
         global $DB;
 
@@ -1299,7 +1313,8 @@ class aggregation {
 
         // Are there any altered weights at all for this course?
         // This avoids a load of relatively expensive checks.
-        $anyalteredweights = self::any_altered_weights($courseid);
+        $anyalteredweights ??= self::any_altered_weights($courseid);
+        $capturedata ??= \local_gugrades\usercapture::load_aggregation_data($courseid, [$userid]);
 
         // Information about the category is in the param
         // The field 'children' holds all the sub-items and sub-categories that
@@ -1348,6 +1363,8 @@ class aggregation {
                             $skipdroplow,
                             $categorycondmet,
                             $firstcategorycondmet,
+                            $anyalteredweights,
+                            $capturedata,
                         );
                     $firstresult = $agg->firstsitting;
                     $childcategorytotal = $agg->total;
@@ -1378,7 +1395,7 @@ class aggregation {
             } else {
                 // Is there a grade (in MyGrades) for this user?
                 // Provisional will be null if nothing has been imported.
-                $usercapture = \local_gugrades\usercapture::create($courseid, $child->itemid, $userid);
+                $usercapture = \local_gugrades\usercapture::create($courseid, $child->itemid, $userid, $capturedata);
                 $provisional = $usercapture->get_provisional();
 
                 // MGU-1293: Additional check for null grade which counts as missing grade.
@@ -1685,6 +1702,9 @@ class aggregation {
         // Counts for progress.
         $count = 0;
         $numberofusers = count($users);
+        $anyalteredweights = self::any_altered_weights($courseid);
+        $categories = \local_gugrades\grades::get_gradecategories_recursive($level1categoryid);
+        $capturedata = \local_gugrades\usercapture::load_aggregation_data($courseid, $users);
 
         // Run through each user and aggregate their grades.
         foreach ($users as $userid) {
@@ -1694,12 +1714,16 @@ class aggregation {
             \local_gugrades\progress::record($courseid, 0, 'aggregate', intval($progress));
 
             // Invalidate any stored data.
-            self::invalidate_aggdata($courseid, $gradecategoryid, $userid);
-            self::invalidate_aggdata($courseid, $level1categoryid, $userid);
+            self::invalidate_aggdata($courseid, $level1categoryid, $userid, $categories);
 
             // 1 = level 1 (we need to know what level we're at). Level is incremented
             // as call recurses.
-            self::aggregate_user($courseid, $toplevel, $userid, 1, $skipdroplow);
+            $nursingcondmet = false;
+            $firstnursingcondmet = false;
+            self::aggregate_user(
+                $courseid, $toplevel, $userid, 1, $skipdroplow,
+                $nursingcondmet, $firstnursingcondmet, $anyalteredweights, $capturedata,
+            );
         }
     }
 
