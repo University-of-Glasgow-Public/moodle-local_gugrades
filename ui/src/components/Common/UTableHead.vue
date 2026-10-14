@@ -14,10 +14,8 @@
           isScrolledX && isPinnedColumn(header.column.id) ? 'utable-pin-name--scrolled' : '',
           header.column.columns.length ? (bottomGradeLabels ? 'border-r border-white/30 text-center' : 'border-x border-white/30 bg-white/10 text-center') : '',
           header.column.parent ? (bottomGradeLabels ? 'normal-case tracking-normal' : 'border-x border-white/20 normal-case tracking-normal') : '',
-          bottomGradeLabels && isGroupEnd(header.column) ? 'border-r border-white/30' : '',
+          bottomGradeLabels ? 'border-r border-white/30' : '',
           bottomGradeLabels && header.column.parent?.columns.length === 2 ? 'utable-dual-grade' : '',
-          bottomGradeLabels && isDualGroupStart(header.column) ? 'border-l border-white/30' : '',
-          bottomGradeLabels && header.column.columns.length === 2 ? 'border-l border-white/30' : '',
         ]"
       >
         <div
@@ -60,9 +58,8 @@
             isPinnedColumn(column.id) ? 'utable-pin-name utable-pin-name--filter' : '',
             isScrolledX && isPinnedColumn(column.id) ? 'utable-pin-name--scrolled' : '',
             column.parent ? (bottomGradeLabels ? 'utable-grade-filter' : 'border-x border-white/20') : '',
-            bottomGradeLabels && isGroupEnd(column) ? 'border-r border-white/30' : '',
+            bottomGradeLabels ? 'border-r border-white/30' : '',
             bottomGradeLabels && column.parent?.columns.length === 2 ? 'utable-dual-grade' : '',
-            bottomGradeLabels && isDualGroupStart(column) ? 'border-l border-white/30' : '',
           ]"
         >
           <input
@@ -82,7 +79,7 @@
 
 <script setup lang="ts">
     import { computed } from 'vue'
-    import { FlexRender, type Column, type Table } from '@tanstack/vue-table'
+    import { FlexRender, type Table } from '@tanstack/vue-table'
     import { ArrowUp, ArrowDown, ArrowUpDown } from '@lucide/vue'
 
     const props = defineProps<{
@@ -106,13 +103,6 @@
         return columnId === 'displayname';
     }
 
-    function isGroupEnd(column: Column<any>) {
-        return column.parent?.columns.at(-1)?.id === column.id;
-    }
-
-    function isDualGroupStart(column: Column<any>) {
-        return column.parent?.columns.length === 2 && column.parent.columns[0]?.id === column.id;
-    }
 </script>
 
 <style scoped>

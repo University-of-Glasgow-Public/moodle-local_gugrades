@@ -85,8 +85,10 @@ Grade concepts
   The aggregation header uses one blue background with compact metadata and
   controls. The table fills the available width; dual-grade columns stay
   content-sized while names and single-grade columns take the remaining space.
-  A shared tint and outer borders visually join each first-sitting/award pair,
-  without an internal divider. Grade cells retain narrow padding and compact
+  A shared tint visually joins each first-sitting/award pair. Consistent vertical
+  separators divide all columns in the body, filters and grade-label row,
+  including each dual-grade pair; top headers span their grouped columns.
+  Grade cells retain narrow padding and compact
   filters. Other shared-table layouts keep their usual sizing.
   Aggregation cells anchor menus and grades to the left of their column.
   Administrative grades reserve the same minimum display space as normal

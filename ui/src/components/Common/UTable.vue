@@ -35,9 +35,8 @@
                 isPinnedColumn(cell.column.id) ? 'utable-pin-name' : '',
                 isScrolledX && isPinnedColumn(cell.column.id) ? 'utable-pin-name--scrolled' : '',
                 cell.column.parent ? (bottomGradeLabels ? 'text-center' : 'border-x border-brand-light-purple/20') : '',
-                bottomGradeLabels && cell.column.parent?.columns.at(-1)?.id === cell.column.id ? 'border-r border-brand-light-purple/40' : '',
+                bottomGradeLabels ? 'border-r border-brand-light-purple/40' : '',
                 bottomGradeLabels && cell.column.parent?.columns.length === 2 ? 'utable-dual-grade' : '',
-                bottomGradeLabels && cell.column.parent?.columns.length === 2 && cell.column.parent.columns[0]?.id === cell.column.id ? 'border-l border-brand-light-purple/40' : '',
               ]"
             >
               <FlexRender 
