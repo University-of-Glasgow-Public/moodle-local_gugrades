@@ -20,7 +20,9 @@
         </div>
         <div class="flex flex-wrap items-center justify-center gap-x-2 font-normal text-white/80">
             <span v-if="!infocol && column.showweights">{{ column.weight }}%</span>
-            <span v-if="column.gradetype">{{ column.gradetype }} <span v-if="!column.isscale">({{ column.grademax }})</span></span>
+            <span v-if="column.gradetype" :class="column.gradetype === mstrings.seewarnings ? 'rounded bg-brand-light-yellow px-1.5 py-0.5 font-medium text-university-blue' : ''">
+                {{ column.gradetype }} <span v-if="!column.isscale && column.gradetype !== mstrings.seewarnings">({{ column.grademax }})</span>
+            </span>
         </div>
         <div class="font-normal text-white/80" v-if="column.strategy"><i>{{ column.strategy }}</i></div>
         <div v-if="totaltype" class="font-normal text-white/80">({{ totaltype }})</div>

@@ -473,6 +473,7 @@ $string['scaletypehelp'] = 'Name of scale type - schedulea or scheduleb at the m
 $string['scalevalues'] = 'Scale values';
 $string['scalevalueshelp'] = 'Add scale value on each line followed by a comma and then the numeric value';
 $string['scalevaluesinfo'] = 'Define the numeric values for each scale to be available in tool. If unused leave both fields empty. Used scales must specify schedulea or scheduleb (exactly like that)';
+$string['seewarnings'] = 'See warning(s)';
 $string['select'] = 'Select';
 $string['selectareason'] = 'Select a reason';
 $string['selected'] = 'Selected';

@@ -226,7 +226,7 @@ class aggregation {
                 'dualgrades' => self::has_reassessment($gradecategory, $aggregation),
                 'shortname' => $gradecategory->shortname,
                 'fullname' => $gradecategory->name,
-                'gradetype' => $gradecategory->gradetype,
+                'gradetype' => self::translate_atype($gradecategory->atype),
                 'grademax' => $gradecategory->grademax,
                 'isscale' => $gradecategory->isscale,
                 'schedule' => $gradecategory->schedule,
@@ -851,7 +851,7 @@ class aggregation {
         } else if ($atype == \local_gugrades\GRADETYPE_POINTS) {
             return get_string('points', 'local_gugrades');
         } else if ($atype == \local_gugrades\GRADETYPE_ERROR) {
-            return get_string('error', 'local_gugrades');
+            return get_string('seewarnings', 'local_gugrades');
         } else {
             throw new \moodle_exception('Unrecognised $atype - ' . $atype);
         }

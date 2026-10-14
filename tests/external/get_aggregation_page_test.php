@@ -93,6 +93,27 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
     }
 
     /**
+     * Invalid aggregation types direct users to the warnings without changing valid type labels.
+     */
+    public function test_aggregation_type_warning_label(): void {
+        $this->assertSame('See warning(s)', \local_gugrades\aggregation::translate_atype(\local_gugrades\GRADETYPE_ERROR));
+        $this->assertSame('GGS1', \local_gugrades\aggregation::translate_atype(\local_gugrades\GRADETYPE_SCHEDULEA));
+        $this->assertSame('GGS2', \local_gugrades\aggregation::translate_atype(\local_gugrades\GRADETYPE_SCHEDULEB));
+        $this->assertSame(
+            get_string('points', 'local_gugrades'),
+            \local_gugrades\aggregation::translate_atype(\local_gugrades\GRADETYPE_POINTS),
+        );
+
+        [$columns] = \local_gugrades\aggregation::get_columns($this->course->id, $this->gradecatsummative->parent, false);
+        $summative = array_values(array_filter(
+            $columns,
+            fn($column) => $column->categoryid == $this->gradecatsummative->id,
+        ));
+        $this->assertCount(1, $summative);
+        $this->assertSame('See warning(s)', $summative[0]->gradetype);
+    }
+
+    /**
      * Checking basic (good) get page
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute

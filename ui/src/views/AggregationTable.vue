@@ -475,7 +475,7 @@
         } else if (atype.value == 'C') {
             return mstringstore.getMstring('converted');
         } else if (atype.value == 'E') {
-            return 'Error';
+            return mstringstore.getMstring('seewarnings');
         } else {
             return '[[' + atype.value + ']]';
         }
