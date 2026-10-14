@@ -23,7 +23,7 @@
           class="flex gap-1.5 w-full transition-colors duration-150"
           :class="[
             bottomGradeLabels ? 'px-2 py-1 gap-1' : dense ? 'px-3 py-1.5' : 'px-6 py-2.5',
-            bottomGradeLabels && index === 0 && !header.column.columns.length ? 'h-9 items-center text-sm font-bold leading-tight' : 'items-stretch',
+            bottomGradeLabels && index === 0 && !header.column.columns.length && header.column.id !== 'back' ? 'h-9 items-center text-sm font-bold leading-tight' : 'items-stretch',
             header.column.columns.length ? 'justify-center' : '',
             bottomGradeLabels && header.column.parent ? 'justify-center whitespace-nowrap' : '',
             header.column.getCanSort() ? 'cursor-pointer hover:bg-white/10' : ''

@@ -267,6 +267,7 @@
                     return h(AggregationTableHeader, {
                         column: column,
                         headercontext: context,
+                        showweights: showweights.value,
                         onExpandclicked: () => expand_clicked(column.categoryid),
                     });
                 },

@@ -90,6 +90,10 @@ Grade concepts
   including each dual-grade pair; top headers span their grouped columns.
   Grade cells retain narrow padding and compact
   filters. Other shared-table layouts keep their usual sizing.
+  All assessment/category headers show their percentage when the displayed
+  category uses weighted mean, independently of category-only weight-editing
+  controls. The header Back button reserves the same title space and action row
+  as category headers, aligning it vertically with Expand.
   Aggregation cells anchor menus and grades to the left of their column.
   Administrative grades reserve the same minimum display space as normal
   grade badges, keeping ellipsis controls aligned even for longer messages.

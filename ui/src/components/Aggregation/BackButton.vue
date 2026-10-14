@@ -1,7 +1,12 @@
 <template>
-    <UButton @click="backclicked" class="cursor-pointer">
-        <ArrowBigLeft :size="18" /> Back
-    </UButton>
+    <div class="w-full">
+        <div class="mb-1 h-7" aria-hidden="true"></div>
+        <div class="mb-2 flex h-8 items-center justify-center">
+            <UButton @click="backclicked" class="cursor-pointer">
+                <ArrowBigLeft :size="18" /> Back
+            </UButton>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">

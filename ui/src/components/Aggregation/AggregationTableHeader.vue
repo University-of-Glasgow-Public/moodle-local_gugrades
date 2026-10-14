@@ -19,7 +19,7 @@
             </button>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-x-2 font-normal text-white/80">
-            <span v-if="!infocol && column.showweights">{{ column.weight }}%</span>
+            <span v-if="!infocol && showweights">{{ column.weight }}%</span>
             <span v-if="column.gradetype" :class="column.gradetype === mstrings.seewarnings ? 'rounded bg-brand-light-yellow px-1.5 py-0.5 font-medium text-university-blue' : ''">
                 {{ column.gradetype }} <span v-if="!column.isscale && column.gradetype !== mstrings.seewarnings">({{ column.grademax }})</span>
             </span>
@@ -43,6 +43,7 @@
     interface iProps {
         column: IColumn;
         headercontext: HeaderContext<any, any>;
+        showweights: boolean;
         infocol?: boolean;
         totaltype?: string;
     }
