@@ -88,6 +88,9 @@ Grade concepts
   A shared tint and outer borders visually join each first-sitting/award pair,
   without an internal divider. Grade cells retain narrow padding and compact
   filters. Other shared-table layouts keep their usual sizing.
+  Aggregation cells anchor menus and grades to the left of their column.
+  Administrative grades reserve the same minimum display space as normal
+  grade badges, keeping ellipsis controls aligned even for longer messages.
   Invalid aggregation types in category and total headers display "See warning(s)"
   with a subtle yellow highlight instead of "Error"; specific grade-cell error
   messages and aggregation behaviour are unchanged.

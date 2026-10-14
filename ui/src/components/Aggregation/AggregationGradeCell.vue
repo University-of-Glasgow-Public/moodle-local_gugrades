@@ -1,5 +1,5 @@
 <template>
-    <div class="inline-flex align-middle" :class="column.dualgrades ? 'gap-0.5 items-center' : 'gap-2'">
+    <div class="flex w-full items-center justify-start text-left" :class="column.dualgrades ? 'gap-0.5' : 'gap-2'">
 
         <!-- add/override grade -->
         <OverrideGrade
@@ -21,13 +21,13 @@
 
         <!-- strikethrough if data is dropped -->
         <!-- bold if admin -->
-        <UTooltip :class="itemclasses(gradeobject)" class="p-0.5" :text="itemtooltip(gradeobject)" :position="beforehalfway ? 'below' : 'above'">
+        <UTooltip :class="itemclasses(gradeobject)" class="min-w-11 p-0.5" :text="itemtooltip(gradeobject)" :position="beforehalfway ? 'below' : 'above'">
             <s v-if="gradeobject.dropped">
-                <b v-if="gradeobject.isadmin">{{ displaygrade }}</b>
+                <b v-if="gradeobject.isadmin" class="inline-flex h-6 min-w-10 items-center justify-center px-1">{{ displaygrade }}</b>
                 <GradeColor v-else :grade="displaygrade" :strikethrough="true"></GradeColor>
             </s>
             <span v-else>
-                <b v-if="gradeobject.isadmin">{{ displaygrade }}</b>
+                <b v-if="gradeobject.isadmin" class="inline-flex h-6 min-w-10 items-center justify-center px-1">{{ displaygrade }}</b>
                 <GradeColor v-else :grade="displaygrade"></GradeColor>
             </span>
         </UTooltip>

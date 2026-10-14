@@ -1,5 +1,5 @@
 <template>
-    <div class="inline-flex" :class="dualgrades ? 'gap-0.5 items-center' : 'gap-2'">
+    <div class="flex w-full items-center justify-start text-left" :class="dualgrades ? 'gap-0.5' : 'gap-2'">
 
         <!-- add/override for total grade -->
         <OverrideGrade
@@ -21,9 +21,9 @@
         ></OverrideGrade>
 
         <span v-if="firstsitting ? user.error1st : user.error">{{ firstsitting ? user.error1st : user.error }}</span>
-        <UTooltip v-else :class="firstsitting ? [] : itemclasses(props.user)" class="p-0.5" :text="firstsitting ? '' : itemtooltip(user)" :position="beforehalfway ? 'below' : 'above'">
-            <b v-if="firstsitting && user.isadmin1st">{{ user.displaygrade1st }}</b>
-            <GradeColor v-else :grade="firstsitting ? user.displaygrade1st : user.displaygrade"></GradeColor>
+        <UTooltip v-else :class="firstsitting ? [] : itemclasses(props.user)" class="min-w-11 p-0.5" :text="firstsitting ? '' : itemtooltip(user)" :position="beforehalfway ? 'below' : 'above'">
+            <b v-if="firstsitting && user.isadmin1st" class="inline-flex h-6 min-w-10 items-center justify-center px-1">{{ user.displaygrade1st }}</b>
+            <GradeColor v-else :grade="firstsitting ? user.displaygrade1st : user.displaygrade" :otherclasses="['min-w-10']"></GradeColor>
         </UTooltip>
         <span v-if="!firstsitting && user.alteredweight">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-light-yellow text-university-blue">
