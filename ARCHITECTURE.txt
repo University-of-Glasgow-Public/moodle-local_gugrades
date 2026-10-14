@@ -170,6 +170,45 @@ normal production caches and representative data, separately measuring a
 new request/page refresh, recalculation and single-user updates. Do not infer
 production elapsed time by subtracting inclusive traced costs from the baseline.
 
+Normal-cache local course profile (2026-10-14)
+--------------------------------------------
+An approved local course was profiled via CLI calling the same api::recalculate
+and api::get_aggregation_page functions outside PHPUnit. Existing administrator
+identity was used; category results/audit timestamps were recalculated, not
+assessment grades. This is NOT an HTTP/browser timing or a synthetic 800-user
+load test. There were 104 gradeable users, 1664 grade-history rows and a deeper
+category tree than the benchmark.
+Two untraced fresh-process runs gave:
+- Main top-level category: recalculation 4.71s / 4.36s; 25654 / 24886 reads,
+  8321 writes. Page load immediately afterwards 0.45s / 0.46s, about 2030 reads,
+  no writes, 284 KB JSON. Page loading shares warm request-local caches here.
+- Empty sibling category: recalculation 0.31s / 0.27s; page 0.30s.
+Process peak memory was 52-56.5 MiB. Persistent caches differed between runs.
+
+Function trace of main recalculation confirmed 3016 availability checks but
+only 29 activity user-list loads, consistent with production request caching.
+1664 category-result writes and 1664 regulation option lookups were recorded.
+The empty-options cache in from2026 regulation::get_options does not remember
+the ordinary-course outcome; category ancestry was checked 3328 times.
+The from2026 options cache now stores all outcomes (including empty arrays) by
+course ID, preventing repeated ancestry queries and cross-course option reuse.
+PHPUnit still bypasses cache reads so changing fixtures/configuration stays
+visible within a test. Original regulations and result writes are unchanged.
+After the fix, the same main-category recalculation took 4.15s with 16571 reads
+(down from 24886, about 33%) and the same 8321 writes. Empty sibling reads fell
+from 1373 to 853. The page still took about 0.48s. Timing is a single observation,
+not a controlled speedup estimate; targeted PHPUnit validation ran concurrently
+against its separate test database. A non-PHPUnit, read-only check across ten
+ordinary courses verified 1000 cached lookups issued zero additional DB reads.
+Focused regression tests cover empty/Engineering/Nursing cache entries, course
+isolation, Engineering precedence, changing PHPUnit fixtures and aggregation:
+32 tests / 208 assertions passed.
+Result persistence
+and first-request availability loading are also visible costs, but traced
+inclusive times overlap and have large profiler overhead. SQL argument contents
+were suppressed and raw traces removed after numeric summaries were saved.
+These local observations must not be extrapolated directly to 800 students.
+
 Important data
 --------------
 - local_gugrades_grade: grade history and current/provisional grade values.

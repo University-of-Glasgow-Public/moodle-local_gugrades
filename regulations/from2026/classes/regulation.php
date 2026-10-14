@@ -32,9 +32,9 @@ defined('MOODLE_INTERNAL') || die();
 class regulation implements \local_gugrades\IRegulation {
 
     /**
-     * Cached/static options array.
+     * Request-local options keyed by course ID, including empty results.
      */
-    private static ?array $options = null;
+    private static array $options = [];
 
     /**
      * Get short name
@@ -100,16 +100,15 @@ class regulation implements \local_gugrades\IRegulation {
     /**
      * Return array of additional options. For example, modifiers
      * for particular School.
-     * TODO: Need to cache this somehow!!
      * @param int $courseid
      * @return array
      */
     public function get_options(int $courseid) {
         global $DB;
 
-        // Options can't change while MyGrades is active.
-        if (!\local_gugrades\api::is_unit_test() && self::$options) {
-            return self::$options;
+        // MGU-1596: Empty options are also cached; never reuse another course's options.
+        if (!\local_gugrades\api::is_unit_test() && isset(self::$options[$courseid])) {
+            return self::$options[$courseid];
         }
 
         $options = [];
@@ -120,7 +119,7 @@ class regulation implements \local_gugrades\IRegulation {
         if (self::is_in_cat($course->category, $engineeringcat)) {
             $options[] = 'engineering';
 
-            self::$options = $options;
+            self::$options[$courseid] = $options;
             return $options;
         }
 
@@ -132,11 +131,12 @@ class regulation implements \local_gugrades\IRegulation {
             if (self::is_in_cat($course->category, (int)$cat)) {
                 $options[] = 'nursing';
 
-                self::$options = $options;
+                self::$options[$courseid] = $options;
                 return $options;
             }
         }
 
+        self::$options[$courseid] = $options;
         return $options;
     }
 
