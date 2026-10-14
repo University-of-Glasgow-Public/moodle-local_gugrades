@@ -76,6 +76,23 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
     }
 
     /**
+     * MGU-1596: Reassessment-required controls are exclusive to the original regulations.
+     */
+    public function test_reassessment_required_visibility(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+        foreach (['2025-01-01' => true, '2027-01-01' => false] as $date => $expected) {
+            $DB->set_field('course', 'startdate', strtotime($date), ['id' => $this->course->id]);
+            $page = get_aggregation_page::execute(
+                $this->course->id, $this->gradecatsummative->id, '', '', 0, true,
+            );
+            $page = external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+            $this->assertSame($expected, $page['showresitrequired']);
+        }
+    }
+
+    /**
      * Checking basic (good) get page
      *
      * @covers \local_gugrades\external\get_aggregation_page::execute

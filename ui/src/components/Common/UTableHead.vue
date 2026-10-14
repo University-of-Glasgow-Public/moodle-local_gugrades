@@ -22,9 +22,10 @@
       >
         <div
           v-if="bottomGradeLabels ? (index === 0 || !!header.column.parent) : !header.isPlaceholder"
-          class="flex items-center gap-1.5 w-full items-stretch transition-colors duration-150"
+          class="flex gap-1.5 w-full transition-colors duration-150"
           :class="[
             bottomGradeLabels ? 'px-2 py-1 gap-1' : dense ? 'px-3 py-1.5' : 'px-6 py-2.5',
+            bottomGradeLabels && index === 0 && !header.column.columns.length ? 'h-9 items-center text-sm font-bold leading-tight' : 'items-stretch',
             header.column.columns.length ? 'justify-center' : '',
             bottomGradeLabels && header.column.parent ? 'justify-center whitespace-nowrap' : '',
             header.column.getCanSort() ? 'cursor-pointer hover:bg-white/10' : ''

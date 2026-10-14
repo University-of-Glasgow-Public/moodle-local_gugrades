@@ -1,20 +1,22 @@
 <template>
     <div class="w-full max-w-44 text-[11px] leading-tight">
-        <div class="mb-2 flex items-center justify-between gap-1.5">
+        <div class="mb-1 flex h-7 items-center justify-between gap-1.5">
             <UTooltip :text="column.fullname" position="below" class="min-w-0 flex-1">
-                <button
-                    v-if="column.categoryid"
-                    type="button"
-                    class="inline-flex w-full min-w-0 items-center justify-between gap-1.5 rounded-md border border-slate-300 border-b-2 bg-white px-2 py-1.5 font-semibold text-university-blue shadow-md cursor-pointer hover:bg-slate-100 active:translate-y-px active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                    @click.stop="expand_clicked"
-                    :aria-label="mstringstore.getMstring('expand') + ': ' + column.fullname"
-                >
-                    <span class="min-w-0 truncate">{{ column.fullname }}</span>
-                    <ChevronRight :size="16" :stroke-width="2.5" class="shrink-0" aria-hidden="true" />
-                </button>
-                <span v-else class="block truncate">{{ column.fullname }}</span>
+                <span class="block truncate text-sm font-bold">{{ column.fullname }}</span>
             </UTooltip>
             <InfoButton v-if="column.gradeitemid" :itemid="column.gradeitemid" :text="column.fullname"></InfoButton>
+        </div>
+        <div class="mb-2 flex h-8 items-center justify-center">
+            <button
+                v-if="column.categoryid"
+                type="button"
+                class="inline-flex items-center justify-center gap-1.5 rounded-md border border-slate-300 border-b-2 bg-white px-3 py-1.5 text-xs font-semibold text-university-blue shadow-md cursor-pointer hover:bg-slate-100 active:translate-y-px active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                @click.stop="expand_clicked"
+                :aria-label="mstringstore.getMstring('expand') + ': ' + column.fullname"
+            >
+                {{ mstringstore.getMstring('expand') }}
+                <ChevronRight :size="16" :stroke-width="2.5" class="shrink-0" aria-hidden="true" />
+            </button>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-x-2 font-normal text-white/80">
             <span v-if="!infocol && column.showweights">{{ column.weight }}%</span>

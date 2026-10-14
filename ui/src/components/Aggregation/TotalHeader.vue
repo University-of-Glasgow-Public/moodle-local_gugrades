@@ -1,6 +1,6 @@
 <template>
     <div class="w-full max-w-44 text-[11px] leading-tight">
-        <div>{{ shortname }}</div>
+        <div class="mb-1 flex h-7 items-center justify-center text-sm font-bold">{{ shortname }}</div>
         <div class="font-normal text-white/80">{{ formattedatype }}</div>
         <div class="font-normal text-white/80" v-if="strategy"><i>{{ strategy }}</i></div>
         <div class="font-normal text-white/80" v-if="reassessment">{{ mstrings.reassessment }}</div>

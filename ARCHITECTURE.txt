@@ -88,8 +88,13 @@ Grade concepts
   A shared tint and outer borders visually join each first-sitting/award pair,
   without an internal divider. Grade cells retain narrow padding and compact
   filters. Other shared-table layouts keep their usual sizing.
-  Drillable category titles are high-contrast buttons with a chevron; the whole
-  title activates navigation, with keyboard support and a category-specific label.
+  The per-user Reassessment required column is shown only for original
+  regulations; the page API exposes showresitrequired and from2026 omits the
+  entire column and its controls. Existing stored flags remain unchanged.
+  Item/category titles are larger bold plain text. Drillable categories have a
+  separate high-contrast Expand button with a chevron and category-specific label.
+  A fixed-height action row immediately below every item title keeps navigation
+  consistently positioned and metadata aligned; leaf items have no Expand button.
   Title text is truncated visually on one line using the full name, not wrapped
   server-shortened text; the tooltip retains the full name. Space below the title
   row separates the button from grade metadata.

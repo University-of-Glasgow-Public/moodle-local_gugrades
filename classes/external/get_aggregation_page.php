@@ -108,6 +108,7 @@ class get_aggregation_page extends external_api {
             'excludeempty' => new external_value(PARAM_BOOL, 'True when exclude empty grades checked, effects NS interpretation.'),
             'staffuserid' => new external_value(PARAM_INT, 'UserID of person running MyGrades ($USER->id'),
             'completionused' => new external_value(PARAM_BOOL, 'Is the completion % in use?'),
+            'showresitrequired' => new external_value(PARAM_BOOL, 'Show the per-user reassessment-required column?'),
             'isreassessment' => new external_value(PARAM_BOOL, 'Is this category a reassessment?'),
             'dualgrades' => new external_value(PARAM_BOOL, 'Does this category aggregate first-sitting and award results?'),
             'debug' => new external_multiple_structure(

@@ -2272,6 +2272,8 @@ class api {
                 'debug' => [],
                 'staffuserid' => $USER->id,
                 'completionused' => false,
+                // MGU-1596: Per-user reassessment controls apply only to the older regulations.
+                'showresitrequired' => $regulation->shortname() !== 'from2026',
                 'isreassessment' => false,
                 'dualgrades' => false,
             ];
@@ -2366,6 +2368,8 @@ class api {
             'debug' => [],
             'staffuserid' => $USER->id,
             'completionused' => $regulation->is_completion_supported(),
+            // MGU-1596: Per-user reassessment controls apply only to the older regulations.
+            'showresitrequired' => $regulation->shortname() !== 'from2026',
             'isreassessment' => $isreassessment,
             'dualgrades' => \local_gugrades\aggregation::has_dual_grades($courseid, $gradecategoryid),
         ];

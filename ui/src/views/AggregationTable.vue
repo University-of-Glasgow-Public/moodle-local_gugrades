@@ -169,6 +169,7 @@
     const staffuserid = ref(0);
     const caneditgrades = ref(false);
     const completionused = ref(false);
+    const showresitrequired = ref(false);
     const filterstore = useFilter();
     const issetupcomplete = ref(false);
     const isreassessment = ref(false);
@@ -275,8 +276,9 @@
 
         if (toplevel.value) {
 
-            // Resit required
-            cols.push(columnHelper.accessor('resitrequired', {
+            // MGU-1596: Omit the entire reassessment-required column for from2026 regulations.
+            if (showresitrequired.value) {
+                cols.push(columnHelper.accessor('resitrequired', {
                 enableColumnFilter: false,
                 header: mstringstore.getMstring('resitrequired'),
                 cell: ({row}) => {
@@ -287,7 +289,8 @@
                         onUserupdated: () => user_update(user.id),
                     });
                 }
-            }));
+                }));
+            }
 
             // Completion.
             if (completionused.value) {
@@ -570,6 +573,7 @@
             excludeempty.value = result.excludeempty;
             staffuserid.value = result.staffuserid;
             completionused.value = result.completionused;
+            showresitrequired.value = result.showresitrequired;
             isreassessment.value = result.isreassessment;
             dualgrades.value = result.dualgrades;
 
