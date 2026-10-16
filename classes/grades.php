@@ -886,6 +886,7 @@ class grades {
      * @param bool $overwrite
      * @param bool $catoverride
      * @param bool $notavailable (only applicable to categories)
+     * @param bool $capped MGU-1596: Course total award capped because of a resit.
      */
     public static function write_grade(
         int $courseid,
@@ -905,6 +906,7 @@ class grades {
         bool $overwrite = false,
         bool $catoverride = false,
         bool $notavailable = false,
+        bool $capped = false,
     ) {
         global $DB, $USER;
 
@@ -997,6 +999,7 @@ class grades {
                 $gugrade->auditcomment = $auditcomment;
                 $gugrade->points = $ispoints;
                 $gugrade->catoverride = $catoverride;
+                $gugrade->capped = $capped;
 
                 $DB->update_record('local_gugrades_grade', $gugrade);
                 self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
@@ -1025,6 +1028,7 @@ class grades {
         $gugrade->auditcomment = $auditcomment;
         $gugrade->points = $ispoints;
         $gugrade->catoverride = $catoverride;
+        $gugrade->capped = $capped;
         $gugrade->id = $DB->insert_record('local_gugrades_grade', $gugrade);
         self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
     }

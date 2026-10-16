@@ -75,6 +75,9 @@
         if (item.overridden) {
             return mstringstore.getMstring('tooltipoverridden');
         }
+        if (item.capped) {
+            return mstringstore.getMstring('resitcapped');
+        }
         if (item.hidden) {
             return mstringstore.getMstring('tooltiphidden');
         }
@@ -87,6 +90,10 @@
     function itemclasses(item: Record<string, any>) {
         if (item.overridden) {
             return ['border-2', 'border-solid', 'border-red-600', 'rounded-lg'];
+        }
+        // MGU-1596: Award capped because of a resit.
+        if (item.capped) {
+            return ['border-2', 'border-solid', 'border-orange-500', 'rounded-lg'];
         }
         if (item.hidden) {
             return ['border-2', 'border-solid', 'border-brand-light-yellow', 'rounded-lg'];

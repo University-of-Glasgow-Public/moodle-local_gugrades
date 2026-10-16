@@ -77,6 +77,18 @@ class aggregate {
     private ?object $selection = null;
 
     /**
+     * MGU-1596: Resit found in this category or below (award calculation only).
+     * @var bool $resittaken
+     */
+    private bool $resittaken = false;
+
+    /**
+     * MGU-1596: Course total award was capped because of a resit.
+     * @var bool $capped
+     */
+    private bool $capped = false;
+
+    /**
      * Record the deciding item once; later checks in the same calculation do not replace it.
      * @param object $item
      * @param string $reason
@@ -95,6 +107,78 @@ class aggregate {
      */
     public function get_selection(): ?object {
         return $this->selection;
+    }
+
+    /**
+     * MGU-1596: Was a resit taken in this category or any category below it?
+     * A resit is more than one substantive grade (including NS) in a reassessment category.
+     * @param object $category
+     * @param array $items
+     * @param int $userid
+     * @return bool
+     */
+    public function resit_taken(object $category, array $items, int $userid): bool {
+        foreach ($items as $item) {
+            if ($item->iscategory && !empty($item->resittaken)) {
+                return true;
+            }
+        }
+        if (!$this->is_reassessment($category->categoryid)) {
+            return false;
+        }
+        $substantive = array_filter($this->availability($items, $userid), function($item) {
+            return !$item->grademissing && (empty($item->admingrade) || ($item->admingrade == 'NOSUBMISSION'));
+        });
+
+        return count($substantive) > 1;
+    }
+
+    /**
+     * Was a resit found by the last calculation?
+     * @return bool
+     */
+    public function get_resittaken(): bool {
+        return $this->resittaken;
+    }
+
+    /**
+     * Was the last calculated award capped?
+     * @return bool
+     */
+    public function get_capped(): bool {
+        return $this->capped;
+    }
+
+    /**
+     * MGU-1596: Cap the course total award where a resit was taken (UG at D3, PG at C3).
+     * Students with unknown status are treated as UG.
+     * @param int $userid
+     * @param float $grade
+     * @return array [grade, explain]
+     */
+    protected function resit_cap(int $userid, float $grade): array {
+
+        // Below the lowest cap there's nothing to do (and no need to look up the student).
+        if ($grade <= \local_gugrades\RESITCAP_UG) {
+            return [$grade, get_string('explain_resitnotcapped', 'local_gugrades')];
+        }
+        $ugpg = \local_gugrades\users::get_ugpg($userid);
+        $ispg = str_starts_with($ugpg, 'Postgraduate');
+        $cap = $ispg ? \local_gugrades\RESITCAP_PG : \local_gugrades\RESITCAP_UG;
+        if ($grade <= $cap) {
+            return [$grade, get_string('explain_resitnotcapped', 'local_gugrades')];
+        }
+        $this->capped = true;
+        $a = (object)[
+            'grade' => $ispg ? 'C3' : 'D3',
+            'status' => $ispg ? get_string('postgraduate', 'local_gugrades') : get_string('undergraduate', 'local_gugrades'),
+        ];
+        $explain = get_string('explain_resitcapped', 'local_gugrades', $a);
+        if ($ugpg == 'Unknown') {
+            $explain .= ' ' . get_string('explain_resitcapunknown', 'local_gugrades');
+        }
+
+        return [(float)$cap, $explain];
     }
 
     /**
@@ -180,6 +264,8 @@ class aggregate {
         // Initialise 'explain' string.
         $explain = '';
         $this->selection = null;
+        $this->capped = false;
+        $this->resittaken = !$firstsitting && $this->resit_taken($category, $items, $userid);
 
         // Logic will be different if this category is for resits.
         $isresitcategory = $this->is_reassessment($category->categoryid);
@@ -392,6 +478,12 @@ class aggregate {
             $isengineeringcap = $oldaggregatedgrade <> $aggregatedgrade;
         }
 
+        // MGU-1596: The course total award is capped if a resit was taken.
+        $resitcapexplain = '';
+        if (($level == 1) && $this->resittaken && ($atype == \local_gugrades\GRADETYPE_SCHEDULEA)) {
+            [$aggregatedgrade, $resitcapexplain] = $this->resit_cap($userid, $aggregatedgrade);
+        }
+
         // If this is a scale convert the numeric grade to the appropriate.
         if (($atype == \local_gugrades\GRADETYPE_SCHEDULEA) || ($atype == \local_gugrades\GRADETYPE_SCHEDULEB)) {
             [$convertedgrade, $convertedgradevalue] = $this->convert($aggregatedgrade, $atype);
@@ -419,6 +511,9 @@ class aggregate {
             // TODO - can probably improve on this.
             if ($isengineeringcap) {
                 $explain .= " (Capped by Engineering rules)";
+            }
+            if ($resitcapexplain) {
+                $explain .= '. ' . $resitcapexplain;
             }
 
             return [$parentgrade, $aggregatedgrade, '', $displaygrade, 0, '', $explain, false];

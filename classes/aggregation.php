@@ -597,6 +597,7 @@ class aggregation {
         $user->completed = $aggregation->completion($items, $weighted);
         $user->error = '';
         $user->overridden = $item->catoverride;
+        $user->capped = !empty($item->capped);
         $user->itemname = $gcat->fullname;
 
         // Mismatch (can possibly do better).
@@ -1171,6 +1172,7 @@ class aggregation {
             ispoints:       !$category->isscale,
             overwrite:      true,
             notavailable:   $category->notavailable,
+            capped:         !empty($category->capped),
         );
     }
 
@@ -1391,6 +1393,7 @@ class aggregation {
                     'error' => $error,
                     'notavailable' => $notavailable,
                     'nursingcondmet' => $agg ? $agg->nursingcondmet : false,
+                    'resittaken' => $agg ? $agg->resittaken : false,
                 ];
             } else {
                 // Is there a grade (in MyGrades) for this user?
@@ -1534,16 +1537,26 @@ class aggregation {
 
         // An override belongs only to the ordinary result, never to CATEGORY1.
         $override = false;
+        $resittaken = false;
         if (!$firstsitting && ($override = self::get_overridden_category($category->itemid, $userid))) {
             [$total, $rawgrade, $admingrade, $display, $completion, $error, $notavailable] = $override;
             $explain = '';
             $nursingcondmet = false;
+
+            // MGU-1596: An override does not undo a resit, which still caps the course total.
+            if (method_exists($aggregation, 'resit_taken')) {
+                $resittaken = $aggregation->resit_taken($category, $items, $userid);
+            }
         } else {
             [$total, $rawgrade, $admingrade, $display, $completion, $error, $explain, $notavailable] =
                 $aggregation->aggregate_user_category(
                     $courseid, $category, $items, $level, $userid, $nursingcondmet, $firstsitting,
                 );
+            if (method_exists($aggregation, 'get_resittaken')) {
+                $resittaken = $aggregation->get_resittaken();
+            }
         }
+        $capped = !$override && method_exists($aggregation, 'get_capped') && $aggregation->get_capped();
 
         // If this is a points grade, level 2 or deeper, a grade is returned and a map exists then
         // we need to deal with this as a converted grade.
@@ -1578,6 +1591,7 @@ class aggregation {
             'error' => $error,
             'explain' => $explain,
             'notavailable' => $notavailable,
+            'capped' => $capped,
         ];
         self::write_aggregated_category($courseid, $userid, $aggregatedcategory, $firstsitting ? 'CATEGORY1' : 'CATEGORY');
 
@@ -1592,6 +1606,8 @@ class aggregation {
             'explain' => $explain,
             'notavailable' => $notavailable,
             'selection' => (!$override && method_exists($aggregation, 'get_selection')) ? $aggregation->get_selection() : null,
+            'resittaken' => $resittaken,
+            'capped' => $capped,
         ];
     }
 

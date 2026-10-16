@@ -519,5 +519,18 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091700, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026101600) {
+
+        // MGU-1596: Flag course total awards capped because of a resit.
+        $table = new xmldb_table('local_gugrades_grade');
+        $field = new xmldb_field('capped', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'normalisedweight');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101600, 'local', 'gugrades');
+    }
+
     return true;
 }

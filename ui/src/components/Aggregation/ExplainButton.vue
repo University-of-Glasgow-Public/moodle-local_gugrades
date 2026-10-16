@@ -59,7 +59,10 @@
             <div class="flex gap-4 border-b border-brand-light-purple/30 pb-3 text-slate-600">
                 <div class="flex-1 text-left">
                     <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.aggregatedgrade }}</div>
-                    <div class="text-university-blue font-semibold"><GradeColor :grade="user!.displaygrade"/></div>
+                    <div class="text-university-blue font-semibold">
+                        <span v-if="user!.capped" class="inline-block border-2 border-solid border-orange-500 rounded-lg p-0.5" :title="mstrings.resitcapped"><GradeColor :grade="user!.displaygrade"/></span>
+                        <GradeColor v-else :grade="user!.displaygrade"/>
+                    </div>
                 </div>
                 <div v-if="user && user.displaygrade1st" class="flex-1 pl-4 border-l border-brand-light-purple/30">
                     <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.firstsittinggrade }}</div>

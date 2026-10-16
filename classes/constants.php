@@ -33,3 +33,9 @@ define('local_gugrades\GRADETYPE_SCHEDULEB', 'B');
 define('local_gugrades\GRADETYPE_POINTS', 'P');
 define('local_gugrades\GRADETYPE_ERROR', 'E');
 define('local_gugrades\GRADETYPE_CONVERTED', 'C');
+
+/**
+ * MGU-1596: Maximum course total (22 point scale) after a resit. UG is D3, PG is C3.
+ */
+define('local_gugrades\RESITCAP_UG', 9);
+define('local_gugrades\RESITCAP_PG', 12);

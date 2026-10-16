@@ -271,6 +271,7 @@ export interface IUser {
     error1st?: string;
     firstsittingexplain?: string;
     awardexplain?: string;
+    capped?: boolean;
     releasedgrade: string;
     mismatch: boolean;
     rawgrade: number;

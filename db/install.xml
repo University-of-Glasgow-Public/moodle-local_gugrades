@@ -67,6 +67,7 @@
         <FIELD NAME="dropped" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Dropped in aggregation"/>
         <FIELD NAME="catoverride" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates an overridden category."/>
         <FIELD NAME="normalisedweight" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="The weight used in the final calculation"/>
+        <FIELD NAME="capped" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course total award capped because of a resit"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

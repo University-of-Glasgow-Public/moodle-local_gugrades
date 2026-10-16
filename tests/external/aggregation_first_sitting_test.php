@@ -193,7 +193,8 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(16, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
         $this->assertEquals(10, $this->result('Dual middle', 'CATEGORY')->convertedgrade);
         $this->assertEquals(16, $this->result('Dual middle', 'CATEGORY1')->convertedgrade);
-        $this->assertEquals(12, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        // MGU-1596: The child override does not undo the resit, so the course total award is capped (UG, D3).
+        $this->assertEquals(9, $this->result('Dual total', 'CATEGORY')->convertedgrade);
         $this->assertEquals(15, $this->result('Dual total', 'CATEGORY1')->convertedgrade);
         $this->set_reassessment(false);
         $this->aggregate();
@@ -345,7 +346,8 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         );
         $this->write_result($itemid, 12, 'CATEGORY', true);
         $this->aggregate();
-        $this->assertEquals('C2 (13)', $this->result('Dual total', 'CATEGORY')->displaygrade);
+        // MGU-1596: Resit taken, so the course total award is capped (UG, D3). No X as the override hides the condition.
+        $this->assertEquals('D3 (9)', $this->result('Dual total', 'CATEGORY')->displaygrade);
         $this->assertEquals('XD3 (9)', $this->result('Dual total', 'CATEGORY1')->displaygrade);
     }
 
@@ -451,7 +453,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(12, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
         $this->assertEquals(18, $this->result('Dual reassessment', 'CATEGORY')->convertedgrade);
         $this->assertEquals(13, $this->result('Dual total', 'CATEGORY1')->convertedgrade);
-        $this->assertEquals(16, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        // MGU-1596: Two substantive grades is the first resit (the EC did not count), so the award is capped.
+        $this->assertEquals(9, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        $this->assertTrue((bool)$this->result('Dual total', 'CATEGORY')->capped);
     }
 
     /**
@@ -505,11 +509,13 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * Enabling reassessment repairs results without looking up external programme data.
+     * Enabling reassessment repairs results without looking up external programme data
+     * (when no resit has been taken, so no cap needs the UG/PG status).
      */
     public function test_page_repairs_first_sitting_without_programme_lookup(): void {
         global $DB;
 
+        $this->remove_resit();
         set_config('dbtype', '', 'enrol_gudatabase');
         $cache = \cache::make('local_gugrades', 'ugpg');
         $cache->delete($this->student->id);
@@ -533,7 +539,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         foreach (['Dual total' => 15, 'Dual middle' => 16, 'Dual reassessment' => 16] as $name => $expected) {
             $this->assertEquals($expected, $this->result($name, 'CATEGORY1')->rawgrade);
         }
-        $this->assertEquals(16, $this->result('Dual total', 'CATEGORY')->rawgrade);
+        $this->assertEquals(15, $this->result('Dual total', 'CATEGORY')->rawgrade);
         $this->assertFalse($cache->get($this->student->id));
     }
 
@@ -568,6 +574,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     public function test_bulk_aggregation_reloads_altered_weights(): void {
         global $DB;
 
+        $this->remove_resit();
         $this->set_reassessment(true);
         $totalid = $this->categories['Dual total']->id;
         $aggregate = fn() => \local_gugrades\aggregation::aggregate($this->course->id, $totalid, [$this->student->id]);
@@ -584,7 +591,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $DB->delete_records('local_gugrades_altered_weight', ['id' => $weightid]);
         $aggregate();
         $this->assertEquals(15, $this->result('Dual total', 'CATEGORY1')->rawgrade);
-        $this->assertEquals(16, $this->result('Dual total', 'CATEGORY')->rawgrade);
+        $this->assertEquals(15, $this->result('Dual total', 'CATEGORY')->rawgrade);
     }
 
     /**
@@ -669,9 +676,131 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * Calculation and explanation do not need programme/profile display data.
+     * Remove the second attempt so the student has not taken a resit.
+     */
+    private function remove_resit(): void {
+        global $DB;
+        $DB->delete_records('local_gugrades_grade', ['gradeitemid' => $this->get_gradeitemid('Attempt two')]);
+    }
+
+    /**
+     * Set the student's UG/PG status (as cached from the programme data).
+     * @param string $ugpg
+     */
+    private function set_ugpg(string $ugpg): void {
+        set_config('dbtype', '', 'enrol_gudatabase');
+        \cache::make('local_gugrades', 'ugpg')->set($this->student->id, $ugpg);
+    }
+
+    /**
+     * MGU-1596: A resit caps only the course total award; unknown status is treated (and explained) as UG.
+     */
+    public function test_resit_caps_course_total_unknown_as_ug(): void {
+        set_config('dbtype', '', 'enrol_gudatabase');
+        $cache = \cache::make('local_gugrades', 'ugpg');
+        $cache->delete($this->student->id);
+        $this->set_reassessment(true);
+        $this->aggregate();
+
+        $award = $this->result('Dual total', 'CATEGORY');
+        $this->assertEquals(9, $award->convertedgrade);
+        $this->assertEquals('D3 (9)', $award->displaygrade);
+        $this->assertTrue((bool)$award->capped);
+        $this->assertEquals('Unknown', $cache->get($this->student->id));
+        $first = $this->result('Dual total', 'CATEGORY1');
+        $this->assertEquals(15, $first->convertedgrade);
+        $this->assertFalse((bool)$first->capped);
+        foreach (['Dual middle', 'Dual reassessment'] as $name) {
+            $this->assertEquals(18, $this->result($name, 'CATEGORY')->convertedgrade);
+            $this->assertFalse((bool)$this->result($name, 'CATEGORY')->capped);
+        }
+
+        $explain = get_explain_aggregation::execute($this->course->id, $this->categories['Dual total']->id, $this->student->id);
+        $explain = \core_external\external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
+        $this->assertTrue($explain['capped']);
+        $this->assertStringContainsString(get_string('explain_resitcapped', 'local_gugrades', (object)[
+            'grade' => 'D3', 'status' => get_string('undergraduate', 'local_gugrades'),
+        ]), $explain['explain']);
+        $this->assertStringContainsString(get_string('explain_resitcapunknown', 'local_gugrades'), $explain['explain']);
+
+        $page = get_aggregation_page::execute($this->course->id, $this->categories['Dual total']->id, '', '', 0, false);
+        $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+        $user = array_values(array_filter($page['users'], fn($user) => $user['id'] == $this->student->id))[0];
+        $this->assertTrue($user['capped']);
+    }
+
+    /**
+     * MGU-1596: PG is capped at C3, and grades at or below the cap are left alone.
+     */
+    public function test_resit_cap_postgraduate_and_undergraduate(): void {
+        $this->set_ugpg('Postgraduate Taught');
+        $this->set_reassessment(true);
+        $this->aggregate();
+        $award = $this->result('Dual total', 'CATEGORY');
+        $this->assertEquals('C3 (12)', $award->displaygrade);
+        $this->assertTrue((bool)$award->capped);
+        $explain = \local_gugrades\aggregation::get_explain(
+            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+        );
+        $this->assertStringNotContainsString(get_string('explain_resitcapunknown', 'local_gugrades'), $explain);
+
+        // Resit leaves a total of exactly C3 (12): not capped for PG, but capped at D3 for UG.
+        $this->write_result($this->get_gradeitemid('Attempt one'), 8);
+        $this->write_result($this->get_gradeitemid('Attempt two'), 10);
+        $this->aggregate();
+        $award = $this->result('Dual total', 'CATEGORY');
+        $this->assertEquals(12, $award->convertedgrade);
+        $this->assertFalse((bool)$award->capped);
+        $explain = \local_gugrades\aggregation::get_explain(
+            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+        );
+        $this->assertStringContainsString(get_string('explain_resitnotcapped', 'local_gugrades'), $explain);
+        $this->set_ugpg('Undergraduate');
+        $this->aggregate();
+        $this->assertEquals(9, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        $this->assertTrue((bool)$this->result('Dual total', 'CATEGORY')->capped);
+    }
+
+    /**
+     * MGU-1596: No resit (one substantive grade, or not a reassessment category) means no cap.
+     */
+    public function test_no_resit_no_cap(): void {
+        $this->set_ugpg('Undergraduate');
+        $this->aggregate();
+        $this->assertEquals(16, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        $this->assertFalse((bool)$this->result('Dual total', 'CATEGORY')->capped);
+
+        $this->remove_resit();
+        $this->set_reassessment(true);
+        $this->aggregate();
+        $this->assertEquals(15, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        $this->assertFalse((bool)$this->result('Dual total', 'CATEGORY')->capped);
+        $explain = \local_gugrades\aggregation::get_explain(
+            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+        );
+        $this->assertStringNotContainsString(get_string('explain_resitnotcapped', 'local_gugrades'), $explain);
+    }
+
+    /**
+     * MGU-1596: NS is a substantive grade, so a first sitting plus NS is a resit.
+     */
+    public function test_ns_counts_as_resit(): void {
+        $this->set_ugpg('Undergraduate');
+        write_additional_grade::execute(
+            courseid: $this->course->id, gradeitemid: $this->get_gradeitemid('Attempt two'), userid: $this->student->id,
+            reason: 'SECOND', other: '', admingrade: 'NOSUBMISSION', scale: 0, grade: 0, notes: '',
+        );
+        $this->set_reassessment(true);
+        $this->aggregate();
+        $this->assertEquals(9, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        $this->assertTrue((bool)$this->result('Dual total', 'CATEGORY')->capped);
+    }
+
+    /**
+     * Calculation and explanation do not need programme/profile display data (without a resit).
      */
     public function test_calculation_and_explanation_without_programme_lookup(): void {
+        $this->remove_resit();
         set_config('dbtype', '', 'enrol_gudatabase');
         $cache = \cache::make('local_gugrades', 'ugpg');
         $cache->delete($this->student->id);
@@ -815,7 +944,11 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         ]);
         $this->aggregate();
         $this->assertEquals(10.5, $this->result('Dual total', 'CATEGORY1')->rawgrade);
-        $this->assertEquals(13, $this->result('Dual total', 'CATEGORY')->rawgrade);
+        $this->categories['Other reassessment'] = $other;
+        $this->assertEquals(10, $this->result('Other reassessment', 'CATEGORY')->rawgrade);
+        $this->assertEquals(18, $this->result('Dual middle', 'CATEGORY')->rawgrade);
+        // MGU-1596: Uncapped this would be 13, but resits were taken (UG, D3).
+        $this->assertEquals(9, $this->result('Dual total', 'CATEGORY')->rawgrade);
     }
 
     /**
