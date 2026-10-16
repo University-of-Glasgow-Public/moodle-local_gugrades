@@ -91,6 +91,7 @@ $string['checkall'] = 'Check all';
 $string['checknone'] = 'Check none';
 $string['childerror'] = 'One or more sub-categories could not be aggregated preventing further aggregation.';
 $string['cleanuptask'] = 'Cleanup task(s) for MyGrades';
+$string['gradesbackuptask'] = 'Copy current MyGrades values to the backup table';
 $string['close'] = 'Close';
 $string['comment'] = 'Comment';
 $string['completed'] = 'Completed';

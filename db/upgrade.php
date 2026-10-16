@@ -551,7 +551,9 @@ function xmldb_local_gugrades_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        \local_gugrades\grades::rebuild_grade_backups();
+        // Copying existing grades here locks large sites for the whole upgrade.
+        // Cron copies them in batches instead.
+        \local_gugrades\grades::queue_grade_backup_backfill();
 
         // Gugrades savepoint reached.
         upgrade_plugin_savepoint(true, 2026101300, 'local', 'gugrades');
@@ -586,11 +588,23 @@ function xmldb_local_gugrades_upgrade($oldversion) {
             }
         }
 
-        // Drop status-message rows such as "No grade" and "Cannot aggregate".
-        \local_gugrades\grades::rebuild_grade_backups();
-
         // Gugrades savepoint reached.
         upgrade_plugin_savepoint(true, 2026101301, 'local', 'gugrades');
+    }
+
+    if ($oldversion < 2026101302) {
+        $status = get_config('local_gugrades', 'gradesbackup_backfill');
+        if ($status !== 'running') {
+            if ($DB->record_exists('local_gugrades_gradesbackup', [])) {
+                // The earlier upgrade already copied the grades.
+                set_config('gradesbackup_backfill', 'done', 'local_gugrades');
+            } else {
+                \local_gugrades\grades::queue_grade_backup_backfill();
+            }
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101302, 'local', 'gugrades');
     }
 
     return true;

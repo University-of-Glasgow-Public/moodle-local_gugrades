@@ -53,6 +53,8 @@ and aggregated grade category items.
 
 A second copy of the current grade, holding the actual values only. MyGrades writes a row here whenever it saves a current grade. There is one row for each grade item, user and column. History, audit comments and aggregation weights stay in local_gugrades_grade.
 
+After upgrade, existing current grades are copied by the `gradesbackup` background task. Each run copies 500 grades, then waits 10 seconds before the next batch. The upgrade itself only creates the table.
+
 Rows whose displayed grade is a status message are left out. That includes No grade, Grades missing, Cannot aggregate, Not available, No data, and the child-category aggregation error. Administrative grades such as NS are kept.
 
 The row is kept when grades are reset or removed from local_gugrades_grade, so the last values are still available if that table is damaged. It is removed when the course is deleted, and when personal data is deleted. `grades::restore_missing_grade_backups($courseid)` writes back any current grades that are missing.

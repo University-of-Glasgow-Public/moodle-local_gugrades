@@ -1132,8 +1132,61 @@ class grades {
     }
 
     /**
+     * Queue a background copy of existing current grades into the backup table.
+     * Each cron run copies one batch, then schedules the next batch.
+     */
+    public static function queue_grade_backup_backfill(): void {
+        $status = get_config('local_gugrades', 'gradesbackup_backfill');
+        if ($status === 'done') {
+            return;
+        }
+        if (get_config('local_gugrades', 'gradesbackup_backfill_id') === false) {
+            set_config('gradesbackup_backfill_id', 0, 'local_gugrades');
+        }
+        set_config('gradesbackup_backfill', 'running', 'local_gugrades');
+
+        $task = new \local_gugrades\task\gradesbackup();
+        \core\task\manager::queue_adhoc_task($task, true);
+    }
+
+    /**
+     * Copy the next batch of current grades into the backup table.
+     *
+     * @param int $batchsize Maximum number of current grades to read
+     * @return bool True when further grades remain
+     */
+    public static function backfill_grade_backups(int $batchsize): bool {
+        global $DB;
+
+        $lastid = (int) get_config('local_gugrades', 'gradesbackup_backfill_id');
+        $grades = $DB->get_records_select(
+            'local_gugrades_grade',
+            'iscurrent = 1 AND id > :lastid',
+            ['lastid' => $lastid],
+            'id ASC',
+            '*',
+            0,
+            $batchsize
+        );
+        if (!$grades) {
+            set_config('gradesbackup_backfill', 'done', 'local_gugrades');
+            return false;
+        }
+
+        $maxid = $lastid;
+        foreach ($grades as $grade) {
+            self::save_grade_backup($grade);
+            $maxid = max($maxid, (int) $grade->id);
+        }
+        set_config('gradesbackup_backfill_id', $maxid, 'local_gugrades');
+        set_config('gradesbackup_backfill', 'running', 'local_gugrades');
+
+        return true;
+    }
+
+    /**
      * Copy current grades into the backup table.
-     * Used when the table is first created, and after a course restore.
+     * Used after a course restore. Site-wide upgrades use the background backfill.
      *
      * @param int|null $courseid Restrict to one course, or all courses when null
      */

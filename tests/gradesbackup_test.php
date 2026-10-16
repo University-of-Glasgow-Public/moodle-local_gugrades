@@ -283,4 +283,56 @@ final class gradesbackup_test extends \advanced_testcase {
         ], '*', MUST_EXIST);
         $this->assertEquals(0.0, (float) $zero->rawgrade);
     }
+
+    /**
+     * Existing grades are copied a batch at a time, and status messages are skipped.
+     *
+     * @covers \local_gugrades\grades::backfill_grade_backups
+     * @covers \local_gugrades\task\gradesbackup
+     */
+    public function test_backfill_copies_existing_grades_in_batches(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '11', 11);
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'SECOND', '22', 22);
+        grades::write_grade(
+            courseid: $course->id,
+            gradeitemid: $gradeitem->id,
+            userid: $student->id,
+            admingrade: '',
+            rawgrade: null,
+            convertedgrade: null,
+            displaygrade: get_string('gradesmissing', 'local_gugrades'),
+            weightedgrade: 0,
+            gradetype: 'THIRD',
+            other: '',
+            iscurrent: true,
+            iserror: true,
+            auditcomment: '',
+            ispoints: true,
+        );
+        $DB->delete_records('local_gugrades_gradesbackup');
+        unset_config('gradesbackup_backfill', 'local_gugrades');
+        unset_config('gradesbackup_backfill_id', 'local_gugrades');
+
+        $this->assertTrue(grades::backfill_grade_backups(1));
+        $this->assertSame(1, $DB->count_records('local_gugrades_gradesbackup'));
+        $this->assertSame('running', get_config('local_gugrades', 'gradesbackup_backfill'));
+
+        $this->assertTrue(grades::backfill_grade_backups(1));
+        $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup'));
+
+        // The status-message grade is read and skipped.
+        $this->assertTrue(grades::backfill_grade_backups(1));
+        $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup'));
+
+        $this->assertFalse(grades::backfill_grade_backups(1));
+        $this->assertSame('done', get_config('local_gugrades', 'gradesbackup_backfill'));
+
+        grades::queue_grade_backup_backfill();
+        $this->assertSame('done', get_config('local_gugrades', 'gradesbackup_backfill'));
+        $tasks = $DB->get_records('task_adhoc', ['classname' => '\local_gugrades\task\gradesbackup']);
+        $this->assertCount(0, $tasks);
+    }
 }
