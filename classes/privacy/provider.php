@@ -88,6 +88,7 @@ class provider implements
                 'admingrade' => 'privacy:metadata:admingrade',
                 'displaygrade' => 'privacy:metadata:displaygrade',
                 'gradetype' => 'privacy:metadata:gradetype',
+                'capped' => 'privacy:metadata:capped',
             ],
             'privacy:metadata:local_gugrades_gradesbackup'
         );

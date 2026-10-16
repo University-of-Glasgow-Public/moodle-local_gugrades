@@ -98,6 +98,7 @@
         <FIELD NAME="iserror" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="notavailable" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="catoverride" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="capped" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course total award capped because of a resit"/>
         <FIELD NAME="gradeid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="local_gugrades_grade.id this value was copied from"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>

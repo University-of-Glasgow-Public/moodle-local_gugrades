@@ -48,12 +48,13 @@ and aggregated grade category items.
 * **dropped** - this grade has been dropped as part of the aggregation strategy
 * **catoverride** - if true, this is a category that has been overridden by the user
 * **normalisedweight** - the "normalised" weighting used for this item in aggregation.
+* **capped** - course total award was capped because a resit was taken.
 
 ## local_gugrades_gradesbackup
 
 A second copy of the current grade, holding the actual values only. MyGrades writes a row here whenever it saves a current grade. There is one row for each grade item, user and column. History, audit comments and aggregation weights stay in local_gugrades_grade.
 
-After upgrade, existing current grades are copied by the `gradesbackup` background task. Each run copies 500 grades, then waits 10 seconds before the next batch. The upgrade itself only creates the table.
+After upgrade, existing current grades are copied by the scheduled task **Copy current MyGrades values to the backup table**. Each run copies grades for about 25 seconds. Cron repeats it every five minutes, and Run now on the Scheduled tasks page runs one chunk immediately. The upgrade itself only creates the table.
 
 Rows whose displayed grade is a status message are left out. That includes No grade, Grades missing, Cannot aggregate, Not available, No data, and the child-category aggregation error. Administrative grades such as NS are kept.
 
@@ -73,6 +74,7 @@ The row is kept when grades are reset or removed from local_gugrades_grade, so t
 * **iserror** - category grade is in an error state
 * **notavailable** - category grade is not available
 * **catoverride** - category total was overridden
+* **capped** - course total award was capped because a resit was taken
 * **gradeid** - id of the local_gugrades_grade row this value was copied from
 * **timemodified** - when this copy was last written
 

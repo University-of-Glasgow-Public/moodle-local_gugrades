@@ -64,6 +64,7 @@ final class gradesbackup_test extends \advanced_testcase {
      * @param string $displaygrade
      * @param float|null $rawgrade
      * @param string $admingrade
+     * @param bool $capped
      */
     protected function write_grade(
         int $courseid,
@@ -73,6 +74,7 @@ final class gradesbackup_test extends \advanced_testcase {
         string $displaygrade,
         float|null $rawgrade,
         string $admingrade = '',
+        bool $capped = false,
     ): void {
         grades::write_grade(
             courseid: $courseid,
@@ -89,6 +91,7 @@ final class gradesbackup_test extends \advanced_testcase {
             iserror: false,
             auditcomment: 'Captured',
             ispoints: true,
+            capped: $capped,
         );
     }
 
@@ -139,6 +142,38 @@ final class gradesbackup_test extends \advanced_testcase {
         $this->assertSame('NOSUBMISSION', $second->admingrade);
         $this->assertSame('NS', $second->displaygrade);
         $this->assertNull($second->rawgrade);
+        $this->assertEquals(0, (int) $first->capped);
+    }
+
+    /**
+     * A capped course total is stored in the backup and written back on restore.
+     *
+     * @covers \local_gugrades\grades::save_grade_backup
+     * @covers \local_gugrades\grades::restore_missing_grade_backups
+     */
+    public function test_capped_flag_is_copied_and_restored(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '8', 8, '', true);
+
+        $backup = $DB->get_record('local_gugrades_gradesbackup', [
+            'gradeitemid' => $gradeitem->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(1, (int) $backup->capped);
+
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $course->id]);
+
+        $this->assertSame(1, grades::restore_missing_grade_backups($course->id));
+        $grade = $DB->get_record('local_gugrades_grade', [
+            'courseid' => $course->id,
+            'userid' => $student->id,
+            'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(1, (int) $grade->capped);
+        $this->assertEquals(8.0, (float) $grade->rawgrade);
     }
 
     /**
@@ -334,5 +369,37 @@ final class gradesbackup_test extends \advanced_testcase {
         $this->assertSame('done', get_config('local_gugrades', 'gradesbackup_backfill'));
         $tasks = $DB->get_records('task_adhoc', ['classname' => '\local_gugrades\task\gradesbackup']);
         $this->assertCount(0, $tasks);
+    }
+
+    /**
+     * The scheduled task copies grades that are not in the backup yet.
+     *
+     * @covers \local_gugrades\task\backupgrades
+     * @covers \local_gugrades\grades::run_grade_backup_batches
+     */
+    public function test_scheduled_task_copies_grades(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '7', 7);
+        $DB->delete_records('local_gugrades_gradesbackup');
+        unset_config('gradesbackup_backfill', 'local_gugrades');
+        unset_config('gradesbackup_backfill_id', 'local_gugrades');
+
+        $task = new \local_gugrades\task\backupgrades();
+        $this->expectOutputString("MyGrades grade backup is complete.\nMyGrades grade backup is already complete.\n");
+        $task->execute();
+
+        $backup = $DB->get_record('local_gugrades_gradesbackup', [
+            'gradeitemid' => $gradeitem->id,
+            'gradetype' => 'FIRST',
+        ], '*', MUST_EXIST);
+        $this->assertEquals(7.0, (float) $backup->rawgrade);
+        $this->assertSame('done', get_config('local_gugrades', 'gradesbackup_backfill'));
+
+        $task->execute();
+        $this->assertSame(1, $DB->count_records('local_gugrades_gradesbackup', [
+            'gradeitemid' => $gradeitem->id,
+        ]));
     }
 }

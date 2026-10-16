@@ -530,6 +530,8 @@ function xmldb_local_gugrades_upgrade($oldversion) {
 
         // Gugrades savepoint reached.
         upgrade_plugin_savepoint(true, 2026101600, 'local', 'gugrades');
+    }
+
     if ($oldversion < 2026101300) {
 
         // Separate copy of the current grade values. Grade history stays in local_gugrades_grade.
@@ -550,6 +552,7 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         $table->add_field('iserror', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('notavailable', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('catoverride', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('capped', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('gradeid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
 
@@ -618,5 +621,34 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026101302, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026101601) {
+        // The copy is now a scheduled task, so it can be run from Scheduled tasks.
+        // A copy that was never started should start. A finished copy stays finished.
+        if (get_config('local_gugrades', 'gradesbackup_backfill') !== 'done') {
+            \local_gugrades\grades::queue_grade_backup_backfill();
+        }
+
+        upgrade_plugin_savepoint(true, 2026101601, 'local', 'gugrades');
+    }
+
+    if ($oldversion < 2026101602) {
+        $table = new xmldb_table('local_gugrades_gradesbackup');
+        $field = new xmldb_field('capped', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'catoverride');
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Fill the flag from the grade it was copied from. New writes keep it up to date.
+        if ($dbman->table_exists($table) && $dbman->field_exists($table, $field)) {
+            $DB->execute("UPDATE {local_gugrades_gradesbackup}
+                             SET capped = 1
+                           WHERE gradeid IN (
+                                 SELECT id FROM {local_gugrades_grade} WHERE capped = 1
+                           )");
+        }
+
+        upgrade_plugin_savepoint(true, 2026101602, 'local', 'gugrades');
+    }
+
     return true;
-}}
+}

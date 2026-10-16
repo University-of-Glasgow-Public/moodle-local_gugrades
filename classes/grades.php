@@ -1123,6 +1123,7 @@ class grades {
             'iserror' => empty($grade->iserror) ? 0 : 1,
             'notavailable' => empty($grade->notavailable) ? 0 : 1,
             'catoverride' => empty($grade->catoverride) ? 0 : 1,
+            'capped' => empty($grade->capped) ? 0 : 1,
             'gradeid' => $grade->id,
             'timemodified' => time(),
         ];
@@ -1186,6 +1187,38 @@ class grades {
         set_config('gradesbackup_backfill', 'running', 'local_gugrades');
 
         return true;
+    }
+
+    /**
+     * Copy current grades until the time limit is reached or none remain.
+     * A finished copy is left unchanged.
+     *
+     * @param int $batchsize Maximum number of current grades to read in one query
+     * @param int $timelimit Seconds to keep copying before returning
+     */
+    public static function run_grade_backup_batches(int $batchsize, int $timelimit): void {
+        $status = get_config('local_gugrades', 'gradesbackup_backfill');
+        if ($status === 'done') {
+            mtrace('MyGrades grade backup is already complete.');
+            return;
+        }
+        if (get_config('local_gugrades', 'gradesbackup_backfill_id') === false) {
+            set_config('gradesbackup_backfill_id', 0, 'local_gugrades');
+        }
+        set_config('gradesbackup_backfill', 'running', 'local_gugrades');
+
+        $started = time();
+        $more = false;
+        do {
+            $more = self::backfill_grade_backups($batchsize);
+        } while ($more && (time() - $started) < $timelimit);
+
+        if (!$more) {
+            mtrace('MyGrades grade backup is complete.');
+            return;
+        }
+        $lastid = (int) get_config('local_gugrades', 'gradesbackup_backfill_id');
+        mtrace('MyGrades grade backup paused at grade id ' . $lastid . '.');
     }
 
     /**
@@ -1265,6 +1298,7 @@ class grades {
                 overwrite: false,
                 catoverride: (bool) $value->catoverride,
                 notavailable: (bool) $value->notavailable,
+                capped: !empty($value->capped),
             );
             $restored++;
 

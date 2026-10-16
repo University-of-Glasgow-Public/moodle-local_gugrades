@@ -31,9 +31,6 @@ class gradesbackup extends \core\task\adhoc_task {
     /** @var int Current grades read on each run. */
     public const BATCH_SIZE = 500;
 
-    /** @var int Seconds to wait before the next batch. */
-    public const BATCH_DELAY = 10;
-
     /**
      * Task name shown in the admin task list.
      *
@@ -44,19 +41,9 @@ class gradesbackup extends \core\task\adhoc_task {
     }
 
     /**
-     * Copy one batch, then schedule the next batch while grades remain.
+     * Copy grades for a short time. The scheduled task continues the rest.
      */
     public function execute() {
-        $more = \local_gugrades\grades::backfill_grade_backups(self::BATCH_SIZE);
-        $lastid = (int) get_config('local_gugrades', 'gradesbackup_backfill_id');
-        if (!$more) {
-            mtrace('MyGrades grade backup is complete.');
-            return;
-        }
-
-        mtrace('MyGrades grade backup batch finished. Last grade id ' . $lastid . '.');
-        $next = new self();
-        $next->set_next_run_time(time() + self::BATCH_DELAY);
-        \core\task\manager::queue_adhoc_task($next, true);
+        \local_gugrades\grades::run_grade_backup_batches(self::BATCH_SIZE, backupgrades::TIME_LIMIT);
     }
 }

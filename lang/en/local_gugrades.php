@@ -409,6 +409,7 @@ $string['points'] = 'Points';
 $string['privacy:metadata:admingrade'] = 'Admin grade';
 $string['privacy:metadata:auditby'] = 'Modified by user id';
 $string['privacy:metadata:auditcomment'] = 'Audit comment';
+$string['privacy:metadata:capped'] = 'Award capped because a resit was taken';
 $string['privacy:metadata:convertedgrade'] = 'Converted grade';
 $string['privacy:metadata:courseid'] = 'Course ID';
 $string['privacy:metadata:displaygrade'] = 'Display grade';
