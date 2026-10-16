@@ -77,6 +77,22 @@ class provider implements
         );
 
         $collection->add_database_table(
+            'local_gugrades_gradesbackup',
+            [
+                'courseid' => 'privacy:metadata:courseid',
+                'userid' => 'privacy:metadata:userid',
+                'gradeitemid' => 'privacy:metadata:gradeitemid',
+                'points' => 'privacy:metadata:points',
+                'rawgrade' => 'privacy:metadata:rawgrade',
+                'convertedgrade' => 'privacy:metadata:convertedgrade',
+                'admingrade' => 'privacy:metadata:admingrade',
+                'displaygrade' => 'privacy:metadata:displaygrade',
+                'gradetype' => 'privacy:metadata:gradetype',
+            ],
+            'privacy:metadata:local_gugrades_gradesbackup'
+        );
+
+        $collection->add_database_table(
             'local_gugrades_hidden',
             [
                 'courseid' => 'privacy:metadata:courseid',
@@ -108,15 +124,20 @@ class provider implements
         $contextlist = new \core_privacy\local\request\contextlist();
 
         // All course contexts for which this user has any data.
-        $sql = "SELECT DISTINCT c.id FROM {context} c
-                    JOIN {local_gugrades_grade} ggg ON ggg.courseid = c.instanceid
-                    WHERE ggg.userid = :userid
-                    AND c.contextlevel = :contextlevel";
         $params = [
             'userid' => $userid,
             'contextlevel' => \CONTEXT_COURSE,
         ];
+        $sql = "SELECT DISTINCT c.id FROM {context} c
+                    JOIN {local_gugrades_grade} ggg ON ggg.courseid = c.instanceid
+                    WHERE ggg.userid = :userid
+                    AND c.contextlevel = :contextlevel";
+        $contextlist->add_from_sql($sql, $params);
 
+        $sql = "SELECT DISTINCT c.id FROM {context} c
+                    JOIN {local_gugrades_gradesbackup} ggg ON ggg.courseid = c.instanceid
+                    WHERE ggg.userid = :userid
+                    AND c.contextlevel = :contextlevel";
         $contextlist->add_from_sql($sql, $params);
 
         return $contextlist;
@@ -133,14 +154,18 @@ class provider implements
             return;
         }
 
-        $sql = "SELECT DISTINCT ggg.userid FROM {local_gugrades_grade} ggg
-                    JOIN {context} c ON ggg.courseid = c.instanceid AND c.contextlevel = :contextlevel
-                    WHERE c.id = :contextid";
         $params = [
             'contextlevel' => \CONTEXT_COURSE,
             'contextid' => $context->id,
         ];
+        $sql = "SELECT DISTINCT ggg.userid FROM {local_gugrades_grade} ggg
+                    JOIN {context} c ON ggg.courseid = c.instanceid AND c.contextlevel = :contextlevel
+                    WHERE c.id = :contextid";
+        $userlist->add_from_sql('userid', $sql, $params);
 
+        $sql = "SELECT DISTINCT ggg.userid FROM {local_gugrades_gradesbackup} ggg
+                    JOIN {context} c ON ggg.courseid = c.instanceid AND c.contextlevel = :contextlevel
+                    WHERE c.id = :contextid";
         $userlist->add_from_sql('userid', $sql, $params);
 
         return $userlist;
@@ -172,6 +197,13 @@ class provider implements
 
             // ...local_gugrades_grade.
             $records = $DB->get_records('local_gugrades_grade', ['userid' => $userid, 'courseid' => $courseid]);
+            foreach ($records as $record) {
+                writer::with_context($context)
+                    ->export_data([], $record);
+            }
+
+            // ...local_gugrades_gradesbackup.
+            $records = $DB->get_records('local_gugrades_gradesbackup', ['userid' => $userid, 'courseid' => $courseid]);
             foreach ($records as $record) {
                 writer::with_context($context)
                     ->export_data([], $record);
@@ -212,6 +244,7 @@ class provider implements
 
         $DB->delete_records('local_gugrades_audit', $params);
         $DB->delete_records('local_gugrades_grade', $params);
+        $DB->delete_records('local_gugrades_gradesbackup', $params);
         $DB->delete_records('local_gugrades_hidden', $params);
         $DB->delete_records('local_gugrades_resitrequired', $params);
     }
@@ -234,6 +267,7 @@ class provider implements
 
             $DB->delete_records('local_gugrades_audit', $params);
             $DB->delete_records('local_gugrades_grade', $params);
+            $DB->delete_records('local_gugrades_gradesbackup', $params);
             $DB->delete_records('local_gugrades_hidden', $params);
             $DB->delete_records('local_gugrades_resitrequired', $params);
         }
@@ -261,6 +295,7 @@ class provider implements
 
             $DB->delete_records('local_gugrades_audit', $params);
             $DB->delete_records('local_gugrades_grade', $params);
+            $DB->delete_records('local_gugrades_gradesbackup', $params);
             $DB->delete_records('local_gugrades_hidden', $params);
             $DB->delete_records('local_gugrades_resitrequired', $params);
         }

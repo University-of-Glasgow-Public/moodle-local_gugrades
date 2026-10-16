@@ -310,5 +310,8 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
             $note->gradeitemid = $this->get_mappingid('grade_item', 0 - $note->gradeitemid);
             $DB->update_record('local_gugrades_notes', $note);
         }
+
+        // Current grade values are derived from the restored grade rows.
+        \local_gugrades\grades::rebuild_grade_backups($this->task->get_courseid());
     }
 }

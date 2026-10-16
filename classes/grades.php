@@ -1000,6 +1000,7 @@ class grades {
 
                 $DB->update_record('local_gugrades_grade', $gugrade);
                 self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
+                self::save_grade_backup($gugrade, $other);
 
                 return;
             }
@@ -1027,6 +1028,196 @@ class grades {
         $gugrade->catoverride = $catoverride;
         $gugrade->id = $DB->insert_record('local_gugrades_grade', $gugrade);
         self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
+        self::save_grade_backup($gugrade, $other);
+    }
+
+    /**
+     * Whether this grade is an actual value worth keeping in the backup.
+     * Status text such as "No grade", "Grades missing" and "Cannot aggregate" is omitted.
+     *
+     * @param object $grade
+     * @return bool
+     */
+    public static function is_backup_grade(object $grade): bool {
+        if (!empty($grade->iserror) || !empty($grade->notavailable)) {
+            return false;
+        }
+
+        $display = trim((string) ($grade->displaygrade ?? ''));
+        $messages = [
+            get_string('nograde', 'local_gugrades'),
+            get_string('gradesmissing', 'local_gugrades'),
+            get_string('cannotaggregate', 'local_gugrades'),
+            get_string('notavailable', 'local_gugrades'),
+            get_string('nodata', 'local_gugrades'),
+            get_string('childerror', 'local_gugrades'),
+        ];
+        if (in_array($display, $messages, true)) {
+            return false;
+        }
+
+        if (trim((string) ($grade->admingrade ?? '')) !== '') {
+            return true;
+        }
+
+        foreach ([$grade->rawgrade ?? null, $grade->convertedgrade ?? null] as $value) {
+            if ($value === null || $value === '') {
+                continue;
+            }
+            if ((float) $value === -1.0) {
+                continue;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Store the current actual grade in local_gugrades_gradesbackup.
+     * One row is kept for each grade item, user and column. History and audit
+     * comments stay in local_gugrades_grade. This copy is left in place when
+     * grades are reset, so the last values can be restored.
+     *
+     * @param object $grade Grade row just written to local_gugrades_grade
+     * @param string|null $other Column description. Looked up from the column when omitted.
+     */
+    public static function save_grade_backup(object $grade, ?string $other = null): void {
+        global $DB;
+
+        if (empty($grade->id) || empty($grade->iscurrent)) {
+            return;
+        }
+
+        $params = [
+            'gradeitemid' => $grade->gradeitemid,
+            'userid' => $grade->userid,
+            'columnid' => $grade->columnid,
+        ];
+        if (!self::is_backup_grade($grade)) {
+            $DB->delete_records('local_gugrades_gradesbackup', $params);
+            return;
+        }
+
+        if ($other === null) {
+            $column = $DB->get_record('local_gugrades_column', ['id' => $grade->columnid], 'id, other');
+            $other = $column ? (string) $column->other : '';
+        }
+
+        $record = (object) [
+            'courseid' => $grade->courseid,
+            'gradeitemid' => $grade->gradeitemid,
+            'userid' => $grade->userid,
+            'columnid' => $grade->columnid,
+            'gradetype' => $grade->gradetype,
+            'points' => empty($grade->points) ? 0 : 1,
+            'rawgrade' => $grade->rawgrade,
+            'convertedgrade' => $grade->convertedgrade,
+            'admingrade' => $grade->admingrade,
+            'displaygrade' => $grade->displaygrade,
+            'other' => $other,
+            'iserror' => empty($grade->iserror) ? 0 : 1,
+            'notavailable' => empty($grade->notavailable) ? 0 : 1,
+            'catoverride' => empty($grade->catoverride) ? 0 : 1,
+            'gradeid' => $grade->id,
+            'timemodified' => time(),
+        ];
+
+        if ($existing = $DB->get_record('local_gugrades_gradesbackup', $params)) {
+            $record->id = $existing->id;
+            $DB->update_record('local_gugrades_gradesbackup', $record);
+        } else {
+            $DB->insert_record('local_gugrades_gradesbackup', $record);
+        }
+    }
+
+    /**
+     * Copy current grades into the backup table.
+     * Used when the table is first created, and after a course restore.
+     *
+     * @param int|null $courseid Restrict to one course, or all courses when null
+     */
+    public static function rebuild_grade_backups(?int $courseid = null): void {
+        global $DB;
+
+        if ($courseid) {
+            $DB->delete_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
+            $grades = $DB->get_recordset('local_gugrades_grade', ['courseid' => $courseid, 'iscurrent' => 1], 'id ASC');
+        } else {
+            $DB->delete_records('local_gugrades_gradesbackup');
+            $grades = $DB->get_recordset('local_gugrades_grade', ['iscurrent' => 1], 'id ASC');
+        }
+
+        foreach ($grades as $grade) {
+            self::save_grade_backup($grade);
+        }
+        $grades->close();
+    }
+
+    /**
+     * Write backup grades back into local_gugrades_grade where the current grade is missing.
+     * Grades that are still present are left unchanged.
+     *
+     * @param int $courseid
+     * @return int Number of grades restored
+     */
+    public static function restore_missing_grade_backups(int $courseid): int {
+        global $DB;
+
+        $values = $DB->get_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
+        $restored = 0;
+        foreach ($values as $value) {
+            if (!$DB->record_exists('grade_items', ['id' => $value->gradeitemid, 'courseid' => $courseid])) {
+                continue;
+            }
+            if ($DB->record_exists('local_gugrades_grade', [
+                'courseid' => $courseid,
+                'gradeitemid' => $value->gradeitemid,
+                'userid' => $value->userid,
+                'columnid' => $value->columnid,
+                'iscurrent' => 1,
+            ])) {
+                continue;
+            }
+            // A recreated column already holds this grade type for the user.
+            if ($value->gradetype !== 'OTHER' && $DB->record_exists('local_gugrades_grade', [
+                'courseid' => $courseid,
+                'gradeitemid' => $value->gradeitemid,
+                'userid' => $value->userid,
+                'gradetype' => $value->gradetype,
+                'iscurrent' => 1,
+            ])) {
+                continue;
+            }
+
+            self::write_grade(
+                courseid: $courseid,
+                gradeitemid: (int) $value->gradeitemid,
+                userid: (int) $value->userid,
+                admingrade: $value->admingrade ?? '',
+                rawgrade: $value->rawgrade === null ? null : (float) $value->rawgrade,
+                convertedgrade: $value->convertedgrade === null ? null : (float) $value->convertedgrade,
+                displaygrade: $value->displaygrade,
+                weightedgrade: 0,
+                gradetype: $value->gradetype,
+                other: $value->other ?? '',
+                iscurrent: true,
+                iserror: (bool) $value->iserror,
+                auditcomment: 'Restored from grades backup',
+                ispoints: (bool) $value->points,
+                overwrite: false,
+                catoverride: (bool) $value->catoverride,
+                notavailable: (bool) $value->notavailable,
+            );
+            $restored++;
+
+            // The old column was removed, so drop the value row that still points at it.
+            if (!$DB->record_exists('local_gugrades_column', ['id' => $value->columnid])) {
+                $DB->delete_records('local_gugrades_gradesbackup', ['id' => $value->id]);
+            }
+        }
+
+        return $restored;
     }
 
     /**
@@ -1631,6 +1822,7 @@ class grades {
 
     /**
      * Delete all MyGrades data for a user in a course.
+     * local_gugrades_gradesbackup is kept so the last actual grades can be restored.
      * @param int $courseid
      * @param int $userid
      */
@@ -1651,6 +1843,7 @@ class grades {
     /**
      * Delete all data for gradeitemid
      * TODO: Don't forget to add anything new that we add in db.
+     * local_gugrades_gradesbackup is kept so the last actual grades can be restored.
      * @param int $courseid
      * @param int $gradeitemid
      */
@@ -1687,6 +1880,7 @@ class grades {
         $DB->delete_records('local_gugrades_map', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_resitrequired', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_grade', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_audit', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_column', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_hidden', ['courseid' => $courseid]);

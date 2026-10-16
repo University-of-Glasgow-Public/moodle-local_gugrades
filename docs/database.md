@@ -49,6 +49,31 @@ and aggregated grade category items.
 * **catoverride** - if true, this is a category that has been overridden by the user
 * **normalisedweight** - the "normalised" weighting used for this item in aggregation.
 
+## local_gugrades_gradesbackup
+
+A second copy of the current grade, holding the actual values only. MyGrades writes a row here whenever it saves a current grade. There is one row for each grade item, user and column. History, audit comments and aggregation weights stay in local_gugrades_grade.
+
+Rows whose displayed grade is a status message are left out. That includes No grade, Grades missing, Cannot aggregate, Not available, No data, and the child-category aggregation error. Administrative grades such as NS are kept.
+
+The row is kept when grades are reset or removed from local_gugrades_grade, so the last values are still available if that table is damaged. It is removed when the course is deleted, and when personal data is deleted. `grades::restore_missing_grade_backups($courseid)` writes back any current grades that are missing.
+
+* **courseid** - containing course id
+* **gradeitemid** - the Moodle grade item
+* **userid** - whose grade it is
+* **columnid** - the capture or category column this value belongs to
+* **gradetype** - FIRST, SECOND, CATEGORY and so on
+* **points** - 1 for a points grade, 0 for a scale grade
+* **rawgrade** - point value, or scale index
+* **convertedgrade** - grade used for ongoing aggregation
+* **admingrade** - administrative grade code, when the grade is one
+* **displaygrade** - grade as displayed
+* **other** - description of an OTHER column, otherwise empty
+* **iserror** - category grade is in an error state
+* **notavailable** - category grade is not available
+* **catoverride** - category total was overridden
+* **gradeid** - id of the local_gugrades_grade row this value was copied from
+* **timemodified** - when this copy was last written
+
 ## local_gugrades_audit
 
 A number of actions result in an item being added to this table, purely for audit purposes. It's very much like the Moodle log but more specific. In many cases a core log
