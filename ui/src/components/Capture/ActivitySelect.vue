@@ -9,7 +9,7 @@
             class="a11y-picker-panel border border-slate-300 bg-white text-neutral px-3 rounded-md w-120 shadow-md transition-all duration-200 h-10 flex flex-col justify-center"
             :class="{ 'border-primary ring-1 ring-primary !h-auto py-3': !collapsed }"
         >
-            <!-- Collapsed State: Fills the exact 32px height cleanly -->
+            <!-- Collapsed State: Fills the 32px height cleanly -->
             <div v-if="collapsed" @click="open_selection" class="cursor-pointer flex items-center justify-between gap-2 select-none w-full h-full">
                 <div v-if="selectedactivity" class="text-xs truncate">
                     <span class="opacity-60">{{ mstrings.selected }}:</span> {{ selectedactivity.itemname }}
@@ -24,7 +24,9 @@
                 <div class="a11y-picker-header flex items-center justify-between border-b border-slate-200 pb-1 mb-1">
                     <b class="text-xs font-semibold">{{ categoryname }}</b>
                 </div>
-                <ActivityTree v-if="!treeerror" :nodes="activitytree" @activityselected="activity_selected" :depth="1"></ActivityTree>
+                <div v-if="!treeerror" class="max-h-[60vh] overflow-y-auto pr-1">
+                    <ActivityTree :nodes="activitytree" @activityselected="activity_selected" :depth="1"></ActivityTree>
+                </div>
                 <ConfigError v-if="treeerror" :errormessage="treeerror"></ConfigError>
             </div>
         </div>
