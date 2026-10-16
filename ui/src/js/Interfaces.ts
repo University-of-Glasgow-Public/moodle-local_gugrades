@@ -269,6 +269,8 @@ export interface IUser {
     displaygrade1st?: string;
     isadmin1st?: boolean;
     error1st?: string;
+    firstsittingexplain?: string;
+    awardexplain?: string;
     releasedgrade: string;
     mismatch: boolean;
     rawgrade: number;

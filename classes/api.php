@@ -2181,7 +2181,8 @@ class api {
      */
     public static function get_explain_aggregation(int $courseid, int $gradecategoryid, int $userid) {
 
-        $explain = \local_gugrades\aggregation::get_explain($courseid, $gradecategoryid, $userid);
+        $result = \local_gugrades\aggregation::explain_user($courseid, $gradecategoryid, $userid);
+        $explain = $result->explain;
 
         // Convert admin codes in string. MGU-1360.
         $explain = \local_gugrades\admingrades::replace_explain($explain);
@@ -2214,7 +2215,50 @@ class api {
         $user->formattedatype = \local_gugrades\aggregation::translate_atype($atype);
         $user->explain = $explain;
 
+        // MGU-1596: For from2026 reassessment categories, say which grade produced each result.
+        $user->firstsittingexplain = '';
+        $user->awardexplain = '';
+        if (\local_gugrades\grades::is_reassessment_category_set($courseid, $gradecategoryid)) {
+            $names = array_column($user->fields, 'fullname', 'gradeitemid');
+            $user->firstsittingexplain = self::explain_selection(
+                get_string('firstsittinggrade', 'local_gugrades'), $result->firstsitting, $names,
+            );
+            if ($user->overridden) {
+                $user->awardexplain = get_string('explain_awardoverridden', 'local_gugrades');
+            } else if (\local_gugrades\aggregation::get_aggregation_strategy($courseid, $gradecategoryid) != \GRADE_AGGREGATE_MAX) {
+                $user->awardexplain = get_string('categorynothighest', 'local_gugrades');
+            } else {
+                $user->awardexplain = self::explain_selection(
+                    get_string('awardgrade', 'local_gugrades'), $result, $names,
+                );
+            }
+        }
+
         return (array) $user;
+    }
+
+    /**
+     * Describe which item decided a reassessment result.
+     * @param string $label Name of the result (1st sitting / award).
+     * @param object|null $result Aggregated result (with any selection).
+     * @param array $names Item full names keyed by grade item ID.
+     * @return string
+     */
+    private static function explain_selection(string $label, ?object $result, array $names): string {
+        $selection = $result->selection ?? null;
+        if (!$selection || !isset($names[$selection->itemid])) {
+            $reason = $result ? ($result->error ?: $result->explain) : '';
+            return get_string('explain_selection_none', 'local_gugrades', (object)[
+                'result' => $label,
+                'reason' => \local_gugrades\admingrades::replace_explain((string)$reason),
+            ]);
+        }
+
+        return get_string('explain_selection_' . $selection->reason, 'local_gugrades', (object)[
+            'result' => $label,
+            'item' => $names[$selection->itemid],
+            'grade' => $selection->display,
+        ]);
     }
 
     /**

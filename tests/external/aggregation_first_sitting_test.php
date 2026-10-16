@@ -687,6 +687,72 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * Run the explain web service for a category.
+     * @param string $name
+     * @return array
+     */
+    private function explain(string $name): array {
+        $explain = get_explain_aggregation::execute(
+            $this->course->id, $this->categories[$name]->id, $this->student->id,
+        );
+        return \core_external\external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
+    }
+
+    /**
+     * MGU-1596: Reassessment explanations name the grades chosen for each result.
+     */
+    public function test_explain_reassessment_selections(): void {
+        $this->set_reassessment(true);
+        $this->aggregate();
+        $explain = $this->explain('Dual reassessment');
+        $this->assertNotEmpty($explain['displaygrade1st']);
+        $this->assertEquals(get_string('explain_selection_earliest', 'local_gugrades', (object)[
+            'result' => get_string('firstsittinggrade', 'local_gugrades'), 'grade' => '16', 'item' => 'Attempt one',
+        ]), $explain['firstsittingexplain']);
+        $this->assertEquals(get_string('explain_selection_highest', 'local_gugrades', (object)[
+            'result' => get_string('awardgrade', 'local_gugrades'), 'grade' => '18', 'item' => 'Attempt two',
+        ]), $explain['awardexplain']);
+
+        // Parent categories and non-reassessment categories get no extra lines.
+        foreach (['Dual middle', 'Dual total'] as $name) {
+            $explain = $this->explain($name);
+            $this->assertSame('', $explain['firstsittingexplain']);
+            $this->assertSame('', $explain['awardexplain']);
+        }
+        $this->set_reassessment(false);
+        $this->aggregate();
+        $explain = $this->explain('Dual reassessment');
+        $this->assertSame('', $explain['firstsittingexplain']);
+        $this->assertSame('', $explain['awardexplain']);
+    }
+
+    /**
+     * MGU-1596: Award explanation repeats the strategy warning or notes an override.
+     */
+    public function test_explain_reassessment_award_warning_and_override(): void {
+        global $DB;
+
+        $this->set_reassessment(true);
+        $DB->set_field('grade_categories', 'aggregation', GRADE_AGGREGATE_MEAN,
+            ['id' => $this->categories['Dual reassessment']->id]);
+        $this->aggregate();
+        $explain = $this->explain('Dual reassessment');
+        $this->assertEquals(get_string('categorynothighest', 'local_gugrades'), $explain['awardexplain']);
+        $this->assertStringContainsString('Attempt one', $explain['firstsittingexplain']);
+
+        $DB->set_field('grade_categories', 'aggregation', GRADE_AGGREGATE_MAX,
+            ['id' => $this->categories['Dual reassessment']->id]);
+        $itemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid(
+            $this->categories['Dual reassessment']->id,
+        );
+        $this->write_result($itemid, 10, 'CATEGORY', true);
+        $this->aggregate();
+        $explain = $this->explain('Dual reassessment');
+        $this->assertEquals(get_string('explain_awardoverridden', 'local_gugrades'), $explain['awardexplain']);
+        $this->assertStringContainsString('Attempt one', $explain['firstsittingexplain']);
+    }
+
+    /**
      * The page and row refresh expose both totals and corresponding child grades.
      */
     public function test_aggregation_display_and_row_refresh(): void {

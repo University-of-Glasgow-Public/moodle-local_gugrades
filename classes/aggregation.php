@@ -1591,6 +1591,7 @@ class aggregation {
             'error' => $error,
             'explain' => $explain,
             'notavailable' => $notavailable,
+            'selection' => (!$override && method_exists($aggregation, 'get_selection')) ? $aggregation->get_selection() : null,
         ];
     }
 
@@ -1603,6 +1604,18 @@ class aggregation {
      * @return string
      */
     public static function get_explain(int $courseid, int $gradecategoryid, int $userid) {
+        return self::explain_user($courseid, $gradecategoryid, $userid)->explain;
+    }
+
+    /**
+     * Recalculate one user for explanation, returning the full result for the requested category
+     * (including any first-sitting result and the items that decided each result).
+     * @param int $courseid
+     * @param int $gradecategoryid
+     * @param int $userid
+     * @return object
+     */
+    public static function explain_user(int $courseid, int $gradecategoryid, int $userid): object {
 
         // Invalidate their cached data.
         self::invalidate_aggdata($courseid, $gradecategoryid, $userid);
@@ -1626,10 +1639,7 @@ class aggregation {
         $level = \local_gugrades\grades::get_category_level($gradecategoryid);
 
         // Aggregate this user.
-        $aggregatedresult = self::aggregate_user($courseid, $tree, $userid, $level, $skipdroplow);
-        $explain = $aggregatedresult->explain;
-
-        return $explain;
+        return self::aggregate_user($courseid, $tree, $userid, $level, $skipdroplow);
     }
 
     /**

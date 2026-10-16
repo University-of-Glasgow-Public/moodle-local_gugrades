@@ -71,8 +71,31 @@ class aggregate {
     private bool $mv0found = false;
 
     /**
-     * @var string $atype
+     * MGU-1596: Item that alone determined a reassessment result, for explanations.
+     * @var object|null $selection {itemid, display, reason}
      */
+    private ?object $selection = null;
+
+    /**
+     * Record the deciding item once; later checks in the same calculation do not replace it.
+     * @param object $item
+     * @param string $reason
+     */
+    private function select_item(object $item, string $reason): void {
+        $this->selection ??= (object)[
+            'itemid' => (int)$item->itemid,
+            'display' => (string)($item->displaygrade ?? ''),
+            'reason' => $reason,
+        ];
+    }
+
+    /**
+     * Item that determined the last reassessment result calculated, if any.
+     * @return object|null {itemid, display, reason}
+     */
+    public function get_selection(): ?object {
+        return $this->selection;
+    }
 
     /**
      * Set some required data
@@ -156,6 +179,7 @@ class aggregate {
 
         // Initialise 'explain' string.
         $explain = '';
+        $this->selection = null;
 
         // Logic will be different if this category is for resits.
         $isresitcategory = $this->is_reassessment($category->categoryid);
@@ -177,6 +201,10 @@ class aggregate {
                 return [null, null, '', null, 0, get_string('gradesmissing', 'local_gugrades'),
                     get_string('explain_gradesmissing', 'local_gugrades'), false];
             }
+            if (count($items) == 1) {
+                $substantive = empty($items[0]->admingrade) || ($items[0]->admingrade == 'NOSUBMISSION');
+                $this->select_item($items[0], $substantive ? 'earliest' : 'ecfallback');
+            }
         }
         if ($isnursing && $firstsitting && $this->nursing_check($items, $lowestnursinggrade)) {
             $conditionmet = true;
@@ -189,6 +217,9 @@ class aggregate {
 
             // Just let it drop through if grademissing
             if (!$item->grademissing && $item->admingrade) {
+                if ($isresitcategory) {
+                    $this->select_item($item, 'onlygrade');
+                }
                 if ($item->admingrade) {
                     $explain = get_string('explain_onegrade_admin', 'local_gugrades');
                     return [0, 0, $item->admingrade, $item->displaygrade, 0, '', $explain, false];
@@ -338,6 +369,17 @@ class aggregate {
 
         // Now call the appropriate aggregation function to do the sums.
         $aggregatedgrade = call_user_func([$this, $aggfunction], $items);
+
+        // A highest-grade reassessment result comes from one item (the first, if tied).
+        if ($isresitcategory && ($aggfunction == 'strategy_max')) {
+            $highest = null;
+            foreach ($items as $item) {
+                if (!$highest || ($item->grade / $item->grademax > $highest->grade / $highest->grademax)) {
+                    $highest = $item;
+                }
+            }
+            $this->select_item($highest, 'highest');
+        }
 
         // Flag modifying explanation if Engineering cap applied.
         $isengineeringcap = false;
@@ -812,6 +854,7 @@ class aggregate {
         if (count($items) == 1) {
             $explain = get_string('explain_resitoneitem', 'local_gugrades');
             $item = $items[0];
+            $this->select_item($item, 'onlygrade');
 
             // Normalise grade.
             $norm = $maxgrade * $item->grade / $item->grademax;
@@ -838,6 +881,7 @@ class aggregate {
         // If the $lastitem is an admingrade then it's the category total.
         // An NC is a substantive grade for reassessment purposes. 
         if (!empty($lastitem->admingrade) && ($lastitem->admingrade != 'NOSUBMISSION')) {
+            $this->select_item($lastitem, 'latestadmin');
             return [0, $lastitem->admingrade, get_string('explain_resitlastadmin', 'local_gugrades'), $items];
         }
 
