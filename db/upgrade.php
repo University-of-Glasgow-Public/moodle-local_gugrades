@@ -519,7 +519,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091700, 'local', 'gugrades');
     }
 
-<<<<<<< HEAD
     if ($oldversion < 2026101600) {
 
         // MGU-1596: Flag course total awards capped because of a resit.
@@ -531,7 +530,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
 
         // Gugrades savepoint reached.
         upgrade_plugin_savepoint(true, 2026101600, 'local', 'gugrades');
-=======
     if ($oldversion < 2026101300) {
 
         // Separate copy of the current grade values. Grade history stays in local_gugrades_grade.
@@ -618,8 +616,7 @@ function xmldb_local_gugrades_upgrade($oldversion) {
 
         // Gugrades savepoint reached.
         upgrade_plugin_savepoint(true, 2026101302, 'local', 'gugrades');
->>>>>>> d2db0c65e8d036b17f4d5202c01fb6f4d0314f43
     }
 
     return true;
-}
+}}
