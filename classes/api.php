@@ -1859,7 +1859,7 @@ class api {
     public static function reset(int $courseid) {
         global $DB;
 
-        // Delete grades.
+        // Delete grades. local_gugrades_gradesbackup is kept so the last actual grades can be restored.
         $DB->delete_records('local_gugrades_grade', ['courseid' => $courseid]);
 
         // Delete columns.

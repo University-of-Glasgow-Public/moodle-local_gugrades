@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/gugrades/db" VERSION="20260917" COMMENT="XMLDB file for Moodle local/gugrades"
+<XMLDB PATH="local/gugrades/db" VERSION="20261013" COMMENT="XMLDB file for Moodle local/gugrades"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -79,6 +79,34 @@
         <INDEX NAME="local_gugrades_giuiic" UNIQUE="false" FIELDS="id, gradeitemid, userid, iscurrent"/>
         <INDEX NAME="local_gugrades_giuiip" UNIQUE="false" FIELDS="gradeitemid, userid, isprovisional" COMMENT="gradeitemid, userid, isprovisional"/>
         <INDEX NAME="local_gugrades_prov" UNIQUE="false" FIELDS="gradeitemid, userid, iscurrent"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_gugrades_gradesbackup" COMMENT="Last actual grade values, kept apart from grade history so they can be restored if local_gugrades_grade is damaged.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="gradeitemid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="columnid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="gradetype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="points" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="rawgrade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
+        <FIELD NAME="convertedgrade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
+        <FIELD NAME="admingrade" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="displaygrade" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="other" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Column description for OTHER grades"/>
+        <FIELD NAME="iserror" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="notavailable" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="catoverride" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="gradeid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="local_gugrades_grade.id this value was copied from"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="gugradesbak_giusco" UNIQUE="true" FIELDS="gradeitemid, userid, columnid"/>
+        <INDEX NAME="gugradesbak_cou" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_gugrades_audit" COMMENT="Contains audit trail of errors, warnings and info">

@@ -519,6 +519,7 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091700, 'local', 'gugrades');
     }
 
+<<<<<<< HEAD
     if ($oldversion < 2026101600) {
 
         // MGU-1596: Flag course total awards capped because of a resit.
@@ -530,6 +531,94 @@ function xmldb_local_gugrades_upgrade($oldversion) {
 
         // Gugrades savepoint reached.
         upgrade_plugin_savepoint(true, 2026101600, 'local', 'gugrades');
+=======
+    if ($oldversion < 2026101300) {
+
+        // Separate copy of the current grade values. Grade history stays in local_gugrades_grade.
+        $table = new xmldb_table('local_gugrades_gradesbackup');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('gradeitemid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('columnid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('gradetype', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('points', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('rawgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
+        $table->add_field('convertedgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
+        $table->add_field('admingrade', XMLDB_TYPE_CHAR, '30', null, null, null, null);
+        $table->add_field('displaygrade', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('other', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('iserror', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('notavailable', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('catoverride', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('gradeid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $table->add_index('gugradesbak_giusco', XMLDB_INDEX_UNIQUE, ['gradeitemid', 'userid', 'columnid']);
+        $table->add_index('gugradesbak_cou', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Copying existing grades here locks large sites for the whole upgrade.
+        // Cron copies them in batches instead.
+        \local_gugrades\grades::queue_grade_backup_backfill();
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101300, 'local', 'gugrades');
+    }
+
+    if ($oldversion < 2026101301) {
+
+        // The first version of this table used another name.
+        $oldtable = new xmldb_table('local_gugrades_gradevalue');
+        $table = new xmldb_table('local_gugrades_gradesbackup');
+        if ($dbman->table_exists($oldtable) && !$dbman->table_exists($table)) {
+            $dbman->rename_table($oldtable, 'local_gugrades_gradesbackup');
+        }
+
+        if ($dbman->table_exists($table)) {
+            $oldindex = new xmldb_index('gugradeval_giusco', XMLDB_INDEX_UNIQUE, ['gradeitemid', 'userid', 'columnid']);
+            $newindex = new xmldb_index('gugradesbak_giusco', XMLDB_INDEX_UNIQUE, ['gradeitemid', 'userid', 'columnid']);
+            if ($dbman->index_exists($table, $oldindex)) {
+                $dbman->drop_index($table, $oldindex);
+            }
+            if (!$dbman->index_exists($table, $newindex)) {
+                $dbman->add_index($table, $newindex);
+            }
+
+            $oldindex = new xmldb_index('gugradeval_cou', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+            $newindex = new xmldb_index('gugradesbak_cou', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+            if ($dbman->index_exists($table, $oldindex)) {
+                $dbman->drop_index($table, $oldindex);
+            }
+            if (!$dbman->index_exists($table, $newindex)) {
+                $dbman->add_index($table, $newindex);
+            }
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101301, 'local', 'gugrades');
+    }
+
+    if ($oldversion < 2026101302) {
+        $status = get_config('local_gugrades', 'gradesbackup_backfill');
+        if ($status !== 'running') {
+            if ($DB->record_exists('local_gugrades_gradesbackup', [])) {
+                // The earlier upgrade already copied the grades.
+                set_config('gradesbackup_backfill', 'done', 'local_gugrades');
+            } else {
+                \local_gugrades\grades::queue_grade_backup_backfill();
+            }
+        }
+
+        // Gugrades savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101302, 'local', 'gugrades');
+>>>>>>> d2db0c65e8d036b17f4d5202c01fb6f4d0314f43
     }
 
     return true;

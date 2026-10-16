@@ -212,6 +212,14 @@ These local observations must not be extrapolated directly to 800 students.
 Important data
 --------------
 - local_gugrades_grade: grade history and current/provisional grade values.
+- local_gugrades_gradesbackup: last actual grade values for each user, grade
+  item and column. Written whenever a current grade is saved. Existing grades
+  are copied after upgrade by the gradesbackup adhoc task, 500 at a time, with
+  a short pause between batches. Status messages such as No grade, Grades
+  missing, Cannot aggregate and Not available are omitted. Kept when MyGrades
+  grades are reset, and removed when the course is deleted or personal data
+  is deleted. grades::restore_missing_grade_backups() copies missing current
+  grades back from this table.
 - local_gugrades_latest: identifies the current grade record for a course,
   grade item, and user.
 - local_gugrades_column: imported or captured grade columns.
