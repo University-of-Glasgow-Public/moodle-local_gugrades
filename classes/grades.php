@@ -2937,6 +2937,66 @@ class grades {
     }
 
     /**
+     * Check for scale grade items whose scale was changed in the gradebook after grades were imported.
+     * Uses core grade item history, so changes are not detected if grade history is disabled.
+     * @param int $courseid
+     * @return array
+     */
+    public static function check_integrity_scale_changed(int $courseid) {
+        global $DB;
+
+        $sql = "SELECT gr.gradeitemid, MIN(gr.audittimecreated) AS firstimport, COUNT(DISTINCT gr.userid) AS students
+                  FROM {local_gugrades_grade} gr
+                  JOIN {grade_items} gi ON gi.id = gr.gradeitemid
+                 WHERE gr.courseid = :courseid
+                   AND gr.iscurrent = 1
+                   AND gr.points = 0
+                   AND gr.gradetype <> 'CATEGORY'
+                   AND (gr.admingrade = '' OR gr.admingrade IS NULL)
+                   AND gi.scaleid IS NOT NULL
+              GROUP BY gr.gradeitemid";
+        $imported = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+
+        $errors = [];
+        foreach ($imported as $import) {
+            $history = $DB->get_records_sql(
+                'SELECT id, scaleid
+                   FROM {grade_items_history}
+                  WHERE oldid = :gradeitemid
+                    AND timemodified <= :firstimport
+               ORDER BY timemodified DESC, id DESC',
+                ['gradeitemid' => $import->gradeitemid, 'firstimport' => $import->firstimport],
+                0,
+                1
+            );
+            if (!$history) {
+                continue;
+            }
+            $oldscaleid = (int) reset($history)->scaleid;
+
+            $gradeitem = $DB->get_record('grade_items', ['id' => $import->gradeitemid], '*', MUST_EXIST);
+            if (!$oldscaleid || ($oldscaleid == $gradeitem->scaleid)) {
+                continue;
+            }
+
+            $oldname = $DB->get_field('scale', 'name', ['id' => $oldscaleid]);
+            $newname = $DB->get_field('scale', 'name', ['id' => $gradeitem->scaleid]);
+            $errors[] = [
+                'gradeitemid' => $gradeitem->id,
+                'itemname' => $gradeitem->itemname,
+                'error' => get_string('integrity_scale_changed', 'local_gugrades', (object) [
+                    'oldscale' => $oldname ?: get_string('integrity_scale_deleted', 'local_gugrades', $oldscaleid),
+                    'newscale' => $newname ?: $gradeitem->scaleid,
+                    'count' => $import->students,
+                ]),
+                'errortype' => 'scale_changed',
+            ];
+        }
+
+        return $errors;
+    }
+
+    /**
      * Check for current MyGrades data belonging to users who are no longer enrolled.
      * @param int $courseid
      * @return array

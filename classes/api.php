@@ -3179,6 +3179,9 @@ class api {
         // Check for range / points/scale mismatch
         $errors = array_merge($errors, \local_gugrades\grades::check_integrity_range($courseid));
 
+        // Check for scale changed in the gradebook after grades were imported.
+        $errors = array_merge($errors, \local_gugrades\grades::check_integrity_scale_changed($courseid));
+
         // Check for MyGrades data linked to users who are no longer enrolled.
         $errors = array_merge($errors, \local_gugrades\grades::check_integrity_unenrolled_users($courseid));
 
