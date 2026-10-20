@@ -1862,7 +1862,7 @@ class api {
         // Delete grades. local_gugrades_gradesbackup is kept so the last actual grades can be restored.
         $DB->delete_records('local_gugrades_grade', ['courseid' => $courseid]);
 
-        // Delete columns.
+        // Delete columns. local_gugrades_columnbackup is kept so those grades still have their column ids.
         $DB->delete_records('local_gugrades_column', ['courseid' => $courseid]);
 
         // Delete maps.
@@ -1987,7 +1987,7 @@ class api {
             $DB->execute($sql, $params);
         }
 
-        // Delete the column itself.
+        // Delete the column itself. The column backup is kept so a grades backup can still be restored.
         $DB->delete_records('local_gugrades_column', ['id' => $columnid]);
 
         // Cleanup and recalculate.

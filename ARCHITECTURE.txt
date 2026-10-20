@@ -220,6 +220,11 @@ Important data
   grades are reset, and removed when the course is deleted or personal data
   is deleted. grades::restore_missing_grade_backups() copies missing current
   grades back from this table.
+- local_gugrades_columnbackup: copy of local_gugrades_column, including the
+  original column id. Written when a column is created or its points flag
+  changes. Kept when columns are reset or removed, and removed when the
+  course is deleted. Restoring grades puts these columns back first so the
+  grades backup column ids still match.
 - local_gugrades_latest: identifies the current grade record for a course,
   grade item, and user.
 - local_gugrades_column: imported or captured grade columns.

@@ -94,6 +94,16 @@ class provider implements
         );
 
         $collection->add_database_table(
+            'local_gugrades_columnbackup',
+            [
+                'courseid' => 'privacy:metadata:courseid',
+                'gradeitemid' => 'privacy:metadata:gradeitemid',
+                'gradetype' => 'privacy:metadata:gradetype',
+            ],
+            'privacy:metadata:local_gugrades_columnbackup'
+        );
+
+        $collection->add_database_table(
             'local_gugrades_hidden',
             [
                 'courseid' => 'privacy:metadata:courseid',
@@ -246,6 +256,7 @@ class provider implements
         $DB->delete_records('local_gugrades_audit', $params);
         $DB->delete_records('local_gugrades_grade', $params);
         $DB->delete_records('local_gugrades_gradesbackup', $params);
+        $DB->delete_records('local_gugrades_columnbackup', $params);
         $DB->delete_records('local_gugrades_hidden', $params);
         $DB->delete_records('local_gugrades_resitrequired', $params);
     }

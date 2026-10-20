@@ -420,6 +420,7 @@ $string['privacy:metadata:iserror'] = 'Error grade?';
 $string['privacy:metadata:local_gugrades_audit'] = 'Audit log';
 $string['privacy:metadata:local_gugrades_grades'] = 'Grades';
 $string['privacy:metadata:local_gugrades_gradesbackup'] = 'Copy of current grade values';
+$string['privacy:metadata:local_gugrades_columnbackup'] = 'Copy of grade columns';
 $string['privacy:metadata:local_gugrades_hidden'] = 'Hidden grades';
 $string['privacy:metadata:local_gugrades_resitrequired'] = 'Resit required';
 $string['privacy:metadata:message'] = 'Message';

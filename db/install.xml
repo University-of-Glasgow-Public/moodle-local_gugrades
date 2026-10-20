@@ -110,6 +110,25 @@
         <INDEX NAME="gugradesbak_cou" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_gugrades_columnbackup" COMMENT="Copy of grade columns so grades backup column ids can be restored.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="columnid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="local_gugrades_column.id this row was copied from"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="gradeitemid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="gradetype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="other" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="points" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="gugradecolbak_col" UNIQUE="true" FIELDS="columnid"/>
+        <INDEX NAME="gugradecolbak_cou" UNIQUE="false" FIELDS="courseid"/>
+      </INDEXES>
+    </TABLE>
     <TABLE NAME="local_gugrades_audit" COMMENT="Contains audit trail of errors, warnings and info">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

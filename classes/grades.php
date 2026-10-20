@@ -758,6 +758,7 @@ class grades {
         $column->other = $other;
         $column->points = $points;
         $column->id = $DB->insert_record('local_gugrades_column', $column);
+        self::save_column_backup($column);
 
         return $column;
     }
@@ -1078,6 +1079,138 @@ class grades {
     }
 
     /**
+     * Store a column so a grades backup row can still find it by columnid.
+     * The copy keeps the original column id. It is left in place when columns
+     * are reset or removed, and removed with the course.
+     *
+     * @param object $column Column row from local_gugrades_column
+     */
+    public static function save_column_backup(object $column): void {
+        global $DB;
+
+        if (empty($column->id)) {
+            return;
+        }
+
+        $record = (object) [
+            'columnid' => $column->id,
+            'courseid' => $column->courseid,
+            'gradeitemid' => $column->gradeitemid,
+            'gradetype' => $column->gradetype,
+            'other' => $column->other ?? '',
+            'points' => empty($column->points) ? 0 : 1,
+            'timemodified' => time(),
+        ];
+
+        if ($existing = $DB->get_record('local_gugrades_columnbackup', ['columnid' => $column->id])) {
+            $record->id = $existing->id;
+            $DB->update_record('local_gugrades_columnbackup', $record);
+        } else {
+            $DB->insert_record('local_gugrades_columnbackup', $record);
+        }
+    }
+
+    /**
+     * Copy columns that are not in the backup yet.
+     * The column table is small, so this reads every missing row.
+     */
+    public static function backfill_column_backups(): void {
+        global $DB;
+
+        $sql = "SELECT c.*
+                  FROM {local_gugrades_column} c
+             LEFT JOIN {local_gugrades_columnbackup} b ON b.columnid = c.id
+                 WHERE b.id IS NULL";
+        $columns = $DB->get_recordset_sql($sql);
+        foreach ($columns as $column) {
+            self::save_column_backup($column);
+        }
+        $columns->close();
+    }
+
+    /**
+     * Replace the column backup for one course, or the whole site, from the live columns.
+     *
+     * @param int|null $courseid Restrict to one course, or all courses when null
+     */
+    public static function rebuild_column_backups(?int $courseid = null): void {
+        global $DB;
+
+        if ($courseid) {
+            $DB->delete_records('local_gugrades_columnbackup', ['courseid' => $courseid]);
+            $columns = $DB->get_recordset('local_gugrades_column', ['courseid' => $courseid], 'id ASC');
+        } else {
+            $DB->delete_records('local_gugrades_columnbackup');
+            $columns = $DB->get_recordset('local_gugrades_column', null, 'id ASC');
+        }
+
+        foreach ($columns as $column) {
+            self::save_column_backup($column);
+        }
+        $columns->close();
+    }
+
+    /**
+     * Put missing columns back with their original ids.
+     * Grades backup rows point at those ids, so a new id would not match.
+     *
+     * @param int $courseid
+     * @return int Number of columns restored
+     */
+    public static function restore_missing_column_backups(int $courseid): int {
+        global $DB;
+
+        $backups = $DB->get_records('local_gugrades_columnbackup', ['courseid' => $courseid]);
+        $restored = 0;
+        foreach ($backups as $backup) {
+            if ($DB->record_exists('local_gugrades_column', ['id' => $backup->columnid])) {
+                continue;
+            }
+            // A replacement column already covers this grade type.
+            if ($backup->gradetype !== 'OTHER' && $DB->record_exists('local_gugrades_column', [
+                'gradeitemid' => $backup->gradeitemid,
+                'gradetype' => $backup->gradetype,
+            ])) {
+                continue;
+            }
+            if ($backup->gradetype === 'OTHER') {
+                $compareother = $DB->sql_compare_text('other');
+                $sql = "SELECT id
+                          FROM {local_gugrades_column}
+                         WHERE gradeitemid = :gradeitemid
+                           AND gradetype = :gradetype
+                           AND $compareother = :other";
+                if ($DB->record_exists_sql($sql, [
+                    'gradeitemid' => $backup->gradeitemid,
+                    'gradetype' => $backup->gradetype,
+                    'other' => $backup->other,
+                ])) {
+                    continue;
+                }
+            }
+
+            $column = (object) [
+                'id' => $backup->columnid,
+                'courseid' => $backup->courseid,
+                'gradeitemid' => $backup->gradeitemid,
+                'gradetype' => $backup->gradetype,
+                'other' => $backup->other ?? '',
+                'points' => empty($backup->points) ? 0 : 1,
+            ];
+            $DB->insert_record_raw('local_gugrades_column', $column, false, false, true);
+            $restored++;
+        }
+
+        // Deleted rows leave the sequence where it was. A recreated table starts at 1,
+        // so move it past the restored ids. Sequence changes commit, which PHPUnit cannot do.
+        if ($restored && !PHPUNIT_TEST) {
+            $DB->get_manager()->reset_sequence('local_gugrades_column');
+        }
+
+        return $restored;
+    }
+
+    /**
      * Store the current actual grade in local_gugrades_gradesbackup.
      * One row is kept for each grade item, user and column. History and audit
      * comments stay in local_gugrades_grade. This copy is left in place when
@@ -1197,6 +1330,9 @@ class grades {
      * @param int $timelimit Seconds to keep copying before returning
      */
     public static function run_grade_backup_batches(int $batchsize, int $timelimit): void {
+        // Columns are few, so catch any that were not copied when they were created.
+        self::backfill_column_backups();
+
         $status = get_config('local_gugrades', 'gradesbackup_backfill');
         if ($status === 'done') {
             mtrace('MyGrades grade backup is already complete.');
@@ -1230,6 +1366,8 @@ class grades {
     public static function rebuild_grade_backups(?int $courseid = null): void {
         global $DB;
 
+        self::rebuild_column_backups($courseid);
+
         if ($courseid) {
             $DB->delete_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
             $grades = $DB->get_recordset('local_gugrades_grade', ['courseid' => $courseid, 'iscurrent' => 1], 'id ASC');
@@ -1253,6 +1391,8 @@ class grades {
      */
     public static function restore_missing_grade_backups(int $courseid): int {
         global $DB;
+
+        self::restore_missing_column_backups($courseid);
 
         $values = $DB->get_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
         $restored = 0;
@@ -1934,7 +2074,8 @@ class grades {
     /**
      * Delete all data for gradeitemid
      * TODO: Don't forget to add anything new that we add in db.
-     * local_gugrades_gradesbackup is kept so the last actual grades can be restored.
+     * local_gugrades_gradesbackup and local_gugrades_columnbackup are kept so the
+     * last actual grades can be restored with their original column ids.
      * @param int $courseid
      * @param int $gradeitemid
      */
@@ -1972,6 +2113,7 @@ class grades {
         $DB->delete_records('local_gugrades_resitrequired', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_grade', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
+        $DB->delete_records('local_gugrades_columnbackup', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_audit', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_column', ['courseid' => $courseid]);
         $DB->delete_records('local_gugrades_hidden', ['courseid' => $courseid]);

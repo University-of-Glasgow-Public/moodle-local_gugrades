@@ -248,12 +248,60 @@ final class gradesbackup_test extends \advanced_testcase {
         $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '10', 10);
         grades::delete_course($course->id);
         $this->assertSame(0, $DB->count_records('local_gugrades_gradesbackup', ['courseid' => $course->id]));
+        $this->assertSame(0, $DB->count_records('local_gugrades_columnbackup', ['courseid' => $course->id]));
 
         [$course, $student, $gradeitem] = $this->course_with_item();
         $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '10', 10);
         $context = \context_course::instance($course->id);
         privacy\provider::delete_data_for_all_users_in_context($context);
         $this->assertSame(0, $DB->count_records('local_gugrades_gradesbackup', ['courseid' => $course->id]));
+        $this->assertSame(0, $DB->count_records('local_gugrades_columnbackup', ['courseid' => $course->id]));
+    }
+
+    /**
+     * The column copy keeps the original id, and restore puts that column back.
+     *
+     * @covers \local_gugrades\grades::save_column_backup
+     * @covers \local_gugrades\grades::backfill_column_backups
+     * @covers \local_gugrades\grades::restore_missing_column_backups
+     */
+    public function test_column_backup_restores_original_id(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '18', 18);
+
+        $gradebackup = $DB->get_record('local_gugrades_gradesbackup', [
+            'gradeitemid' => $gradeitem->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+        $columnbackup = $DB->get_record('local_gugrades_columnbackup', [
+            'columnid' => $gradebackup->columnid,
+        ], '*', MUST_EXIST);
+        $this->assertEquals($gradeitem->id, $columnbackup->gradeitemid);
+        $this->assertSame('FIRST', $columnbackup->gradetype);
+
+        $DB->delete_records('local_gugrades_columnbackup', ['columnid' => $gradebackup->columnid]);
+        grades::backfill_column_backups();
+        $this->assertTrue($DB->record_exists('local_gugrades_columnbackup', [
+            'columnid' => $gradebackup->columnid,
+        ]));
+
+        api::reset($course->id);
+        $this->assertFalse($DB->record_exists('local_gugrades_column', ['id' => $gradebackup->columnid]));
+        $this->assertTrue($DB->record_exists('local_gugrades_columnbackup', [
+            'columnid' => $gradebackup->columnid,
+        ]));
+
+        grades::restore_missing_grade_backups($course->id);
+        $column = $DB->get_record('local_gugrades_column', ['id' => $gradebackup->columnid], '*', MUST_EXIST);
+        $this->assertSame('FIRST', $column->gradetype);
+        $grade = $DB->get_record('local_gugrades_grade', [
+            'gradeitemid' => $gradeitem->id,
+            'userid' => $student->id,
+            'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        $this->assertEquals($gradebackup->columnid, $grade->columnid);
     }
 
     /**

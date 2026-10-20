@@ -505,6 +505,7 @@ class conversion {
                 ) {
                     $provisionalcolumn->points = true;
                     $DB->update_record('local_gugrades_column', $provisionalcolumn);
+                    \local_gugrades\grades::save_column_backup($provisionalcolumn);
                 }
                 \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
             }
@@ -768,6 +769,7 @@ class conversion {
         ) {
             $provisionalcolumn->points = false;
             $DB->update_record('local_gugrades_column', $provisionalcolumn);
+            \local_gugrades\grades::save_column_backup($provisionalcolumn);
         }
     }
 

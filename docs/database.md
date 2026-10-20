@@ -24,6 +24,18 @@ simple to grab the columns from this table to construct the table for presentati
 * **other** - if OTHER is the selected gradetype, then this is the description of the field. Otherwise, blank.
 * **points** - If true/1 then the column shows points. If false/0 the column shows scale values. 
 
+## local_gugrades_columnbackup
+
+A copy of `local_gugrades_column`. The grades backup stores `columnid`, which is the id from the columns table, so that id has to be recoverable as well. MyGrades writes a row here when a column is created, and updates it when the column's points flag changes. Upgrade copies the columns that already exist. The copy is kept when MyGrades is reset or a column is removed, and it is removed when the course is deleted. Restoring missing grades puts these columns back with their original ids before writing the grades.
+
+* **columnid** - the `local_gugrades_column.id` this row was copied from
+* **courseid** - containing course id
+* **gradeitemid** - the Moodle grade item
+* **gradetype** - FIRST, SECOND, OTHER and so on
+* **other** - description when the grade type is OTHER, otherwise empty
+* **points** - 1 for a points column, 0 for a scale column
+* **timemodified** - when this copy was last written
+
 ## local_gugrades_grade
 
 Contains the MyGrades individual grades. This is the cornerstone of the app and stores all versions of captured grades
@@ -63,7 +75,7 @@ The row is kept when grades are reset or removed from local_gugrades_grade, so t
 * **courseid** - containing course id
 * **gradeitemid** - the Moodle grade item
 * **userid** - whose grade it is
-* **columnid** - the capture or category column this value belongs to
+* **columnid** - the capture or category column this value belongs to. `local_gugrades_columnbackup` keeps that column, including this id
 * **gradetype** - FIRST, SECOND, CATEGORY and so on
 * **points** - 1 for a points grade, 0 for a scale grade
 * **rawgrade** - point value, or scale index

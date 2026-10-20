@@ -650,5 +650,33 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026101602, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026102000) {
+        // Columns are needed to interpret columnid on the grades backup.
+        // There are few of them, so copy the existing rows during the upgrade.
+        $table = new xmldb_table('local_gugrades_columnbackup');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('columnid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('gradeitemid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('gradetype', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('other', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('points', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $table->add_index('gugradecolbak_col', XMLDB_INDEX_UNIQUE, ['columnid']);
+        $table->add_index('gugradecolbak_cou', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        \local_gugrades\grades::backfill_column_backups();
+
+        upgrade_plugin_savepoint(true, 2026102000, 'local', 'gugrades');
+    }
+
     return true;
 }
