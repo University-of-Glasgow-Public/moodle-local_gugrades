@@ -450,4 +450,53 @@ final class gradesbackup_test extends \advanced_testcase {
             'gradeitemid' => $gradeitem->id,
         ]));
     }
+
+    /**
+     * Settings restore writes missing grades back and refuses a user who cannot reset the course.
+     *
+     * @covers \local_gugrades\external\restore_grades
+     */
+    public function test_settings_restore_writes_missing_grades(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '15', 15);
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_column', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $course->id]);
+
+        $this->setUser($student);
+        $this->expectException(\required_capability_exception::class);
+        \local_gugrades\external\restore_grades::execute($course->id);
+    }
+
+    /**
+     * An admin can restore a missing grade from the settings function.
+     *
+     * @covers \local_gugrades\external\restore_grades
+     */
+    public function test_settings_restore_as_admin(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '15', 15);
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_column', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $course->id]);
+
+        $this->setAdminUser();
+        $result = \local_gugrades\external\restore_grades::execute($course->id);
+        $this->assertSame(1, $result['restored']);
+
+        $grade = $DB->get_record('local_gugrades_grade', [
+            'gradeitemid' => $gradeitem->id,
+            'userid' => $student->id,
+            'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(15.0, (float) $grade->rawgrade);
+        $this->assertSame('Restored from grades backup', $grade->auditcomment);
+
+        $again = \local_gugrades\external\restore_grades::execute($course->id);
+        $this->assertSame(0, $again['restored']);
+    }
 }

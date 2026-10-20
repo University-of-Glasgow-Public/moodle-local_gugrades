@@ -54,6 +54,7 @@ $services = [
             'local_gugrades_release_grades',
             'local_gugrades_release_grade',
             'local_gugrades_reset',
+            'local_gugrades_restore_grades',
             'local_gugrades_get_groups',
             'local_gugrades_get_csv_download',
             'local_gugrades_get_capture_cell_form',
@@ -262,6 +263,12 @@ $functions = [
     'local_gugrades_reset' => [
         'classname' => 'local_gugrades\external\reset',
         'description' => 'Completely deletes MyGrades data for given course. Process cannot be undone!',
+        'type' => 'write',
+        'ajax' => true,
+    ],
+    'local_gugrades_restore_grades' => [
+        'classname' => 'local_gugrades\external\restore_grades',
+        'description' => 'Write missing MyGrades grades and columns back from the backup tables.',
         'type' => 'write',
         'ajax' => true,
     ],

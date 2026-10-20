@@ -19,6 +19,7 @@
         </FormKit>
 
         <div class="mt-5">
+            <RestoreButton></RestoreButton>
             <ResetButton></ResetButton>
         </div>
     </div>
@@ -31,6 +32,7 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import { useToast } from "vue-toastification";
     import ResetButton from '@/components/Settings/ResetButton.vue';
+    import RestoreButton from '@/components/Settings/RestoreButton.vue';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useLogo } from '@/js/monochromelogo';
     import UAlert from '@/components/Common/UAlert.vue';
