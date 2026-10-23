@@ -61,12 +61,16 @@
                     <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.aggregatedgrade }}</div>
                     <div class="text-university-blue font-semibold">
                         <span v-if="user!.capped" class="inline-block border-2 border-solid border-orange-500 rounded-lg p-0.5" :title="mstrings.resitcapped"><GradeColor :grade="user!.displaygrade"/></span>
+                        <span v-else-if="!user!.displaygrade1st && user!.engcapped" class="inline-block border-2 border-solid border-orange-500 rounded-lg p-0.5" :title="mstrings.engineeringcapped"><GradeColor :grade="user!.displaygrade"/></span>
                         <GradeColor v-else :grade="user!.displaygrade"/>
                     </div>
                 </div>
                 <div v-if="user && user.displaygrade1st" class="flex-1 pl-4 border-l border-brand-light-purple/30">
                     <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.firstsittinggrade }}</div>
-                    <div class="text-university-blue font-semibold"><GradeColor :grade="user!.displaygrade1st"/></div>
+                    <div class="text-university-blue font-semibold">
+                        <span v-if="user!.engcapped1st" class="inline-block border-2 border-solid border-orange-500 rounded-lg p-0.5" :title="mstrings.engineeringcapped"><GradeColor :grade="user!.displaygrade1st"/></span>
+                        <GradeColor v-else :grade="user!.displaygrade1st"/>
+                    </div>
                 </div>
                 <div v-if="user && user.regulationname == 'original'" class="flex-1 pl-4 border-l border-brand-light-purple/30">
                     <div class="uppercase text-xs font-semibold tracking-wider text-brand-dark-purple/70 mb-1">{{ mstrings.completed }}</div>

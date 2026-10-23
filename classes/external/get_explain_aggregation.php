@@ -101,6 +101,8 @@ class get_explain_aggregation extends external_api {
             'total' => new external_value(PARAM_FLOAT, 'Total grade used for ongoing aggregation'),
             'overridden' => new external_value(PARAM_BOOL, 'Has grade been overridden?'),
             'capped' => new external_value(PARAM_BOOL, 'Award capped because of a resit (MGU-1596)', VALUE_DEFAULT, false),
+            'engcapped' => new external_value(PARAM_BOOL, 'First-attempt course total capped by the Engineering threshold', VALUE_DEFAULT, false),
+            'engcapped1st' => new external_value(PARAM_BOOL, 'First-sitting course total capped by the Engineering threshold', VALUE_DEFAULT, false),
             'alteredweight' => new external_value(PARAM_BOOL, 'Have the weights been altered for this user?'),
             'showweights' => new external_value(PARAM_BOOL, 'Should weights be shown in headers?'),
             'strategy' => new external_value(PARAM_TEXT, 'Aggregation strategy formatted for display'),

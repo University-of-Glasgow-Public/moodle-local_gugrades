@@ -65,6 +65,7 @@ final class gradesbackup_test extends \advanced_testcase {
      * @param float|null $rawgrade
      * @param string $admingrade
      * @param bool $capped
+     * @param bool $engcapped
      */
     protected function write_grade(
         int $courseid,
@@ -75,6 +76,7 @@ final class gradesbackup_test extends \advanced_testcase {
         float|null $rawgrade,
         string $admingrade = '',
         bool $capped = false,
+        bool $engcapped = false,
     ): void {
         grades::write_grade(
             courseid: $courseid,
@@ -92,6 +94,7 @@ final class gradesbackup_test extends \advanced_testcase {
             auditcomment: 'Captured',
             ispoints: true,
             capped: $capped,
+            engcapped: $engcapped,
         );
     }
 
@@ -174,6 +177,38 @@ final class gradesbackup_test extends \advanced_testcase {
         ], '*', MUST_EXIST);
         $this->assertEquals(1, (int) $grade->capped);
         $this->assertEquals(8.0, (float) $grade->rawgrade);
+    }
+
+    /**
+     * An Engineering-capped first attempt is stored in the backup and written back on restore.
+     *
+     * @covers \local_gugrades\grades::save_grade_backup
+     * @covers \local_gugrades\grades::restore_missing_grade_backups
+     */
+    public function test_engcapped_flag_is_copied_and_restored(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'CATEGORY', 'E1 (8)', 8, '', false, true);
+
+        $backup = $DB->get_record('local_gugrades_gradesbackup', [
+            'gradeitemid' => $gradeitem->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(1, (int) $backup->engcapped);
+        $this->assertEquals(0, (int) $backup->capped);
+
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $course->id]);
+
+        $this->assertSame(1, grades::restore_missing_grade_backups($course->id));
+        $grade = $DB->get_record('local_gugrades_grade', [
+            'courseid' => $course->id,
+            'userid' => $student->id,
+            'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(1, (int) $grade->engcapped);
+        $this->assertEquals(0, (int) $grade->capped);
     }
 
     /**

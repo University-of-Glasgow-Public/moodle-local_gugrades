@@ -61,6 +61,7 @@ and aggregated grade category items.
 * **catoverride** - if true, this is a category that has been overridden by the user
 * **normalisedweight** - the "normalised" weighting used for this item in aggregation.
 * **capped** - course total award was capped because a resit was taken.
+* **engcapped** - first-attempt course total was reduced by the Engineering threshold (maximum E1).
 
 ## local_gugrades_gradesbackup
 
@@ -87,6 +88,7 @@ The row is kept when grades are reset or removed from local_gugrades_grade, so t
 * **notavailable** - category grade is not available
 * **catoverride** - category total was overridden
 * **capped** - course total award was capped because a resit was taken
+* **engcapped** - first-attempt course total was reduced by the Engineering threshold (maximum E1)
 * **gradeid** - id of the local_gugrades_grade row this value was copied from
 * **timemodified** - when this copy was last written
 

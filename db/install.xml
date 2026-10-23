@@ -68,6 +68,7 @@
         <FIELD NAME="catoverride" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates an overridden category."/>
         <FIELD NAME="normalisedweight" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="The weight used in the final calculation"/>
         <FIELD NAME="capped" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course total award capped because of a resit"/>
+        <FIELD NAME="engcapped" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="First-attempt course total capped by the Engineering threshold"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -99,6 +100,7 @@
         <FIELD NAME="notavailable" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="catoverride" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="capped" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course total award capped because of a resit"/>
+        <FIELD NAME="engcapped" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="First-attempt course total capped by the Engineering threshold"/>
         <FIELD NAME="gradeid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="local_gugrades_grade.id this value was copied from"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>

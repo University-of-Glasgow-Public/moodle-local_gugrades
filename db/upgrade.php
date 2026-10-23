@@ -678,5 +678,22 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026102000, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026102002) {
+        // First-attempt course total reduced by the Engineering threshold.
+        $table = new xmldb_table('local_gugrades_grade');
+        $field = new xmldb_field('engcapped', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'capped');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('local_gugrades_gradesbackup');
+        $field = new xmldb_field('engcapped', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'capped');
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026102002, 'local', 'gugrades');
+    }
+
     return true;
 }

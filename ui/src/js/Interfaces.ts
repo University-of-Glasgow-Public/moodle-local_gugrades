@@ -272,6 +272,8 @@ export interface IUser {
     firstsittingexplain?: string;
     awardexplain?: string;
     capped?: boolean;
+    engcapped?: boolean;
+    engcapped1st?: boolean;
     releasedgrade: string;
     mismatch: boolean;
     rawgrade: number;

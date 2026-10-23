@@ -89,6 +89,12 @@ class aggregate {
     private bool $capped = false;
 
     /**
+     * Engineering threshold reduced this course total (maximum E1).
+     * @var bool $engineeringcapped
+     */
+    private bool $engineeringcapped = false;
+
+    /**
      * Record the deciding item once; later checks in the same calculation do not replace it.
      * @param object $item
      * @param string $reason
@@ -147,6 +153,14 @@ class aggregate {
      */
     public function get_capped(): bool {
         return $this->capped;
+    }
+
+    /**
+     * Was the last calculated course total reduced by the Engineering threshold?
+     * @return bool
+     */
+    public function get_engineeringcapped(): bool {
+        return $this->engineeringcapped;
     }
 
     /**
@@ -265,6 +279,7 @@ class aggregate {
         $explain = '';
         $this->selection = null;
         $this->capped = false;
+        $this->engineeringcapped = false;
         $this->resittaken = !$firstsitting && $this->resit_taken($category, $items, $userid);
 
         // Logic will be different if this category is for resits.
@@ -476,6 +491,7 @@ class aggregate {
             $oldaggregatedgrade = $aggregatedgrade;
             $aggregatedgrade = $this->engineering_cap($courseid, $aggregatedgrade, $items);
             $isengineeringcap = $oldaggregatedgrade <> $aggregatedgrade;
+            $this->engineeringcapped = $isengineeringcap;
         }
 
         // MGU-1596: The course total award is capped if a resit was taken.

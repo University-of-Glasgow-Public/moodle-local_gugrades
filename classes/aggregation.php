@@ -471,7 +471,7 @@ class aggregation {
         // Establish if this user is already in the cache.
         $cache = \cache::make('local_gugrades', 'useraggdata');
         $cachetag = self::get_aggdata_cachetag($courseid, $gradecategoryid, $user->id);
-        if (($cacheduser = $cache->get($cachetag)) && !$isunittest && isset($cacheduser->isadmin1st)) {
+        if (($cacheduser = $cache->get($cachetag)) && !$isunittest && isset($cacheduser->isadmin1st, $cacheduser->engcapped)) {
             return $cacheduser;
         }
 
@@ -584,11 +584,13 @@ class aggregation {
         $user->displaygrade1st = '';
         $user->isadmin1st = false;
         $user->error1st = '';
+        $user->engcapped1st = false;
         if (self::has_dual_grades($courseid, $gradecategoryid)) {
             $first = self::get_first_sitting_grade($courseid, $gradecatitem->id, $user->id);
             $user->displaygrade1st = $first->displaygrade;
             $user->isadmin1st = !empty($first->admingrade);
             $user->error1st = $first->iserror ? $first->displaygrade : '';
+            $user->engcapped1st = !empty($first->engcapped);
         }
         $user->releasegrade = $releasegrade;
         $user->mismatch = $released && ($item->displaygrade != $releasegrade);
@@ -598,6 +600,7 @@ class aggregation {
         $user->error = '';
         $user->overridden = $item->catoverride;
         $user->capped = !empty($item->capped);
+        $user->engcapped = !empty($item->engcapped);
         $user->itemname = $gcat->fullname;
 
         // Mismatch (can possibly do better).
@@ -1173,6 +1176,7 @@ class aggregation {
             overwrite:      true,
             notavailable:   $category->notavailable,
             capped:         !empty($category->capped),
+            engcapped:      !empty($category->engcapped),
         );
     }
 
@@ -1557,6 +1561,7 @@ class aggregation {
             }
         }
         $capped = !$override && method_exists($aggregation, 'get_capped') && $aggregation->get_capped();
+        $engcapped = !$override && method_exists($aggregation, 'get_engineeringcapped') && $aggregation->get_engineeringcapped();
 
         // If this is a points grade, level 2 or deeper, a grade is returned and a map exists then
         // we need to deal with this as a converted grade.
@@ -1592,6 +1597,7 @@ class aggregation {
             'explain' => $explain,
             'notavailable' => $notavailable,
             'capped' => $capped,
+            'engcapped' => $engcapped,
         ];
         self::write_aggregated_category($courseid, $userid, $aggregatedcategory, $firstsitting ? 'CATEGORY1' : 'CATEGORY');
 
@@ -1608,6 +1614,7 @@ class aggregation {
             'selection' => (!$override && method_exists($aggregation, 'get_selection')) ? $aggregation->get_selection() : null,
             'resittaken' => $resittaken,
             'capped' => $capped,
+            'engcapped' => $engcapped,
         ];
     }
 

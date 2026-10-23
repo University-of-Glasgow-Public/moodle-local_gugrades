@@ -116,6 +116,8 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
 
         $fred = $page['users'][0];
         $this->assertEquals('E1 (8)', $fred['displaygrade']);
+        $this->assertTrue($fred['engcapped']);
+        $this->assertFalse($fred['engcapped1st']);
 
         // Explain current page.
         $explain = get_explain_aggregation::execute($this->course->id, $summativeid, $this->student->id);

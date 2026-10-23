@@ -888,6 +888,7 @@ class grades {
      * @param bool $catoverride
      * @param bool $notavailable (only applicable to categories)
      * @param bool $capped MGU-1596: Course total award capped because of a resit.
+     * @param bool $engcapped First-attempt course total capped by the Engineering threshold.
      */
     public static function write_grade(
         int $courseid,
@@ -908,6 +909,7 @@ class grades {
         bool $catoverride = false,
         bool $notavailable = false,
         bool $capped = false,
+        bool $engcapped = false,
     ) {
         global $DB, $USER;
 
@@ -1001,6 +1003,7 @@ class grades {
                 $gugrade->points = $ispoints;
                 $gugrade->catoverride = $catoverride;
                 $gugrade->capped = $capped;
+                $gugrade->engcapped = $engcapped;
 
                 $DB->update_record('local_gugrades_grade', $gugrade);
                 self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
@@ -1031,6 +1034,7 @@ class grades {
         $gugrade->points = $ispoints;
         $gugrade->catoverride = $catoverride;
         $gugrade->capped = $capped;
+        $gugrade->engcapped = $engcapped;
         $gugrade->id = $DB->insert_record('local_gugrades_grade', $gugrade);
         self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
         self::save_grade_backup($gugrade, $other);
@@ -1257,6 +1261,7 @@ class grades {
             'notavailable' => empty($grade->notavailable) ? 0 : 1,
             'catoverride' => empty($grade->catoverride) ? 0 : 1,
             'capped' => empty($grade->capped) ? 0 : 1,
+            'engcapped' => empty($grade->engcapped) ? 0 : 1,
             'gradeid' => $grade->id,
             'timemodified' => time(),
         ];
@@ -1439,6 +1444,7 @@ class grades {
                 catoverride: (bool) $value->catoverride,
                 notavailable: (bool) $value->notavailable,
                 capped: !empty($value->capped),
+                engcapped: !empty($value->engcapped),
             );
             $restored++;
 

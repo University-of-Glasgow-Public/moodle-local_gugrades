@@ -21,7 +21,7 @@
         ></OverrideGrade>
 
         <span v-if="firstsitting ? user.error1st : user.error">{{ firstsitting ? user.error1st : user.error }}</span>
-        <UTooltip v-else :class="firstsitting ? [] : itemclasses(props.user)" class="min-w-11 p-0.5" :text="firstsitting ? '' : itemtooltip(user)" :position="beforehalfway ? 'below' : 'above'">
+        <UTooltip v-else :class="cellclasses()" class="min-w-11 p-0.5" :text="celltooltip()" :position="beforehalfway ? 'below' : 'above'">
             <b v-if="firstsitting && user.isadmin1st" class="inline-flex h-6 min-w-10 items-center justify-center px-1">{{ user.displaygrade1st }}</b>
             <GradeColor v-else :grade="firstsitting ? user.displaygrade1st : user.displaygrade" :otherclasses="['min-w-10']"></GradeColor>
         </UTooltip>
@@ -66,6 +66,55 @@
      */
     function grade_changed(userid: number) {
         emits('gradeadded', userid);
+    }
+
+    /**
+     * Engineering threshold reduced the first-attempt course total.
+     * With two results, that is the first-sitting column. With one result, it is the course total.
+     */
+    function engineeringCapped(item: Record<string, any>) {
+        if (!props.toplevel) {
+            return false;
+        }
+        if (props.firstsitting) {
+            return !!item.engcapped1st;
+        }
+        if (!props.dualgrades) {
+            return !!item.engcapped;
+        }
+        return false;
+    }
+
+    /**
+     * Tooltip for the total being shown.
+     */
+    function celltooltip() {
+        if (!props.firstsitting) {
+            const tip = itemtooltip(props.user);
+            if (tip) {
+                return tip;
+            }
+        }
+        if (engineeringCapped(props.user)) {
+            return mstringstore.getMstring('engineeringcapped');
+        }
+        return '';
+    }
+
+    /**
+     * Border classes for the total being shown.
+     */
+    function cellclasses() {
+        if (!props.firstsitting) {
+            const classes = itemclasses(props.user);
+            if (classes.length) {
+                return classes;
+            }
+        }
+        if (engineeringCapped(props.user)) {
+            return ['border-2', 'border-solid', 'border-orange-500', 'rounded-lg'];
+        }
+        return [];
     }
 
     /**
