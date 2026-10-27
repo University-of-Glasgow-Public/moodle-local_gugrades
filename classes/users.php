@@ -385,9 +385,8 @@ class users {
      * Determine if user is UG, PG or neither
      * Returns 'Postgraduate Taught', 'Lifelong Learning, 'Undergraduate', 'Postgraduate Research',
      * 'External'. Or 'Unknown' if no record found
-     * If no data for a user, we call enrol_gudatabase in an attempt to do something
-     * about it. However, as we don't want to keep hammering the external enrolment database
-     * we'll have a cache for this information. 
+     * A resolved status is cached so later calls do not query the external enrolment database.
+     * Unknown is not cached: the next call checks the profile field and enrolment database again.
      * @param int $userid
      * @return string
      */
@@ -395,7 +394,13 @@ class users {
         global $DB, $CFG;
 
         $cache = \cache::make('local_gugrades', 'ugpg');
-        if ($ugpg = $cache->get($userid)) {
+        $ugpg = $cache->get($userid);
+        if ($ugpg === 'Unknown') {
+            // An earlier miss must not stick. Drop it and look the student up again.
+            $cache->delete($userid);
+            $ugpg = false;
+        }
+        if ($ugpg) {
             return $ugpg;
         }
 
@@ -413,9 +418,9 @@ class users {
         require_once("$CFG->dirroot/enrol/gudatabase/lib.php");
         $plugin = new \enrol_gudatabase_plugin();
 
-        // If it's not configured, then we can only return Unknown
+        // If it's not configured, then we can only return Unknown.
+        // Leave it uncached so a later call can try again once the plugin is configured.
         if (!$plugin->is_configured()) {
-            $cache->set($userid, 'Unknown');
             return 'Unknown';
         }
         $plugin->external_programdata($user);
@@ -428,8 +433,7 @@ class users {
         }
 
         // Failed. Not a student at all or missing record.
-        $cache->set($userid, 'Unknown');
-
+        // Do not cache this: the enrolment record may appear later.
         return 'Unknown';
     }
 }

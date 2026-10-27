@@ -706,7 +706,8 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(9, $award->convertedgrade);
         $this->assertEquals('D3 (9)', $award->displaygrade);
         $this->assertTrue((bool)$award->capped);
-        $this->assertEquals('Unknown', $cache->get($this->student->id));
+        // Unknown is not cached, so a later lookup tries the enrolment database again.
+        $this->assertFalse($cache->get($this->student->id));
         $first = $this->result('Dual total', 'CATEGORY1');
         $this->assertEquals(15, $first->convertedgrade);
         $this->assertFalse((bool)$first->capped);
