@@ -382,15 +382,137 @@ class users {
     }
 
     /**
+     * UG/PG status already recorded for this student on this course.
+     * @param int $courseid
+     * @param int $userid
+     * @return string Empty when this course has no recorded status.
+     */
+    public static function get_saved_course_ugpg(int $courseid, int $userid): string {
+        global $DB;
+
+        if (!$courseid || !$userid) {
+            return '';
+        }
+        $ugpg = $DB->get_field('local_gugrades_ugpg', 'ugpg', ['courseid' => $courseid, 'userid' => $userid]);
+
+        return $ugpg ?: '';
+    }
+
+    /**
+     * Record the status used for this student on this course.
+     * An existing record is left as it is, so a later programme change cannot replace it.
+     * @param int $courseid
+     * @param int $userid
+     * @param string $ugpg
+     */
+    public static function save_course_ugpg(int $courseid, int $userid, string $ugpg): void {
+        global $DB;
+
+        $ugpg = trim($ugpg);
+        if (!$courseid || !$userid || $ugpg === '' || $ugpg === 'Unknown') {
+            return;
+        }
+        if ($DB->record_exists('local_gugrades_ugpg', ['courseid' => $courseid, 'userid' => $userid])) {
+            return;
+        }
+        $DB->insert_record('local_gugrades_ugpg', (object)[
+            'courseid' => $courseid,
+            'userid' => $userid,
+            'ugpg' => $ugpg,
+            'timecreated' => time(),
+        ]);
+    }
+
+    /**
+     * Does this course already have MyGrades grades for the student?
+     * @param int $courseid
+     * @param int $userid
+     * @return bool
+     */
+    protected static function course_has_grades(int $courseid, int $userid): bool {
+        global $DB;
+
+        return $DB->record_exists('local_gugrades_grade', ['courseid' => $courseid, 'userid' => $userid]);
+    }
+
+    /**
+     * Copy the status already reflected in existing MyGrades data onto the course.
+     * A resit cap wins over the current profile field, because the profile may have changed
+     * since that cap was stored. Courses with grades but no cap take the profile field when it is set.
+     */
+    public static function backfill_course_ugpg(): void {
+        global $DB;
+
+        // Upgrade does not load the API, which is otherwise what includes these constants.
+        require_once(dirname(__FILE__) . '/constants.php');
+
+        $sql = "SELECT courseid, userid, convertedgrade
+                  FROM {local_gugrades_grade}
+                 WHERE iscurrent = 1
+                   AND capped = 1
+                   AND (convertedgrade = :ug OR convertedgrade = :pg)
+              ORDER BY audittimecreated DESC, id DESC";
+        $rs = $DB->get_recordset_sql($sql, [
+            'ug' => \local_gugrades\RESITCAP_UG,
+            'pg' => \local_gugrades\RESITCAP_PG,
+        ]);
+        foreach ($rs as $row) {
+            $fromcap = ((float)$row->convertedgrade == (float)\local_gugrades\RESITCAP_PG)
+                ? 'Postgraduate'
+                : 'Undergraduate';
+            self::save_course_ugpg((int)$row->courseid, (int)$row->userid, $fromcap);
+        }
+        $rs->close();
+
+        $sql = "SELECT DISTINCT g.courseid, g.userid, d.data AS ugpg
+                  FROM {local_gugrades_grade} g
+                  JOIN {user_info_data} d ON d.userid = g.userid
+                  JOIN {user_info_field} f ON f.id = d.fieldid AND f.shortname = :shortname
+                 WHERE d.data <> ''";
+        $rs = $DB->get_recordset_sql($sql, ['shortname' => 'ugpg']);
+        foreach ($rs as $row) {
+            self::save_course_ugpg((int)$row->courseid, (int)$row->userid, (string)$row->ugpg);
+        }
+        $rs->close();
+    }
+
+    /**
      * Determine if user is UG, PG or neither
      * Returns 'Postgraduate Taught', 'Lifelong Learning, 'Undergraduate', 'Postgraduate Research',
      * 'External'. Or 'Unknown' if no record found
      * A resolved status is cached so later calls do not query the external enrolment database.
      * Unknown is not cached: the next call checks the profile field and enrolment database again.
+     * When a course id is supplied and that course already has a recorded status, that status is
+     * returned. A resolved status is recorded for the course once MyGrades has grades for the
+     * student, or when $record is set because this call is applying the status to a result.
+     * @param int $userid
+     * @param int $courseid Course whose recorded status should be used. 0 reads the current status only.
+     * @param bool $record Record a resolved status against the course even when it has no grades yet.
+     * @return string
+     */
+    public static function get_ugpg(int $userid, int $courseid = 0, bool $record = false): string {
+        if ($courseid) {
+            $saved = self::get_saved_course_ugpg($courseid, $userid);
+            if ($saved !== '') {
+                return $saved;
+            }
+        }
+
+        $ugpg = self::resolve_live_ugpg($userid);
+        if ($courseid && $ugpg !== 'Unknown' && ($record || self::course_has_grades($courseid, $userid))) {
+            self::save_course_ugpg($courseid, $userid, $ugpg);
+        }
+
+        return $ugpg;
+    }
+
+    /**
+     * Current UG/PG status from the cache, profile field, or enrolment database.
+     * This is the student's status now. It is not the status recorded for a particular course.
      * @param int $userid
      * @return string
      */
-    public static function get_ugpg(int $userid): string {
+    protected static function resolve_live_ugpg(int $userid): string {
         global $DB, $CFG;
 
         $cache = \cache::make('local_gugrades', 'ugpg');

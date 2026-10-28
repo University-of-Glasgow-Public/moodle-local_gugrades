@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/gugrades/db" VERSION="20261013" COMMENT="XMLDB file for Moodle local/gugrades"
+<XMLDB PATH="local/gugrades/db" VERSION="2026102700" COMMENT="XMLDB file for Moodle local/gugrades"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -335,6 +335,21 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="local_gugrades_ugpg" COMMENT="UG/PG status used for a student on a course. Not replaced when their current status changes.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="ugpg" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Status used for this course"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="gugradesugpg_couuse" UNIQUE="true" FIELDS="courseid, userid"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

@@ -176,7 +176,9 @@ class aggregate {
         if ($grade <= \local_gugrades\RESITCAP_UG) {
             return [$grade, get_string('explain_resitnotcapped', 'local_gugrades')];
         }
-        $ugpg = \local_gugrades\users::get_ugpg($userid);
+        // Keep the status already recorded for this course. A later change to the
+        // student's current programme must not rewrite this course's resit cap.
+        $ugpg = \local_gugrades\users::get_ugpg($userid, $this->courseid, true);
         $ispg = str_starts_with($ugpg, 'Postgraduate');
         $cap = $ispg ? \local_gugrades\RESITCAP_PG : \local_gugrades\RESITCAP_UG;
         if ($grade <= $cap) {

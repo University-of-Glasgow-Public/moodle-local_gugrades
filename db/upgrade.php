@@ -695,5 +695,28 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026102002, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026102700) {
+        // Keep the UG/PG status used for a course, so a later programme change
+        // does not rewrite MyGrades data already stored for that course.
+        $table = new xmldb_table('local_gugrades_ugpg');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('ugpg', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('gugradesugpg_couuse', XMLDB_INDEX_UNIQUE, ['courseid', 'userid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        \local_gugrades\users::backfill_course_ugpg();
+
+        upgrade_plugin_savepoint(true, 2026102700, 'local', 'gugrades');
+    }
+
     return true;
 }

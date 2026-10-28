@@ -706,8 +706,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(9, $award->convertedgrade);
         $this->assertEquals('D3 (9)', $award->displaygrade);
         $this->assertTrue((bool)$award->capped);
-        // Unknown is not cached, so a later lookup tries the enrolment database again.
+        // Unknown is not cached or recorded against the course, so a later lookup can still resolve it.
         $this->assertFalse($cache->get($this->student->id));
+        $this->assertSame('', \local_gugrades\users::get_saved_course_ugpg($this->course->id, $this->student->id));
         $first = $this->result('Dual total', 'CATEGORY1');
         $this->assertEquals(15, $first->convertedgrade);
         $this->assertFalse((bool)$first->capped);
@@ -745,7 +746,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         );
         $this->assertStringNotContainsString(get_string('explain_resitcapunknown', 'local_gugrades'), $explain);
 
-        // Resit leaves a total of exactly C3 (12): not capped for PG, but capped at D3 for UG.
+        // Resit leaves a total of exactly C3 (12): not capped for the PG status recorded on this course.
         $this->write_result($this->get_gradeitemid('Attempt one'), 8);
         $this->write_result($this->get_gradeitemid('Attempt two'), 10);
         $this->aggregate();
@@ -756,10 +757,21 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             $this->course->id, $this->categories['Dual total']->id, $this->student->id,
         );
         $this->assertStringContainsString(get_string('explain_resitnotcapped', 'local_gugrades'), $explain);
+
+        // The course already has MyGrades data, so a later change of UG/PG status does not rewrite it.
         $this->set_ugpg('Undergraduate');
         $this->aggregate();
-        $this->assertEquals(9, $this->result('Dual total', 'CATEGORY')->convertedgrade);
-        $this->assertTrue((bool)$this->result('Dual total', 'CATEGORY')->capped);
+        $award = $this->result('Dual total', 'CATEGORY');
+        $this->assertEquals(12, $award->convertedgrade);
+        $this->assertFalse((bool)$award->capped);
+        $this->assertEquals('Postgraduate Taught', \local_gugrades\users::get_saved_course_ugpg(
+            $this->course->id, $this->student->id,
+        ));
+        $explain = get_explain_aggregation::execute(
+            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+        );
+        $explain = \core_external\external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
+        $this->assertEquals('Postgraduate Taught', $explain['ugpg']);
     }
 
     /**
