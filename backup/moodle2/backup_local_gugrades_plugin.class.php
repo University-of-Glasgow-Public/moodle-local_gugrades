@@ -108,7 +108,7 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
             $grades = new backup_nested_element('gugrades_grades');
             $grade = new backup_nested_element(
                 'gugrades_grade',
-                null,
+                ['id'],
                 [
                     'gradeitemid',
                     'userid',
@@ -184,6 +184,56 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
             $notes->add_child($note);
             $note->set_source_table('local_gugrades_notes', ['courseid' => backup::VAR_COURSEID]);
             $gugrades->add_child($notes);
+
+            // UG/PG status recorded for this course. Kept with user data so a restore
+            // does not recalculate historical grades against a later programme status.
+            $ugpgs = new backup_nested_element('gugrades_ugpgs');
+            $ugpg = new backup_nested_element('gugrades_ugpg', null, ['userid', 'ugpg', 'timecreated']);
+            $ugpg->annotate_ids('user', 'userid');
+            $ugpgs->add_child($ugpg);
+            $ugpg->set_source_table('local_gugrades_ugpg', ['courseid' => backup::VAR_COURSEID]);
+            $gugrades->add_child($ugpgs);
+
+            // Backup copies of columns. Kept even when the live column has been removed.
+            $columnbackups = new backup_nested_element('gugrades_columnbackups');
+            $columnbackup = new backup_nested_element(
+                'gugrades_columnbackup',
+                null,
+                ['columnid', 'gradeitemid', 'gradetype', 'other', 'points', 'timemodified']
+            );
+            $columnbackups->add_child($columnbackup);
+            $columnbackup->set_source_table('local_gugrades_columnbackup', ['courseid' => backup::VAR_COURSEID]);
+            $gugrades->add_child($columnbackups);
+
+            // Backup copies of current grade values.
+            $gradebackups = new backup_nested_element('gugrades_gradebackups');
+            $gradebackup = new backup_nested_element(
+                'gugrades_gradebackup',
+                null,
+                [
+                    'gradeitemid',
+                    'userid',
+                    'columnid',
+                    'gradetype',
+                    'points',
+                    'rawgrade',
+                    'convertedgrade',
+                    'admingrade',
+                    'displaygrade',
+                    'other',
+                    'iserror',
+                    'notavailable',
+                    'catoverride',
+                    'capped',
+                    'engcapped',
+                    'gradeid',
+                    'timemodified',
+                ]
+            );
+            $gradebackup->annotate_ids('user', 'userid');
+            $gradebackups->add_child($gradebackup);
+            $gradebackup->set_source_table('local_gugrades_gradesbackup', ['courseid' => backup::VAR_COURSEID]);
+            $gugrades->add_child($gradebackups);
         }
 
         // Finally.
