@@ -71,7 +71,7 @@ After upgrade, existing current grades are copied by the scheduled task **Copy c
 
 Rows whose displayed grade is a status message are left out. That includes No grade, Grades missing, Cannot aggregate, Not available, No data, and the child-category aggregation error. Administrative grades such as NS are kept.
 
-The row is kept when grades are reset or removed from local_gugrades_grade, so the last values are still available if that table is damaged. It is removed when the course is deleted, and when personal data is deleted. **Restore grades** in MyGrades settings calls `grades::restore_missing_grade_backups($courseid)`, which writes back any current grades that are missing. Grades that are still present are left unchanged.
+The row is kept when grades are reset or removed from local_gugrades_grade, so the last values are still available if that table is damaged. It is removed when the course is deleted, and when personal data is deleted. A Moodle course backup includes this table and `local_gugrades_columnbackup` when user data is included. **Restore grades** in MyGrades settings calls `grades::restore_missing_grade_backups($courseid)`, which writes back any current grades that are missing. Grades that are still present are left unchanged.
 
 * **courseid** - containing course id
 * **gradeitemid** - the Moodle grade item

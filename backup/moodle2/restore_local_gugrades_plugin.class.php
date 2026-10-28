@@ -55,6 +55,15 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $paths[] = new restore_path_element('gugrades_hidden', $coursepath . '/gugrades_hiddens/gugrades_hidden');
         $paths[] = new restore_path_element('gugrades_resit', $coursepath . '/gugrades_resits/gugrades_resit');
         $paths[] = new restore_path_element('gugrades_note', $coursepath . '/gugrades_notes/gugrades_note');
+        $paths[] = new restore_path_element('gugrades_ugpg', $coursepath . '/gugrades_ugpgs/gugrades_ugpg');
+        $paths[] = new restore_path_element(
+            'gugrades_columnbackup',
+            $coursepath . '/gugrades_columnbackups/gugrades_columnbackup'
+        );
+        $paths[] = new restore_path_element(
+            'gugrades_gradebackup',
+            $coursepath . '/gugrades_gradebackups/gugrades_gradebackup'
+        );
 
         return $paths;
     }
@@ -156,12 +165,17 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         global $DB;
 
         $data = (object) $data;
+        $oldid = $data->id ?? 0;
+        unset($data->id);
         $data->courseid = $this->task->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->columnid = $this->get_mappingid('gugrades_column', $data->columnid);
         $data->auditby = $this->get_mappingid('user', $data->auditby);
 
-        $DB->insert_record('local_gugrades_grade', $data);
+        $newid = $DB->insert_record('local_gugrades_grade', $data);
+        if ($oldid) {
+            $this->set_mapping('gugrades_grade', $oldid, $newid);
+        }
     }
 
     /**
@@ -247,6 +261,88 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
     }
 
     /**
+     * Process the UG/PG status recorded for a student on this course.
+     * @param array $data
+     */
+    public function process_gugrades_ugpg($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $data->courseid = $this->task->get_courseid();
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        if (!$data->userid) {
+            return;
+        }
+
+        $DB->insert_record('local_gugrades_ugpg', $data);
+    }
+
+    /**
+     * Process a column backup row.
+     * Column ids are remapped onto the restored columns. A column that exists
+     * only in the backup is created so the grades backup can still point at it.
+     *
+     * @param array $data
+     */
+    public function process_gugrades_columnbackup($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $oldcolumnid = $data->columnid;
+        unset($data->id);
+        $data->courseid = $this->task->get_courseid();
+
+        $newcolumnid = $this->get_mappingid('gugrades_column', $oldcolumnid);
+        if (!$newcolumnid) {
+            $column = (object) [
+                'courseid' => $data->courseid,
+                'gradeitemid' => $data->gradeitemid,
+                'gradetype' => $data->gradetype,
+                'other' => $data->other ?? '',
+                'points' => empty($data->points) ? 0 : 1,
+            ];
+            $newcolumnid = $DB->insert_record('local_gugrades_column', $column);
+            $this->set_mapping('gugrades_column', $oldcolumnid, $newcolumnid);
+        }
+        $data->columnid = $newcolumnid;
+
+        $DB->insert_record('local_gugrades_columnbackup', $data);
+        $this->mark_backup_tables_included();
+    }
+
+    /**
+     * Process a grade backup row.
+     *
+     * @param array $data
+     */
+    public function process_gugrades_gradebackup($data) {
+        global $DB;
+
+        $data = (object) $data;
+        unset($data->id);
+        $data->courseid = $this->task->get_courseid();
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        $data->columnid = $this->get_mappingid('gugrades_column', $data->columnid);
+        if (!$data->userid || !$data->columnid) {
+            return;
+        }
+        $gradeid = $this->get_mappingid('gugrades_grade', $data->gradeid);
+        $data->gradeid = $gradeid ?: 0;
+
+        $DB->insert_record('local_gugrades_gradesbackup', $data);
+        $this->mark_backup_tables_included();
+    }
+
+    /**
+     * Remember that this backup file contained the grade backup tables.
+     */
+    protected function mark_backup_tables_included(): void {
+        if (!$this->get_mappingid('gugrades_backupincluded', 1)) {
+            $this->set_mapping('gugrades_backupincluded', 1, 1);
+        }
+    }
+
+    /**
      * Update ids that were unknown when course.xml processed
      */
     protected function after_restore_course() {
@@ -311,7 +407,27 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
             $DB->update_record('local_gugrades_notes', $note);
         }
 
-        // Current grade values are derived from the restored grade rows.
-        \local_gugrades\grades::rebuild_grade_backups($this->task->get_courseid());
+        $courseid = $this->task->get_courseid();
+
+        // Grade items were not mapped when the backup rows were inserted.
+        $columnbackups = $DB->get_recordset('local_gugrades_columnbackup', ['courseid' => $courseid]);
+        foreach ($columnbackups as $columnbackup) {
+            $columnbackup->gradeitemid = $this->get_mappingid('grade_item', $columnbackup->gradeitemid);
+            $DB->update_record('local_gugrades_columnbackup', $columnbackup);
+        }
+        $columnbackups->close();
+
+        $gradebackups = $DB->get_recordset('local_gugrades_gradesbackup', ['courseid' => $courseid]);
+        foreach ($gradebackups as $gradebackup) {
+            $gradebackup->gradeitemid = $this->get_mappingid('grade_item', $gradebackup->gradeitemid);
+            $DB->update_record('local_gugrades_gradesbackup', $gradebackup);
+        }
+        $gradebackups->close();
+
+        // Older backups have no copy of these tables. Build one from the restored grades.
+        // A backup that included them is left as it was, including rows whose live grade was removed.
+        if (!$this->get_mappingid('gugrades_backupincluded', 1)) {
+            \local_gugrades\grades::rebuild_grade_backups($courseid);
+        }
     }
 }

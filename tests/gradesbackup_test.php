@@ -24,6 +24,12 @@
 
 namespace local_gugrades;
 
+use backup;
+use backup_controller;
+use backup_setting;
+use restore_controller;
+use restore_dbops;
+
 /**
  * Grade value backup tests.
  * @group local_gugrades
@@ -533,5 +539,82 @@ final class gradesbackup_test extends \advanced_testcase {
 
         $again = \local_gugrades\external\restore_grades::execute($course->id);
         $this->assertSame(0, $again['restored']);
+    }
+
+    /**
+     * A course backup with user data includes the grade and column backup tables.
+     * Rows that no longer exist in the live tables are still restored.
+     *
+     * @covers \backup_local_gugrades_plugin
+     * @covers \restore_local_gugrades_plugin
+     */
+    public function test_course_backup_includes_backup_tables_with_user_data(): void {
+        global $CFG, $DB, $USER;
+
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+
+        $this->setAdminUser();
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '21', 21);
+
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_column', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $course->id]);
+
+        // course_with_item logs in as the teacher, who cannot restore a course.
+        // MODE_IMPORT keeps an unpacked backup, but turns user data off. Turn it back on
+        // before the plan runs, which is when the plugin structure is built.
+        $this->setAdminUser();
+        $CFG->backup_file_logger_level = backup::LOG_NONE;
+        $bc = new backup_controller(
+            backup::TYPE_1COURSE,
+            $course->id,
+            backup::FORMAT_MOODLE,
+            backup::INTERACTIVE_NO,
+            backup::MODE_IMPORT,
+            $USER->id
+        );
+        $bc->get_plan()->get_setting('users')->set_status(backup_setting::NOT_LOCKED);
+        $bc->get_plan()->get_setting('users')->set_value(true);
+        $backupid = $bc->get_backupid();
+        $bc->execute_plan();
+        $bc->destroy();
+
+        $newcourseid = restore_dbops::create_new_course('Restored MyGrades', 'restoredmg', 1);
+        $rc = new restore_controller(
+            $backupid,
+            $newcourseid,
+            backup::INTERACTIVE_NO,
+            backup::MODE_GENERAL,
+            $USER->id,
+            backup::TARGET_NEW_COURSE
+        );
+        $rc->get_plan()->get_setting('users')->set_status(backup_setting::NOT_LOCKED);
+        $rc->get_plan()->get_setting('users')->set_value(true);
+        $this->assertTrue($rc->execute_precheck());
+        $rc->execute_plan();
+        $rc->destroy();
+
+        $restored = $DB->get_record('local_gugrades_gradesbackup', [
+            'courseid' => $newcourseid,
+            'displaygrade' => '21',
+        ], '*', MUST_EXIST);
+        $this->assertNotEquals($gradeitem->id, (int) $restored->gradeitemid);
+        $this->assertTrue($DB->record_exists('grade_items', [
+            'id' => $restored->gradeitemid,
+            'courseid' => $newcourseid,
+        ]));
+        $this->assertTrue($DB->record_exists('local_gugrades_columnbackup', [
+            'courseid' => $newcourseid,
+            'columnid' => $restored->columnid,
+            'gradetype' => 'FIRST',
+        ]));
+        $this->assertTrue($DB->record_exists('local_gugrades_column', [
+            'id' => $restored->columnid,
+            'courseid' => $newcourseid,
+            'gradetype' => 'FIRST',
+        ]));
+        $this->assertSame(0, $DB->count_records('local_gugrades_grade', ['courseid' => $newcourseid]));
     }
 }
