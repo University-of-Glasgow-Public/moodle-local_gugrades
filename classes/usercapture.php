@@ -311,7 +311,7 @@ class usercapture {
             ], 'id ASC');
         }
         $grades = array_filter($grades, function ($grade) {
-            return $grade->gradetype != 'CATEGORY1';
+            return !in_array($grade->gradetype, ['CATEGORY1', 'RELEASED1']);
         });
 
         // Work out / add provisional grade.

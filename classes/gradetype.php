@@ -141,6 +141,9 @@ class gradetype {
         if ($gradetype == 'CATEGORY1') {
             return get_string('gradetypecategory1', 'local_gugrades');
         }
+        if ($gradetype == 'RELEASED1') {
+            return get_string('released', 'local_gugrades') . ': ' . get_string('firstsittinggrade', 'local_gugrades');
+        }
         if ($gradetype == 'CATEGORY') {
             return get_string('gradetypecategory', 'local_gugrades');
         } else {

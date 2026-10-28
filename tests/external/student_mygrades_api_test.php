@@ -141,6 +141,15 @@ final class student_mygrades_api_test extends \local_gugrades\external\gugrades_
             $this->student->id
         );
 
+        $this->assertFalse($user['isreassessment']);
+        $this->assertFalse($user['dualgrades']);
+        $this->assertNull($user['releasegrade1st']);
+        foreach ($user['fields'] as $field) {
+            $this->assertFalse($field['isreassessment']);
+            $this->assertFalse($field['dualgrades']);
+            $this->assertNull($field['releasegrade1st']);
+        }
+
         return;
 
         // Change item 1 to an MV.

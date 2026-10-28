@@ -76,6 +76,98 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
     }
 
     /**
+     * Dashboard dual grades must use released snapshots rather than calculated grades.
+     * @covers \local_gugrades\api::get_aggregation_dashboard_user
+     */
+    public function test_dashboard_released_dual_grades(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+        $DB->set_field('course', 'startdate', strtotime('2027-01-01'), ['id' => $this->course->id]);
+        $summer = $DB->get_record('grade_categories', ['fullname' => 'Summer exam'], '*', MUST_EXIST);
+        \local_gugrades\api::write_flags($this->course->id, [[
+            'gradecategoryid' => $summer->id,
+            'gradeitemid' => 0,
+            'engexam' => false,
+            'resit' => true,
+        ]]);
+        $this->load_data('data18a', $this->student->id);
+        foreach ($this->gradeitemids as $gradeitemid) {
+            $this->import_grades($this->course->id, $gradeitemid, [$this->student->id]);
+        }
+
+        $summeritemid = $this->get_gradeitemid_from_grade_category('Summer exam');
+        $firstitemid = $this->get_gradeitemid('Summer first sitting');
+        \local_gugrades\api::release_grades($this->course->id, $firstitemid, 0, false);
+        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $summer->id, $this->student->id,
+        );
+        $this->assertNull($user['parent']->releasegrade1st);
+        $fields = array_column($user['fields'], null, 'gradeitemid');
+        $this->assertFalse($fields[$firstitemid]['dualgrades']);
+        $this->assertFalse($fields[$firstitemid]['isreassessment']);
+        $this->assertNull($fields[$firstitemid]['releasegrade1st']);
+        $this->assertEquals('B2', $fields[$firstitemid]['releasegrade']->displaygrade);
+        $first = $DB->get_record('local_gugrades_grade', [
+            'gradeitemid' => $summeritemid,
+            'userid' => $this->student->id,
+            'gradetype' => 'CATEGORY1',
+            'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        \local_gugrades\api::release_grades($this->course->id, $summeritemid, 0, false);
+
+        \local_gugrades\grades::write_grade(
+            courseid: $this->course->id,
+            gradeitemid: $firstitemid,
+            userid: $this->student->id,
+            admingrade: '',
+            rawgrade: 0,
+            convertedgrade: 0,
+            displaygrade: 'H',
+            weightedgrade: 0,
+            gradetype: 'FIRST',
+            other: '',
+            iscurrent: true,
+            iserror: false,
+            auditcomment: 'Change assessment after release',
+            ispoints: false,
+        );
+        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $summer->id, $this->student->id,
+        );
+        $this->assertEquals('H', $user['displaygrade1st']);
+        $this->assertTrue($user['isreassessment']);
+        $this->assertTrue($user['dualgrades']);
+        $this->assertTrue($user['parent']->isreassessment);
+        $this->assertEquals($first->displaygrade, $user['parent']->releasegrade1st->displaygrade);
+        $this->assertEquals($user['releasegrade'], $user['parent']->releasegrade->displaygrade);
+        $this->assertEquals($first->displaygrade, $user['releasegrade1st']);
+
+        $parent = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $this->gradecatsummative->id, $this->student->id,
+        );
+        $this->assertFalse($parent['isreassessment']);
+        $this->assertTrue($parent['dualgrades']);
+        $fields = array_column($parent['fields'], null, 'gradeitemid');
+        $this->assertTrue($fields[$summeritemid]['isreassessment']);
+        $this->assertTrue($fields[$summeritemid]['dualgrades']);
+        $this->assertEquals($first->displaygrade, $fields[$summeritemid]['releasegrade1st']->displaygrade);
+
+        \local_gugrades\api::release_grades($this->course->id, $summeritemid, 0, false);
+        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $summer->id, $this->student->id,
+        );
+        $this->assertEquals('H', $user['parent']->releasegrade1st->displaygrade);
+
+        \local_gugrades\api::release_grades($this->course->id, $summeritemid, 0, true);
+        $user = \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id, $summer->id, $this->student->id,
+        );
+        $this->assertFalse($user['parent']->releasegrade);
+        $this->assertNull($user['parent']->releasegrade1st);
+    }
+
+    /**
      * Check basics of reassessment in new regs
      * 
      * @return void

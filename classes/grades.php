@@ -805,7 +805,7 @@ class grades {
     public static function set_latest_grade(int $courseid, int $gradeitemid, int $userid, object $newgrade = null) {
         global $DB;
 
-        if ($newgrade && $newgrade->gradetype == 'CATEGORY1') {
+        if ($newgrade && in_array($newgrade->gradetype, ['CATEGORY1', 'RELEASED1'])) {
             return null;
         }
 
@@ -822,6 +822,7 @@ class grades {
                     AND userid = :userid
                     AND gradetype<>"RELEASED"
                     AND gradetype<>"CATEGORY1"
+                    AND gradetype<>"RELEASED1"
                     AND iscurrent = 1)';
             if (!$grade = $DB->get_record_sql($sql, ['gradeitemid' => $gradeitemid, 'userid' => $userid])) {
                 return null;
@@ -1525,7 +1526,7 @@ class grades {
                FROM {local_gugrades_grade}
               WHERE gradeitemid $insql
                 AND userid = :userid
-                AND gradetype NOT IN ('CATEGORY', 'CATEGORY1', 'RELEASED')
+                AND gradetype NOT IN ('CATEGORY', 'CATEGORY1', 'RELEASED', 'RELEASED1')
                 AND iserror = 0
                 AND ((rawgrade IS NOT NULL AND rawgrade <> -1) OR admingrade <> '')",
             $params,
@@ -2174,16 +2175,17 @@ class grades {
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
+     * @param bool $firstsitting Return the released first-attempt snapshot.
      * @return object | false
      */
-    public static function get_released_grade(int $courseid, int $gradeitemid, int $userid) {
+    public static function get_released_grade(int $courseid, int $gradeitemid, int $userid, bool $firstsitting = false) {
         global $DB;
 
         $params = [
             'courseid' => $courseid,
             'gradeitemid' => $gradeitemid,
             'userid' => $userid,
-            'gradetype' => 'RELEASED',
+            'gradetype' => $firstsitting ? 'RELEASED1' : 'RELEASED',
             'iscurrent' => 1,
         ];
         if ($grade = $DB->get_record('local_gugrades_grade', $params)) {
@@ -2582,6 +2584,43 @@ class grades {
                 auditcomment: 'Release grades',
                 ispoints: $released->points,
             );
+
+            $DB->set_field('local_gugrades_grade', 'iscurrent', 0, [
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+                'gradetype' => 'RELEASED1',
+                'iscurrent' => 1,
+            ]);
+            $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+            $gradeitem = self::get_gradeitem($gradeitemid);
+            if ($regulation->shortname() === 'from2026' && $gradeitem->itemtype === 'category' &&
+                    \local_gugrades\aggregation::has_dual_grades($courseid, $gradeitem->iteminstance)) {
+                $first = $DB->get_record('local_gugrades_grade', [
+                    'gradeitemid' => $gradeitemid,
+                    'userid' => $userid,
+                    'gradetype' => 'CATEGORY1',
+                    'iscurrent' => 1,
+                ]);
+                if ($first && !$first->iserror) {
+                    self::write_grade(
+                        courseid: $courseid,
+                        gradeitemid: $gradeitemid,
+                        userid: $userid,
+                        admingrade: $first->admingrade,
+                        rawgrade: $first->rawgrade,
+                        convertedgrade: $first->convertedgrade,
+                        displaygrade: $first->displaygrade,
+                        weightedgrade: $first->weightedgrade,
+                        gradetype: 'RELEASED1',
+                        other: '',
+                        iscurrent: true,
+                        iserror: false,
+                        auditcomment: 'Release first-attempt grade',
+                        ispoints: $first->points,
+                        engcapped: !empty($first->engcapped),
+                    );
+                }
+            }
         }
 
         // Activity action .
@@ -2679,6 +2718,7 @@ class grades {
             AND gr.courseid = :courseid
             AND gradetype <> "RELEASED"
             AND gradetype <> "CATEGORY1"
+            AND gradetype <> "RELEASED1"
             AND iscurrent = 1';
         $missinggrades = $DB->get_records_sql($sql, ['courseid' => $courseid]);
         foreach ($missinggrades as $grade) {

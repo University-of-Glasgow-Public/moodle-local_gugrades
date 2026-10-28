@@ -1810,10 +1810,10 @@ class api {
 
         // MGU-1527: Unrelease ALL items, as user may have been removed beteween release and unrelease.
         if ($revert) {
-            $sql = 'UPDATE {local_gugrades_grade}
+            $sql = "UPDATE {local_gugrades_grade}
                 SET iscurrent = 0
-                WHERE gradetype = "RELEASED"
-                AND gradeitemid = :gradeitemid';
+                WHERE gradetype IN ('RELEASED', 'RELEASED1')
+                AND gradeitemid = :gradeitemid";
             $DB->execute($sql, ['gradeitemid' => $gradeitemid]);   
 
             // Remove any columns that this has orphaned.
@@ -2446,6 +2446,9 @@ class api {
     /**
      * Get user data for dashboard
      * It's basically get_aggregation_user with some extras added
+    * Released first-attempt grades are nullable; existing award fields are unchanged.
+    * releasegrade1st is a grade record on fields/parent and a display string on the user.
+    * Reassessment and dual-grade flags apply only to from2026 regulations.
      * @param int $courseid
      * @param int $gradecategoryid
      * @param int $userid
@@ -2468,10 +2471,9 @@ class api {
 
         // Run over the fields and add released status.
         foreach ($user->fields as $id => $field) {
-            $released = \local_gugrades\grades::is_grades_released($courseid, $field['gradeitemid']);
-            $releasegrade = \local_gugrades\grades::get_released_grade($courseid, $field['gradeitemid'], $userid);
-            $user->fields[$id]['released'] = $released;
-            $user->fields[$id]['releasegrade'] = $releasegrade;
+            $user->fields[$id] = array_merge($field, self::get_dashboard_release_data(
+                $courseid, $field['gradeitemid'], $userid,
+            ));
         }
 
         // Get the category.
@@ -2481,12 +2483,46 @@ class api {
         // Get provisional grade for the actual category.
         $provisional = \local_gugrades\grades::get_provisional_from_id($courseid, $gradeitemid, $userid);
         $provisional->itemid = $gradeitemid;
-        $provisional->released = \local_gugrades\grades::is_grades_released($courseid, $gradeitemid);
+        $releasedata = self::get_dashboard_release_data($courseid, $gradeitemid, $userid);
+        foreach ($releasedata as $name => $value) {
+            $provisional->$name = $value;
+        }
+        $user->releasegrade1st = $releasedata['releasegrade1st']->displaygrade ?? null;
+        $user->dualgrades = $releasedata['dualgrades'];
+        $user->isreassessment = $releasedata['isreassessment'];
 
         // Add the 'parent' grade item to the record.
         $user->parent = $provisional;
 
         return (array) $user;
+    }
+
+    /**
+     * Read released dashboard grades and category flags without exposing live first-attempt grades.
+     * @param int $courseid
+     * @param int $gradeitemid
+     * @param int $userid
+     * @return array
+     */
+    private static function get_dashboard_release_data(int $courseid, int $gradeitemid, int $userid): array {
+        $releasegrade = \local_gugrades\grades::get_released_grade($courseid, $gradeitemid, $userid);
+        $dualgrades = false;
+        $isreassessment = false;
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
+        if ($regulation->shortname() === 'from2026' && $gradeitem->itemtype === 'category') {
+            $dualgrades = \local_gugrades\aggregation::has_dual_grades($courseid, $gradeitem->iteminstance);
+            $isreassessment = $regulation->get_aggregation($courseid, '')->is_reassessment($gradeitem->iteminstance);
+        }
+
+        return [
+            'released' => \local_gugrades\grades::is_grades_released($courseid, $gradeitemid),
+            'releasegrade' => $releasegrade,
+            'releasegrade1st' => $dualgrades && $releasegrade ?
+                (\local_gugrades\grades::get_released_grade($courseid, $gradeitemid, $userid, true) ?: null) : null,
+            'dualgrades' => $dualgrades,
+            'isreassessment' => $isreassessment,
+        ];
     }
 
     /**
