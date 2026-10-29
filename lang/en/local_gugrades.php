@@ -103,6 +103,7 @@ $string['confirm'] = 'Confirm';
 $string['containsreassessment'] = 'Contains reassessment';
 $string['conversion'] = 'Conversion';
 $string['conversion_warning'] = 'WARNING: Only the current points grade is converted. If you do anything to change the aggregated grade it will NOT be reflected in the converted grade. You will need to convert again.';
+$string['conversiondiscrepancywarning'] = 'One or more students are currently showing a discrepancy. Are you sure you wish to convert before resolving this?';
 $string['conversionhelp'] = 'Conversion maps can be applied to individual assessments (Grade capture) or later at the Aggregation stage. <a href="https://gla.sharepoint.com/sites/learning-innovation/SitePages/LISU-Guides-MyGrades-Stage-3.aspx" target="_blank" rel="noopener noreferrer">See LISU guidance for more details';
 $string['conversioninfo'] = 'Default values for conversion maps';
 $string['conversionmapname'] = 'Conversion map name';

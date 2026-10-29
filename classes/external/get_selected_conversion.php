@@ -85,6 +85,7 @@ class get_selected_conversion extends external_api {
             'maxgrade' => new external_value(PARAM_FLOAT, 'Maximum grade assigned'),
             'scale' => new external_value(PARAM_ALPHANUM, 'schedulea, scheduleb'),
             'anygrades' => new external_value(PARAM_BOOL, 'Are there any grades to convert?'),
+            'anyalerts' => new external_value(PARAM_BOOL, 'Are there unresolved capture discrepancies?', VALUE_DEFAULT, false),
         ]);
     }
 }

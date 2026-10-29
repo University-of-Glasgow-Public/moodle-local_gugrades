@@ -9,16 +9,24 @@
 
         <PleaseWait v-if="waiting"></PleaseWait>
 
-        <div v-if="showmismatch">
+        <div v-if="showdiscrepancy">
+            <UAlert variant="warning" class="mb-3">{{ mstrings['conversiondiscrepancywarning'] }}</UAlert>
+            <div class="inline-flex gap-2 mt-2">
+                <UButton variant="primary" @click="confirm_discrepancy">{{ mstrings['yes'] }}</UButton>
+                <UButton variant="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
+            </div>
+        </div>
+
+        <div v-else-if="showmismatch">
             <UAlert class="mb-3">{{ mstrings['conversionmismatch'] }}</UAlert>
             <div class="inline-flex gap-2 mt-2">
-                <UButton variant="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['yes'] }}</UButton>
+                <UButton variant="primary"  @click="save_clicked" :disabled="mapid == 0 || !selectionloaded || !gradeitem || waiting">{{ mstrings['yes'] }}</UButton>
                 <UButton variant="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
             </div>
         </div>
 
 
-        <div v-if="!showmismatch">
+        <div v-else>
 
             <!-- Show the selected map name (if there is one)-->
             <p v-if="mapname" class="mb-2">
@@ -63,7 +71,7 @@
                     </table>
 
                     <div class="inline-flex gap-2 mt-2">
-                        <UButton variant="primary"  @click="save_clicked" :disabled="mapid == 0">{{ mstrings['save'] }}</UButton>
+                        <UButton variant="primary"  @click="save_clicked" :disabled="mapid == 0 || !selectionloaded || !gradeitem || waiting">{{ mstrings['save'] }}</UButton>
                         <UButton variant="warning" @click="showselectmodal = false">{{ mstrings['cancel'] }}</UButton>
                     </div>
                 </div>
@@ -106,6 +114,10 @@
     const waiting = ref(false);
     const gradeitem =ref<IGradeitem | null>(null);
     const showmismatch = ref(false);
+    const anyalerts = ref(false);
+    const selectionloaded = ref(false);
+    const showdiscrepancy = ref(false);
+    const discrepancyconfirmed = ref(false);
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
@@ -181,6 +193,8 @@
             selection.value = result.id;
             anygrades.value = result.anygrades;
             mapname.value = result.name;
+            anyalerts.value = result.anyalerts;
+            selectionloaded.value = true;
         })
         .catch((error) => {
             window.console.error(error);
@@ -213,6 +227,15 @@
      * Conversion button has been clicked
      */
     function conversion_clicked() {
+        loaded.value = false;
+        selectionloaded.value = false;
+        gradeitem.value = null;
+        mapid.value = 0;
+        selection.value = 0;
+        anyalerts.value = false;
+        waiting.value = false;
+        showdiscrepancy.value = false;
+        discrepancyconfirmed.value = false;
         get_grade_item();
         get_maps();
         get_selected();
@@ -238,9 +261,25 @@
     }
 
     /**
+     * Continue conversion after acknowledging unresolved marking discrepancies.
+     */
+    function confirm_discrepancy() {
+        discrepancyconfirmed.value = true;
+        showdiscrepancy.value = false;
+        save_clicked();
+    }
+
+    /**
      * Save button has been clicked
      */
     function save_clicked() {
+        if (!selectionloaded.value || !gradeitem.value || waiting.value) {
+            return;
+        }
+        if (anyalerts.value && !discrepancyconfirmed.value) {
+            showdiscrepancy.value = true;
+            return;
+        }
 
         // mismatch
         if (is_mismatch() && !showmismatch.value) {

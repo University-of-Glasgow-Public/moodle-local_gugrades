@@ -184,11 +184,43 @@ class usercapture {
      * @return boolean
      */
     protected function is_alert() {
-        $gradesbygt = $this->gradesbygradetype;
+        return self::grades_have_discrepancy($this->gradesbygradetype);
+    }
+
+    /**
+     * Check all current capture rows for an assessment, independently of display filters.
+     * @param int $courseid
+     * @param int $gradeitemid
+     * @return bool
+     */
+    public static function any_alerts(int $courseid, int $gradeitemid): bool {
+        global $DB;
+
+        $records = $DB->get_records('local_gugrades_grade', [
+            'courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'iscurrent' => 1,
+        ], 'id ASC', 'id, userid, gradetype, rawgrade');
+        $users = [];
+        foreach ($records as $grade) {
+            $users[$grade->userid][$grade->gradetype] = $grade;
+        }
+        foreach ($users as $grades) {
+            if (self::grades_have_discrepancy($grades)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Compare supplied marking grades unless an agreed or converted grade supersedes them.
+     * @param array $gradesbygt
+     * @return bool
+     */
+    private static function grades_have_discrepancy(array $gradesbygt): bool {
 
         // 1st, 2nd and 3rd grade have to agree
         // unless there is an agreed grade
-        if (array_key_exists('AGREED', $gradesbygt)) {
+        if (array_key_exists('AGREED', $gradesbygt) || array_key_exists('CONVERTED', $gradesbygt)) {
             return false;
         }
 

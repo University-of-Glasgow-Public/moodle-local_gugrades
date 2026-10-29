@@ -574,6 +574,7 @@ class conversion {
 
         // Are there any grades to convert?
         $anygrades = \local_gugrades\grades::any_grades($gradeitemid);
+        $anyalerts = $gradeitemid ? \local_gugrades\usercapture::any_alerts($courseid, $gradeitemid) : false;
 
         // Is it gradeitem or gradecategory?
         if ($gradeitemid) {
@@ -595,6 +596,7 @@ class conversion {
             }
 
             $mapinfo->anygrades = $anygrades;
+            $mapinfo->anyalerts = $anyalerts;
 
             return $mapinfo;
         } else {
@@ -604,6 +606,7 @@ class conversion {
                 'maxgrade' => 0,
                 'scale' => '',
                 'anygrades' => $anygrades,
+                'anyalerts' => $anyalerts,
             ];
         }
     }

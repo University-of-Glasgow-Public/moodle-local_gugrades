@@ -1024,6 +1024,43 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
     }
 
     /**
+     * Conversion supersedes marking discrepancies and removal restores their original status.
+     */
+    public function test_conversion_discrepancy_warning_and_alerts(): void {
+        $this->setUser($this->teacher);
+        $itemid = $this->gradeitemidassign1;
+        $courseid = $this->course->id;
+        $userid = $this->student2->id;
+        $map = get_conversion_map::execute($courseid, 0, 'schedulea');
+        $map = external_api::clean_returnvalue(get_conversion_map::execute_returns(), $map);
+        $saved = write_conversion_map::execute($courseid, 0, 'Discrepancy conversion', 'schedulea', 100, $map['map']);
+        $saved = external_api::clean_returnvalue(write_conversion_map::execute_returns(), $saved);
+        $this->import_grades($courseid, $itemid, [$this->student->id, $userid]);
+        $readselection = fn() => external_api::clean_returnvalue(
+            get_selected_conversion::execute_returns(), get_selected_conversion::execute($courseid, $itemid, 0),
+        );
+
+        $this->assertFalse($readselection()['anyalerts']);
+        foreach (['SECOND' => 60, 'THIRD' => 65] as $type => $grade) {
+            write_additional_grade::execute($courseid, $itemid, $userid, $type, '', '', 0, $grade, 'Marking grade');
+        }
+        $this->assertTrue(\local_gugrades\usercapture::create($courseid, $itemid, $userid)->alert());
+        $this->assertTrue($readselection()['anyalerts']);
+
+        select_conversion::execute($courseid, $itemid, 0, $saved['mapid']);
+        $this->assertFalse(\local_gugrades\usercapture::create($courseid, $itemid, $userid)->alert());
+        $this->assertFalse($readselection()['anyalerts']);
+
+        select_conversion::execute($courseid, $itemid, 0, 0);
+        $this->assertTrue(\local_gugrades\usercapture::create($courseid, $itemid, $userid)->alert());
+        $this->assertTrue($readselection()['anyalerts']);
+
+        write_additional_grade::execute($courseid, $itemid, $userid, 'AGREED', '', '', 0, 65, 'Agreed grade');
+        $this->assertFalse(\local_gugrades\usercapture::create($courseid, $itemid, $userid)->alert());
+        $this->assertFalse($readselection()['anyalerts']);
+    }
+
+    /**
      * Now that maps can have empty values - check the conversion still works as expected.
      * @covers \local_gugrades\external\get_conversion_map::execute
      * @covers \local_gugrades\external\write_conversion_map::execute
