@@ -216,8 +216,11 @@ class aggregate {
     public function is_reassessment(int $categoryid): bool {
         global $DB;
 
-        $resit = $DB->get_field('local_gugrades_flag', 'resit', ['gradecategoryid' => $categoryid]);
-        return $resit ?? false;
+        return $DB->record_exists('local_gugrades_flag', [
+            'courseid' => $this->courseid,
+            'gradecategoryid' => $categoryid,
+            'resit' => 1,
+        ]);
     }
 
     /**

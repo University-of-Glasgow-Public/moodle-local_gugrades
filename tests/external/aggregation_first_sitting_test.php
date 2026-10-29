@@ -143,6 +143,42 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * Engineering rows cannot hide an enabled reassessment flag for the same category.
+     */
+    public function test_engineering_and_reassessment_flags_are_independent(): void {
+        global $DB;
+
+        $categoryid = $this->categories['Dual reassessment']->id;
+        $engineering = [
+            'gradecategoryid' => $categoryid, 'gradeitemid' => 0, 'engexam' => true, 'resit' => false,
+        ];
+        $reassessment = [
+            'gradecategoryid' => $categoryid, 'gradeitemid' => 0, 'engexam' => false, 'resit' => true,
+        ];
+        foreach ([[$engineering, $reassessment], [$reassessment, $engineering]] as $flags) {
+            write_flags::execute($this->course->id, $flags);
+            $rules = new \regulations_from2026\aggregate();
+            $rules->set_data($this->course->id, 'A');
+            $this->assertTrue($rules->is_reassessment($categoryid));
+            $this->assertTrue(\local_gugrades\aggregation::has_dual_grades($this->course->id, $categoryid));
+            $this->assertEquals(16, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
+            $this->assertEquals(18, $this->result('Dual reassessment', 'CATEGORY')->convertedgrade);
+            $this->assertEquals(2, $DB->count_records('local_gugrades_flag', [
+                'courseid' => $this->course->id, 'gradecategoryid' => $categoryid,
+            ]));
+            $rules->set_data(0, 'A');
+            $this->assertFalse($rules->is_reassessment($categoryid));
+        }
+
+        write_flags::execute($this->course->id, [$engineering]);
+        $this->assertFalse(\local_gugrades\aggregation::has_dual_grades($this->course->id, $categoryid));
+        $this->assertFalse($DB->record_exists('local_gugrades_grade', [
+            'gradeitemid' => $this->result('Dual reassessment', 'CATEGORY')->gradeitemid,
+            'userid' => $this->student->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
+        ]));
+    }
+
+    /**
      * First-sitting selection propagates, and repeat runs overwrite their own rows.
      */
     public function test_results_and_lifecycle(): void {
