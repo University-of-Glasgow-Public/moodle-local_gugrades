@@ -1,10 +1,11 @@
 <template>
   <Popover class="relative">
-    <PopoverButton class="cursor-pointer" aria-label="Open menu">
+    <PopoverButton ref="menuButton" class="cursor-pointer" aria-label="Open menu">
       <EllipsisVertical :size="18" class="text-base_content" tabindex="0" />
     </PopoverButton>
 
-    <PopoverPanel class="border border-slate-200 rounded-lg shadow-lg absolute z-999 left-0 top-0 ml-6 -mt-12 overflow-hidden" v-slot="{ close }">
+    <Portal>
+    <PopoverPanel ref="menuPanel" :style="floatingStyles" class="border border-slate-200 rounded-lg shadow-lg z-999 overflow-hidden" v-slot="{ close }">
         <ul class="bg-white text-university-blue w-52 py-1 divide-y divide-slate-100" tabindex="-1">
             <li v-if="props.awaitingcapture && !props.converted && caneditgrades">
               <ImportUserGradeButton :itemid="props.itemid" :userid="props.userid" @imported="grade_added()" :close="close" />
@@ -20,6 +21,7 @@
             </li>
         </ul>
     </PopoverPanel>
+    </Portal>
   </Popover>
 </template>
 
@@ -28,8 +30,19 @@
     import ImportUserGradeButton from '@/components/Capture/ImportUserGradeButton.vue';
     import AddGradeButton from '@/components/Capture/AddGradeButton.vue';
     import HideShowButton from '@/components/Capture/HideShowButton.vue';
-    import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
+    import { ref } from 'vue';
+    import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue';
+    import { Popover, PopoverButton, PopoverPanel, Portal } from '@headlessui/vue'
     import { EllipsisVertical } from '@lucide/vue';
+
+    const menuButton = ref<InstanceType<typeof PopoverButton> | null>(null);
+    const menuPanel = ref<InstanceType<typeof PopoverPanel> | null>(null);
+    const { floatingStyles } = useFloating(menuButton, menuPanel, {
+      placement: 'right-start',
+      strategy: 'fixed',
+      middleware: [offset(8), flip(), shift({ padding: 8 })],
+      whileElementsMounted: autoUpdate,
+    });
 
     const props = defineProps({
         userid: Number,
