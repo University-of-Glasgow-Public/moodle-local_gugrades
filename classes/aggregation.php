@@ -1571,6 +1571,7 @@ class aggregation {
         // If this is a points grade, level 2 or deeper, a grade is returned and a map exists then
         // we need to deal with this as a converted grade.
         if (empty($override) && ($level >= 2) &&
+            !array_filter($category->children, fn($child) => $child->isscale) &&
                 ($mapid = \local_gugrades\conversion::get_mapid_for_category($category->categoryid)) && $rawgrade) {
             // Get original maximum grade for conversion.
             $grademax = $category->grademax;

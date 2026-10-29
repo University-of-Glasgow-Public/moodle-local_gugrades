@@ -280,6 +280,64 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * Scale child totals and their overrides are not converted again at a reassessment parent.
+     */
+    public function test_scale_category_with_unavailable_sibling_and_parent_map(): void {
+        global $DB, $GUGRADES_VALIDUSERS;
+
+        $categoryid = $this->categories['Dual reassessment']->id;
+        foreach (['Attempt one', 'Attempt two'] as $name) {
+            $DB->set_field('grade_items', 'gradetype', GRADE_TYPE_NONE, ['id' => $this->get_gradeitemid($name)]);
+        }
+        $this->build_schema([
+            (object)[
+                'name' => 'Available attempt', 'category' => true,
+                'children' => [(object)['name' => 'Available assessment', 'category' => false, 'type' => 'schedulea']],
+            ],
+            (object)[
+                'name' => 'Unavailable attempt', 'category' => true,
+                'children' => [(object)['name' => 'Unavailable assessment', 'category' => false, 'type' => 'schedulea']],
+            ],
+        ], $categoryid);
+        $this->write_result($this->get_gradeitemid('Available assessment'), 21);
+        $unavailableid = $this->get_gradeitemid('Unavailable assessment');
+        $this->write_result($unavailableid, 22);
+        $DB->insert_record('local_gugrades_map_item', (object)[
+            'courseid' => $this->course->id,
+            'gradeitemid' => 0,
+            'gradecategoryid' => $categoryid,
+            'mapid' => $this->make_conversion_map(),
+        ]);
+        $this->set_reassessment(true);
+        $GUGRADES_VALIDUSERS[$unavailableid] = [];
+
+        try {
+            $this->aggregate();
+            foreach (['CATEGORY', 'CATEGORY1'] as $type) {
+                $result = $this->result('Dual reassessment', $type);
+                $this->assertEquals(21, $result->convertedgrade);
+                $this->assertSame('A2', $result->displaygrade);
+            }
+            $availableid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid(
+                $DB->get_field('grade_categories', 'id', [
+                    'courseid' => $this->course->id, 'fullname' => 'Available attempt',
+                ], MUST_EXIST),
+            );
+            foreach ([18 => 'A5', 16 => 'B2'] as $grade => $display) {
+                $this->write_result($availableid, $grade, 'CATEGORY', true);
+                $this->aggregate();
+                foreach (['CATEGORY', 'CATEGORY1'] as $type) {
+                    $result = $this->result('Dual reassessment', $type);
+                    $this->assertEquals($grade, $result->convertedgrade);
+                    $this->assertSame($display, $result->displaygrade);
+                }
+            }
+        } finally {
+            unset($GUGRADES_VALIDUSERS[$unavailableid]);
+        }
+    }
+
+    /**
      * Non-substantive administrative grades cannot replace the first sitting.
      */
     public function test_administrative_grade_propagates(): void {
