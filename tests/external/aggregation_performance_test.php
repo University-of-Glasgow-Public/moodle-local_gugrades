@@ -217,7 +217,7 @@ final class aggregation_performance_test extends gugrades_aggregation_testcase {
         $this->assertSame($students * 5, $DB->count_records('local_gugrades_grade', [
             'courseid' => $this->course->id, 'gradetype' => 'CATEGORY', 'iscurrent' => 1, 'iserror' => 0,
         ]));
-        $this->assertSame($dual ? $students * 2 : 0, $DB->count_records('local_gugrades_grade', [
+        $this->assertSame($dual ? $students * 2 : $students, $DB->count_records('local_gugrades_grade', [
             'courseid' => $this->course->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1, 'iserror' => 0,
         ]));
         foreach (['page_after_recalculation', 'repeated_page'] as $phase) {
@@ -226,7 +226,7 @@ final class aggregation_performance_test extends gugrades_aggregation_testcase {
                     get_aggregation_page::execute($this->course->id, $totalid, '', '', 0, false));
             });
             $this->assertCount($students, $page['users']);
-            $this->assertSame($dual, $page['dualgrades']);
+            $this->assertTrue($page['dualgrades']);
             unset($page);
         }
         $firstitemid = $this->get_gradeitemid('Group 1 attempt 1');

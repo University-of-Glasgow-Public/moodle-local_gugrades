@@ -149,7 +149,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         global $DB;
 
         $this->aggregate();
-        $this->assertFalse($DB->record_exists('local_gugrades_grade', ['gradetype' => 'CATEGORY1']));
+        $this->assertEquals($this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+        $this->assertEquals(1, $DB->count_records('local_gugrades_grade', ['gradetype' => 'CATEGORY1', 'iscurrent' => 1]));
         $this->set_reassessment(true);
         $this->aggregate();
         $ids = [];
@@ -174,7 +176,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         ]));
         $this->set_reassessment(false);
         $this->aggregate();
-        $this->assertFalse($DB->record_exists('local_gugrades_grade', ['gradetype' => 'CATEGORY1', 'iscurrent' => 1]));
+        $this->assertEquals(1, $DB->count_records('local_gugrades_grade', ['gradetype' => 'CATEGORY1', 'iscurrent' => 1]));
+        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade);
     }
 
     /**
@@ -198,7 +202,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(15, $this->result('Dual total', 'CATEGORY1')->convertedgrade);
         $this->set_reassessment(false);
         $this->aggregate();
-        $this->assertFalse($DB->record_exists('local_gugrades_grade', ['gradetype' => 'CATEGORY1', 'iscurrent' => 1]));
+        $this->assertEquals(1, $DB->count_records('local_gugrades_grade', ['gradetype' => 'CATEGORY1', 'iscurrent' => 1]));
+        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade);
     }
 
     /**
@@ -234,7 +240,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * Original regulations never enable the second path even when a flag exists.
+    * Original regulations mirror the course total without calculating independent child results.
      */
     public function test_original_regulations_remain_single_pass(): void {
         global $DB;
@@ -242,10 +248,18 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->set_reassessment(true);
         $DB->set_field('course', 'startdate', strtotime('2025-01-01'), ['id' => $this->course->id]);
         $this->aggregate();
-        $this->assertFalse($DB->record_exists('local_gugrades_grade', [
+        $this->assertEquals(1, $DB->count_records('local_gugrades_grade', [
             'userid' => $this->student->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
         ]));
         $this->assertEquals(18, $this->result('Dual reassessment', 'CATEGORY')->convertedgrade);
+        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+        $this->assertTrue(\local_gugrades\aggregation::has_dual_grades(
+            $this->course->id, $this->categories['Dual total']->id,
+        ));
+        $this->write_result($this->result('Dual total', 'CATEGORY')->gradeitemid, 10, 'CATEGORY', true);
+        $this->aggregate();
+        $this->assertSame('10', $this->result('Dual total', 'CATEGORY1')->displaygrade);
     }
 
     /**
@@ -580,7 +594,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         \local_gugrades\aggregation::aggregate(
             $this->course->id, $this->categories['Dual total']->id, [$this->student->id],
         );
-        $this->assertFalse($DB->record_exists('local_gugrades_grade', ['gradetype' => 'CATEGORY1']));
+        $this->assertEquals(1, $DB->count_records('local_gugrades_grade', ['gradetype' => 'CATEGORY1', 'iscurrent' => 1]));
         $this->set_reassessment(true);
         $DB->delete_records('local_gugrades_grade', [
             'courseid' => $this->course->id, 'gradetype' => 'CATEGORY1',
@@ -1155,11 +1169,37 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * Single-grade categories remain single in both page and row APIs.
+     * Course totals always show both grades, identical by default and after a course-total override.
+     */
+    public function test_course_total_defaults_to_matching_dual_grades(): void {
+        global $DB;
+
+        $this->aggregate();
+        $itemid = $this->result('Dual total', 'CATEGORY')->gradeitemid;
+        $DB->delete_records('local_gugrades_grade', ['gradeitemid' => $itemid, 'gradetype' => 'CATEGORY1']);
+        $page = get_aggregation_page::execute(
+            $this->course->id, $this->categories['Dual total']->id, '', '', 0, false,
+        );
+        $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+        $this->assertTrue($page['dualgrades']);
+        foreach ($page['columns'] as $column) {
+            $this->assertFalse($column['dualgrades']);
+        }
+        foreach ($page['users'] as $user) {
+            $this->assertSame($user['displaygrade'], $user['displaygrade1st']);
+        }
+        $this->write_result($itemid, 10, 'CATEGORY', true);
+        $this->aggregate();
+        $this->assertSame('10', $this->result('Dual total', 'CATEGORY')->displaygrade);
+        $this->assertSame('10', $this->result('Dual total', 'CATEGORY1')->displaygrade);
+    }
+
+    /**
+     * Single-grade subcategories remain single in both page and row APIs.
      */
     public function test_single_grade_display(): void {
         $page = get_aggregation_page::execute(
-            $this->course->id, $this->categories['Dual total']->id, '', '', 0, true,
+            $this->course->id, $this->categories['Dual middle']->id, '', '', 0, true,
         );
         $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
         $this->assertFalse($page['dualgrades']);

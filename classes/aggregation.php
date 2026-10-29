@@ -1456,7 +1456,7 @@ class aggregation {
             $firstsitting = self::aggregate_category(
                 $courseid, $category, $firstitems, $level, $userid, $firstcategorycondmet, true,
             );
-        } else {
+        } else if ($level > 1) {
             $DB->set_field('local_gugrades_grade', 'iscurrent', 0, [
                 'courseid' => $courseid,
                 'gradeitemid' => $category->itemid,
@@ -1468,6 +1468,15 @@ class aggregation {
 
         $result = self::aggregate_category($courseid, $category, $items, $level, $userid, $categorycondmet);
         $result->nursingcondmet = $categorycondmet;
+        if (($level == 1) && !$hasfirstsitting) {
+            $firstsitting = clone $result;
+            $firstsitting->itemid = $category->itemid;
+            $firstsitting->isscale = $category->isscale;
+            $firstsitting->grade = $result->total;
+            $firstsitting->displaygrade = $result->display;
+            $firstcategorycondmet = $categorycondmet;
+            self::write_aggregated_category($courseid, $userid, $firstsitting, 'CATEGORY1');
+        }
         if ($firstsitting) {
             $firstsitting->nursingcondmet = $firstcategorycondmet;
         }
@@ -1503,6 +1512,9 @@ class aggregation {
      * @return bool
      */
     public static function has_dual_grades(int $courseid, int $gradecategoryid): bool {
+        if (self::is_top_level($gradecategoryid)) {
+            return true;
+        }
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         return self::has_reassessment(
             self::recurse_tree($courseid, $gradecategoryid),
