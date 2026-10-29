@@ -99,6 +99,7 @@ class get_aggregation_user extends external_api {
             'isadmin1st' => new external_value(PARAM_BOOL, 'Is the first-sitting total administrative?'),
             'error1st' => new external_value(PARAM_TEXT, 'First-sitting total error'),
             'releasegrade' => new external_value(PARAM_TEXT, 'Grade to show in the released column (if any)'),
+            'releasegrade1st' => new external_value(PARAM_TEXT, 'Released first-sitting grade (if any)', VALUE_DEFAULT, ''),
             'mismatch' => new external_value(PARAM_BOOL, 'Released and display grades do not match'),
             'rawgrade' => new external_value(PARAM_FLOAT, 'Aggregated grade before any conversion'),
             'total' => new external_value(PARAM_FLOAT, 'Total grade used for ongoing aggregation'),

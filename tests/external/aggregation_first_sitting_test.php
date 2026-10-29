@@ -595,6 +595,51 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * Released dual totals expose both stored snapshots until release is reverted.
+     */
+    public function test_released_dual_totals_on_aggregation_page(): void {
+        $this->set_reassessment(true);
+        $this->aggregate();
+        $categoryid = $this->categories['Dual middle']->id;
+        $itemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($categoryid);
+        $readuser = function() use ($categoryid): array {
+            $page = get_aggregation_page::execute($this->course->id, $categoryid, '', '', 0, false);
+            $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+            $this->assertTrue($page['dualgrades']);
+            return array_values(array_filter($page['users'], fn($user) => $user['id'] == $this->student->id))[0];
+        };
+
+        $user = $readuser();
+        $this->assertSame('', $user['releasegrade']);
+        $this->assertSame('', $user['releasegrade1st']);
+
+        release_grades::execute($this->course->id, $itemid, 0, false);
+        $award = $this->result('Dual middle', 'RELEASED');
+        $first = $this->result('Dual middle', 'RELEASED1');
+        $this->assertNotEquals($award->displaygrade, $first->displaygrade);
+        $this->assertSame($this->result('Dual middle', 'CATEGORY')->displaygrade, $award->displaygrade);
+        $this->assertSame($this->result('Dual middle', 'CATEGORY1')->displaygrade, $first->displaygrade);
+        $user = $readuser();
+        $this->assertSame($award->displaygrade, $user['releasegrade']);
+        $this->assertSame($first->displaygrade, $user['releasegrade1st']);
+
+        $user = get_aggregation_user::execute($this->course->id, $categoryid, $this->student->id);
+        $user = \core_external\external_api::clean_returnvalue(get_aggregation_user::execute_returns(), $user);
+        $this->assertSame($award->displaygrade, $user['releasegrade']);
+        $this->assertSame($first->displaygrade, $user['releasegrade1st']);
+
+        $this->write_result($itemid, 5, 'CATEGORY1');
+        $user = $readuser();
+        $this->assertSame('5', $user['displaygrade1st']);
+        $this->assertSame($first->displaygrade, $user['releasegrade1st']);
+
+        release_grades::execute($this->course->id, $itemid, 0, true);
+        $user = $readuser();
+        $this->assertSame('', $user['releasegrade']);
+        $this->assertSame('', $user['releasegrade1st']);
+    }
+
+    /**
      * Preloaded invalidation deletes every subtree entry without more database reads.
      */
     public function test_preloaded_cache_invalidation(): void {

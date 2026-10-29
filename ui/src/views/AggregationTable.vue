@@ -347,15 +347,24 @@
 
         // Released grade
         if (released.value && !toplevel.value) {
-            cols.push(columnHelper.accessor('releasegrade', {
-                header: mstringstore.getMstring('released'),
-                cell: ({row}) => {
-                    const user = row.original;
-                    return h(ReleaseGrade, {
-                        grade: user.releasegrade
-                    });
-                }
-            }));
+            const releaseColumns = (dualgrades.value ? [true, false] : [false]).map(firstsitting => {
+                const field = firstsitting ? 'releasegrade1st' : 'releasegrade';
+                return columnHelper.accessor(field, {
+                    header: mstringstore.getMstring(dualgrades.value ? firstsitting ? 'firstsitting' : 'award' : 'released'),
+                    cell: ({row}) => h(ReleaseGrade, {
+                        grade: row.original[field],
+                    }),
+                });
+            });
+            if (dualgrades.value) {
+                cols.push(columnHelper.group({
+                    id: 'GROUP_released',
+                    header: mstringstore.getMstring('released'),
+                    columns: releaseColumns,
+                }));
+            } else {
+                cols.push(...releaseColumns);
+            }
         }
 
         return cols;

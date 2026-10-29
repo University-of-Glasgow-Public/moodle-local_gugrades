@@ -471,7 +471,8 @@ class aggregation {
         // Establish if this user is already in the cache.
         $cache = \cache::make('local_gugrades', 'useraggdata');
         $cachetag = self::get_aggdata_cachetag($courseid, $gradecategoryid, $user->id);
-        if (($cacheduser = $cache->get($cachetag)) && !$isunittest && isset($cacheduser->isadmin1st, $cacheduser->engcapped)) {
+        if (($cacheduser = $cache->get($cachetag)) && !$isunittest &&
+            isset($cacheduser->isadmin1st, $cacheduser->engcapped, $cacheduser->releasegrade1st)) {
             return $cacheduser;
         }
 
@@ -585,12 +586,16 @@ class aggregation {
         $user->isadmin1st = false;
         $user->error1st = '';
         $user->engcapped1st = false;
+        $user->releasegrade1st = '';
         if (self::has_dual_grades($courseid, $gradecategoryid)) {
             $first = self::get_first_sitting_grade($courseid, $gradecatitem->id, $user->id);
             $user->displaygrade1st = $first->displaygrade;
             $user->isadmin1st = !empty($first->admingrade);
             $user->error1st = $first->iserror ? $first->displaygrade : '';
             $user->engcapped1st = !empty($first->engcapped);
+            $releasedfirst = $released ?
+                \local_gugrades\grades::get_released_grade($courseid, $gradecatitem->id, $user->id, true) : false;
+            $user->releasegrade1st = $releasedfirst ? $releasedfirst->displaygrade : '';
         }
         $user->releasegrade = $releasegrade;
         $user->mismatch = $released && ($item->displaygrade != $releasegrade);

@@ -276,6 +276,9 @@ Grade concepts
   Both the page and row-refresh APIs expose displaygrade1st/isadmin1st/error1st
   for totals and display1st/isadmin1st/error1st for children. Missing or
   administrative first-sitting outcomes keep their own display and status.
+  Released totals use the stored RELEASED (award) and RELEASED1 (first-sitting)
+  snapshots, exposed as releasegrade/releasegrade1st by both APIs. The Released
+  heading has matching first-sitting/award subcolumns when the total is dual.
 - Aggregation table headers use TanStack column groups: category/item details
   span Grade for a single result, or 1st Sitting and Award for dual results.
   Identity and category details occupy the top row, filters the middle row,
