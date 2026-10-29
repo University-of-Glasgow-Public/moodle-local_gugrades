@@ -542,6 +542,80 @@ final class gradesbackup_test extends \advanced_testcase {
     }
 
     /**
+     * User-data settings for course flag backup coverage.
+     * @return array
+     */
+    public static function flag_backup_user_data_provider(): array {
+        return ['with users' => [true], 'without users' => [false]];
+    }
+
+    /**
+     * Course flags are configuration and survive backups with or without user data.
+     * @dataProvider flag_backup_user_data_provider
+     * @param bool $userdata
+     */
+    public function test_course_backup_includes_flags(bool $userdata): void {
+        global $CFG, $DB, $USER;
+
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $category = $this->getDataGenerator()->create_grade_category([
+            'courseid' => $course->id, 'fullname' => 'Flagged category',
+        ]);
+        $DB->insert_record('local_gugrades_flag', (object)[
+            'courseid' => $course->id, 'gradecategoryid' => $category->id, 'gradeitemid' => 0,
+            'engexam' => 1, 'resit' => 1,
+        ]);
+        $DB->insert_record('local_gugrades_flag', (object)[
+            'courseid' => $course->id, 'gradecategoryid' => 0, 'gradeitemid' => $gradeitem->id,
+            'engexam' => 0, 'resit' => 1,
+        ]);
+
+        $this->setAdminUser();
+        $CFG->backup_file_logger_level = backup::LOG_NONE;
+        $bc = new backup_controller(
+            backup::TYPE_1COURSE, $course->id, backup::FORMAT_MOODLE, backup::INTERACTIVE_NO,
+            backup::MODE_IMPORT, $USER->id,
+        );
+        $bc->get_plan()->get_setting('users')->set_status(backup_setting::NOT_LOCKED);
+        $bc->get_plan()->get_setting('users')->set_value($userdata);
+        $backupid = $bc->get_backupid();
+        $bc->execute_plan();
+        $bc->destroy();
+
+        $newcourseid = restore_dbops::create_new_course('Restored flags', 'restoredflags', 1);
+        $rc = new restore_controller(
+            $backupid, $newcourseid, backup::INTERACTIVE_NO, backup::MODE_GENERAL,
+            $USER->id, backup::TARGET_NEW_COURSE,
+        );
+        $rc->get_plan()->get_setting('users')->set_status(backup_setting::NOT_LOCKED);
+        $rc->get_plan()->get_setting('users')->set_value($userdata);
+        $this->assertTrue($rc->execute_precheck());
+        $rc->execute_plan();
+        $rc->destroy();
+
+        $this->assertEquals(2, $DB->count_records('local_gugrades_flag', ['courseid' => $newcourseid]));
+        $restoredcategory = $DB->get_record('grade_categories', [
+            'courseid' => $newcourseid, 'fullname' => 'Flagged category',
+        ], '*', MUST_EXIST);
+        $this->assertNotEquals($category->id, $restoredcategory->id);
+        $this->assertTrue($DB->record_exists('local_gugrades_flag', [
+            'courseid' => $newcourseid, 'gradecategoryid' => $restoredcategory->id, 'gradeitemid' => 0,
+            'engexam' => 1, 'resit' => 1,
+        ]));
+        $restoreditem = $DB->get_record('grade_items', [
+            'courseid' => $newcourseid, 'itemtype' => 'manual',
+        ], '*', MUST_EXIST);
+        $this->assertNotEquals($gradeitem->id, $restoreditem->id);
+        $this->assertTrue($DB->record_exists('local_gugrades_flag', [
+            'courseid' => $newcourseid, 'gradecategoryid' => 0, 'gradeitemid' => $restoreditem->id,
+            'engexam' => 0, 'resit' => 1,
+        ]));
+    }
+
+    /**
      * A course backup with user data includes the grade and column backup tables.
      * Rows that no longer exist in the live tables are still restored.
      *

@@ -66,6 +66,12 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
         $resitcats->add_child($resitcat);
         $gugrades->add_child($resitcats);
 
+        $flags = new backup_nested_element('gugrades_flags');
+        $flag = new backup_nested_element('gugrades_flag', null, ['gradecategoryid', 'gradeitemid', 'engexam', 'resit']);
+        $flag->set_source_table('local_gugrades_flag', ['courseid' => backup::VAR_COURSEID]);
+        $flags->add_child($flag);
+        $gugrades->add_child($flags);
+
         // Add conversion map values
         // We need to nest this inside more maps to keep track of the ID. Can't do it above as we'll lose the ID when restoring
         // (think about it).

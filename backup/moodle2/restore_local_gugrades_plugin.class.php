@@ -42,6 +42,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $paths[] = new restore_path_element('gugrades_config', $coursepath . '/gugrades_config');
         $paths[] = new restore_path_element('gugrades_map', $coursepath . '/gugrades_maps/gugrades_map');
         $paths[] = new restore_path_element('gugrades_resitcat', $coursepath . '/gugrades_resitcats/gugrades_resitcat');
+        $paths[] = new restore_path_element('gugrades_flag', $coursepath . '/gugrades_flags/gugrades_flag');
         $paths[] = new restore_path_element(
             'gugrades_map_value',
             $coursepath .
@@ -112,6 +113,25 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
         $data->gradeitemid = $data->gradeitemid;
 
         $DB->insert_record('local_gugrades_resit', $data);
+    }
+
+    /**
+     * Process category and grade-item flags before their restored IDs are available.
+     * @param array $data
+     */
+    public function process_gugrades_flag($data) {
+        global $DB;
+
+        $data = (object) $data;
+        unset($data->id);
+        $data->courseid = $this->task->get_courseid();
+        if (!empty($data->gradecategoryid)) {
+            $data->gradecategoryid = 0 - $data->gradecategoryid;
+        }
+        if (!empty($data->gradeitemid)) {
+            $data->gradeitemid = 0 - $data->gradeitemid;
+        }
+        $DB->insert_record('local_gugrades_flag', $data);
     }
 
     /**
@@ -347,6 +367,23 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
      */
     protected function after_restore_course() {
         global $DB;
+
+        $flags = $DB->get_recordset_select('local_gugrades_flag',
+            'courseid = :courseid AND (gradecategoryid < 0 OR gradeitemid < 0)',
+            ['courseid' => $this->task->get_courseid()]);
+        foreach ($flags as $flag) {
+            foreach (['gradecategoryid' => 'grade_category', 'gradeitemid' => 'grade_item'] as $field => $mapping) {
+                if ($flag->$field < 0) {
+                    $flag->$field = $this->get_mappingid($mapping, 0 - $flag->$field);
+                    if (!$flag->$field) {
+                        $DB->delete_records('local_gugrades_flag', ['id' => $flag->id]);
+                        continue 2;
+                    }
+                }
+            }
+            $DB->update_record('local_gugrades_flag', $flag);
+        }
+        $flags->close();
 
         // Map items.
         $items = $DB->get_recordset('local_gugrades_map_item', ['courseid' => $this->task->get_courseid()]);
