@@ -2,7 +2,9 @@
     <VueModal v-model="showmodal" :enableClose="false" modalClass="rounded max-w-xl" :title="titletext">
         <div class="flex justify-center" >
             <div class="border-solid rounded-md m-1 p-2 flex justify-center" style="min-width: 300px">
-                <span v-if="!showprogress" class="loading loading-ring loading-xl"></span>
+                <span v-if="!showprogress" role="status" :aria-label="titletext">
+                    <LoaderCircle :size="48" class="animate-spin text-university-blue" aria-hidden="true" />
+                </span>
                 <RadialProgress v-if="showprogress" :diameter="100" :totalSteps="100" :completedSteps="progress">{{ progress }}%</RadialProgress>
             </div>
         </div>
@@ -11,6 +13,7 @@
 
 <script setup lang="ts">
     import {ref, onMounted, onUnmounted, computed} from 'vue';
+    import { LoaderCircle } from '@lucide/vue';
     import { storeToRefs } from 'pinia';
     import { useIntervalFn } from '@vueuse/core';
     import { useMstrings } from '@/stores/mstrings.js';
