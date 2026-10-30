@@ -40,7 +40,7 @@
     }>();
 
     const emits = defineEmits<{
-        (e: 'cleaned', payload: { cleaned: number; erroritems: iError[] }): void;
+        (e: 'cleaned', payload: { cleaned: number; erroritems: iError[]; dualgradecategoryids: number[] }): void;
     }>();
 
     const showconfirm = ref(false);
@@ -104,6 +104,7 @@
                 emits('cleaned', {
                     cleaned,
                     erroritems: result.erroritems || [],
+                    dualgradecategoryids: result.dualgradecategoryids || [],
                 });
             })
             .catch((error) => {

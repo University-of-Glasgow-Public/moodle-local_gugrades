@@ -1,6 +1,8 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
+    <PleaseWait v-if="recalculatingDualGrades" :message="dualGradeMessage" />
+
     <VueModal :model-value="showModalOpen" :enableClose="false" modalClass="rounded max-w-4xl" :title="modalTitle" @update:modelValue="() => {}">
         <UAlert v-if="showerrors" variant="error">
             <div class="mb-4">
@@ -39,6 +41,10 @@
                 <UButton variant="primary" @click="continueSetup">{{ continueLabel }}</UButton>
             </div>
         </UAlert>
+        <UAlert v-else-if="dualGradeFailed" variant="error">
+            <p class="mb-4">{{ mstrings.dualgraderecalculationfailed }}</p>
+            <UButton variant="primary" @click="continueSetup">{{ mstrings.dualgraderecalculationretry }}</UButton>
+        </UAlert>
         <UAlert v-else>
             Setting up MyGrades and checking data integrity.
         </UAlert>
@@ -46,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-    import { ref, onMounted, computed } from 'vue';
+    import { ref, onMounted, computed, nextTick } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -55,6 +61,8 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import { useActivityTreeStore } from '../stores/activitytree.js';
     import { usePopulateTrees } from '@/js/setuptrees.ts';
+    import { usePreload } from '@/js/preload';
+    import PleaseWait from './Common/PleaseWait.vue';
     import CleanupIntegrityButton from './Capture/CleanupIntegrityButton.vue';
     import MenuButton from './Common/MenuButton.vue';
     import { useToast } from 'vue-toastification';
@@ -75,6 +83,7 @@
 
     const treestore = useActivityTreeStore();
     const populatetrees = usePopulateTrees();
+    const preload = usePreload();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs(mstringstore);
     const toast = useToast();
@@ -87,8 +96,15 @@
     const isSettingUp = ref(true);
     const setupFinished = ref(false);
     const courseurl = ref('');
+    const dualGradeCategoryIds = ref<number[]>([]);
+    const recalculatingDualGrades = ref(false);
+    const dualGradeFailed = ref(false);
 
-    const showModalOpen = computed(() => !setupFinished.value && (isSettingUp.value || showerrors.value || shownotices.value));
+    const showModalOpen = computed(() => !recalculatingDualGrades.value && !setupFinished.value &&
+        (isSettingUp.value || showerrors.value || shownotices.value || dualGradeFailed.value));
+
+    const dualGradeMessage = computed(() => mstrings.value.dualgraderecalculationwait ||
+        'Creating first-sitting and award grades. Please wait while this course is recalculated; large courses may take several minutes.');
 
     const modalTitle = computed(() => {
         if (shownotices.value) {
@@ -113,14 +129,37 @@
     }
 
     async function continueSetup() {
+        if (recalculatingDualGrades.value || setupFinished.value) {
+            return;
+        }
         shownotices.value = false;
         isSettingUp.value = true;
+        dualGradeFailed.value = false;
 
         try {
+            if (dualGradeCategoryIds.value.length > 0) {
+                recalculatingDualGrades.value = true;
+                await nextTick();
+                try {
+                    while (dualGradeCategoryIds.value.length > 0) {
+                        await moodleFetch('local_gugrades_recalculate', {
+                            gradecategoryid: dualGradeCategoryIds.value[0],
+                        });
+                        dualGradeCategoryIds.value.shift();
+                    }
+                } finally {
+                    recalculatingDualGrades.value = false;
+                }
+            }
             await populatetrees.populate();
             setupFinished.value = true;
             isSettingUp.value = false;
+            preload.recalculate();
         } catch (error: any) {
+            if (dualGradeCategoryIds.value.length > 0) {
+                dualGradeFailed.value = true;
+                isSettingUp.value = false;
+            }
             debug.value = error;
             console.error(error);
         }
@@ -137,6 +176,7 @@
             courseurl.value = courseinfo.url || '';
             errors.value = result.erroritems || [];
             notices.value = result.reassessmentnotices || [];
+            dualGradeCategoryIds.value = result.dualgradecategoryids || [];
 
             if (notices.value.length > 0) {
                 showReassessmentNotices();
@@ -162,8 +202,9 @@
         }
     });
 
-    async function onCleanupComplete(payload: { cleaned: number; erroritems: iError[] }) {
+    async function onCleanupComplete(payload: { cleaned: number; erroritems: iError[]; dualgradecategoryids?: number[] }) {
         errors.value = payload.erroritems || [];
+        dualGradeCategoryIds.value = payload.dualgradecategoryids || [];
 
         if (errors.value.length === 0) {
             showerrors.value = false;

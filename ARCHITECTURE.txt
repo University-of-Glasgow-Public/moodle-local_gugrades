@@ -276,6 +276,10 @@ Grade concepts
   Course totals always show both grades under every regulation. Without any
   reassessment, CATEGORY1 mirrors CATEGORY, including course-total overrides;
   only reassessment introduces an independently calculated first-sitting result.
+  After successful startup integrity checks, from2026 courses with current
+  CATEGORY totals but no current CATEGORY1 results are automatically recalculated
+  under a dedicated waiting modal, before tree loading and background setup.
+  This is a course-wide legacy check, not a per-user completeness check.
   Both the page and row-refresh APIs expose displaygrade1st/isadmin1st/error1st
   for totals and display1st/isadmin1st/error1st for children. Missing or
   administrative first-sitting outcomes keep their own display and status.

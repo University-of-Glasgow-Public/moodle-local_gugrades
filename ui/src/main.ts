@@ -5,7 +5,6 @@ import "vue-toastification/dist/index.css";
 import { plugin, defaultConfig } from '@formkit/vue';
 import { createPinia } from 'pinia';
 import { usePopulateTrees } from './js/setuptrees';
-import { usePreload } from './js/preload';
 import { useMstrings } from './stores/mstrings';
 import { moodleFetch } from '@/js/moodlefetch';
 import '../src/assets/VueModal.css';
@@ -69,7 +68,4 @@ moodleFetch('local_gugrades_get_all_strings', {})
         //const populatetrees = usePopulateTrees();
         //populatetrees.populate();
 
-        // Preload aggregation recalculations
-        const preload = usePreload();
-        preload.recalculate();
     });

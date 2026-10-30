@@ -1205,6 +1205,38 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * Integrity checks identify legacy from2026 totals without recalculating during the check.
+     */
+    public function test_integrity_detects_missing_initial_dual_grades(): void {
+        global $DB;
+
+        $readcheck = fn() => \core_external\external_api::clean_returnvalue(
+            check_integrity::execute_returns(), check_integrity::execute($this->course->id),
+        );
+        $this->assertSame([], $readcheck()['dualgradecategoryids']);
+        $this->aggregate();
+        $this->assertSame([], $readcheck()['dualgradecategoryids']);
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $this->course->id, 'gradetype' => 'CATEGORY1']);
+
+        $DB->set_field('course', 'startdate', strtotime('2025-01-01'), ['id' => $this->course->id]);
+        $this->assertSame([], $readcheck()['dualgradecategoryids']);
+        $DB->set_field('course', 'startdate', strtotime('2027-01-01'), ['id' => $this->course->id]);
+        $result = $readcheck();
+        $this->assertEmpty($result['erroritems']);
+        $this->assertContains($this->categories['Dual total']->id, $result['dualgradecategoryids']);
+        $this->assertFalse($DB->record_exists('local_gugrades_grade', [
+            'courseid' => $this->course->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
+        ]));
+
+        foreach ($result['dualgradecategoryids'] as $categoryid) {
+            recalculate::execute($this->course->id, $categoryid);
+        }
+        $this->assertSame([], $readcheck()['dualgradecategoryids']);
+        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+    }
+
+    /**
      * Course totals always show both grades, identical by default and after a course-total override.
      */
     public function test_course_total_defaults_to_matching_dual_grades(): void {

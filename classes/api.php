@@ -3193,6 +3193,26 @@ class api {
     }
 
     /**
+     * Find legacy from2026 courses that have totals but no first-sitting results yet.
+     * @param int $courseid
+     * @return int[] Top-level categories requiring recalculation.
+     */
+    private static function missing_dual_grade_categoryids(int $courseid): array {
+        global $DB;
+
+        if (\local_gugrades\regulations::get_active_regulation($courseid)->shortname() !== 'from2026' ||
+                $DB->record_exists('local_gugrades_grade', [
+                    'courseid' => $courseid, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
+                ]) || !$DB->record_exists('local_gugrades_grade', [
+                    'courseid' => $courseid, 'gradetype' => 'CATEGORY', 'iscurrent' => 1,
+                ])) {
+            return [];
+        }
+
+        return array_map('intval', array_keys(\local_gugrades\grades::get_firstlevel($courseid)));
+    }
+
+    /**
      * Check integrity of MyGrades data for this course. 
      * @param int $courseid
      * @return array
@@ -3227,6 +3247,7 @@ class api {
         return [
             'erroritems' => $errors,
             'reassessmentnotices' => $reassessmentnotices,
+            'dualgradecategoryids' => $errors ? [] : self::missing_dual_grade_categoryids($courseid),
         ];
     }
 
@@ -3298,6 +3319,7 @@ class api {
             'cleaned' => $cleaned,
             'erroritems' => $remaining['erroritems'],
             'reassessmentnotices' => $remaining['reassessmentnotices'],
+            'dualgradecategoryids' => $remaining['dualgradecategoryids'],
         ];
     }
 }

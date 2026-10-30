@@ -66,6 +66,10 @@ class check_integrity extends external_api {
      */
     public static function execute_returns() {
         return new external_single_structure([
+            'dualgradecategoryids' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Top-level category requiring initial dual-grade recalculation'),
+                'Legacy from2026 totals needing dual grades', VALUE_DEFAULT, [],
+            ),
             'erroritems' => new external_multiple_structure(
                 new external_single_structure([
                     'gradeitemid' => new external_value(PARAM_INT, 'Grade item id'),
