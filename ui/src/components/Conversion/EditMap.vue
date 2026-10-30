@@ -72,7 +72,7 @@
 
             </div>
 
-            <div class="divider"></div>
+            <Divider />
 
             <div :class="isScheduleA ? 'grid grid-cols-2 gap-x-6' : 'flex flex-col'">
 
@@ -175,9 +175,9 @@
                 </div>
             </div>
 
-            <div v-if="!ordervalidated" class="alert alert-danger my-3">
+            <UAlert v-if="!ordervalidated" variant="error" class="my-3">
                 {{ mstrings.mapnotinorder }}
-            </div>
+            </UAlert>
 
             <div class="flex gap-2 mt-3">
                 <UButton v-if="caneditgrades" variant="primary" type="submit">Save</UButton>
@@ -203,6 +203,8 @@
     import type { IConversionMap } from '@/js/Interfaces';
     import type { FormKitNode } from '@formkit/core';
     import UButton from '../Common/UButton.vue';
+    import UAlert from '../Common/UAlert.vue';
+    import Divider from '../Common/Divider.vue';
     import { gradecolors } from '@/js/GradeColors';
     import HelpButton from '../Common/HelpButton.vue';
     import GradeColor from '../Common/GradeColor.vue';

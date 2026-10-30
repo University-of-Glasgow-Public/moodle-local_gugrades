@@ -45,9 +45,9 @@
 
                 <!-- Recursive options -->
                 <div v-if="recursiveavailable">
-                    <div v-if="!allgradesvalid" class="alert alert-danger">
+                    <UAlert v-if="!allgradesvalid" variant="error">
                         {{ mstrings['invalidgradetype'] }}
-                    </div>
+                    </UAlert>
                     <div v-else>
                         <FormKit
                             type="radio"
@@ -110,7 +110,7 @@
                 {{ mstrings['importnomatch'] }}
             </UAlert>
 
-            <div class="divider"></div>
+            <Divider />
 
             <div class="mt-2 pt-2 flex gap-2">
                 <UButton variant="primary" @click="dryrungrades()">{{ mstrings.yesimport }}</UButton>

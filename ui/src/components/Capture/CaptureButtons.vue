@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!loaded" class="w-full h-[40px] skeleton"></div>
+    <div v-if="!loaded" class="w-full h-[40px] rounded-md bg-gray-200 animate-pulse motion-reduce:animate-none" role="status" aria-label="Loading actions"></div>
     <div v-else class="flex justify-start gap-2">
         <ImportButton :enable="!converted && caneditgrades" :disabledReason="importDisabledReason" :itemid="props.itemid" :groupid="props.groupid" :userids="props.userids" :staffuserid="props.staffuserid" @imported="emit('refreshtable')"></ImportButton>
         <CSVImportButton :enable="caneditgrades" :disabledReason="csvDisabledReason" :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :show="props.showcsvimport" :staffuserid="props.staffuserid" @uploaded="emit('refreshtable')"></CSVImportButton>

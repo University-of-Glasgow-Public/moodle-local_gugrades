@@ -32,7 +32,7 @@
 
         <!-- OLD regulations -->
         <div v-if="loaded && !treeerror && !newregs">
-            <table id="config_table" class="table table-zebra mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm">
+            <table id="config_table" class="table mt-4 border rounded-md bg-base-100 border-gray-300 shadow-sm [&>tbody>tr:nth-child(even)]:bg-gray-50">
                 <tbody>
                     <ConfigTree
                         v-if="activitytree"

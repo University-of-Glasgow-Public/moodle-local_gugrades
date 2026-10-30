@@ -4,14 +4,14 @@
 
         <Portal>
         <PopoverPanel ref="menuPanel" :style="floatingStyles" class="border-2 border-base-300 rounded-md z-999" v-slot="{ close }">
-            <ul v-if="props.categoryid == 0" class="menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">
+            <ul v-if="props.categoryid == 0" class="flex flex-col bg-base-100 text-base-content rounded-md z-999 w-52 p-2 shadow-sm" tabindex="-1">
                 <li v-if="caneditgrades" >
                     <AddGradeButton :itemid="props.itemid" :selectedcategoryid="props.selectedcategoryid" :userid="props.userid" :name="props.name" :itemname="props.itemname" :released="props.released" @gradeadded="grade_added" :close="close"></AddGradeButton>
                 </li>
                 <li><HistoryButton :userid="props.userid" :itemid="props.itemid" :name="props.name" :itemname="props.itemname" :close="close"></HistoryButton></li>
                 <li v-if="caneditgrades"><HideShowButton :gradehidden="props.gradehidden" :itemid="props.itemid" :userid="props.userid" @changed="grade_added()" :close="close"></HideShowButton></li>
             </ul>
-            <ul v-else class="menu dropdown-content bg-base-100 text-base-content rounded-box z-999 w-52 p-2 shadow-sm" tabindex="-1">
+            <ul v-else class="flex flex-col bg-base-100 text-base-content rounded-md z-999 w-52 p-2 shadow-sm" tabindex="-1">
                 <li v-if="caneditgrades"><AddGradeButton
                     :itemid="props.itemid"
                     :selectedcategoryid="props.selectedcategoryid"

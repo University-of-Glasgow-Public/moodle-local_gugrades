@@ -59,7 +59,7 @@
 
     const progressclass = computed(() => {
         if (progress.value < 33.3) {
-            return 'bg-danger';
+            return 'bg-brand-dark-red';
         }
         if (progress.value < 66.6) {
             return 'bg-info';

@@ -18,7 +18,7 @@
                 <li><b>{{ mstrings.idnumber }}:</b> {{ idnumber }}</li>
             </ul>
 
-            <div class="divider"></div>
+            <Divider />
 
             <!-- grade items therein -->
             <table class="table mt-3 p-2">
@@ -63,7 +63,7 @@
 
             <UAlert v-if="!closeenough" variant="warning" class="my-2">{{ mstrings.donotaddto1 }}</UAlert>
 
-            <div class="divider"></div>
+            <Divider />
 
             <!-- reason -->
             <div class="my-4">
@@ -95,6 +95,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import UButton from '../Common/UButton.vue';
     import UAlert from '../Common/UAlert.vue';
+    import Divider from '../Common/Divider.vue';
     import type { IAlterWeightItem, ISaveAlteredWeightItem } from '@/js/Interfaces';
 
     const showaltermodal = ref(false);

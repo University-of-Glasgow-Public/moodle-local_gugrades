@@ -1,7 +1,7 @@
 <template>
   <Popover class="relative">
     <PopoverButton ref="menuButton" class="cursor-pointer" aria-label="Open menu">
-      <EllipsisVertical :size="18" class="text-base_content" tabindex="0" />
+      <EllipsisVertical :size="18" class="text-base-content" tabindex="0" />
     </PopoverButton>
 
     <Portal>

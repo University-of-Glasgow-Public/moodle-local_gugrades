@@ -4,7 +4,7 @@
             <SquareCheck v-if="checked" tabindex="0"></SquareCheck>
             <Square v-else tabindex="0"></Square>
         </a>
-        <span class="badge badge-pill ml-2"  :class="badgeclass">{{ mstrings.reassessment }}?</span>
+        <UBadge class="ml-2" :variant="badgevariant">{{ mstrings.reassessment }}?</UBadge>
     </div>
 </template>
 
@@ -13,6 +13,7 @@
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { SquareCheck, Square } from '@lucide/vue';
+    import UBadge from '../Common/UBadge.vue';
 
     const props = defineProps({
         itemid: Number,
@@ -23,14 +24,14 @@
         }
     });
 
-    const bscolors = [
+    const badgevariants = [
         'primary',
         'secondary',
         'info',
         'danger',
         'warning',
         'success'
-    ];
+    ] as const;
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
 
@@ -42,10 +43,10 @@
     /**
      * badge class (by color)
      */
-    const badgeclass = computed(() => {
-        const index = (props.depth - 2) % bscolors.length;
+    const badgevariant = computed(() => {
+        const index = (props.depth - 2) % badgevariants.length;
 
-        return 'badge-' + bscolors[index];
+        return badgevariants[index] ?? 'neutral';
     })
 
     /**

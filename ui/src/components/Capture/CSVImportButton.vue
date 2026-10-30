@@ -22,7 +22,7 @@
 
                 <UButton variant="primary" @click="csv_download()" class="mt-2">{{  mstrings.csvdownload }}</UButton>
 
-                <div class="divider"></div>
+                <Divider />
 
                 <!-- select file / upload bit -->
                 <p><b>{{ mstrings['csvuploadhelp'] }}</b></p>
@@ -76,7 +76,7 @@
 
                 <!-- submit bit (if no errors) -->
                 <div v-if="!errorcount" class="mt-2">
-                    <div class="divider"></div>
+                    <Divider />
                     <FormKit type="form" @submit="submit_reason_form">
                         <FormKit
                             type="select"
@@ -117,6 +117,7 @@
     import PleaseWait from '@/components/Common/PleaseWait.vue';
     import UButton from '../Common/UButton.vue';
     import UAlert from '../Common/UAlert.vue';
+    import Divider from '../Common/Divider.vue';
     import TwDropzone from '../Tailwind/TwDropzone.vue';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
