@@ -22,12 +22,17 @@
                 </button>
             </div>
         </template>
-        <template #footer>&nbsp;</template>
+        <template #footer>
+            <MenuButton v-if="notsetup && courseurl" :href="courseurl" iconName="MoveLeft">
+                {{ returnToCourseLabel }}
+            </MenuButton>
+            <span v-else>&nbsp;</span>
+        </template>
     </UModal>
 </template>
 
 <script setup lang="ts">
-    import { ref, onMounted, watch } from 'vue';
+    import { computed, ref, onMounted, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import type { ICategories } from '@/js/Interfaces';
@@ -36,15 +41,18 @@
     import { moodleFetch } from '@/js/moodlefetch';
     import UAlert from '@/components/Common/UAlert.vue';
     import UModal from './Common/UModal.vue';
+    import MenuButton from './Common/MenuButton.vue';
 
     const level1categories = ref< ICategories[] >([]);
     const notsetup = ref(false);
     const itemerror = ref(false);
     const debug = ref({});
     const displaymodal = ref(false);
+    const courseurl = ref('');
     const level1store = useLeve1Store();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
+    const returnToCourseLabel = computed(() => mstrings.value.integrity_return_to_course || 'Back to course');
 
     const emits = defineEmits(['finished']);
 
@@ -54,10 +62,16 @@
             'local_gugrades_get_levelonecategories',
             {}
         )
-        .then((result: any) => {
+        .then(async (result: any) => {
 
             level1categories.value = result.categories;
             notsetup.value = level1categories.value.length == 0;
+            if (notsetup.value) {
+                displaymodal.value = true;
+                const courseinfo: any = await moodleFetch('local_gugrades_get_course_info', {});
+                courseurl.value = courseinfo.url;
+                return;
+            }
 
             // if there's only one then might as well select it.
             if ((level1categories.value.length == 1) && (0 in level1categories.value) && !itemerror.value && !notsetup.value) {
