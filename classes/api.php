@@ -3120,7 +3120,7 @@ class api {
             'fullname' => $course->fullname,
             'shortname' => $course->shortname,
             'url' => $url->out(),
-            'startdate' => userdate($course->startdate),
+            'startdate' => userdate($course->startdate, get_string('strftimedate', 'langconfig')),
             'enddate' => userdate($course->enddate),
             'specialcategory' => $regulationextra,
         ];
