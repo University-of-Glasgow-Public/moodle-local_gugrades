@@ -23,9 +23,11 @@
             </div>
         </template>
         <template #footer>
-            <MenuButton v-if="notsetup && courseurl" :href="courseurl" iconName="MoveLeft">
-                {{ returnToCourseLabel }}
-            </MenuButton>
+            <div v-if="notsetup && courseurl" class="w-52 max-w-full">
+                <MenuButton :href="courseurl" :wide="true" iconName="MoveLeft">
+                    {{ returnToCourseLabel }}
+                </MenuButton>
+            </div>
             <span v-else>&nbsp;</span>
         </template>
     </UModal>
