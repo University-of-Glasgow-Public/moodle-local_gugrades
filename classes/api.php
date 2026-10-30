@@ -2221,15 +2221,16 @@ class api {
         if (\local_gugrades\grades::is_reassessment_category_set($courseid, $gradecategoryid)) {
             $names = array_column($user->fields, 'fullname', 'gradeitemid');
             $user->firstsittingexplain = self::explain_selection(
-                get_string('firstsittinggrade', 'local_gugrades'), $result->firstsitting, $names,
+                get_string('firstsitting', 'local_gugrades'), $result->firstsitting, $names,
             );
             if ($user->overridden) {
                 $user->awardexplain = get_string('explain_awardoverridden', 'local_gugrades');
             } else if (\local_gugrades\aggregation::get_aggregation_strategy($courseid, $gradecategoryid) != \GRADE_AGGREGATE_MAX) {
-                $user->awardexplain = get_string('categorynothighest', 'local_gugrades');
+                $user->awardexplain = get_string('award', 'local_gugrades') . ': ' .
+                    get_string('categorynothighest', 'local_gugrades');
             } else {
                 $user->awardexplain = self::explain_selection(
-                    get_string('awardgrade', 'local_gugrades'), $result, $names,
+                    get_string('award', 'local_gugrades'), $result, $names,
                 );
             }
         }

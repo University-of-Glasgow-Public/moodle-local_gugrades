@@ -1046,10 +1046,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $explain = $this->explain('Dual reassessment');
         $this->assertNotEmpty($explain['displaygrade1st']);
         $this->assertEquals(get_string('explain_selection_earliest', 'local_gugrades', (object)[
-            'result' => get_string('firstsittinggrade', 'local_gugrades'), 'grade' => '16', 'item' => 'Attempt one',
+            'result' => get_string('firstsitting', 'local_gugrades'), 'grade' => '16', 'item' => 'Attempt one',
         ]), $explain['firstsittingexplain']);
         $this->assertEquals(get_string('explain_selection_highest', 'local_gugrades', (object)[
-            'result' => get_string('awardgrade', 'local_gugrades'), 'grade' => '18', 'item' => 'Attempt two',
+            'result' => get_string('award', 'local_gugrades'), 'grade' => '18', 'item' => 'Attempt two',
         ]), $explain['awardexplain']);
 
         // Parent categories and non-reassessment categories get no extra lines.
@@ -1076,7 +1076,8 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             ['id' => $this->categories['Dual reassessment']->id]);
         $this->aggregate();
         $explain = $this->explain('Dual reassessment');
-        $this->assertEquals(get_string('categorynothighest', 'local_gugrades'), $explain['awardexplain']);
+        $this->assertEquals(get_string('award', 'local_gugrades') . ': ' .
+            get_string('categorynothighest', 'local_gugrades'), $explain['awardexplain']);
         $this->assertStringContainsString('Attempt one', $explain['firstsittingexplain']);
 
         $DB->set_field('grade_categories', 'aggregation', GRADE_AGGREGATE_MAX,
