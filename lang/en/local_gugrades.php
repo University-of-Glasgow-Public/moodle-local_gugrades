@@ -201,6 +201,7 @@ $string['explain_overridden'] = 'Aggregated grade has been overridden';
 $string['explain_points'] = 'Grades are aggregated in points';
 $string['explain_resitadmingrade'] = 'In a reassessment category with at least one admin grade, the result is the reassessment grade (or admin grade)';
 $string['explain_resitcapped'] = 'Award grade CAPPED at {$a->grade} because a resit was taken ({$a->status})';
+$string['explain_resitcategories'] = 'Resit categories: {$a}';
 $string['explain_resitcapunknown'] = 'Undergraduate/Postgraduate status is unknown, so treated as Undergraduate.';
 $string['explain_resitnotcapped'] = 'A resit was taken but the award grade does not exceed the cap, so no capping was applied';
 $string['explain_resitlastadmin'] = 'In a reassessment category, if the last grade is an admin grade, the result is the last admin grade';

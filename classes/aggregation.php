@@ -1403,6 +1403,7 @@ class aggregation {
                     'notavailable' => $notavailable,
                     'nursingcondmet' => $agg ? $agg->nursingcondmet : false,
                     'resittaken' => $agg ? $agg->resittaken : false,
+                    'resitcategories' => $agg ? $agg->resitcategories : [],
                 ];
             } else {
                 // Is there a grade (in MyGrades) for this user?
@@ -1631,6 +1632,8 @@ class aggregation {
             'notavailable' => $notavailable,
             'selection' => (!$override && method_exists($aggregation, 'get_selection')) ? $aggregation->get_selection() : null,
             'resittaken' => $resittaken,
+            'resitcategories' => $resittaken && method_exists($aggregation, 'get_resitcategories') ?
+                $aggregation->get_resitcategories() : [],
             'capped' => $capped,
             'engcapped' => $engcapped,
         ];

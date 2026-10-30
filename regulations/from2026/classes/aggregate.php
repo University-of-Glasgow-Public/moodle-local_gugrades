@@ -83,6 +83,11 @@ class aggregate {
     private bool $resittaken = false;
 
     /**
+     * @var array Resit category names keyed by category ID.
+     */
+    private array $resitcategories = [];
+
+    /**
      * MGU-1596: Course total award was capped because of a resit.
      * @var bool $capped
      */
@@ -124,10 +129,18 @@ class aggregate {
      * @return bool
      */
     public function resit_taken(object $category, array $items, int $userid): bool {
+        $this->resitcategories = [];
+        $resittaken = false;
         foreach ($items as $item) {
             if ($item->iscategory && !empty($item->resittaken)) {
-                return true;
+                $resittaken = true;
+                foreach ($item->resitcategories ?? [] as $categoryid => $name) {
+                    $this->resitcategories[$categoryid] = $name;
+                }
             }
+        }
+        if ($resittaken) {
+            return true;
         }
         if (!$this->is_reassessment($category->categoryid)) {
             return false;
@@ -136,7 +149,19 @@ class aggregate {
             return !$item->grademissing && (empty($item->admingrade) || ($item->admingrade == 'NOSUBMISSION'));
         });
 
-        return count($substantive) > 1;
+        if (count($substantive) > 1) {
+            $this->resitcategories[$category->categoryid] = $category->name;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Categories where resits were taken in this calculation.
+     * @return array
+     */
+    public function get_resitcategories(): array {
+        return $this->resitcategories;
     }
 
     /**
@@ -190,6 +215,10 @@ class aggregate {
             'status' => $ispg ? get_string('postgraduate', 'local_gugrades') : get_string('undergraduate', 'local_gugrades'),
         ];
         $explain = get_string('explain_resitcapped', 'local_gugrades', $a);
+        if ($this->resitcategories) {
+            $explain .= '. ' . get_string('explain_resitcategories', 'local_gugrades',
+                implode(', ', $this->resitcategories));
+        }
         if ($ugpg == 'Unknown') {
             $explain .= ' ' . get_string('explain_resitcapunknown', 'local_gugrades');
         }
@@ -285,6 +314,7 @@ class aggregate {
         $this->selection = null;
         $this->capped = false;
         $this->engineeringcapped = false;
+        $this->resitcategories = [];
         $this->resittaken = !$firstsitting && $this->resit_taken($category, $items, $userid);
 
         // Logic will be different if this category is for resits.

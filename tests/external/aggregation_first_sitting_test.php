@@ -877,11 +877,55 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             'grade' => 'D3', 'status' => get_string('undergraduate', 'local_gugrades'),
         ]), $explain['explain']);
         $this->assertStringContainsString(get_string('explain_resitcapunknown', 'local_gugrades'), $explain['explain']);
+        $this->assertStringContainsString(get_string('explain_resitcategories', 'local_gugrades', 'Dual reassessment'),
+            $explain['explain']);
 
         $page = get_aggregation_page::execute($this->course->id, $this->categories['Dual total']->id, '', '', 0, false);
         $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
         $user = array_values(array_filter($page['users'], fn($user) => $user['id'] == $this->student->id))[0];
         $this->assertTrue($user['capped']);
+    }
+
+    /**
+     * Resit-cap explanations name all actual resit categories, including below overrides.
+     */
+    public function test_resit_cap_explanation_names_all_resit_categories(): void {
+        global $DB;
+
+        $this->set_ugpg('Undergraduate');
+        $this->build_schema([
+            (object)[
+                'name' => 'Additional reassessment', 'category' => true, 'aggregation' => 'max',
+                'children' => [
+                    (object)['name' => 'Additional first', 'category' => false, 'type' => 'schedulea'],
+                    (object)['name' => 'Additional second', 'category' => false, 'type' => 'schedulea'],
+                ],
+            ],
+        ], $this->categories['Dual total']->id);
+        $additionalid = $DB->get_field('grade_categories', 'id', [
+            'courseid' => $this->course->id, 'fullname' => 'Additional reassessment',
+        ], MUST_EXIST);
+        $this->write_result($this->get_gradeitemid('Additional first'), 18);
+        $this->write_result($this->get_gradeitemid('Additional second'), 20);
+        write_flags::execute($this->course->id, array_map(fn($categoryid) => [
+            'gradecategoryid' => $categoryid, 'gradeitemid' => 0, 'engexam' => false, 'resit' => true,
+        ], [$this->categories['Dual reassessment']->id, $additionalid]));
+        $middleitemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($this->categories['Dual middle']->id);
+        $this->write_result($middleitemid, 17, 'CATEGORY', true);
+
+        $explain = get_explain_aggregation::execute($this->course->id, $this->categories['Dual total']->id, $this->student->id);
+        $explain = \core_external\external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
+        $this->assertTrue($explain['capped']);
+        $this->assertEquals(9, $this->result('Dual total', 'CATEGORY')->convertedgrade);
+        foreach (['Dual reassessment', 'Additional reassessment'] as $name) {
+            $this->assertSame(1, substr_count($explain['explain'], $name));
+        }
+        $this->assertStringNotContainsString('Dual middle', $explain['explain']);
+
+        $DB->delete_records('local_gugrades_grade', ['gradeitemid' => $this->get_gradeitemid('Additional second')]);
+        $explain = get_explain_aggregation::execute($this->course->id, $this->categories['Dual total']->id, $this->student->id);
+        $this->assertStringContainsString('Dual reassessment', $explain['explain']);
+        $this->assertStringNotContainsString('Additional reassessment', $explain['explain']);
     }
 
     /**
