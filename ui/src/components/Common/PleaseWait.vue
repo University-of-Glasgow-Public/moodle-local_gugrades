@@ -8,6 +8,9 @@
                 <RadialProgress v-if="showprogress" :diameter="100" :totalSteps="100" :completedSteps="progress">{{ progress }}%</RadialProgress>
             </div>
         </div>
+        <div v-if="$slots.default" class="space-y-2 px-4 pb-4 text-center text-sm leading-6 text-brand-dark-purple">
+            <slot />
+        </div>
     </VueModal>
 </template>
 

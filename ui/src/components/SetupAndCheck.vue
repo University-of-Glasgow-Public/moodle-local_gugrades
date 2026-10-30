@@ -1,7 +1,10 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
 
-    <PleaseWait v-if="recalculatingDualGrades" :message="dualGradeMessage" />
+    <PleaseWait v-if="recalculatingDualGrades" :message="mstrings.dualgraderecalculationtitle || 'Updating course grades'">
+        <p>{{ dualGradeMessage }}</p>
+        <p class="text-brand-dark-purple/70">{{ mstrings.dualgraderecalculationtime || 'This may take several minutes for larger courses.' }}</p>
+    </PleaseWait>
 
     <VueModal :model-value="showModalOpen" :enableClose="false" modalClass="rounded max-w-4xl" :title="modalTitle" @update:modelValue="() => {}">
         <UAlert v-if="showerrors" variant="error">
@@ -104,7 +107,7 @@
         (isSettingUp.value || showerrors.value || shownotices.value || dualGradeFailed.value));
 
     const dualGradeMessage = computed(() => mstrings.value.dualgraderecalculationwait ||
-        'Creating first-sitting and award grades. Please wait while this course is recalculated; large courses may take several minutes.');
+        'Please wait while we prepare the first-sitting and award grades for this course.');
 
     const modalTitle = computed(() => {
         if (shownotices.value) {
