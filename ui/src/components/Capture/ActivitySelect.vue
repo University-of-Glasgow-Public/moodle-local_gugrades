@@ -15,7 +15,7 @@
                     <span class="opacity-60">{{ mstrings.selected }}:</span> {{ selectedactivity.itemname }}
                 </div>
                 <div class="opacity-60 shrink-0">
-                    <i class="fa fa-chevron-down text-[10px]" aria-hidden="true"></i>
+                    <ChevronDown :size="12" aria-hidden="true" />
                 </div>
             </div>
             
@@ -35,6 +35,7 @@
 
 <script setup lang="ts">
     import {ref, onMounted, watch } from 'vue';
+    import { ChevronDown } from '@lucide/vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';

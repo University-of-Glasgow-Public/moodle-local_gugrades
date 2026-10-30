@@ -51,10 +51,12 @@
                                     <span v-if="(item as any).grade">{{ (item as any).gradevalue }}</span>
                                 </template>
                                 <template v-else-if="header.value === 'error'">
-                                    <i v-if="(item as any).state < 0" class="text-red-500 fa fa-times" aria-hidden="true"></i>
-                                    <i v-if="(item as any).state > 0" class="text-green-500 fa fa-check" aria-hidden="true"></i>
-                                    <i v-if="(item as any).state == 0" class="text-yellow-500 fa fa-info" aria-hidden="true"></i>
-                                    {{ (item as any).error }}
+                                    <span class="inline-flex items-center gap-2">
+                                        <Check v-if="(item as any).state > 0" :size="18" class="shrink-0 text-green-600" role="img" aria-label="Valid row" />
+                                        <X v-else-if="(item as any).state < 0" :size="18" class="shrink-0 text-red-600" role="img" aria-label="Invalid row" />
+                                        <Info v-else :size="18" class="shrink-0 text-yellow-600" role="img" aria-label="Skipped row" />
+                                        <span v-if="(item as any).error">{{ (item as any).error }}</span>
+                                    </span>
                                 </template>
                                 <template v-else>
                                     {{ (item as any)[header.value] }}
@@ -107,6 +109,7 @@
 
 <script setup lang="ts">
     import {ref, onMounted, computed} from 'vue';
+    import { Check, Info, X } from '@lucide/vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from "vue-toastification";
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';

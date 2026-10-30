@@ -26,8 +26,7 @@
             </td>
             <td :style="indentstyle">
                 <b>
-                    <i v-if="props.depth == 1" class="fa fa-folder icon itemicon" :title="mstrings['gradecategory']" aria-hidden="true"></i>
-                    <i v-else class="fa fa-folder-o" :title="mstrings['gradecategory']" aria-hidden="true"></i>
+                    <Folder :size="18" class="inline-block align-middle mr-1" :fill="props.depth == 1 ? 'currentColor' : 'none'" :title="mstrings['gradecategory']" aria-hidden="true" />
                     {{ category.category.fullname }}
                     <!-- <span v-if="engineering"><input type="checkbox" /></span> -->
                 </b>
@@ -47,6 +46,7 @@
 
 <script setup lang="ts">
     import {ref, computed, onMounted} from 'vue';
+    import { Folder } from '@lucide/vue';
     import { storeToRefs } from 'pinia';
     import ConfigTreeIcon from '@/components/Configure/ConfigTreeIcon.vue';
     import ResitCheckbox from '@/components/Configure/ResitCheckbox.vue';
