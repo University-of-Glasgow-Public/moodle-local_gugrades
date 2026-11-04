@@ -2742,51 +2742,6 @@ class grades {
     }
 
     /**
-     * Check grademax=22 in new regs. 
-     * If new regs apply
-     * AND there are any grade items with grademax=22
-     * AND there are any gugrades for this item not in points
-     * AND no conversion has been applied
-     * THEN we have an error condition.
-     * @param int $courseid
-     * @return array
-     */
-    public static function check_integrity_grademax22_newregs(int $courseid) {
-        global $DB;
-
-        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
-        if ($regulation->shortname() != 'from2026') {
-            return [];
-        }
-
-        $errors = [];
-
-        // Find any grade items with grademax = 22
-        if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22])) {
-            return [];
-        }
-
-        foreach ($items as $item) {
-
-            // If this item has been converted then it must have been points at some time.
-            if (\local_gugrades\conversion::is_conversion_applied($courseid, $item->id)) {
-                continue;
-            }
-
-            // If it's not converted then there cannot be any non-point gugrades
-            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'points' => false, 'iscurrent' => 1])) {
-                $errors[] = [
-                    'gradeitemid' => $item->id,
-                    'itemname' => $item->itemname,
-                    'error' => 'Item graded out of exactly 22 automatic conversion, found in new regs',
-                ];
-            }
-        }
-
-        return $errors;
-    }
-
-    /**
      * Check grademax=22 in old regs. 
      * If old regs apply
      * AND there are any grade items with grademax=22

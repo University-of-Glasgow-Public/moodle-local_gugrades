@@ -109,10 +109,9 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
             $errors
         );
 
-        // Assign 22 is flagged by both the grademax=22 new-regs check and the range/points check.
-        $this->assertCount(2, $errors['erroritems']);
+        // The general points/scale check flags this numeric item.
+        $this->assertCount(1, $errors['erroritems']);
         $this->assertEquals('Assign 22', $errors['erroritems'][0]['itemname']);
-        $this->assertEquals('Assign 22', $errors['erroritems'][1]['itemname']);
     }
 
     /**

@@ -3224,11 +3224,8 @@ class api {
         // Does not modify erroritems or run for from2026 courses.
         $reassessmentnotices = \local_gugrades\grades::check_integrity_reassessment_structure($courseid);
 
-        // grademax=22 check new regs
-        $errors = \local_gugrades\grades::check_integrity_grademax22_newregs($courseid);
-
         // grademax=22 check old regs
-        $errors = array_merge($errors, \local_gugrades\grades::check_integrity_grademax22_oldregs($courseid));
+        $errors = \local_gugrades\grades::check_integrity_grademax22_oldregs($courseid);
 
         // Check for valid admingrades
         $errors = array_merge($errors, \local_gugrades\grades::check_integrity_admingrades($courseid));
