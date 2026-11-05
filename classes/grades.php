@@ -61,12 +61,6 @@ class grades {
     private static $gradecategories = [];
 
     /**
-     * Bulk data variable for grade items
-     * @var array $gradeitems
-     */
-    //private static $gradeitems = [];
-
-    /**
      * Bulk data foor grade items indexed by corresponding
      * category id
      * @var array $gradeitemsbycategoryid
@@ -91,7 +85,7 @@ class grades {
 
     /**
      * Converts a string to a number with explicit parsing.
-     * 
+     *
      * @param string $value
      * @return int|float
      */
@@ -1174,10 +1168,12 @@ class grades {
                 continue;
             }
             // A replacement column already covers this grade type.
-            if ($backup->gradetype !== 'OTHER' && $DB->record_exists('local_gugrades_column', [
+            if (
+                $backup->gradetype !== 'OTHER' && $DB->record_exists('local_gugrades_column', [
                 'gradeitemid' => $backup->gradeitemid,
                 'gradetype' => $backup->gradetype,
-            ])) {
+                ])
+            ) {
                 continue;
             }
             if ($backup->gradetype === 'OTHER') {
@@ -1187,11 +1183,13 @@ class grades {
                          WHERE gradeitemid = :gradeitemid
                            AND gradetype = :gradetype
                            AND $compareother = :other";
-                if ($DB->record_exists_sql($sql, [
+                if (
+                    $DB->record_exists_sql($sql, [
                     'gradeitemid' => $backup->gradeitemid,
                     'gradetype' => $backup->gradetype,
                     'other' => $backup->other,
-                ])) {
+                    ])
+                ) {
                     continue;
                 }
             }
@@ -1218,8 +1216,8 @@ class grades {
     }
 
     /**
-    * Store an actual grade revision and its audit details in local_gugrades_gradesbackup.
-    * Copies are retained when grades are reset.
+     * Store an actual grade revision and its audit details in local_gugrades_gradesbackup.
+     * Copies are retained when grades are reset.
      *
      * @param object $grade Grade row just written to local_gugrades_grade
      * @param string|null $other Column description. Looked up from the column when omitted.
@@ -1233,19 +1231,24 @@ class grades {
 
         $params = ['gradeid' => $grade->id];
         if (!empty($grade->iscurrent)) {
-            $DB->set_field_select('local_gugrades_gradesbackup', 'iscurrent', 0,
-                'gradeitemid = :gradeitemid AND userid = :userid AND columnid = :columnid AND gradeid <> :gradeid', [
+            $DB->set_field_select(
+                'local_gugrades_gradesbackup',
+                'iscurrent',
+                0,
+                'gradeitemid = :gradeitemid AND userid = :userid AND columnid = :columnid AND gradeid <> :gradeid',
+                [
                     'gradeitemid' => $grade->gradeitemid,
                     'userid' => $grade->userid,
                     'columnid' => $grade->columnid,
                     'gradeid' => $grade->id,
-                ]);
+                ]
+            );
         }
 
-            if (!self::is_backup_grade($grade)) {
-                $DB->delete_records('local_gugrades_gradesbackup', $params);
-                return;
-            }
+        if (!self::is_backup_grade($grade)) {
+            $DB->delete_records('local_gugrades_gradesbackup', $params);
+            return;
+        }
 
         if ($other === null) {
             $column = $DB->get_record('local_gugrades_column', ['id' => $grade->columnid], 'id, other');
@@ -1286,7 +1289,7 @@ class grades {
     }
 
     /**
-    * Queue a background copy of existing grades and history into the backup table.
+     * Queue a background copy of existing grades and history into the backup table.
      * Each cron run copies one batch, then schedules the next batch.
      */
     public static function queue_grade_backup_backfill(): void {
@@ -1304,9 +1307,9 @@ class grades {
     }
 
     /**
-    * Copy the next batch of grades and history into the backup table.
+     * Copy the next batch of grades and history into the backup table.
      *
-    * @param int $batchsize Maximum number of grade revisions to read
+     * @param int $batchsize Maximum number of grade revisions to read
      * @return bool True when further grades remain
      */
     public static function backfill_grade_backups(int $batchsize): bool {
@@ -1339,7 +1342,7 @@ class grades {
     }
 
     /**
-    * Copy grades and history until the time limit is reached or none remain.
+     * Copy grades and history until the time limit is reached or none remain.
      * A finished copy is left unchanged.
      *
      * @param int $batchsize Maximum number of current grades to read in one query
@@ -1374,7 +1377,7 @@ class grades {
     }
 
     /**
-    * Copy grades and history into the backup table.
+     * Copy grades and history into the backup table.
      * Used after a course restore. Site-wide upgrades use the background backfill.
      *
      * @param int|null $courseid Restrict to one course, or all courses when null
@@ -1414,21 +1417,31 @@ class grades {
             return 0;
         }
 
-        $values = $DB->get_records('local_gugrades_gradesbackup', ['courseid' => $courseid],
-            'iscurrent ASC, audittimecreated ASC, id ASC');
+        $values = $DB->get_records(
+            'local_gugrades_gradesbackup',
+            ['courseid' => $courseid],
+            'iscurrent ASC, audittimecreated ASC, id ASC'
+        );
         $restored = 0;
         foreach ($values as $value) {
             if (!$DB->record_exists('grade_items', ['id' => $value->gradeitemid, 'courseid' => $courseid])) {
                 continue;
             }
             if (!$value->iscurrent) {
-                if ($value->gradeid && $DB->record_exists('local_gugrades_grade', [
+                if (
+                    $value->gradeid && $DB->record_exists('local_gugrades_grade', [
                     'id' => $value->gradeid, 'courseid' => $courseid,
-                ])) {
+                    ])
+                ) {
                     continue;
                 }
-                $column = self::get_column($courseid, $value->gradeitemid, $value->gradetype,
-                    $value->other ?? '', (bool) $value->points);
+                $column = self::get_column(
+                    $courseid,
+                    $value->gradeitemid,
+                    $value->gradetype,
+                    $value->other ?? '',
+                    (bool) $value->points
+                );
                 $grade = clone $value;
                 unset($grade->id, $grade->gradeid, $grade->other, $grade->timemodified);
                 $grade->columnid = $column->id;
@@ -1439,23 +1452,27 @@ class grades {
                 $restored++;
                 continue;
             }
-            if ($DB->record_exists('local_gugrades_grade', [
+            if (
+                $DB->record_exists('local_gugrades_grade', [
                 'courseid' => $courseid,
                 'gradeitemid' => $value->gradeitemid,
                 'userid' => $value->userid,
                 'columnid' => $value->columnid,
                 'iscurrent' => 1,
-            ])) {
+                ])
+            ) {
                 continue;
             }
             // A recreated column already holds this grade type for the user.
-            if ($value->gradetype !== 'OTHER' && $DB->record_exists('local_gugrades_grade', [
+            if (
+                $value->gradetype !== 'OTHER' && $DB->record_exists('local_gugrades_grade', [
                 'courseid' => $courseid,
                 'gradeitemid' => $value->gradeitemid,
                 'userid' => $value->userid,
                 'gradetype' => $value->gradetype,
                 'iscurrent' => 1,
-            ])) {
+                ])
+            ) {
                 continue;
             }
 
@@ -1493,13 +1510,13 @@ class grades {
      * @param int $gradeitemid
      * @param int $userid
      * @return int|null
-     */ 
+     */
     public static function get_first_timestamp(int $gradeitemid, int $userid) {
         global $DB;
 
         $record = $DB->get_record('local_gugrades_grade', [
             'gradeitemid' => $gradeitemid,
-            'userid' => $userid
+            'userid' => $userid,
         ], 'id, audittimecreated', IGNORE_MULTIPLE);
 
         return $record ? $record->audittimecreated : null;
@@ -1564,20 +1581,6 @@ class grades {
 
         return $id === null || $id === false ? null : (int)$id;
     }
-
-    /**
-     * Get grade from array by reason
-     * @param array $grades
-     * @param string $reason
-     * @return object
-     */
-    /*
-    private static function get_grade_by_reason(array $grades, string $reason) {
-        $grade = array_column($grades, null, 'reasonshortname')[$reason] ?? false;
-
-        return $grade->grade;
-    }
-        */
 
     /**
      * Get the provisional/released grade from the
@@ -1726,8 +1729,8 @@ class grades {
         $gradeitem = self::get_gradeitem($gradeitemid);
 
         return [
-            $gradeitem->hidden == 1 ? true : false,
-            $gradeitem->locked == 1 ? true : false,
+        $gradeitem->hidden == 1 ? true : false,
+        $gradeitem->locked == 1 ? true : false,
         ];
     }
 
@@ -1792,7 +1795,7 @@ class grades {
                 JOIN {groups_members} gm ON gm.userid = gg.userid
                 WHERE gg.gradeitemid = :gradeitemid
                 AND gm.groupid = :groupid";
-                $params = ['gradeitemid' => $gradeitemid, 'groupid' => $groupid];
+            $params = ['gradeitemid' => $gradeitemid, 'groupid' => $groupid];
         } else {
             $sql = 'select * from {local_gugrades_grade} where gradeitemid=:gradeitemid';
             $params = ['gradeitemid' => $gradeitemid];
@@ -1897,11 +1900,11 @@ class grades {
         $mapping = self::mapping_factory($courseid, $gradeitemid);
         if (!in_array('FIRST', array_column($columns, 'gradetype'))) {
             $firstcolumn = (object)[
-                'id' => 0,
-                'gradetype' => 'FIRST',
-                'description' => gradetype::get_description('FIRST'),
-                'other' => '',
-                'points' => !$mapping->is_scale(),
+            'id' => 0,
+            'gradetype' => 'FIRST',
+            'description' => gradetype::get_description('FIRST'),
+            'other' => '',
+            'points' => !$mapping->is_scale(),
             ];
             array_unshift($columns, $firstcolumn);
         }
@@ -2212,11 +2215,11 @@ class grades {
         global $DB;
 
         $params = [
-            'courseid' => $courseid,
-            'gradeitemid' => $gradeitemid,
-            'userid' => $userid,
-            'gradetype' => $firstsitting ? 'RELEASED1' : 'RELEASED',
-            'iscurrent' => 1,
+        'courseid' => $courseid,
+        'gradeitemid' => $gradeitemid,
+        'userid' => $userid,
+        'gradetype' => $firstsitting ? 'RELEASED1' : 'RELEASED',
+        'iscurrent' => 1,
         ];
         if ($grade = $DB->get_record('local_gugrades_grade', $params)) {
             return $grade;
@@ -2279,7 +2282,7 @@ class grades {
     public static function grade_item_updated(int $courseid, int $gradeitemid) {
         global $DB;
 
-        // I'm disabling this as MyGrades recalculates anyway when it is 
+        // I'm disabling this as MyGrades recalculates anyway when it is
         // launched.
         return;
     }
@@ -2423,8 +2426,8 @@ class grades {
             AND gradetype = "CATEGORY"
             AND iscurrent = 1)';
         $category = $DB->get_record_sql($sql, [
-            'gradeitemid' => $gradeitemid,
-            'userid' => $userid,
+        'gradeitemid' => $gradeitemid,
+        'userid' => $userid,
         ]);
 
         // Released?
@@ -2435,8 +2438,8 @@ class grades {
             AND gradetype = "RELEASED"
             AND iscurrent = 1)';
         $released = $DB->get_record_sql($sql, [
-            'gradeitemid' => $gradeitemid,
-            'userid' => $userid,
+        'gradeitemid' => $gradeitemid,
+        'userid' => $userid,
         ]);
 
         return [$category, $released];
@@ -2541,7 +2544,6 @@ class grades {
         global $DB;
 
         return [];
-
     }
 
     /**
@@ -2584,11 +2586,6 @@ class grades {
     public static function release_user_grade(int $courseid, int $gradeitemid, int $userid, object $activity) {
         global $DB;
 
-        // Look up actvity object if we need to.
-        //if (!$activity) {
-        //    $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
-        //}
-
         // Is it an aggregated category?
         if (!$released = self::get_aggregated_from_gradeitemid($gradeitemid, $userid)) {
             // Nope. So get 'normal' grade.
@@ -2623,13 +2620,15 @@ class grades {
             ]);
             $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
             $gradeitem = self::get_gradeitem($gradeitemid);
-            if ($regulation->shortname() === 'from2026' && $gradeitem->itemtype === 'category' &&
-                    \local_gugrades\aggregation::has_dual_grades($courseid, $gradeitem->iteminstance)) {
+            if (
+                $regulation->shortname() === 'from2026' && $gradeitem->itemtype === 'category' &&
+                \local_gugrades\aggregation::has_dual_grades($courseid, $gradeitem->iteminstance)
+            ) {
                 $first = $DB->get_record('local_gugrades_grade', [
-                    'gradeitemid' => $gradeitemid,
-                    'userid' => $userid,
-                    'gradetype' => 'CATEGORY1',
-                    'iscurrent' => 1,
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+                'gradetype' => 'CATEGORY1',
+                'iscurrent' => 1,
                 ]);
                 if ($first && !$first->iserror) {
                     self::write_grade(
@@ -2669,7 +2668,9 @@ class grades {
         global $DB;
 
         $admingrades = array_merge([''], $admingrades);
-        $admingrades = array_map(function ($a) { return '"' . $a . '"'; }, $admingrades);
+        $admingrades = array_map(function ($a) {
+            return '"' . $a . '"';
+        }, $admingrades);
         $validgrades = implode(',', $admingrades);
 
         $sql = 'SELECT * FROM {local_gugrades_grade}
@@ -2700,9 +2701,6 @@ class grades {
 
         // Grade categories.
         self::$gradecategories = $DB->get_records('grade_categories', ['courseid' => $courseid]);
-
-        // Grade items.
-        //self::$gradeitems = $DB->get_records('grade_items', ['courseid' => $courseid]);
 
         // Grade items by grade category.
          $sql = "SELECT * FROM {grade_items}
@@ -2772,7 +2770,7 @@ class grades {
     }
 
     /**
-     * Check grademax=22 in old regs. 
+     * Check grademax=22 in old regs.
      * If old regs apply
      * AND there are any grade items with grademax=22
      * AND there are FIRST grades in points
@@ -2792,20 +2790,26 @@ class grades {
 
         $errors = [];
 
-        // Find any grade items with grademax = 22
+        // Find any grade items with grademax = 22.
         if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid, 'grademax' => 22])) {
             return [];
-        }        
+        }
 
         foreach ($items as $item) {
-
             // There cannot be FIRST items in points as they should have been imported
-            // as a scale. 
-            if ($DB->record_exists('local_gugrades_grade', ['gradeitemid' => $item->id, 'gradetype' => 'FIRST', 'points' => true, 'iscurrent' => 1])) {
+            // as a scale.
+            if (
+                $DB->record_exists('local_gugrades_grade', [
+                'gradeitemid' => $item->id,
+                'gradetype' => 'FIRST',
+                'points' => true,
+                'iscurrent' => 1,
+                ])
+            ) {
                 $errors[] = [
-                    'gradeitemid' => $item->id,
-                    'itemname' => $item->itemname,
-                    'error' => 'Item graded out of exactly 22 unconverted found in old regs',
+                'gradeitemid' => $item->id,
+                'itemname' => $item->itemname,
+                'error' => 'Item graded out of exactly 22 unconverted found in old regs',
                 ];
             }
         }
@@ -2824,10 +2828,12 @@ class grades {
         $admingrades = \local_gugrades\admingrades::get_all_admingrade_codes($courseid);
 
         $admingrades = array_merge([''], $admingrades);
-        $admingrades = array_map(function ($a) { return '"' . $a . '"'; }, $admingrades);
+        $admingrades = array_map(function ($a) {
+            return '"' . $a . '"';
+        }, $admingrades);
         $validgrades = implode(',', $admingrades);
 
-        // All admingrades found for this course must be in that list
+        // All admingrades found for this course must be in that list.
         $sql = "SELECT * FROM {local_gugrades_grade}
             WHERE courseid = :courseid
             AND iscurrent = 1
@@ -2856,17 +2862,17 @@ class grades {
                     $label = $admingrade;
                 }
                 $details[] = get_string('integrity_invalid_admingrade_detail', 'local_gugrades', (object) [
-                    'admingrade' => $label,
-                    'count' => count($users),
+                'admingrade' => $label,
+                'count' => count($users),
                 ]);
             }
             $errors[] = [
-                'gradeitemid' => $id,
-                'itemname' => $gradeitem->itemname,
-                'error' => get_string('integrity_invalid_admingrade', 'local_gugrades', (object) [
-                    'details' => implode('; ', $details),
-                    'regulation' => $regulation->displayname(),
-                ]),
+            'gradeitemid' => $id,
+            'itemname' => $gradeitem->itemname,
+            'error' => get_string('integrity_invalid_admingrade', 'local_gugrades', (object) [
+                'details' => implode('; ', $details),
+                'regulation' => $regulation->displayname(),
+            ]),
             ];
         }
 
@@ -2886,7 +2892,7 @@ class grades {
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         $originalregs = $regulation->shortname() == 'original';
 
-        // Get all the gradeitems in the course
+        // Get all the gradeitems in the course.
         if (!$items = $DB->get_records('grade_items', ['courseid' => $courseid])) {
             return [];
         }
@@ -2903,8 +2909,8 @@ class grades {
                 continue;
             }
 
-            // work out if it's points or scale. Complicated by grademmax=22 being scale
-            // in oldregs
+            // Work out if it's points or scale. Complicated by grademax=22 being scale
+            // in old regulations.
             if (is_null($item->scaleid)) {
                 if ($originalregs && ($item->grademax == 22)) {
                     $points = false;
@@ -2915,7 +2921,7 @@ class grades {
                 $points = false;
             }
 
-            // If this scale / points have to agree
+            // The scale and points settings have to agree.
             $mismatched = $DB->count_records_select(
                 'local_gugrades_grade',
                 'gradeitemid = :gradeitemid AND points = :points AND admingrade = :admingrade AND iscurrent = 1',
@@ -2932,34 +2938,32 @@ class grades {
                     $expected = get_string('integrity_expected_points', 'local_gugrades', format_float($item->grademax, -1));
                 }
                 $errors[] = [
-                    'gradeitemid' => $item->id,
-                    'itemname' => $item->itemname,
-                    'error' => get_string('integrity_scale_points_mismatch', 'local_gugrades', (object) [
-                        'expected' => $expected,
-                        'stored' => get_string($points ? 'integrity_stored_scale' : 'integrity_stored_points', 'local_gugrades'),
-                        'count' => $mismatched,
-                    ]),
+                'gradeitemid' => $item->id,
+                'itemname' => $item->itemname,
+                'error' => get_string('integrity_scale_points_mismatch', 'local_gugrades', (object) [
+                    'expected' => $expected,
+                    'stored' => get_string($points ? 'integrity_stored_scale' : 'integrity_stored_points', 'local_gugrades'),
+                    'count' => $mismatched,
+                ]),
                 ];
 
                 continue;
             }
 
-
             // If it's a scale, then we won't worry about range. This CAN be out if Schedule B is selected
-            // (Max 8 in Gradebook, 22 in MyGrades)
+            // (Max 8 in Gradebook, 22 in MyGrades).
             if ($points) {
-
-                // Are there any grades with a *higher* grade than this
+                // Are there any grades with a higher grade than this?
                 $sql = "SELECT * FROM {local_gugrades_grade}
                     WHERE gradeitemid = :gradeitemid
                     AND iscurrent = 1
                     AND rawgrade > :grademax";
                 if ($DB->record_exists_sql($sql, ['gradeitemid' => $item->id, 'grademax' => $item->grademax])) {
                     $errors[] = [
-                        'gradeitemid' => $item->id,
-                        'itemname' => $item->itemname,
-                        'error' => 'Grade value out of range',
-                    ];              
+                    'gradeitemid' => $item->id,
+                    'itemname' => $item->itemname,
+                    'error' => 'Grade value out of range',
+                    ];
                 }
             }
         }
@@ -3013,13 +3017,13 @@ class grades {
             $oldname = $DB->get_field('scale', 'name', ['id' => $oldscaleid]);
             $newname = $DB->get_field('scale', 'name', ['id' => $gradeitem->scaleid]);
             $errors[] = [
-                'gradeitemid' => $gradeitem->id,
-                'itemname' => $gradeitem->itemname,
-                'error' => get_string('integrity_scale_changed', 'local_gugrades', (object) [
-                    'oldscale' => $oldname ?: get_string('integrity_scale_deleted', 'local_gugrades', $oldscaleid),
-                    'newscale' => $newname ?: $gradeitem->scaleid,
-                    'count' => $import->students,
-                ]),
+            'gradeitemid' => $gradeitem->id,
+            'itemname' => $gradeitem->itemname,
+            'error' => get_string('integrity_scale_changed', 'local_gugrades', (object) [
+                'oldscale' => $oldname ?: get_string('integrity_scale_deleted', 'local_gugrades', $oldscaleid),
+                'newscale' => $newname ?: $gradeitem->scaleid,
+                'count' => $import->students,
+            ]),
                 'errortype' => 'scale_changed',
             ];
         }
@@ -3047,12 +3051,12 @@ class grades {
         sort($names);
 
         return [[
-            'gradeitemid' => 0,
-            'itemname' => get_string('integrity_unenrolled_users_name', 'local_gugrades', count($names)),
-            'error' => get_string('integrity_unenrolled_users', 'local_gugrades', implode(', ', $names)),
-            'errortype' => 'unenrolled_user',
-            'userid' => 0,
-            'usernames' => $names,
+        'gradeitemid' => 0,
+        'itemname' => get_string('integrity_unenrolled_users_name', 'local_gugrades', count($names)),
+        'error' => get_string('integrity_unenrolled_users', 'local_gugrades', implode(', ', $names)),
+        'errortype' => 'unenrolled_user',
+        'userid' => 0,
+        'usernames' => $names,
         ]];
     }
 
@@ -3111,11 +3115,11 @@ class grades {
         $errors = [];
         foreach ($gradeitemids as $gradeitemid) {
             $errors[] = [
-                'gradeitemid' => (int) $gradeitemid,
-                'itemname' => get_string('integrity_removed_gradeitem_name', 'local_gugrades', $gradeitemid),
-                'error' => get_string('integrity_removed_gradeitem', 'local_gugrades'),
-                'errortype' => 'removed_gradeitem',
-                'userid' => 0,
+            'gradeitemid' => (int) $gradeitemid,
+            'itemname' => get_string('integrity_removed_gradeitem_name', 'local_gugrades', $gradeitemid),
+            'error' => get_string('integrity_removed_gradeitem', 'local_gugrades'),
+            'errortype' => 'removed_gradeitem',
+            'userid' => 0,
             ];
         }
 
@@ -3157,8 +3161,8 @@ class grades {
             }
 
             $notices[] = [
-                'itemname' => $category->fullname,
-                'message' => get_string('integrity_reassessment_removed', 'local_gugrades', $category->fullname),
+            'itemname' => $category->fullname,
+            'message' => get_string('integrity_reassessment_removed', 'local_gugrades', $category->fullname),
             ];
         }
 

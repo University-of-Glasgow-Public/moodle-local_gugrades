@@ -3185,7 +3185,7 @@ class api {
 
     /**
      * Set user tour state for current user
-     * @param int $enabled
+    * @param bool $enabled Whether the user tour is enabled.
      */
     public static function set_tour_state(bool $enabled) {
         global $USER;

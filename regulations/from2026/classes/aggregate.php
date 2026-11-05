@@ -270,7 +270,7 @@ class aggregate {
      * @param array $items
      * @param int $level
      * @param int $userid
-     * @param bool &$conditionmet
+    * @param bool $conditionmet Nursing condition result, updated by reference.
      * @param bool $firstsitting Select the earliest-assigned current substantive reassessment grade.
      * @return array ['rounded' grade, grade val, admingrade, grade disp, completion, error, explain, not available]
      */

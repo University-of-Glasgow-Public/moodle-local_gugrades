@@ -105,7 +105,7 @@ final class gradesbackup_test extends \advanced_testcase {
     }
 
     /**
-    * Saving a grade retains earlier revisions and marks only the latest current.
+     * Saving a grade retains earlier revisions and marks only the latest current.
      *
      * @covers \local_gugrades\grades::write_grade
      * @covers \local_gugrades\grades::save_grade_backup
@@ -387,7 +387,7 @@ final class gradesbackup_test extends \advanced_testcase {
     }
 
     /**
-    * Status messages are not copied, but earlier actual grades remain as history.
+     * Status messages are not copied, but earlier actual grades remain as history.
      *
      * @covers \local_gugrades\grades::is_backup_grade
      * @covers \local_gugrades\grades::save_grade_backup
@@ -458,7 +458,7 @@ final class gradesbackup_test extends \advanced_testcase {
     }
 
     /**
-    * Existing history and current values are copied a batch at a time.
+     * Existing history and current values are copied a batch at a time.
      *
      * @covers \local_gugrades\grades::backfill_grade_backups
      * @covers \local_gugrades\task\gradesbackup
@@ -472,8 +472,9 @@ final class gradesbackup_test extends \advanced_testcase {
         $DB->delete_records('local_gugrades_gradesbackup');
         unset_config('gradesbackup_backfill_id', 'local_gugrades');
 
-        while (grades::backfill_grade_backups(1)) {
-        }
+        do {
+            $more = grades::backfill_grade_backups(1);
+        } while ($more);
 
         $history = $DB->get_records('local_gugrades_grade', ['courseid' => $course->id], 'id ASC');
         $this->assertCount(2, $history);
@@ -487,8 +488,9 @@ final class gradesbackup_test extends \advanced_testcase {
             $this->assertSame($grade->auditcomment, $backup->auditcomment);
         }
         unset_config('gradesbackup_backfill_id', 'local_gugrades');
-        while (grades::backfill_grade_backups(1)) {
-        }
+        do {
+            $more = grades::backfill_grade_backups(1);
+        } while ($more);
         $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup', ['courseid' => $course->id]));
     }
 
@@ -634,6 +636,8 @@ final class gradesbackup_test extends \advanced_testcase {
 
     /**
      * Course flags are configuration and survive backups with or without user data.
+     * @covers \backup_local_gugrades_plugin
+     * @covers \restore_local_gugrades_plugin
      * @dataProvider flag_backup_user_data_provider
      * @param bool $userdata
      */
@@ -659,8 +663,12 @@ final class gradesbackup_test extends \advanced_testcase {
         $this->setAdminUser();
         $CFG->backup_file_logger_level = backup::LOG_NONE;
         $bc = new backup_controller(
-            backup::TYPE_1COURSE, $course->id, backup::FORMAT_MOODLE, backup::INTERACTIVE_NO,
-            backup::MODE_IMPORT, $USER->id,
+            backup::TYPE_1COURSE,
+            $course->id,
+            backup::FORMAT_MOODLE,
+            backup::INTERACTIVE_NO,
+            backup::MODE_IMPORT,
+            $USER->id,
         );
         $bc->get_plan()->get_setting('users')->set_status(backup_setting::NOT_LOCKED);
         $bc->get_plan()->get_setting('users')->set_value($userdata);
@@ -670,8 +678,12 @@ final class gradesbackup_test extends \advanced_testcase {
 
         $newcourseid = restore_dbops::create_new_course('Restored flags', 'restoredflags', 1);
         $rc = new restore_controller(
-            $backupid, $newcourseid, backup::INTERACTIVE_NO, backup::MODE_GENERAL,
-            $USER->id, backup::TARGET_NEW_COURSE,
+            $backupid,
+            $newcourseid,
+            backup::INTERACTIVE_NO,
+            backup::MODE_GENERAL,
+            $USER->id,
+            backup::TARGET_NEW_COURSE,
         );
         $rc->get_plan()->get_setting('users')->set_status(backup_setting::NOT_LOCKED);
         $rc->get_plan()->get_setting('users')->set_value($userdata);
@@ -720,7 +732,7 @@ final class gradesbackup_test extends \advanced_testcase {
         $DB->delete_records('local_gugrades_column', ['courseid' => $course->id]);
         $DB->delete_records('local_gugrades_latest', ['courseid' => $course->id]);
 
-        // course_with_item logs in as the teacher, who cannot restore a course.
+        // The course helper logs in as the teacher, who cannot restore a course.
         // MODE_IMPORT keeps an unpacked backup, but turns user data off. Turn it back on
         // before the plan runs, which is when the plugin structure is built.
         $this->setAdminUser();

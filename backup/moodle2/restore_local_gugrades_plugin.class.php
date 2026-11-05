@@ -370,9 +370,11 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
     protected function after_restore_course() {
         global $DB;
 
-        $flags = $DB->get_recordset_select('local_gugrades_flag',
+        $flags = $DB->get_recordset_select(
+            'local_gugrades_flag',
             'courseid = :courseid AND (gradecategoryid < 0 OR gradeitemid < 0)',
-            ['courseid' => $this->task->get_courseid()]);
+            ['courseid' => $this->task->get_courseid()]
+        );
         foreach ($flags as $flag) {
             foreach (['gradecategoryid' => 'grade_category', 'gradeitemid' => 'grade_item'] as $field => $mapping) {
                 if ($flag->$field < 0) {
@@ -395,7 +397,7 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
             $DB->update_record('local_gugrades_map_item', $item);
         }
 
-        // Resit categories
+        // Resit categories.
         $resitcats = $DB->get_recordset('local_gugrades_resit', ['courseid' => $this->task->get_courseid()]);
         foreach ($resitcats as $resitcat) {
             $resitcat->gradeitemid = $this->get_mappingid('grade_item', $resitcat->gradeitemid);

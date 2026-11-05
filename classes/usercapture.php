@@ -319,6 +319,7 @@ class usercapture {
     /**
      * Acquire and check grades in database
      *
+    * @param object|null $bulkdata Preloaded aggregation snapshot, or null to read from the database.
      */
     private function read_grades(?object $bulkdata = null) {
         global $DB;

@@ -62,7 +62,7 @@ $result = external_api::call_external_function(
     $params,
 );
 
-/// If the external function fails, handle the output securely
+// If the external function fails, handle the output securely.
 if (!empty($result['error'])) {
     http_response_code(500);
     

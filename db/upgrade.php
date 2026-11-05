@@ -392,7 +392,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026060100) {
-
         // Define table local_gugrades_notes to be created.
         $table = new xmldb_table('local_gugrades_notes');
 
@@ -419,7 +418,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026061600) {
-
         // Define table local_gugrades_flag to be created.
         $table = new xmldb_table('local_gugrades_flag');
 
@@ -444,7 +442,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026062200) {
-
         // Rename field legacyrecit on table local_gugrades_flag to resit.
         $table = new xmldb_table('local_gugrades_flag');
         $field = new xmldb_field('legacyrecit', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'engexam');
@@ -457,7 +454,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026070101) {
-
         // Define field first_rawgrade to be added to local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_grade');
 
@@ -490,8 +486,8 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026091700) {
-
-        // Define fields first_rawgrade, first_convertedgrade, first_admingrade, first_displaygrade to be dropped from local_gugrades_grade.
+        // Drop the first_rawgrade, first_convertedgrade, first_admingrade and first_displaygrade fields
+        // from local_gugrades_grade.
         // Abandoned approach: superseded by separate grade records for resit stages.
         $table = new xmldb_table('local_gugrades_grade');
 
@@ -520,7 +516,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026101300) {
-
         // Separate copy of the current grade values. Grade history stays in local_gugrades_grade.
         $table = new xmldb_table('local_gugrades_gradesbackup');
 
@@ -561,7 +556,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026101301) {
-
         // The first version of this table used another name.
         $oldtable = new xmldb_table('local_gugrades_gradevalue');
         $table = new xmldb_table('local_gugrades_gradesbackup');
@@ -609,7 +603,6 @@ function xmldb_local_gugrades_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026101600) {
-
         // MGU-1596: Flag course total awards capped because of a resit.
         $table = new xmldb_table('local_gugrades_grade');
         $field = new xmldb_field('capped', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'normalisedweight');

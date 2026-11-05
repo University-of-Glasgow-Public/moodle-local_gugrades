@@ -108,7 +108,7 @@ class aggregate {
      * @param array $items
      * @param int $level
      * @param int $userid
-     * @param bool &$conditionmet Unused under the original regulations.
+    * @param bool $conditionmet Unused under the original regulations.
      * @param bool $firstsitting Unused under the original regulations.
      * @return array ['rounded' grade, grade val, admingrade, grade disp, completion, error, explain, not available]
      */

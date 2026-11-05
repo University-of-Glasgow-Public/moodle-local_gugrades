@@ -29,6 +29,13 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 
 /**
  * Independent category results and their lifecycle.
+ *
+ * @covers \local_gugrades\aggregation
+ * @covers \local_gugrades\api
+ * @covers \local_gugrades\grades
+ * @covers \local_gugrades\usercapture
+ * @covers \regulations_from2026\aggregate
+ * @covers \regulations_original\aggregate
  */
 final class aggregation_first_sitting_test extends gugrades_aggregation_testcase {
     /**
@@ -123,7 +130,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
      */
     private function aggregate(): void {
         \local_gugrades\aggregation::aggregate_user_helper(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id, true,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
+            true,
         );
     }
 
@@ -185,8 +195,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         global $DB;
 
         $this->aggregate();
-        $this->assertEquals($this->result('Dual total', 'CATEGORY')->displaygrade,
-            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+        $this->assertEquals(
+            $this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade
+        );
         $this->assertEquals(1, $DB->count_records('local_gugrades_grade', [
             'userid' => $this->student->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
         ]));
@@ -201,7 +213,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             $this->assertEquals($expected[$name], $first->convertedgrade);
             $ids[$name] = $first->id;
             $latest = \local_gugrades\grades::set_latest_grade(
-                $this->course->id, $ordinary->gradeitemid, $this->student->id,
+                $this->course->id,
+                $ordinary->gradeitemid,
+                $this->student->id,
             );
             $this->assertEquals($ordinary->id, $latest->id);
         }
@@ -217,8 +231,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(1, $DB->count_records('local_gugrades_grade', [
             'userid' => $this->student->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
         ]));
-        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
-            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+        $this->assertSame(
+            $this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade
+        );
     }
 
     /**
@@ -245,8 +261,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(1, $DB->count_records('local_gugrades_grade', [
             'userid' => $this->student->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
         ]));
-        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
-            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+        $this->assertSame(
+            $this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade
+        );
     }
 
     /**
@@ -268,11 +286,15 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals($ordinary->id, $latest->gugradeid);
         \local_gugrades\grades::missing_latest($this->course->id);
         $latest = \local_gugrades\grades::set_latest_grade(
-            $this->course->id, $ordinary->gradeitemid, $this->student->id,
+            $this->course->id,
+            $ordinary->gradeitemid,
+            $this->student->id,
         );
         $this->assertEquals($ordinary->id, $latest->id);
         $capture = \local_gugrades\usercapture::create(
-            $this->course->id, $ordinary->gradeitemid, $this->student->id,
+            $this->course->id,
+            $ordinary->gradeitemid,
+            $this->student->id,
         );
         $this->assertEquals($ordinary->convertedgrade, $capture->get_provisional()->convertedgrade);
         $this->assertArrayNotHasKey('CATEGORY1', $capture->get_gradesbygradetype());
@@ -282,7 +304,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-    * Original regulations mirror the course total without calculating independent child results.
+     * Original regulations mirror the course total without calculating independent child results.
      */
     public function test_original_regulations_remain_single_pass(): void {
         global $DB;
@@ -294,10 +316,13 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             'userid' => $this->student->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
         ]));
         $this->assertEquals(18, $this->result('Dual reassessment', 'CATEGORY')->convertedgrade);
-        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
-            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+        $this->assertSame(
+            $this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade
+        );
         $this->assertTrue(\local_gugrades\aggregation::has_dual_grades(
-            $this->course->id, $this->categories['Dual total']->id,
+            $this->course->id,
+            $this->categories['Dual total']->id,
         ));
         $this->write_result($this->result('Dual total', 'CATEGORY')->gradeitemid, 10, 'CATEGORY', true);
         $this->aggregate();
@@ -320,7 +345,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         }
         $mapid = $this->make_conversion_map();
         select_conversion::execute(
-            $this->course->id, 0, $this->categories['Dual reassessment']->id, $mapid,
+            $this->course->id,
+            0,
+            $this->categories['Dual reassessment']->id,
+            $mapid,
         );
         $this->set_reassessment(true);
         $this->aggregate();
@@ -494,7 +522,12 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             courseid: $this->course->id,
             gradeitemid: $this->get_gradeitemid('Attempt one'),
             userid: $this->student->id,
-            reason: 'SECOND', other: '', admingrade: '', scale: 13, grade: 0, notes: '',
+            reason: 'SECOND',
+            other: '',
+            admingrade: '',
+            scale: 13,
+            grade: 0,
+            notes: '',
         );
         $this->aggregate();
         $this->assertEquals(13, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
@@ -514,8 +547,15 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->aggregate();
         $this->assertEquals(18, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
         write_additional_grade::execute(
-            courseid: $this->course->id, gradeitemid: $itemid, userid: $this->student->id,
-            reason: 'SECOND', other: '', admingrade: '', scale: 1, grade: 0, notes: '',
+            courseid: $this->course->id,
+            gradeitemid: $itemid,
+            userid: $this->student->id,
+            reason: 'SECOND',
+            other: '',
+            admingrade: '',
+            scale: 1,
+            grade: 0,
+            notes: '',
         );
         $this->aggregate();
         $this->assertEquals(1, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
@@ -523,8 +563,15 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->aggregate();
         $this->assertEquals(0, $this->result('Dual reassessment', 'CATEGORY1')->convertedgrade);
         write_additional_grade::execute(
-            courseid: $this->course->id, gradeitemid: $itemid, userid: $this->student->id,
-            reason: 'SECOND', other: '', admingrade: 'NOSUBMISSION', scale: 0, grade: 0, notes: '',
+            courseid: $this->course->id,
+            gradeitemid: $itemid,
+            userid: $this->student->id,
+            reason: 'SECOND',
+            other: '',
+            admingrade: 'NOSUBMISSION',
+            scale: 0,
+            grade: 0,
+            notes: '',
         );
         $this->aggregate();
         $this->assertEquals('NOSUBMISSION', $this->result('Dual reassessment', 'CATEGORY1')->admingrade);
@@ -565,8 +612,15 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             $DB->delete_records('local_gugrades_grade', ['gradeitemid' => $itemid]);
         }
         write_additional_grade::execute(
-            courseid: $this->course->id, gradeitemid: $firstid, userid: $this->student->id,
-            reason: 'SECOND', other: '', admingrade: 'GOODCAUSE_FO', scale: 0, grade: 0, notes: '',
+            courseid: $this->course->id,
+            gradeitemid: $firstid,
+            userid: $this->student->id,
+            reason: 'SECOND',
+            other: '',
+            admingrade: 'GOODCAUSE_FO',
+            scale: 0,
+            grade: 0,
+            notes: '',
         );
         $this->set_reassessment(true);
         $this->aggregate();
@@ -654,7 +708,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $cache = \cache::make('local_gugrades', 'ugpg');
         $cache->delete($this->student->id);
         \local_gugrades\aggregation::aggregate(
-            $this->course->id, $this->categories['Dual total']->id, [$this->student->id],
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            [$this->student->id],
         );
         $this->assertEquals(1, $DB->count_records('local_gugrades_grade', ['gradetype' => 'CATEGORY1', 'iscurrent' => 1]));
         $this->set_reassessment(true);
@@ -662,11 +718,18 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             'courseid' => $this->course->id, 'gradetype' => 'CATEGORY1',
         ]);
         \local_gugrades\aggregation::invalidate_aggdata(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
         );
 
         $page = get_aggregation_page::execute(
-            $this->course->id, $this->categories['Dual total']->id, '', '', 0, false,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            '',
+            '',
+            0,
+            false,
         );
         $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
         $this->assertTrue($page['dualgrades']);
@@ -684,8 +747,11 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         global $DB;
 
         $this->set_reassessment(true);
-        \local_gugrades\aggregation::aggregate($this->course->id, $this->categories['Dual total']->id,
-            [$this->student->id, $this->student2->id]);
+        \local_gugrades\aggregation::aggregate(
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            [$this->student->id, $this->student2->id]
+        );
         $otherfirst = $DB->get_record('local_gugrades_grade', [
             'gradeitemid' => \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($this->categories['Dual middle']->id),
             'userid' => $this->student2->id, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
@@ -695,7 +761,11 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         [$columns] = \local_gugrades\aggregation::get_columns($this->course->id, $this->categories['Dual total']->id);
         $users = \local_gugrades\aggregation::get_users($this->course->id, $this->categories['Dual total']->id, '', '', 0);
         [$users, $debug] = \local_gugrades\aggregation::add_aggregation_fields_to_users(
-            $this->course->id, $this->categories['Dual total']->id, $users, $columns);
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $users,
+            $columns
+        );
         $this->assertCount(2, $users);
         $this->assertSame('1 User helper calls count.', $debug[0]['line']);
         $this->assertEquals(16, $this->result('Dual middle', 'CATEGORY1')->convertedgrade);
@@ -736,7 +806,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->aggregate();
         $categoryid = $this->categories['Dual middle']->id;
         $itemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid($categoryid);
-        $readuser = function() use ($categoryid): array {
+        $readuser = function () use ($categoryid): array {
             $page = get_aggregation_page::execute($this->course->id, $categoryid, '', '', 0, false);
             $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
             $this->assertTrue($page['dualgrades']);
@@ -787,7 +857,11 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         }
         $reads = $DB->perf_get_reads();
         \local_gugrades\aggregation::invalidate_aggdata(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id, $categories);
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
+            $categories
+        );
         $this->assertSame($reads, $DB->perf_get_reads());
         foreach ($categories as $category) {
             $this->assertFalse($cache->get('AGGDATA_' . $category->id . '_' . $this->student->id));
@@ -805,13 +879,15 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $base = $DB->get_record('local_gugrades_grade', [
             'gradeitemid' => $itemid, 'userid' => $this->student->id, 'iscurrent' => 1,
         ], '*', MUST_EXIST);
-        foreach ([
+        foreach (
+            [
             ['gradetype' => 'SECOND', 'rawgrade' => 0, 'convertedgrade' => 0, 'displaygrade' => 'H:0'],
             ['gradetype' => 'RELEASED', 'admingrade' => 'NOSUBMISSION', 'rawgrade' => 0,
                 'convertedgrade' => 0, 'displaygrade' => 'NS'],
             ['gradetype' => 'THIRD', 'iscurrent' => 0, 'rawgrade' => 22],
             ['gradetype' => 'CATEGORY1', 'rawgrade' => 20],
-        ] as $values) {
+            ] as $values
+        ) {
             $grade = clone $base;
             unset($grade->id);
             foreach ($values as $field => $value) {
@@ -820,13 +896,19 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             $DB->insert_record('local_gugrades_grade', $grade);
             $individual = \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id);
             $data = \local_gugrades\usercapture::load_aggregation_data(
-                $this->course->id, [$this->student->id, $this->student2->id]);
+                $this->course->id,
+                [$this->student->id, $this->student2->id]
+            );
             $bulk = \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id, $data);
             $this->assertEquals($individual->get_provisional(), $bulk->get_provisional());
             $this->assertEquals($individual->get_grades(), $bulk->get_grades());
             $this->assertSame($individual->alert(), $bulk->alert());
             $this->assertNull(\local_gugrades\usercapture::create(
-                $this->course->id, $itemid, $this->student2->id, $data)->get_provisional());
+                $this->course->id,
+                $itemid,
+                $this->student2->id,
+                $data
+            )->get_provisional());
         }
         $data = \local_gugrades\usercapture::load_aggregation_data($this->course->id, [$this->student->id]);
         \local_gugrades\usercapture::create($this->course->id, $itemid, $this->student->id, $data);
@@ -836,7 +918,11 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->write_result($itemid, 10, 'AGREED');
         $fresh = \local_gugrades\usercapture::load_aggregation_data($this->course->id, [$this->student->id]);
         $this->assertEquals(10, \local_gugrades\usercapture::create(
-            $this->course->id, $itemid, $this->student->id, $fresh)->get_provisional()->rawgrade);
+            $this->course->id,
+            $itemid,
+            $this->student->id,
+            $fresh
+        )->get_provisional()->rawgrade);
     }
 
     /**
@@ -903,8 +989,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             'grade' => 'D3', 'status' => get_string('undergraduate', 'local_gugrades'),
         ]), $explain['explain']);
         $this->assertStringContainsString(get_string('explain_resitcapunknown', 'local_gugrades'), $explain['explain']);
-        $this->assertStringContainsString(get_string('explain_resitcategories', 'local_gugrades', 'Dual reassessment'),
-            $explain['explain']);
+        $this->assertStringContainsString(
+            get_string('explain_resitcategories', 'local_gugrades', 'Dual reassessment'),
+            $explain['explain']
+        );
 
         $page = get_aggregation_page::execute($this->course->id, $this->categories['Dual total']->id, '', '', 0, false);
         $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
@@ -965,7 +1053,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals('C3 (12)', $award->displaygrade);
         $this->assertTrue((bool)$award->capped);
         $explain = \local_gugrades\aggregation::get_explain(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
         );
         $this->assertStringNotContainsString(get_string('explain_resitcapunknown', 'local_gugrades'), $explain);
 
@@ -977,7 +1067,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(12, $award->convertedgrade);
         $this->assertFalse((bool)$award->capped);
         $explain = \local_gugrades\aggregation::get_explain(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
         );
         $this->assertStringContainsString(get_string('explain_resitnotcapped', 'local_gugrades'), $explain);
 
@@ -988,10 +1080,13 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(12, $award->convertedgrade);
         $this->assertFalse((bool)$award->capped);
         $this->assertEquals('Postgraduate Taught', \local_gugrades\users::get_saved_course_ugpg(
-            $this->course->id, $this->student->id,
+            $this->course->id,
+            $this->student->id,
         ));
         $explain = get_explain_aggregation::execute(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
         );
         $explain = \core_external\external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
         $this->assertEquals('Postgraduate Taught', $explain['ugpg']);
@@ -1012,7 +1107,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertEquals(15, $this->result('Dual total', 'CATEGORY')->convertedgrade);
         $this->assertFalse((bool)$this->result('Dual total', 'CATEGORY')->capped);
         $explain = \local_gugrades\aggregation::get_explain(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
         );
         $this->assertStringNotContainsString(get_string('explain_resitnotcapped', 'local_gugrades'), $explain);
     }
@@ -1023,8 +1120,15 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     public function test_ns_counts_as_resit(): void {
         $this->set_ugpg('Undergraduate');
         write_additional_grade::execute(
-            courseid: $this->course->id, gradeitemid: $this->get_gradeitemid('Attempt two'), userid: $this->student->id,
-            reason: 'SECOND', other: '', admingrade: 'NOSUBMISSION', scale: 0, grade: 0, notes: '',
+            courseid: $this->course->id,
+            gradeitemid: $this->get_gradeitemid('Attempt two'),
+            userid: $this->student->id,
+            reason: 'SECOND',
+            other: '',
+            admingrade: 'NOSUBMISSION',
+            scale: 0,
+            grade: 0,
+            notes: '',
         );
         $this->set_reassessment(true);
         $this->aggregate();
@@ -1045,7 +1149,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertFalse($cache->get($this->student->id));
 
         $explain = \local_gugrades\aggregation::get_explain(
-            $this->course->id, $this->categories['Dual total']->id, $this->student->id,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
         );
         $this->assertNotEmpty($explain);
         $this->assertFalse($cache->get($this->student->id));
@@ -1058,7 +1164,9 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
      */
     private function explain(string $name): array {
         $explain = get_explain_aggregation::execute(
-            $this->course->id, $this->categories[$name]->id, $this->student->id,
+            $this->course->id,
+            $this->categories[$name]->id,
+            $this->student->id,
         );
         return \core_external\external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
     }
@@ -1098,16 +1206,24 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         global $DB;
 
         $this->set_reassessment(true);
-        $DB->set_field('grade_categories', 'aggregation', GRADE_AGGREGATE_MEAN,
-            ['id' => $this->categories['Dual reassessment']->id]);
+        $DB->set_field(
+            'grade_categories',
+            'aggregation',
+            GRADE_AGGREGATE_MEAN,
+            ['id' => $this->categories['Dual reassessment']->id]
+        );
         $this->aggregate();
         $explain = $this->explain('Dual reassessment');
         $this->assertEquals(get_string('award', 'local_gugrades') . ': ' .
             get_string('categorynothighest', 'local_gugrades'), $explain['awardexplain']);
         $this->assertStringContainsString('Attempt one', $explain['firstsittingexplain']);
 
-        $DB->set_field('grade_categories', 'aggregation', GRADE_AGGREGATE_MAX,
-            ['id' => $this->categories['Dual reassessment']->id]);
+        $DB->set_field(
+            'grade_categories',
+            'aggregation',
+            GRADE_AGGREGATE_MAX,
+            ['id' => $this->categories['Dual reassessment']->id]
+        );
         $itemid = \local_gugrades\grades::get_gradeitemid_from_gradecategoryid(
             $this->categories['Dual reassessment']->id,
         );
@@ -1125,7 +1241,12 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->set_reassessment(true);
         foreach (array_keys($this->categories) as $name) {
             $page = get_aggregation_page::execute(
-                $this->course->id, $this->categories[$name]->id, '', '', 0, false,
+                $this->course->id,
+                $this->categories[$name]->id,
+                '',
+                '',
+                0,
+                false,
             );
             $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
             $this->assertTrue($page['dualgrades']);
@@ -1202,7 +1323,12 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             $DB->insert_record('local_gugrades_grade', $first);
         }
         $page = get_aggregation_page::execute(
-            $this->course->id, $this->categories['Dual total']->id, '', '', 0, false,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            '',
+            '',
+            0,
+            false,
         );
         $this->assertTrue($page['dualgrades']);
         foreach (['Dual total', 'Dual middle'] as $name) {
@@ -1220,8 +1346,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     public function test_first_sitting_description(): void {
         $this->assertSame('Category (1st Sitting)', \local_gugrades\gradetype::get_description('CATEGORY1'));
         $this->assertFalse(\local_gugrades\gradetype::can_gradetype_be_edited('CATEGORY1'));
-        $this->assertArrayNotHasKey('CATEGORY1',
-            \local_gugrades\gradetype::get_menu($this->get_gradeitemid('Attempt one')));
+        $this->assertArrayNotHasKey(
+            'CATEGORY1',
+            \local_gugrades\gradetype::get_menu($this->get_gradeitemid('Attempt one'))
+        );
     }
 
     /**
@@ -1255,10 +1383,12 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $this->assertSame('10', $row[7]);
 
         $first = $this->result('Dual reassessment', 'CATEGORY1');
-        foreach ([
+        foreach (
+            [
             ['admingrade' => 'NOSUBMISSION', 'displaygrade' => 'NS', 'iserror' => 0, 'expected' => 'NS'],
             ['admingrade' => '', 'displaygrade' => 'Grades missing', 'iserror' => 1, 'expected' => ''],
-        ] as $case) {
+            ] as $case
+        ) {
             $first->rawgrade = null;
             $first->convertedgrade = null;
             $first->admingrade = $case['admingrade'];
@@ -1282,7 +1412,8 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         global $DB;
 
         $readcheck = fn() => \core_external\external_api::clean_returnvalue(
-            check_integrity::execute_returns(), check_integrity::execute($this->course->id),
+            check_integrity::execute_returns(),
+            check_integrity::execute($this->course->id),
         );
         $this->assertSame([], $readcheck()['dualgradecategoryids']);
         $this->aggregate();
@@ -1303,8 +1434,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             recalculate::execute($this->course->id, $categoryid);
         }
         $this->assertSame([], $readcheck()['dualgradecategoryids']);
-        $this->assertSame($this->result('Dual total', 'CATEGORY')->displaygrade,
-            $this->result('Dual total', 'CATEGORY1')->displaygrade);
+        $this->assertSame(
+            $this->result('Dual total', 'CATEGORY')->displaygrade,
+            $this->result('Dual total', 'CATEGORY1')->displaygrade
+        );
     }
 
     /**
@@ -1317,7 +1450,12 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $itemid = $this->result('Dual total', 'CATEGORY')->gradeitemid;
         $DB->delete_records('local_gugrades_grade', ['gradeitemid' => $itemid, 'gradetype' => 'CATEGORY1']);
         $page = get_aggregation_page::execute(
-            $this->course->id, $this->categories['Dual total']->id, '', '', 0, false,
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            '',
+            '',
+            0,
+            false,
         );
         $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
         $this->assertTrue($page['dualgrades']);
@@ -1338,7 +1476,12 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
      */
     public function test_single_grade_display(): void {
         $page = get_aggregation_page::execute(
-            $this->course->id, $this->categories['Dual middle']->id, '', '', 0, true,
+            $this->course->id,
+            $this->categories['Dual middle']->id,
+            '',
+            '',
+            0,
+            true,
         );
         $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
         $this->assertFalse($page['dualgrades']);
