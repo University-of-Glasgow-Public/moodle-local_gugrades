@@ -99,8 +99,11 @@ class usercapture {
         $data = (object)[
             'courseid' => $courseid,
             'userids' => array_fill_keys($userids, true),
-            'items' => $DB->get_records_select('grade_items',
-                "courseid = :courseid AND itemtype IN ('mod', 'manual')", ['courseid' => $courseid]),
+            'items' => $DB->get_records_select(
+                'grade_items',
+                "courseid = :courseid AND itemtype IN ('mod', 'manual')",
+                ['courseid' => $courseid]
+            ),
             'grades' => [],
             'columns' => [],
         ];
@@ -319,7 +322,7 @@ class usercapture {
     /**
      * Acquire and check grades in database
      *
-    * @param object|null $bulkdata Preloaded aggregation snapshot, or null to read from the database.
+     * @param object|null $bulkdata Preloaded aggregation snapshot, or null to read from the database.
      */
     private function read_grades(?object $bulkdata = null) {
         global $DB;
@@ -328,8 +331,10 @@ class usercapture {
 
         // Get the gradeitem to sanity check grade, MGU-1344.
         if ($bulkdata !== null) {
-            if ($bulkdata->courseid != $this->courseid || !isset($bulkdata->userids[$this->userid]) ||
-                    !isset($bulkdata->items[$this->gradeitemid])) {
+            if (
+                $bulkdata->courseid != $this->courseid || !isset($bulkdata->userids[$this->userid]) ||
+                    !isset($bulkdata->items[$this->gradeitemid])
+            ) {
                 throw new \coding_exception('Capture request is outside the aggregation snapshot.');
             }
             $gradeitem = $bulkdata->items[$this->gradeitemid];

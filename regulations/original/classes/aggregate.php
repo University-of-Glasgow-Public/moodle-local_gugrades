@@ -19,7 +19,7 @@
  * This class defines basic functional logic.
  * It could be overriden for custom instances.
  *
- * @package    local_gugrades
+ * @package    regulations_original
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -87,7 +87,7 @@ class aggregate {
      * @return bool
      */
     public function is_reassessment(int $categoryid): bool {
-        
+
         return false;
     }
 
@@ -108,7 +108,7 @@ class aggregate {
      * @param array $items
      * @param int $level
      * @param int $userid
-    * @param bool $conditionmet Unused under the original regulations.
+     * @param bool $conditionmet Unused under the original regulations.
      * @param bool $firstsitting Unused under the original regulations.
      * @return array ['rounded' grade, grade val, admingrade, grade disp, completion, error, explain, not available]
      */

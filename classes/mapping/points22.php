@@ -108,6 +108,5 @@ class points22 extends schedulea {
         } else {
             return [$grade, $map[$grade]];
         }
-
     }
 }

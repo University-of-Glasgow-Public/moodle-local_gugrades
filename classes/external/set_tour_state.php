@@ -16,7 +16,7 @@
 
 /**
  * Define function set_tour_state
- * 
+ *
  * @package    local_gugrades
  * @copyright  2026
  * @author     Howard Miller

@@ -36,9 +36,10 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 
 /**
  * Test(s) for resit web services
+ * @covers \regulations_from2026\regulation
+ * @covers \regulations_from2026\aggregate
  */
 final class mgu_1442_nursing_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummative
      */
@@ -124,7 +125,7 @@ final class mgu_1442_nursing_test extends \local_gugrades\external\gugrades_aggr
         $this->assertEquals('XC2 (13)', $fred['displaygrade']);
 
         // Write grade 17 for Question 3
-        // Should remove X
+        // Should remove X.
         $question3 = $this->get_gradeitemid('Question 3');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -179,5 +180,4 @@ final class mgu_1442_nursing_test extends \local_gugrades\external\gugrades_aggr
         $fred = $page['users'][0];
         $this->assertEquals('XC2 (12.66667)', $fred['displaygrade']);
     }
-
 }

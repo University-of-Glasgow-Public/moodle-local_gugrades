@@ -24,8 +24,14 @@
 
 namespace local_gugrades;
 
-class regulations_test extends \advanced_testcase {
-
+/**
+ * Regulation discovery and selection tests.
+ * @covers \local_gugrades\regulations
+ * @covers \regulations_from2026\regulation
+ * @covers \regulations_original\regulation
+ */
+final class regulations_test extends \advanced_testcase {
+    /** @var object Course used to test regulation selection. */
     private $course;
 
     protected function setUp(): void {
@@ -54,7 +60,7 @@ class regulations_test extends \advanced_testcase {
         $original = $regulations['original'];
         $this->assertEquals('Old regulations (to 2026)', $original->displayname());
 
-        // Check correct regulations are selected
+        // Check correct regulations are selected.
         $regulation = \local_gugrades\regulations::get_active_regulation($this->course->id);
         $this->assertEquals('original', $regulation->shortname());
     }
@@ -75,5 +81,4 @@ class regulations_test extends \advanced_testcase {
         $regulation = \local_gugrades\regulations::get_active_regulation($newcourse->id);
         $this->assertEquals('from2026', $regulation->shortname());
     }
-
 }

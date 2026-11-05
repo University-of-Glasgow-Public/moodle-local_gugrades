@@ -36,9 +36,10 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 
 /**
  * Test(s) for resit web services
+ * @covers \regulations_from2026\regulation
+ * @covers \regulations_from2026\aggregate
  */
 final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * Additional setup steps
      * (Push course into engineering category)
@@ -68,7 +69,7 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
         // Install test schema.
         $this->gradeitemids = $this->load_schema('schema9');
 
-        // Get the categories. 
+        // Get the categories.
         $summativeid = $this->get_grade_category('Summative');
         $category1id = $this->get_grade_category('Category 1');
         $category2id = $this->get_grade_category('Category 2');
@@ -80,7 +81,7 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
                 'gradeitemid' => 0,
                 'engexam' => true,
                 'resit' => false,
-            ]
+            ],
         ];
         $nothing = write_flags::execute($this->course->id, $flags);
         $nothing = external_api::clean_returnvalue(
@@ -88,7 +89,7 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
             $nothing,
         );
 
-        // Check we can read them back
+        // Check we can read them back.
         $readflags = read_flags::execute($this->course->id);
         $readflags = external_api::clean_returnvalue(
             read_flags::execute_returns(),
@@ -144,5 +145,4 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
         $this->assertEquals('Academic Regs from 2026/27', $l1categories['regulation']);
         $this->assertEquals('Engineering', $l1categories['regulationextra']);
     }
-
 }

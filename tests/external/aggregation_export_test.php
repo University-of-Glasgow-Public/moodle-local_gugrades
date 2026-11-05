@@ -376,8 +376,9 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
             $data
         );
 
-        $expected = '"Student Number","Last Name","First Name","Subject","Catalog Nbr","Descr Course Name","First Attempt Grade","Award Grade"
-"1234567","Bloggs","Fred","BIOL","1001","Biology 1","D1","D1"
+        $expected = '"Student Number","Last Name","First Name","Subject","Catalog Nbr",' .
+            '"Descr Course Name","First Attempt Grade","Award Grade"' . "\n" .
+            '"1234567","Bloggs","Fred","BIOL","1001","Biology 1","D1","D1"
 "1234560","Perez","Juan","BIOL","1001","Biology 1","",""
 ';
         $this->assertEquals($expected, $data['csv']);
@@ -428,8 +429,9 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
             $data
         );
 
-        $expected = '"Student Number","Last Name","First Name","Subject","Catalog Nbr","Descr Course Name","First Attempt Grade","Award Grade"
-"1234567","Bloggs","Fred","BIOL","1001","Biology 1","EC","EC"
+        $expected = '"Student Number","Last Name","First Name","Subject","Catalog Nbr",' .
+            '"Descr Course Name","First Attempt Grade","Award Grade"' . "\n" .
+            '"1234567","Bloggs","Fred","BIOL","1001","Biology 1","EC","EC"
 "1234560","Perez","Juan","BIOL","1001","Biology 1","",""
 ';
         $this->assertEquals($expected, $data['csv']);

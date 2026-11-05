@@ -19,7 +19,7 @@
  * This class defines basic functional logic.
  * It could be overriden for custom instances.
  *
- * @package    local_gugrades
+ * @package    regulations_from2026
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -145,7 +145,7 @@ class aggregate {
         if (!$this->is_reassessment($category->categoryid)) {
             return false;
         }
-        $substantive = array_filter($this->availability($items, $userid), function($item) {
+        $substantive = array_filter($this->availability($items, $userid), function ($item) {
             return !$item->grademissing && (empty($item->admingrade) || ($item->admingrade == 'NOSUBMISSION'));
         });
 
@@ -216,8 +216,11 @@ class aggregate {
         ];
         $explain = get_string('explain_resitcapped', 'local_gugrades', $a);
         if ($this->resitcategories) {
-            $explain .= '. ' . get_string('explain_resitcategories', 'local_gugrades',
-                implode(', ', $this->resitcategories));
+            $explain .= '. ' . get_string(
+                'explain_resitcategories',
+                'local_gugrades',
+                implode(', ', $this->resitcategories)
+            );
         }
         if ($ugpg == 'Unknown') {
             $explain .= ' ' . get_string('explain_resitcapunknown', 'local_gugrades');
@@ -270,7 +273,7 @@ class aggregate {
      * @param array $items
      * @param int $level
      * @param int $userid
-    * @param bool $conditionmet Nursing condition result, updated by reference.
+     * @param bool $conditionmet Nursing condition result, updated by reference.
      * @param bool $firstsitting Select the earliest-assigned current substantive reassessment grade.
      * @return array ['rounded' grade, grade val, admingrade, grade disp, completion, error, explain, not available]
      */
@@ -299,7 +302,7 @@ class aggregate {
         $isnursing = in_array('nursing', $options);
 
         // If it's not nursing, it doesn't matter what this is set to.
-        // MGU-1506: This is always D3:9
+        // MGU-1506: This is always D3:9.
         $lowestnursinggrade = 9;
 
         // The first-sitting check runs after selecting its substantive item.
@@ -347,11 +350,11 @@ class aggregate {
         }
 
         // MGU-1446. If only one grade then that's the aggregated result (whatever it is)
-        // MGU-1511. But ONLY if an admin grade. Normal grades still need to be converted to percentage. 
+        // MGU-1511. But ONLY if an admin grade. Normal grades still need to be converted to percentage.
         if (($level > 1) && (count($items) == 1)) {
             $item = reset($items);
 
-            // Just let it drop through if grademissing
+            // Just let it drop through if grademissing.
             if (!$item->grademissing && $item->admingrade) {
                 if ($isresitcategory) {
                     $this->select_item($item, 'onlygrade');
@@ -400,9 +403,8 @@ class aggregate {
 
         // If this is a resit category then we may be able to resolve aggregation before doing anything else.
         if ($isresitcategory) {
-
             // Resit categories don't care about missing grades.
-            $items = array_filter($items, function($item) {
+            $items = array_filter($items, function ($item) {
                 return !$item->grademissing;
             });
 
@@ -521,7 +523,7 @@ class aggregate {
         $isengineeringcap = false;
 
         // Is this ENGINEERING? Apply Engineering rules if this is Level 1
-        // NOTE: Only works if aggregation strategy is weighted mean
+        // NOTE: Only works if aggregation strategy is weighted mean.
         if ($isengineering && ($level == 1) && ($aggmethod = \GRADE_AGGREGATE_WEIGHTED_MEAN)) {
             $oldaggregatedgrade = $aggregatedgrade;
             $aggregatedgrade = $this->engineering_cap($courseid, $aggregatedgrade, $items);
@@ -551,15 +553,14 @@ class aggregate {
             );
 
             // MGU-1442: Is this nursing? Do we need to apply an X?
-            // MGU-1506: If aggregatedgrade < 13 then DO NOT apply the X (cf. any individual grade < D3:9)
+            // MGU-1506: If aggregatedgrade < 13 then DO NOT apply the X (cf. any individual grade < D3:9).
             if (($level == 1) && $isnursing && $conditionmet && ($aggregatedgrade >= 9)) {
-
                 $displaygrade = 'X' . $displaygrade;
             }
 
             $explain = get_string('explain_schedule', 'local_gugrades');
 
-            // TODO - can probably improve on this.
+                // This calculation can probably be improved.
             if ($isengineeringcap) {
                 $explain .= " (Capped by Engineering rules)";
             }
@@ -591,7 +592,6 @@ class aggregate {
 
         // Any valid grades < $lowestgrade?
         foreach ($items as $item) {
-
             // Skip items that are missing a grade or have an admingrade.
             if ($item->grademissing || !empty($item->admingrade) || $item->iscategory) {
                 continue;
@@ -647,7 +647,7 @@ class aggregate {
      */
     public function engineering_cap(int $courseid, float $aggregatedgrade, array $items) {
 
-        // Split into exam and course grades. 
+        // Split into exam and course grades.
         [$examitems, $courseitems] = $this->eng_split_items($courseid, $items);
 
         // If there are no exams then the rule does not apply.
@@ -655,23 +655,23 @@ class aggregate {
             return $aggregatedgrade;
         }
 
-        // Get weights
+        // Get weights.
         $examweight = array_sum(array_column($examitems, 'weight'));
         $courseweight = array_sum(array_column($courseitems, 'weight'));
         $totalweight = $examweight + $courseweight;
 
         // Normalise total weights.
         $examweight = round(100 * $examweight / $totalweight, 5);
-        $courseweight = round(100 * $courseweight / $totalweight, 5); 
+        $courseweight = round(100 * $courseweight / $totalweight, 5);
 
         // Get "aggregated" grades.
-        // It HAS to be weigghted mean - we wouldn't be here otherwise. 
+        // It HAS to be weigghted mean - we wouldn't be here otherwise.
         $examgrade = $this->strategy_weighted_mean($examitems);
         $coursegrade = $this->strategy_weighted_mean($courseitems);
 
         // MGU-1439
         // If either exam or course id weighted >30% AND grade is below E3 (6.0)
-        // output grade is capped at a max of E1 (8.0)
+        // output grade is capped at a max of E1 (8.0).
         if (($examweight > 30) && ($examgrade < 6.0)) {
             $aggregatedgrade = $aggregatedgrade > 8.0 ? 8.0 : $aggregatedgrade;
         }
@@ -796,10 +796,9 @@ class aggregate {
     public function pre_process_items(array $items, bool $isweighted, int $level) {
 
         // MGU-1500. If total weights of GOODCAUSE_NR at L1 is LESS THAN 10% then drop them
-        // If 10% or higher then result is GOODCAUSE_NR
+        // If 10% or higher then result is GOODCAUSE_NR.
         if ($level == 1) {
-
-            // Calculate total weight
+            // Calculate total weight.
             $eccweight = 0;
             foreach ($items as $item) {
                 $weight = $isweighted ? $item->weight * 100 : 100 / count($items);
@@ -810,7 +809,7 @@ class aggregate {
         }
 
         // Drop any GOODCAUSE_NR.
-        // UNLESS, level 1, any are weight>10% in which case grade is ECC. (MGU-1387, rule 4)
+        // UNLESS, level 1, any are weight>10% in which case grade is ECC. (MGU-1387, rule 4).
         $newitems = [];
         foreach ($items as $item) {
             if ($item->admingrade != 'GOODCAUSE_NR') {
@@ -937,7 +936,7 @@ class aggregate {
         }
 
         // If ALL grades are NS, then return NS (MGU-1191) at level 2
-        // At Level 1, drop through and just return H
+        // At Level 1, drop through and just return H.
         $allns = true;
         foreach ($items as $item) {
             if ($item->admingrade != 'NOSUBMISSION') {
@@ -966,7 +965,7 @@ class aggregate {
      */
     public function admin_grades_level1(array $items) {
 
-        // TODO: Is this needed?
+        // Confirm whether this is needed.
 
         return '';
     }
@@ -977,8 +976,9 @@ class aggregate {
      * - Discard no/missing grades. If there is nothing left then result is no grade (already done)
      * - If there is only a single grade or single admin grade (not NS) then that is the result. (for efficiency)
      * - If there is one or more admin grades AND no substantive grades are newer, the latest admin grade is the result.
-     * - If any substantive grade (or NS) is the latest grade, any admin grades are removed and the remaining grades are aggregated normally.
-     * 
+     * - If any substantive grade (or NS) is the latest grade, any admin grades are removed
+     *   and the remaining grades are aggregated normally.
+     *
      * - If there is only one item, then that's the grade (or admingrade)
      * - If there are any admingrade then the resit grade is the grade (or admingrade)
      * - If there are two valid grades then aggregation completes 'normally'
@@ -1008,36 +1008,37 @@ class aggregate {
         }
 
         // If there are no admingrades then we can just aggregate "normally".
-        if (!array_filter($items, function($item) {
-            return !empty($item->admingrade);
-        })) {
+        if (
+            !array_filter($items, function ($item) {
+                return !empty($item->admingrade);
+            })
+        ) {
             return [0, '', '', $items];
         }
 
         // Establish which is the "newest" item.
-        $items = array_map(function($item) use ($userid) {
+        $items = array_map(function ($item) use ($userid) {
             $item->gradeid = \local_gugrades\grades::get_first_grade_id($item->itemid, $userid);
             return $item;
         }, $items);
-        usort($items, function($item1, $item2) {
+        usort($items, function ($item1, $item2) {
             return $item1->gradeid <=> $item2->gradeid;
         });
         $lastitem = $items[array_key_last($items)];
 
         // If the $lastitem is an admingrade then it's the category total.
-        // An NC is a substantive grade for reassessment purposes. 
+        // An NC is a substantive grade for reassessment purposes.
         if (!empty($lastitem->admingrade) && ($lastitem->admingrade != 'NOSUBMISSION')) {
             $this->select_item($lastitem, 'latestadmin');
             return [0, $lastitem->admingrade, get_string('explain_resitlastadmin', 'local_gugrades'), $items];
         }
 
-        // In which case, last grade must be substantive grade. 
+        // In which case, last grade must be substantive grade.
         // Remove admin grades.
-        $items = array_filter($items, function($item) {
+        $items = array_filter($items, function ($item) {
             return empty($item->admingrade) || ($item->admingrade == 'NOSUBMISSION');
         });
         $items = array_values($items);
-
 
         // In which case, we must have two grades and can allow normal aggregation to procede.
         // Signified by empty explain.

@@ -667,7 +667,7 @@ class api {
 
             // Don't write or aggregate if it's a dry run.
             if (!$dryrun) {
-                // TODO: Is rawgrade correct? For scheduleB this will be completely
+                // Check whether rawgrade is correct. For Schedule B this will be completely
                 // unrelated. E.g. rawgrade 6 = converted grade = 14.
                 \local_gugrades\grades::write_grade(
                     courseid:       $courseid,
@@ -949,10 +949,10 @@ class api {
     }
 
         /**
-     * Is the accessibility tool enabled in the site settings?
-     * Defaults to true when the setting has never been saved.
-     * @return bool
-     */
+         * Is the accessibility tool enabled in the site settings?
+         * Defaults to true when the setting has never been saved.
+         * @return bool
+         */
     public static function is_accessibility_enabled() {
         // Default to enabled if the setting has never been saved.
         $enabled = get_config('local_gugrades', 'enableaccessibility');
@@ -1045,7 +1045,7 @@ class api {
             'reducemotion' => false,
         ];
     }
-    
+
     /**
      * Get all the strings for this plugin as array of objects
      * @return array
@@ -1462,8 +1462,12 @@ class api {
             // Reject out-of-range points grades (same rules as CSV import).
             // Invalid values previously broke MyGrades when loading the capture page (MGU-1344).
             if (!is_finite($grade) || !$mapping->validate_csv($grade)) {
-                throw new \moodle_exception('gradeoutofrange', 'local_gugrades', '',
-                    (object)['grade' => $grade, 'grademax' => $mapping->get_grademax()]);
+                throw new \moodle_exception(
+                    'gradeoutofrange',
+                    'local_gugrades',
+                    '',
+                    (object)['grade' => $grade, 'grademax' => $mapping->get_grademax()]
+                );
             }
             $displaygrade = $grade;
             $rawgrade = $grade;
@@ -1760,7 +1764,7 @@ class api {
         $courseid = $gradecategory->courseid;
         $context = \context_course::instance($courseid, true);
 
-        // TODO: Get grades.
+        // Grades still need to be loaded.
         $grades = \local_gugrades\grades::get_dashboard_grades($userid, $gradecategoryid);
 
         // Get child categories.
@@ -1814,18 +1818,17 @@ class api {
                 SET iscurrent = 0
                 WHERE gradetype IN ('RELEASED', 'RELEASED1')
                 AND gradeitemid = :gradeitemid";
-            $DB->execute($sql, ['gradeitemid' => $gradeitemid]);   
+            $DB->execute($sql, ['gradeitemid' => $gradeitemid]);
 
             // Remove any columns that this has orphaned.
             \local_gugrades\grades::cleanup_empty_columns($gradeitemid);
-        }     
+        }
 
         // Iterate over users releasing/reverting grades.
         $userids = [];
         foreach ($users as $user) {
             $userids[] = (int) $user->id;
             if ($revert) {
-
                 // Activity action.
                 $activity->unrelease_grades($user->id);
             } else {
@@ -1885,10 +1888,10 @@ class api {
         // Delete resits.
         $DB->delete_records('local_gugrades_resit', ['courseid' => $courseid]);
 
-        // Delete notes
+        // Delete notes.
         $DB->delete_records('local_gugrades_notes', ['courseid' => $courseid]);
 
-        // Delete flags
+        // Delete flags.
         $DB->delete_records('local_gugrades_flag', ['courseid' => $courseid]);
 
         // As this will be a rarely used function we will take the liberty of purging the caches.
@@ -1979,7 +1982,7 @@ class api {
 
         // Remove any 'latest' pointers for affected users so bulk-data rebuild is consistent.
         if ($userids) {
-            list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
             $params = array_merge(['gradeitemid' => $gradeitemid], $inparams);
             $sql = "DELETE FROM {local_gugrades_latest}
                 WHERE gradeitemid = :gradeitemid
@@ -2221,7 +2224,9 @@ class api {
         if (\local_gugrades\grades::is_reassessment_category_set($courseid, $gradecategoryid)) {
             $names = array_column($user->fields, 'fullname', 'gradeitemid');
             $user->firstsittingexplain = self::explain_selection(
-                get_string('firstsitting', 'local_gugrades'), $result->firstsitting, $names,
+                get_string('firstsitting', 'local_gugrades'),
+                $result->firstsitting,
+                $names,
             );
             if ($user->overridden) {
                 $user->awardexplain = get_string('explain_awardoverridden', 'local_gugrades');
@@ -2230,7 +2235,9 @@ class api {
                     get_string('categorynothighest', 'local_gugrades');
             } else {
                 $user->awardexplain = self::explain_selection(
-                    get_string('award', 'local_gugrades'), $result, $names,
+                    get_string('award', 'local_gugrades'),
+                    $result,
+                    $names,
                 );
             }
         }
@@ -2390,9 +2397,9 @@ class api {
         $excludeempty = \local_gugrades\grades::is_exclude_empty_grades($gradecategoryid);
 
         // Is this a reassessment category?
-        $regulation = \local_gugrades\regulations::get_active_regulation($courseid); 
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         $aggregation = $regulation->get_aggregation($courseid, $atype);
-        $isreassessment = $aggregation->is_reassessment($gradecategoryid); 
+        $isreassessment = $aggregation->is_reassessment($gradecategoryid);
 
         return [
             'aggregationsupported' => $aggregationsupported,
@@ -2447,9 +2454,9 @@ class api {
     /**
      * Get user data for dashboard
      * It's basically get_aggregation_user with some extras added
-    * Released first-attempt grades are nullable; existing award fields are unchanged.
-    * releasegrade1st is a grade record on fields/parent and a display string on the user.
-    * Reassessment and dual-grade flags apply only to from2026 regulations.
+     * Released first-attempt grades are nullable; existing award fields are unchanged.
+     * releasegrade1st is a grade record on fields/parent and a display string on the user.
+     * Reassessment and dual-grade flags apply only to from2026 regulations.
      * @param int $courseid
      * @param int $gradecategoryid
      * @param int $userid
@@ -2473,7 +2480,9 @@ class api {
         // Run over the fields and add released status.
         foreach ($user->fields as $id => $field) {
             $user->fields[$id] = array_merge($field, self::get_dashboard_release_data(
-                $courseid, $field['gradeitemid'], $userid,
+                $courseid,
+                $field['gradeitemid'],
+                $userid,
             ));
         }
 
@@ -2633,7 +2642,7 @@ class api {
         $options = array_merge($options, $columns);
 
         // Add selected field for grade types.
-        // TODO - needs linked to user preferences.
+        // This still needs to be linked to user preferences.
         foreach ($options as $option) {
             $option->selected = self::is_export_option_selected($option->gradetype, $savedoptions);
         }
@@ -2994,7 +3003,7 @@ class api {
     public static function background_setup(int $courseid) {
 
         // Make sure custom user fields exist
-        // We need these for UG/PG tests
+        // We need these for UG/PG tests.
         \report_guid\lib::check_create_userprofile();
 
         // First step is to recalculate 'summative' categories.
@@ -3017,7 +3026,7 @@ class api {
     public static function get_help(string $subject) {
         global $CFG;
 
-        // Work out what the filename would be
+        // Work out what the filename would be.
         $filename = $CFG->dirroot . '/local/gugrades/help/' . $subject . '.html';
 
         // Does file exist?
@@ -3102,7 +3111,6 @@ class api {
         $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
         $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
 
-    
         // Regulation.
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         $options = $regulation->get_options($courseid);
@@ -3131,12 +3139,12 @@ class api {
      * Write flags
      * @param int $courseid
      * @param array $flags
-     * 
+     *
      */
     public static function write_flags(int $courseid, array $flags) {
         global $DB;
 
-        // Easiest to delete all the flags for course and write them back again
+        // Easiest to delete all the flags for course and write them back again.
         $DB->delete_records('local_gugrades_flag', ['courseid' => $courseid]);
 
         // Track a category to hang recalculate on.
@@ -3163,7 +3171,7 @@ class api {
      * Read flags
      * @param int $courseid
      * @return array
-     * 
+     *
      */
     public static function read_flags(int $courseid) {
         global $DB;
@@ -3185,7 +3193,7 @@ class api {
 
     /**
      * Set user tour state for current user
-    * @param bool $enabled Whether the user tour is enabled.
+     * @param bool $enabled Whether the user tour is enabled.
      */
     public static function set_tour_state(bool $enabled) {
         global $USER;
@@ -3201,12 +3209,14 @@ class api {
     private static function missing_dual_grade_categoryids(int $courseid): array {
         global $DB;
 
-        if (\local_gugrades\regulations::get_active_regulation($courseid)->shortname() !== 'from2026' ||
+        if (
+            \local_gugrades\regulations::get_active_regulation($courseid)->shortname() !== 'from2026' ||
                 $DB->record_exists('local_gugrades_grade', [
                     'courseid' => $courseid, 'gradetype' => 'CATEGORY1', 'iscurrent' => 1,
                 ]) || !$DB->record_exists('local_gugrades_grade', [
                     'courseid' => $courseid, 'gradetype' => 'CATEGORY', 'iscurrent' => 1,
-                ])) {
+                ])
+        ) {
             return [];
         }
 
@@ -3214,7 +3224,7 @@ class api {
     }
 
     /**
-     * Check integrity of MyGrades data for this course. 
+     * Check integrity of MyGrades data for this course.
      * @param int $courseid
      * @return array
      */
@@ -3224,13 +3234,13 @@ class api {
         // Does not modify erroritems or run for from2026 courses.
         $reassessmentnotices = \local_gugrades\grades::check_integrity_reassessment_structure($courseid);
 
-        // grademax=22 check old regs
+        // Check grademax=22 for the old regulations.
         $errors = \local_gugrades\grades::check_integrity_grademax22_oldregs($courseid);
 
-        // Check for valid admingrades
+        // Check for valid admingrades.
         $errors = array_merge($errors, \local_gugrades\grades::check_integrity_admingrades($courseid));
 
-        // Check for range / points/scale mismatch
+        // Check for range / points/scale mismatch.
         $errors = array_merge($errors, \local_gugrades\grades::check_integrity_range($courseid));
 
         // Check for scale changed in the gradebook after grades were imported.

@@ -8,11 +8,11 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Opt-in synthetic aggregation benchmark. Never uses live course data.
@@ -34,6 +34,8 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  * Measure scaling without introducing timing-dependent assertions.
  *
  * @group aggregation_performance
+ * @covers \local_gugrades\aggregation
+ * @covers \local_gugrades\usercapture
  */
 final class aggregation_performance_test extends gugrades_aggregation_testcase {
     /**
@@ -90,10 +92,14 @@ final class aggregation_performance_test extends gugrades_aggregation_testcase {
                 throw new \coding_exception('Benchmark tracing requires Xdebug with XDEBUG_MODE=trace.');
             }
             if ($students > 100) {
-                throw new \coding_exception('Function traces are limited to 100 students; use untraced benchmarks for larger runs.');
+                throw new \coding_exception(
+                    'Function traces are limited to 100 students; use untraced benchmarks for larger runs.',
+                );
             }
-            foreach (['xdebug.var_display_max_depth' => '0', 'xdebug.var_display_max_children' => '0',
-                    'xdebug.var_display_max_data' => '2048'] as $option => $value) {
+            foreach (
+                ['xdebug.var_display_max_depth' => '0', 'xdebug.var_display_max_children' => '0',
+                    'xdebug.var_display_max_data' => '2048'] as $option => $value
+            ) {
                 $traceoptions[$option] = ini_get($option);
                 ini_set($option, $value);
             }
@@ -140,10 +146,20 @@ final class aggregation_performance_test extends gugrades_aggregation_testcase {
      */
     private function write_result(int $userid, int $itemid, int $grade): void {
         \local_gugrades\grades::write_grade(
-            courseid: $this->course->id, gradeitemid: $itemid, userid: $userid,
-            admingrade: '', rawgrade: $grade, convertedgrade: $grade, displaygrade: (string)$grade,
-            weightedgrade: 0, gradetype: 'FIRST', other: '', iscurrent: true,
-            iserror: false, auditcomment: 'Synthetic benchmark', ispoints: false,
+            courseid: $this->course->id,
+            gradeitemid: $itemid,
+            userid: $userid,
+            admingrade: '',
+            rawgrade: $grade,
+            convertedgrade: $grade,
+            displaygrade: (string)$grade,
+            weightedgrade: 0,
+            gradetype: 'FIRST',
+            other: '',
+            iscurrent: true,
+            iserror: false,
+            auditcomment: 'Synthetic benchmark',
+            ispoints: false,
         );
     }
 
@@ -211,8 +227,12 @@ final class aggregation_performance_test extends gugrades_aggregation_testcase {
             }
         }
         foreach (['initial_recalculation', 'unchanged_recalculation'] as $phase) {
-            $this->measure($phase, $students, $scenario,
-                fn() => \local_gugrades\api::recalculate($this->course->id, $totalid));
+            $this->measure(
+                $phase,
+                $students,
+                $scenario,
+                fn() => \local_gugrades\api::recalculate($this->course->id, $totalid)
+            );
         }
         $this->assertSame($students * 5, $DB->count_records('local_gugrades_grade', [
             'courseid' => $this->course->id, 'gradetype' => 'CATEGORY', 'iscurrent' => 1, 'iserror' => 0,
@@ -222,8 +242,10 @@ final class aggregation_performance_test extends gugrades_aggregation_testcase {
         ]));
         foreach (['page_after_recalculation', 'repeated_page'] as $phase) {
             $page = $this->measure($phase, $students, $scenario, function () use ($totalid) {
-                return external_api::clean_returnvalue(get_aggregation_page::execute_returns(),
-                    get_aggregation_page::execute($this->course->id, $totalid, '', '', 0, false));
+                return external_api::clean_returnvalue(
+                    get_aggregation_page::execute_returns(),
+                    get_aggregation_page::execute($this->course->id, $totalid, '', '', 0, false)
+                );
             });
             $this->assertCount($students, $page['users']);
             $this->assertTrue($page['dualgrades']);

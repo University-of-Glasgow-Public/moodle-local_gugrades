@@ -144,7 +144,11 @@ final class get_aggregation_user_test extends \local_gugrades\external\gugrades_
         // Set aggregation strategy.
         $this->set_strategy($schedulebexam->id, \GRADE_AGGREGATE_WEIGHTED_MEAN);
 
-        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user($this->course->id, $schedulebexam->id, $this->student->id);
+        $user = (object) \local_gugrades\api::get_aggregation_dashboard_user(
+            $this->course->id,
+            $schedulebexam->id,
+            $this->student->id,
+        );
 
         $this->assertEquals(12.82051, $user->parent->normalisedweight);
         $this->assertEquals(44.11765, $user->fields[0]['normalisedweight']);

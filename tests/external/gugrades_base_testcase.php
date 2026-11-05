@@ -287,7 +287,7 @@ class gugrades_base_testcase extends externallib_advanced_testcase {
         // Create a course to apply settings to.
         // Set to a date that will use 'original' aggregation rules.
         $course = $this->getDataGenerator()->create_course([
-            'startdate' => strtotime('2026-01-01')
+            'startdate' => strtotime('2026-01-01'),
         ]);
 
         // Add a scale.

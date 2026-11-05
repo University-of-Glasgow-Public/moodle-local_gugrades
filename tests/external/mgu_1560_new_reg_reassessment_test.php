@@ -34,7 +34,9 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregation_testcase.php');
 
 /**
- * Test(s) for two columns 
+ * Test(s) for two columns
+ * @covers \local_gugrades\aggregation
+ * @covers \regulations_from2026\aggregate
  */
 final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\gugrades_aggregation_testcase {
     /**
@@ -100,7 +102,9 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $firstitemid = $this->get_gradeitemid('Summer first sitting');
         \local_gugrades\api::release_grades($this->course->id, $firstitemid, 0, false);
         $user = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $summer->id, $this->student->id,
+            $this->course->id,
+            $summer->id,
+            $this->student->id,
         );
         $this->assertNull($user['parent']->releasegrade1st);
         $fields = array_column($user['fields'], null, 'gradeitemid');
@@ -133,7 +137,9 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
             ispoints: false,
         );
         $user = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $summer->id, $this->student->id,
+            $this->course->id,
+            $summer->id,
+            $this->student->id,
         );
         $this->assertEquals('H', $user['displaygrade1st']);
         $this->assertTrue($user['isreassessment']);
@@ -144,7 +150,9 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $this->assertEquals($first->displaygrade, $user['releasegrade1st']);
 
         $parent = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $this->gradecatsummative->id, $this->student->id,
+            $this->course->id,
+            $this->gradecatsummative->id,
+            $this->student->id,
         );
         $this->assertFalse($parent['isreassessment']);
         $this->assertTrue($parent['dualgrades']);
@@ -155,13 +163,17 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
 
         \local_gugrades\api::release_grades($this->course->id, $summeritemid, 0, false);
         $user = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $summer->id, $this->student->id,
+            $this->course->id,
+            $summer->id,
+            $this->student->id,
         );
         $this->assertEquals('H', $user['parent']->releasegrade1st->displaygrade);
 
         \local_gugrades\api::release_grades($this->course->id, $summeritemid, 0, true);
         $user = \local_gugrades\api::get_aggregation_dashboard_user(
-            $this->course->id, $summer->id, $this->student->id,
+            $this->course->id,
+            $summer->id,
+            $this->student->id,
         );
         $this->assertFalse($user['parent']->releasegrade);
         $this->assertNull($user['parent']->releasegrade1st);
@@ -169,13 +181,13 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
 
     /**
      * Check basics of reassessment in new regs
-     * 
+     *
      * @return void
      */
     public function test_basic_two_reassessment(): void {
         global $DB;
 
-        // Make sure that we're a teacher
+        // Make sure that we're a teacher.
         $this->setUser($this->teacher);
 
         // Import grades only for one student (so far).
@@ -188,7 +200,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $course->startdate = strtotime('2027-01-01');
         $DB->update_record('course', $course);
 
-        // Get summer exam
+        // Get summer exam.
         $gradecatsummer = $DB->get_record('grade_categories', ['fullname' => 'Summer exam'], '*', MUST_EXIST);
 
         // Get aggregation page for category.
@@ -200,17 +212,17 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
 
         $fred = $page['users'][0];
 
-        // No reassessment set, so 1st attempt grade should be empty
+        // No reassessment set, so 1st attempt grade should be empty.
         $this->assertFalse($page['isreassessment']);
 
-        // Mark as resit (set resit flag for category)
+        // Mark as resit (set resit flag for category).
         $flags = [
             [
                 'gradecategoryid' => $gradecatsummer->id,
                 'gradeitemid' => 0,
                 'engexam' => false,
                 'resit' => true,
-            ]
+            ],
         ];
         $nothing = write_flags::execute($this->course->id, $flags);
         $nothing = external_api::clean_returnvalue(
@@ -219,7 +231,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         );
 
         // Get aggregation page for category.
-        // At this point there should be no data. 
+        // At this point there should be no data.
         $page = get_aggregation_page::execute($this->course->id, $gradecatsummer->id, '', '', 0, true);
         $page = external_api::clean_returnvalue(
             get_aggregation_page::execute_returns(),
@@ -246,7 +258,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $this->assertTrue($page['isreassessment']);
         $this->assertEquals('A5', $fred['displaygrade']);
 
-        // Set summer resit to EC
+        // Set summer resit to EC.
         $summerresit = $this->get_gradeitemid('Summer resit');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -277,13 +289,13 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
 
     /**
      * Check slightly more complex example of reassessment in new regs
-     * 
+     *
      * @return void
      */
     public function test_three_reassessment(): void {
         global $DB;
 
-        // Make sure that we're a teacher
+        // Make sure that we're a teacher.
         $this->setUser($this->teacher);
 
         // Import grades only for one student (so far).
@@ -296,17 +308,17 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $course->startdate = strtotime('2027-01-01');
         $DB->update_record('course', $course);
 
-        // Get scale exam
+        // Get scale exam.
         $gradecatscale = $DB->get_record('grade_categories', ['fullname' => 'Scale exam'], '*', MUST_EXIST);
 
-        // Mark as resit (set resit flag for category)
+        // Mark as resit (set resit flag for category).
         $flags = [
             [
                 'gradecategoryid' => $gradecatscale->id,
                 'gradeitemid' => 0,
                 'engexam' => false,
                 'resit' => true,
-            ]
+            ],
         ];
         $nothing = write_flags::execute($this->course->id, $flags);
         $nothing = external_api::clean_returnvalue(
@@ -324,7 +336,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $fred = $page['users'][0];
         $this->assertEquals('Grades missing', $fred['displaygrade']);
 
-        // Add first grade - miserable failure
+        // Add first grade - miserable failure.
         $questionx = $this->get_gradeitemid('Question X');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -352,7 +364,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $fred = $page['users'][0];
         $this->assertEquals('E2', $fred['displaygrade']);
 
-        // Add EC for Question Y
+        // Add EC for Question Y.
         $questiony = $this->get_gradeitemid('Question Y');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -380,7 +392,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $fred = $page['users'][0];
         $this->assertEquals('EC', $fred['displaygrade']);
 
-        // Add Grade for Question Z 
+        // Add Grade for Question Z.
         $questionz = $this->get_gradeitemid('Question Z');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -405,7 +417,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
             $page
         );
 
-        $fred = $page['users'][0];   
+        $fred = $page['users'][0];
         $this->assertEquals('E2', $fred['displaygrade']);
     }
 }

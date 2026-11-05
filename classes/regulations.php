@@ -28,13 +28,14 @@
 
 namespace local_gugrades;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Discover regulation subplugins and select the active rules for a course.
+ */
 class regulations {
-
     /**
      * Static variable for regulation class
-     * So we don't have to keep working it out. 
+     * So we don't have to keep working it out.
+     * @var object|null Active regulation for the current request.
      */
     private static ?object $regulation = null;
 
@@ -67,7 +68,7 @@ class regulations {
         global $DB;
 
         // Have we already worked this out?
-        // The courseid cannot change while MyGrades is active
+        // The courseid cannot change while MyGrades is active.
         if (!\local_gugrades\api::is_unit_test() && self::$regulation) {
             return self::$regulation;
         }

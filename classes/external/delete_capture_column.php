@@ -85,4 +85,3 @@ class delete_capture_column extends external_api {
         return new external_single_structure([]);
     }
 }
-

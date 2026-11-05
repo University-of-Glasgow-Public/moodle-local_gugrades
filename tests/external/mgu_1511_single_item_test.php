@@ -208,7 +208,7 @@ final class mgu_1511_single_item_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test 'normal' sub-category. Just for comfort.
-     * 
+     *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      * @return void
      */
@@ -275,7 +275,7 @@ final class mgu_1511_single_item_test extends \local_gugrades\external\gugrades_
 
     /**
      * Test 'single item' sub-category. Just for comfort.
-     * 
+     *
      * @covers \local_gugrades\external\get_aggregation_page::execute
      * @return void
      */
@@ -323,7 +323,7 @@ final class mgu_1511_single_item_test extends \local_gugrades\external\gugrades_
         $fred = $page['users'][0];
         $this->assertEquals('58.33333', $fred['displaygrade']);
 
-        // Change grade to admingrade and make sure it bubbles up properly. 
+        // Change grade to admingrade and make sure it bubbles up properly.
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
             gradeitemid:    $item1id,

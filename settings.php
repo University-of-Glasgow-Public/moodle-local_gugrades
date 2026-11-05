@@ -209,28 +209,30 @@ if ($hassiteconfig) {
     );
     $settingspage->add($helptext);
 
-    // Regulations Settings
+    // Regulations Settings.
     $settingspage->add(new admin_setting_heading(
         'local_gugrades/headingregulations',
         new lang_string('regulationssettings', 'local_gugrades'),
         new lang_string('regulationssettings_help', 'local_gugrades')
     ));
 
-    $settingspage->add(new admin_setting_configtext('local_gugrades/engineeringcat',
+    $settingspage->add(new admin_setting_configtext(
+        'local_gugrades/engineeringcat',
         new lang_string('engineeringcat', 'local_gugrades'),
         new lang_string('engineeringcat_help', 'local_gugrades'),
         0,
         PARAM_INT
     ));
 
-    $settingspage->add(new admin_setting_configtext('local_gugrades/nursingcat',
+    $settingspage->add(new admin_setting_configtext(
+        'local_gugrades/nursingcat',
         new lang_string('nursingcat', 'local_gugrades'),
         new lang_string('nursingcat_help', 'local_gugrades'),
         0,
         PARAM_TEXT
     ));
 
-    // User tour
+    // User tour.
     $settingspage->add(new admin_setting_heading(
         'local_gugrades/headingtour',
         new lang_string('toursettings', 'local_gugrades'),

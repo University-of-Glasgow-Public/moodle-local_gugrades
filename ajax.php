@@ -47,14 +47,14 @@ if ($loginrequired) {
         echo json_encode([
             'error' => true,
             'errorcode' => 'notloggedin',
-            'message' => 'User is not logged in'
+            'message' => 'User is not logged in',
         ]);
         exit;
     }
 }
 
 // Close the session to allow concurrent requests
-// This must be done BEFORE calling external functions
+// This must be done BEFORE calling external functions.
 session_write_close();
 
 $result = external_api::call_external_function(
@@ -65,8 +65,8 @@ $result = external_api::call_external_function(
 // If the external function fails, handle the output securely.
 if (!empty($result['error'])) {
     http_response_code(500);
-    
-    // 🛡️ SECURITY PATCH: If we are NOT in developer debugging mode,
+
+    // If we are not in developer debugging mode,
     // scrub the sensitive system paths from the exception payload.
     if (empty($CFG->debugdisplay) || $CFG->debug < DEBUG_DEVELOPER) {
         if (isset($result['exception'])) {

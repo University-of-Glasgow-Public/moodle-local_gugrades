@@ -35,6 +35,8 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 
 /**
  * Test(s) for get_aggregation_page webservice
+ * @covers \local_gugrades\external\get_aggregation_page
+ * @covers \local_gugrades\aggregation
  */
 final class get_aggregation_page_test extends \local_gugrades\external\gugrades_aggregation_testcase {
     /**
@@ -85,7 +87,12 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         foreach (['2025-01-01' => true, '2027-01-01' => false] as $date => $expected) {
             $DB->set_field('course', 'startdate', strtotime($date), ['id' => $this->course->id]);
             $page = get_aggregation_page::execute(
-                $this->course->id, $this->gradecatsummative->id, '', '', 0, true,
+                $this->course->id,
+                $this->gradecatsummative->id,
+                '',
+                '',
+                0,
+                true,
             );
             $page = external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
             $this->assertSame($expected, $page['showresitrequired']);

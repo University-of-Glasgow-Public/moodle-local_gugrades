@@ -35,6 +35,8 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
 
 /**
  * Test get_activities web service.
+ * @covers \local_gugrades\conversion
+ * @covers \local_gugrades\api
  */
 final class get_write_conversion_maps_test extends \local_gugrades\external\gugrades_advanced_testcase {
     /**
@@ -1037,7 +1039,8 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
         $saved = external_api::clean_returnvalue(write_conversion_map::execute_returns(), $saved);
         $this->import_grades($courseid, $itemid, [$this->student->id, $userid]);
         $readselection = fn() => external_api::clean_returnvalue(
-            get_selected_conversion::execute_returns(), get_selected_conversion::execute($courseid, $itemid, 0),
+            get_selected_conversion::execute_returns(),
+            get_selected_conversion::execute($courseid, $itemid, 0),
         );
 
         $this->assertFalse($readselection()['anyalerts']);

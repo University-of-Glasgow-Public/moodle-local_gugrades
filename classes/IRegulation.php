@@ -26,10 +26,10 @@
 
 namespace local_gugrades;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Contract implemented by academic regulation subplugins.
+ */
 interface IRegulation {
-
     /**
      * Get short name
      * @return string

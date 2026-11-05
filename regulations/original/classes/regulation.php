@@ -19,7 +19,7 @@
  *
  * Defines aggregation rules for original regulations
  *
- * @package    local_gugrades
+ * @package    regulations_original
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,10 +27,10 @@
 
 namespace regulations_original;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Academic regulations for courses starting before August 2026.
+ */
 class regulation implements \local_gugrades\IRegulation {
-
     /**
      * Get short name
      * @return string
@@ -154,5 +154,4 @@ class regulation implements \local_gugrades\IRegulation {
     public function get_options(int $courseid) {
         return [];
     }
-
 }

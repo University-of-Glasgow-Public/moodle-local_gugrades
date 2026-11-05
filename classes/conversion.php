@@ -464,32 +464,13 @@ class conversion {
                     ['gradeitemid' => $gradeitemid, 'empty' => '']
                 );
                 // MGU-1487. Previous version was forcing admingrades back to FIRST after unconversion
-                // It's very likely that they were something other than FIRST to start with. 
+                // It's very likely that they were something other than FIRST to start with.
                 foreach ($admingrades as $admingrade) {
                     $admingrade->points = 1;
                     $admingrade->iscurrent = 0;
                     $DB->update_record('local_gugrades_grade', $admingrade);
                 }
-                /*
-                foreach ($admingrades as $grade) {
-                    \local_gugrades\grades::write_grade(
-                        courseid:           $courseid,
-                        gradeitemid:        $gradeitemid,
-                        userid:             $grade->userid,
-                        admingrade:         $grade->admingrade,
-                        rawgrade:           $grade->rawgrade,
-                        convertedgrade:     $grade->convertedgrade,
-                        displaygrade:       $grade->displaygrade,
-                        weightedgrade:      0,
-                        gradetype:          'FIRST',
-                        other:              '',
-                        iscurrent:          true,
-                        iserror:            false,
-                        auditcomment:       '',
-                        ispoints:           true,
-                    );
-                }
-                */
+
                 $sql = 'UPDATE {local_gugrades_grade}
                     SET iscurrent = 0
                     WHERE points = 0
@@ -611,7 +592,7 @@ class conversion {
         }
     }
 
-    /** 
+    /**
      * Convert a point grade according to map values
      * Note that we only use the percentage value and that as a fraction
      * of the maxgrade recorded in the grade item.
@@ -750,7 +731,7 @@ class conversion {
                     userid:             $user->id,
                     admingrade:         '',
                     rawgrade:           $provisional->rawgrade,
-                    convertedgrade:     $convertedgrade->scalevalue, // TODO: Is this correct?
+                    convertedgrade:     $convertedgrade->scalevalue, // Confirm the converted scale value.
                     displaygrade:       $convertedgrade->band,
                     weightedgrade:      0,
                     gradetype:          'CONVERTED',

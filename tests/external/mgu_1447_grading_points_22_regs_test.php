@@ -36,9 +36,11 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 
 /**
  * Test(s) for course activities that are graded in points, specifically with a grademax of 22, using old or new regulations.
+ * @covers \local_gugrades\aggregation
+ * @covers \regulations_from2026\aggregate
+ * @covers \regulations_original\aggregate
  */
 final class mgu_1447_grading_points_22_regs_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $category
      */
@@ -50,18 +52,9 @@ final class mgu_1447_grading_points_22_regs_test extends \local_gugrades\externa
     protected object $gradecatsummative;
 
     /**
-     * Additional setup steps
-     * (Push course into its own category)
-     */
-    protected function setUp(): void {
-        
-        parent::setUp();
-    }
-
-    /**
      * Test that grading activities with a mixture of Points (with grademax=22) and Schedule A passes when using old regs.
      */
-    public function test_grading_points_22_using_old_regulations() {
+    public function test_grading_points_22_using_old_regulations(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -119,13 +112,12 @@ final class mgu_1447_grading_points_22_regs_test extends \local_gugrades\externa
         $fred = $page['users'][0];
         // This is the aggregated category grade.
         $this->assertEquals('C2 (13)', $fred['displaygrade']);
-    
     }
-    
+
     /**
      * Test that grading activities with a mixture of Points (with grademax=22) and Schedule A fails when using new regs.
      */
-    public function test_grading_points_22_using_new_regulations() {
+    public function test_grading_points_22_using_new_regulations(): void {
         global $DB;
 
         // Make sure that we're a teacher.
@@ -184,5 +176,4 @@ final class mgu_1447_grading_points_22_regs_test extends \local_gugrades\externa
         // This should fail given that we can't aggregate when using a mixture of points and scales.
         $this->assertEquals('Cannot aggregate', $fred['displaygrade']);
     }
-
 }

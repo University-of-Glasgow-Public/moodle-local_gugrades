@@ -24,13 +24,11 @@
 
 namespace local_gugrades;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * MGU-1596: Empty options must be stored independently of school-specific options.
+ * @covers \regulations_from2026\regulation
  */
 final class regulation_options_test extends \advanced_testcase {
-
     /**
      * All outcomes, including ordinary courses, populate their own cache entry.
      */

@@ -74,7 +74,9 @@ class cleanup_integrity_errors extends external_api {
             'cleaned' => new external_value(PARAM_INT, 'Number of integrity issues cleaned'),
             'dualgradecategoryids' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'Top-level category requiring initial dual-grade recalculation'),
-                'Legacy from2026 totals needing dual grades', VALUE_DEFAULT, [],
+                'Legacy from2026 totals needing dual grades',
+                VALUE_DEFAULT,
+                [],
             ),
             'erroritems' => new external_multiple_structure(
                 new external_single_structure([

@@ -17,7 +17,7 @@
 /**
  * Admin settings for from2026 subplugin
  *
- * @package    local_gugrades
+ * @package    regulations_from2026
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,7 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$settings->add(new admin_setting_configtext('regulations_from2026/engineeringcat',
+$settings->add(new admin_setting_configtext(
+    'regulations_from2026/engineeringcat',
     new lang_string('engineeringcat', 'regulations_from2026'),
     new lang_string('engineeringcat_help', 'regulations_from2026'),
     0,

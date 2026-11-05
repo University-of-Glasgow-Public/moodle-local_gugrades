@@ -100,7 +100,7 @@ final class mgu_1500_ecc_test extends \local_gugrades\external\gugrades_aggregat
         $fred = $page['users'][0];
         $this->assertEquals('D2 (9.83193)', $fred['displaygrade']);
 
-        // Make Item 1 an ECC
+        // Make Item 1 an ECC.
         $item1id = $this->get_gradeitemid('Item 1');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -128,7 +128,7 @@ final class mgu_1500_ecc_test extends \local_gugrades\external\gugrades_aggregat
         $fred = $page['users'][0];
         $this->assertEquals('D3 (9.47368)', $fred['displaygrade']);
 
-        // Now add ECC to Item 4
+        // Now add ECC to Item 4.
         $item4id = $this->get_gradeitemid('Item 4');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -157,7 +157,7 @@ final class mgu_1500_ecc_test extends \local_gugrades\external\gugrades_aggregat
         $this->assertEquals('D2 (9.63636)', $fred['displaygrade']);
 
         // Now add ECC to Item 3
-        // This pushes us over ECC weights 10%
+        // This pushes us over ECC weights 10%.
         $item3id = $this->get_gradeitemid('Item 3');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -185,5 +185,4 @@ final class mgu_1500_ecc_test extends \local_gugrades\external\gugrades_aggregat
         $fred = $page['users'][0];
         $this->assertEquals('ECC', $fred['displaygrade']);
     }
-
 }

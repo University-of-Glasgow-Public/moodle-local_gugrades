@@ -890,6 +890,5 @@ final class aggregation_from2026_examples_test extends \local_gugrades\external\
             regulation_check::execute_returns(),
             $check
         );
-
     }
 }

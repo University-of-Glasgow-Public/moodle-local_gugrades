@@ -16,7 +16,8 @@
 
 /**
  * Define function check_integrity
- * @package    local_gug6
+ * @package    local_gugrades
+ * @copyright  2026 Howard Miller
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -68,7 +69,9 @@ class check_integrity extends external_api {
         return new external_single_structure([
             'dualgradecategoryids' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'Top-level category requiring initial dual-grade recalculation'),
-                'Legacy from2026 totals needing dual grades', VALUE_DEFAULT, [],
+                'Legacy from2026 totals needing dual grades',
+                VALUE_DEFAULT,
+                [],
             ),
             'erroritems' => new external_multiple_structure(
                 new external_single_structure([

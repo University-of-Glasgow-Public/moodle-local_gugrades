@@ -231,7 +231,7 @@ class users {
         $profile = new \moodle_url('/user/view.php', ['course' => $courseid, 'id' => $user->id]);
         $user->profileurl = $profile->out(false);
 
-        // Also add short note
+        // Also add short note.
         $params = [
             'courseid' => $courseid,
             'gradeitemid' => $gradeitemid,
@@ -373,7 +373,7 @@ class users {
 
         require_once($CFG->dirroot . '/user/profile/lib.php');
 
-        // Fetch all custom profile fields for the student
+        // Fetch all custom profile fields for the student.
         $profilefields = profile_user_record($userid);
 
         $value = $profilefields->$fieldname ?? '';

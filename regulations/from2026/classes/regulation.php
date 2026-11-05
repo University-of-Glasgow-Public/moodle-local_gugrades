@@ -19,7 +19,7 @@
  *
  * Defines aggregation rules for original regulations
  *
- * @package    local_gugrades
+ * @package    regulations_from2026
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,12 +27,13 @@
 
 namespace regulations_from2026;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Academic regulations for courses starting from August 2026.
+ */
 class regulation implements \local_gugrades\IRegulation {
-
     /**
      * Request-local options keyed by course ID, including empty results.
+     * @var array School-specific options indexed by course ID.
      */
     private static array $options = [];
 
@@ -87,7 +88,7 @@ class regulation implements \local_gugrades\IRegulation {
             return false;
         }
 
-        // The parentcatid must exist in the coursecatid's path
+        // The parentcatid must exist in the coursecatid's path.
         $parentcat = $DB->get_record('course_categories', ['id' => $parentcatid], '*', MUST_EXIST);
         $parentpath = $parentcat->path;
 
@@ -123,7 +124,7 @@ class regulation implements \local_gugrades\IRegulation {
             return $options;
         }
 
-        // Check if Nursing
+        // Check if Nursing.
         $nursingcat = get_config('local_gugrades', 'nursingcat');
         $cats = array_map('trim', explode(',', $nursingcat));
 
@@ -238,5 +239,4 @@ class regulation implements \local_gugrades\IRegulation {
             }
         }
     }
-
 }

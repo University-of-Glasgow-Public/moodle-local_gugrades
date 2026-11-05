@@ -35,6 +35,8 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
 
 /**
  * Test(s) for get_all_strings webservice
+ * @covers \local_gugrades\api
+ * @covers \local_gugrades\grades
  */
 final class check_integrity_test extends \local_gugrades\external\gugrades_advanced_testcase {
     /**
@@ -59,7 +61,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
     /**
      * Check creating an "exactly out of 22 grade" in the old regs
-     * and then swapping to the new. 
+     * and then swapping to the new.
      *
      * @covers \local_gugrades\external\check_integrity::execute
      */
@@ -100,9 +102,9 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
         // If we change the date to enforce new rules, the above import will be broken.
         $course->startdate = strtotime('2027-01-01');
-        $DB->update_record('course', $course);     
+        $DB->update_record('course', $course);
 
-        // Integrity check
+        // Integrity check.
         $errors = check_integrity::execute($this->course->id);
         $errors = external_api::clean_returnvalue(
             check_integrity::execute_returns(),
@@ -116,7 +118,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
     /**
      * Check creating an "exactly out of 22 grade" in the old regs
-     * and then swapping to the new. 
+     * and then swapping to the new.
      *
      * @covers \local_gugrades\external\check_integrity::execute
      */
@@ -155,11 +157,11 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
         $columns = $page['columns'];
         $this->assertTrue($columns[0]['points']);
 
-        // If we change the date to enforce old rules, the above import will still show as points. 
-        // This isn't a problem for import but could break somewhere else. 
+        // If we change the date to enforce old rules, the above import will still show as points.
+        // This isn't a problem for import but could break somewhere else.
         $course->startdate = strtotime('2026-01-01');
-        $DB->update_record('course', $course);    
-        
+        $DB->update_record('course', $course);
+
         // Get the capture page.
         $page = get_capture_page::execute($this->course->id, $this->gradeitemidassign22, '', '', 0, false);
         $page = external_api::clean_returnvalue(
@@ -167,7 +169,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
             $page
         );
 
-        // Integrity check
+        // Integrity check.
         $errors = check_integrity::execute($this->course->id);
         $errors = external_api::clean_returnvalue(
             check_integrity::execute_returns(),
@@ -180,7 +182,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
     /**
      * Check for any admin grades that are not permitted for current regs.
-     * 
+     *
      */
     public function test_invalid_admin_grades(): void {
         global $DB;
@@ -191,9 +193,9 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
         // Make sure course is using "old" regs.
         $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
         $course->startdate = strtotime('2026-01-01');
-        $DB->update_record('course', $course);     
-        
-        // Add an NS0 to gradeitemsecond1
+        $DB->update_record('course', $course);
+
+        // Add an NS0 to gradeitemsecond1.
         $nothing = write_additional_grade::execute(
             courseid: $this->course->id,
             gradeitemid: $this->gradeitemsecond1,
@@ -212,9 +214,9 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
         // If we change the date to enforce new rules, NS0 is not permitted.
         $course->startdate = strtotime('2027-01-01');
-        $DB->update_record('course', $course);   
+        $DB->update_record('course', $course);
 
-        // Integrity check
+        // Integrity check.
         $errors = check_integrity::execute($this->course->id);
         $errors = external_api::clean_returnvalue(
             check_integrity::execute_returns(),
@@ -237,9 +239,9 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
         // Make sure course is using "old" regs.
         $course = $DB->get_record('course', ['id' => $this->course->id], '*', MUST_EXIST);
         $course->startdate = strtotime('2026-01-01');
-        $DB->update_record('course', $course);     
-        
-        // Add grade 100 to gradeitemsecond1
+        $DB->update_record('course', $course);
+
+        // Add grade 100 to gradeitemsecond1.
         $nothing = write_additional_grade::execute(
             courseid: $this->course->id,
             gradeitemid: $this->gradeitemsecond1,
@@ -254,8 +256,8 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
         $nothing = external_api::clean_returnvalue(
             write_additional_grade::execute_returns(),
             $nothing
-        ); 
-        
+        );
+
         // Get the capture page.
         $page = get_capture_page::execute($this->course->id, $this->gradeitemsecond1, '', '', 0, false);
         $page = external_api::clean_returnvalue(
@@ -271,7 +273,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
         $grade->grademax = 50;
         $DB->update_record('grade_items', $grade);
 
-        // Integrity check
+        // Integrity check.
         $errors = check_integrity::execute($this->course->id);
         $errors = external_api::clean_returnvalue(
             check_integrity::execute_returns(),
@@ -281,11 +283,11 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
         $this->assertCount(1, $errors['erroritems']);
         $this->assertEquals('Second item 1', $errors['erroritems'][0]['itemname']);
 
-        // Put grade back
+        // Put grade back.
         $grade->grademax = 100;
         $DB->update_record('grade_items', $grade);
 
-        // Integrity check
+        // Integrity check.
         $errors = check_integrity::execute($this->course->id);
         $errors = external_api::clean_returnvalue(
             check_integrity::execute_returns(),
@@ -294,14 +296,14 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
         $this->assertCount(0, $errors['erroritems']);
 
-        // Change grade item to a scale
+        // Change grade item to a scale.
         $grade->gradetype = GRADE_TYPE_SCALE;
         $grade->grademax = 23.0;
         $grade->grademin = 1.0;
         $grade->scaleid = $this->scale->id;
         $DB->update_record('grade_items', $grade);
 
-        // Integrity check
+        // Integrity check.
         $errors = check_integrity::execute($this->course->id);
         $errors = external_api::clean_returnvalue(
             check_integrity::execute_returns(),
@@ -432,5 +434,4 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
             'resititemid' => $resititem->id,
         ];
     }
-
 }

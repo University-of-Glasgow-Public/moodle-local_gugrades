@@ -36,9 +36,9 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
 
 /**
  * Test(s) for resit web services
+ * @covers \local_gugrades\aggregation
  */
 final class mgu_1446_one_item_test extends \local_gugrades\external\gugrades_aggregation_testcase {
-
     /**
      * @var object $gradecatsummer
      */
@@ -107,16 +107,16 @@ final class mgu_1446_one_item_test extends \local_gugrades\external\gugrades_agg
         // Make Question 1 NS.
         $question1 = $this->get_gradeitemid('Question 1');
             $nothing = write_additional_grade::execute(
-            courseid:       $this->course->id,
-            gradeitemid:    $question1,
-            userid:         $this->student->id,
-            reason:         'SECOND',
-            other:          '',
-            admingrade:     'NOSUBMISSION',
-            scale:          0,
-            grade:          0,
-            notes:          'Test notes'
-        );
+                courseid:       $this->course->id,
+                gradeitemid:    $question1,
+                userid:         $this->student->id,
+                reason:         'SECOND',
+                other:          '',
+                admingrade:     'NOSUBMISSION',
+                scale:          0,
+                grade:          0,
+                notes:          'Test notes'
+            );
         $nothing = external_api::clean_returnvalue(
             write_additional_grade::execute_returns(),
             $nothing
@@ -132,5 +132,4 @@ final class mgu_1446_one_item_test extends \local_gugrades\external\gugrades_agg
         $fred = $page['users'][0];
         $this->assertEquals('NS', $fred['displaygrade']);
     }
-
 }

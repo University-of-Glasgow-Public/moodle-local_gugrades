@@ -17,7 +17,7 @@
 /**
  * Language EN
  *
- * @package    local_gugrades_regulations_original
+ * @package    regulations_original
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

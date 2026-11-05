@@ -39,7 +39,7 @@ class admingrades {
      * These are all the *possible* admingrades, not necessarily those
      * valid for the current regulations regime.
      * Code and description are defaults, they can be changed in the
-     * MyGrades settings page. 
+     * MyGrades settings page.
      * @return array
      */
     private static function defaults() {
@@ -90,7 +90,7 @@ class admingrades {
                 'default' => [
                     'code' => 'CNA',
                     'description' => get_string('admincan', 'local_gugrades'),
-                ]
+                ],
             ],
             'UNSATISFACTORY' => [
                 'name' => 'UNSATISFACTORY',
@@ -139,7 +139,7 @@ class admingrades {
                 'default' => [
                     'code' => 'CNY',
                     'description' => get_string('admincny', 'local_gugrades'),
-                ]
+                ],
             ],
             'CREDITAWARDED' => [
                 'default' => [
@@ -354,23 +354,6 @@ class admingrades {
             [$displaygrade, $description] = self::get_displaygrade_from_name($code);
             $admingrades[$displaygrade] = $code;
         }
-
-        /*
-        foreach ($defaults as $name => $default) {
-            // Has to be in items list.
-            if (!self::flag_set($default, 'items')) {
-                continue;
-            }
-
-            // If we're at level 1 then level2 items are not included.
-            if (($level == 1) && self::flag_set($default, 'level2')) {
-                continue;
-            }
-
-            [$displaygrade, ] = self::get_displaygrade_from_name($name);
-            $admingrades[$displaygrade] = $name;
-        }
-        */
 
         return $admingrades;
     }

@@ -50,7 +50,7 @@ class get_gradetypes extends external_api {
      * Execute function
      * @param int $courseid
      * @param int $gradeitemid
-    * @param bool $first Include the first-attempt grade type.
+     * @param bool $first Include the first-attempt grade type.
      * @return array
      */
     public static function execute($courseid, $gradeitemid, $first = false) {

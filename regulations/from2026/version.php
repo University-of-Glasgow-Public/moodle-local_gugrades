@@ -17,7 +17,7 @@
 /**
  * Version file for from2026 subplugin
  *
- * @package    local_gugrades
+ * @package    regulations_from2026
  * @copyright  2026
  * @author     Howard Miller
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
