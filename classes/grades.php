@@ -935,8 +935,9 @@ class grades {
 
         // If this is CATEGORY and there's a corresponding 'catoverride' record then we don't
         // attempt to write anything new.
-        if ($gradetype == 'CATEGORY') {
-            $params = ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'columnid' => $column->id, 'catoverride' => 1];
+        if ($gradetype == 'CATEGORY' && !$catoverride) {
+            $params = ['gradeitemid' => $gradeitemid, 'userid' => $userid, 'columnid' => $column->id,
+                'catoverride' => 1, 'iscurrent' => 1];
             if ($DB->record_exists('local_gugrades_grade', $params)) {
                 return;
             }
@@ -973,6 +974,7 @@ class grades {
                     // It's not current any more.
                     $oldgrade->iscurrent = false;
                     $DB->update_record('local_gugrades_grade', $oldgrade);
+                    self::save_grade_backup($oldgrade);
                 }
             }
         }
@@ -1216,10 +1218,8 @@ class grades {
     }
 
     /**
-     * Store the current actual grade in local_gugrades_gradesbackup.
-     * One row is kept for each grade item, user and column. History and audit
-     * comments stay in local_gugrades_grade. This copy is left in place when
-     * grades are reset, so the last values can be restored.
+    * Store an actual grade revision and its audit details in local_gugrades_gradesbackup.
+    * Copies are retained when grades are reset.
      *
      * @param object $grade Grade row just written to local_gugrades_grade
      * @param string|null $other Column description. Looked up from the column when omitted.
@@ -1227,19 +1227,25 @@ class grades {
     public static function save_grade_backup(object $grade, ?string $other = null): void {
         global $DB;
 
-        if (empty($grade->id) || empty($grade->iscurrent)) {
+        if (empty($grade->id)) {
             return;
         }
 
-        $params = [
-            'gradeitemid' => $grade->gradeitemid,
-            'userid' => $grade->userid,
-            'columnid' => $grade->columnid,
-        ];
-        if (!self::is_backup_grade($grade)) {
-            $DB->delete_records('local_gugrades_gradesbackup', $params);
-            return;
+        $params = ['gradeid' => $grade->id];
+        if (!empty($grade->iscurrent)) {
+            $DB->set_field_select('local_gugrades_gradesbackup', 'iscurrent', 0,
+                'gradeitemid = :gradeitemid AND userid = :userid AND columnid = :columnid AND gradeid <> :gradeid', [
+                    'gradeitemid' => $grade->gradeitemid,
+                    'userid' => $grade->userid,
+                    'columnid' => $grade->columnid,
+                    'gradeid' => $grade->id,
+                ]);
         }
+
+            if (!self::is_backup_grade($grade)) {
+                $DB->delete_records('local_gugrades_gradesbackup', $params);
+                return;
+            }
 
         if ($other === null) {
             $column = $DB->get_record('local_gugrades_column', ['id' => $grade->columnid], 'id, other');
@@ -1263,6 +1269,10 @@ class grades {
             'catoverride' => empty($grade->catoverride) ? 0 : 1,
             'capped' => empty($grade->capped) ? 0 : 1,
             'engcapped' => empty($grade->engcapped) ? 0 : 1,
+            'iscurrent' => empty($grade->iscurrent) ? 0 : 1,
+            'auditby' => $grade->auditby ?? 0,
+            'audittimecreated' => $grade->audittimecreated ?? 0,
+            'auditcomment' => $grade->auditcomment ?? '',
             'gradeid' => $grade->id,
             'timemodified' => time(),
         ];
@@ -1276,7 +1286,7 @@ class grades {
     }
 
     /**
-     * Queue a background copy of existing current grades into the backup table.
+    * Queue a background copy of existing grades and history into the backup table.
      * Each cron run copies one batch, then schedules the next batch.
      */
     public static function queue_grade_backup_backfill(): void {
@@ -1294,9 +1304,9 @@ class grades {
     }
 
     /**
-     * Copy the next batch of current grades into the backup table.
+    * Copy the next batch of grades and history into the backup table.
      *
-     * @param int $batchsize Maximum number of current grades to read
+    * @param int $batchsize Maximum number of grade revisions to read
      * @return bool True when further grades remain
      */
     public static function backfill_grade_backups(int $batchsize): bool {
@@ -1305,7 +1315,7 @@ class grades {
         $lastid = (int) get_config('local_gugrades', 'gradesbackup_backfill_id');
         $grades = $DB->get_records_select(
             'local_gugrades_grade',
-            'iscurrent = 1 AND id > :lastid',
+            'id > :lastid',
             ['lastid' => $lastid],
             'id ASC',
             '*',
@@ -1329,7 +1339,7 @@ class grades {
     }
 
     /**
-     * Copy current grades until the time limit is reached or none remain.
+    * Copy grades and history until the time limit is reached or none remain.
      * A finished copy is left unchanged.
      *
      * @param int $batchsize Maximum number of current grades to read in one query
@@ -1364,7 +1374,7 @@ class grades {
     }
 
     /**
-     * Copy current grades into the backup table.
+    * Copy grades and history into the backup table.
      * Used after a course restore. Site-wide upgrades use the background backfill.
      *
      * @param int|null $courseid Restrict to one course, or all courses when null
@@ -1376,10 +1386,10 @@ class grades {
 
         if ($courseid) {
             $DB->delete_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
-            $grades = $DB->get_recordset('local_gugrades_grade', ['courseid' => $courseid, 'iscurrent' => 1], 'id ASC');
+            $grades = $DB->get_recordset('local_gugrades_grade', ['courseid' => $courseid], 'id ASC');
         } else {
             $DB->delete_records('local_gugrades_gradesbackup');
-            $grades = $DB->get_recordset('local_gugrades_grade', ['iscurrent' => 1], 'id ASC');
+            $grades = $DB->get_recordset('local_gugrades_grade', null, 'id ASC');
         }
 
         foreach ($grades as $grade) {
@@ -1400,10 +1410,33 @@ class grades {
 
         self::restore_missing_column_backups($courseid);
 
-        $values = $DB->get_records('local_gugrades_gradesbackup', ['courseid' => $courseid]);
+        if (!has_capability('local/gugrades:editgrades', \context_course::instance($courseid))) {
+            return 0;
+        }
+
+        $values = $DB->get_records('local_gugrades_gradesbackup', ['courseid' => $courseid],
+            'iscurrent ASC, audittimecreated ASC, id ASC');
         $restored = 0;
         foreach ($values as $value) {
             if (!$DB->record_exists('grade_items', ['id' => $value->gradeitemid, 'courseid' => $courseid])) {
+                continue;
+            }
+            if (!$value->iscurrent) {
+                if ($value->gradeid && $DB->record_exists('local_gugrades_grade', [
+                    'id' => $value->gradeid, 'courseid' => $courseid,
+                ])) {
+                    continue;
+                }
+                $column = self::get_column($courseid, $value->gradeitemid, $value->gradetype,
+                    $value->other ?? '', (bool) $value->points);
+                $grade = clone $value;
+                unset($grade->id, $grade->gradeid, $grade->other, $grade->timemodified);
+                $grade->columnid = $column->id;
+                $grade->id = $DB->insert_record('local_gugrades_grade', $grade);
+                $value->gradeid = $grade->id;
+                $value->columnid = $column->id;
+                $DB->update_record('local_gugrades_gradesbackup', $value);
+                $restored++;
                 continue;
             }
             if ($DB->record_exists('local_gugrades_grade', [
@@ -1449,10 +1482,7 @@ class grades {
             );
             $restored++;
 
-            // The old column was removed, so drop the value row that still points at it.
-            if (!$DB->record_exists('local_gugrades_column', ['id' => $value->columnid])) {
-                $DB->delete_records('local_gugrades_gradesbackup', ['id' => $value->id]);
-            }
+            $DB->delete_records('local_gugrades_gradesbackup', ['id' => $value->id]);
         }
 
         return $restored;

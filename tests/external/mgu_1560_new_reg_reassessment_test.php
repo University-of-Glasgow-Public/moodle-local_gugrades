@@ -107,7 +107,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         $this->assertFalse($fields[$firstitemid]['dualgrades']);
         $this->assertFalse($fields[$firstitemid]['isreassessment']);
         $this->assertNull($fields[$firstitemid]['releasegrade1st']);
-        $this->assertEquals('B2', $fields[$firstitemid]['releasegrade']->displaygrade);
+        $this->assertEquals('B2:16', $fields[$firstitemid]['releasegrade']->displaygrade);
         $first = $DB->get_record('local_gugrades_grade', [
             'gradeitemid' => $summeritemid,
             'userid' => $this->student->id,

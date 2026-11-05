@@ -25,7 +25,7 @@
 namespace local_gugrades\task;
 
 /**
- * Copy current grades into local_gugrades_gradesbackup in small batches.
+ * Copy grades and history into local_gugrades_gradesbackup in small batches.
  */
 class gradesbackup extends \core\task\adhoc_task {
     /** @var int Current grades read on each run. */

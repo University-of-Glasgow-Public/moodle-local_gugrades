@@ -718,5 +718,39 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026102700, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026110500) {
+        $table = new xmldb_table('local_gugrades_gradesbackup');
+        $fields = [
+            new xmldb_field('iscurrent', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1'),
+            new xmldb_field('auditby', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0'),
+            new xmldb_field('audittimecreated', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0'),
+            new xmldb_field('auditcomment', XMLDB_TYPE_TEXT),
+        ];
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        $oldindex = new xmldb_index('gugradesbak_giusco', XMLDB_INDEX_UNIQUE, ['gradeitemid', 'userid', 'columnid']);
+        if ($dbman->index_exists($table, $oldindex)) {
+            $dbman->drop_index($table, $oldindex);
+        }
+        $index = new xmldb_index('gugradesbak_giusco', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid', 'userid', 'columnid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $field = new xmldb_field('gradeid', XMLDB_TYPE_INTEGER, '11', null, null);
+        $dbman->change_field_notnull($table, $field);
+        $DB->set_field('local_gugrades_gradesbackup', 'gradeid', null, ['gradeid' => 0]);
+        $index = new xmldb_index('gugradesbak_gra', XMLDB_INDEX_UNIQUE, ['gradeid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        set_config('gradesbackup_backfill_id', 0, 'local_gugrades');
+        set_config('gradesbackup_backfill', 'running', 'local_gugrades');
+        \local_gugrades\grades::queue_grade_backup_backfill();
+        upgrade_plugin_savepoint(true, 2026110500, 'local', 'gugrades');
+    }
+
     return true;
 }

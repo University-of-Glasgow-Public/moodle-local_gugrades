@@ -105,7 +105,7 @@ final class gradesbackup_test extends \advanced_testcase {
     }
 
     /**
-     * Saving a grade copies the actual value, and a later save replaces that copy.
+    * Saving a grade retains earlier revisions and marks only the latest current.
      *
      * @covers \local_gugrades\grades::write_grade
      * @covers \local_gugrades\grades::save_grade_backup
@@ -119,12 +119,13 @@ final class gradesbackup_test extends \advanced_testcase {
         $this->write_grade($course->id, $gradeitem->id, $student->id, 'SECOND', 'NS', null, 'NOSUBMISSION');
 
         $values = $DB->get_records('local_gugrades_gradesbackup', ['gradeitemid' => $gradeitem->id], 'gradetype');
-        $this->assertCount(2, $values);
+        $this->assertCount(3, $values);
 
         $first = $DB->get_record('local_gugrades_gradesbackup', [
             'gradeitemid' => $gradeitem->id,
             'userid' => $student->id,
             'gradetype' => 'FIRST',
+            'iscurrent' => 1,
         ], '*', MUST_EXIST);
         $current = $DB->get_record('local_gugrades_grade', [
             'gradeitemid' => $gradeitem->id,
@@ -143,6 +144,13 @@ final class gradesbackup_test extends \advanced_testcase {
             'gradetype' => 'FIRST',
         ]);
         $this->assertSame(2, $history);
+        $previous = $DB->get_record('local_gugrades_gradesbackup', [
+            'gradeitemid' => $gradeitem->id,
+            'gradetype' => 'FIRST',
+            'iscurrent' => 0,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(40.0, (float) $previous->rawgrade);
+        $this->assertSame('Captured', $previous->auditcomment);
 
         $second = $DB->get_record('local_gugrades_gradesbackup', [
             'gradeitemid' => $gradeitem->id,
@@ -248,6 +256,39 @@ final class gradesbackup_test extends \advanced_testcase {
     }
 
     /**
+     * Recovery retains history without promoting it or duplicating it on later runs.
+     *
+     * @covers \local_gugrades\grades::restore_missing_grade_backups
+     */
+    public function test_restore_preserves_history_and_current_grade(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '11', 11);
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '22', 22);
+        $previous = $DB->get_record('local_gugrades_grade', [
+            'courseid' => $course->id, 'iscurrent' => 0,
+        ], '*', MUST_EXIST);
+        $DB->delete_records('local_gugrades_grade', ['courseid' => $course->id]);
+        $DB->delete_records('local_gugrades_latest', ['courseid' => $course->id]);
+
+        $this->assertSame(2, grades::restore_missing_grade_backups($course->id));
+        $historical = $DB->get_record('local_gugrades_grade', [
+            'courseid' => $course->id, 'iscurrent' => 0,
+        ], '*', MUST_EXIST);
+        $current = $DB->get_record('local_gugrades_grade', [
+            'courseid' => $course->id, 'iscurrent' => 1,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(11.0, (float) $historical->rawgrade);
+        $this->assertEquals($previous->auditby, $historical->auditby);
+        $this->assertEquals($previous->audittimecreated, $historical->audittimecreated);
+        $this->assertSame($previous->auditcomment, $historical->auditcomment);
+        $this->assertEquals(22.0, (float) $current->rawgrade);
+        $this->assertSame(0, grades::restore_missing_grade_backups($course->id));
+        $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup', ['courseid' => $course->id]));
+    }
+
+    /**
      * A MyGrades reset clears the main grades and keeps the value copy for recovery.
      *
      * @covers \local_gugrades\api::reset
@@ -346,7 +387,7 @@ final class gradesbackup_test extends \advanced_testcase {
     }
 
     /**
-     * Status messages are not copied, and they replace an earlier backup for that column.
+    * Status messages are not copied, but earlier actual grades remain as history.
      *
      * @covers \local_gugrades\grades::is_backup_grade
      * @covers \local_gugrades\grades::save_grade_backup
@@ -398,21 +439,63 @@ final class gradesbackup_test extends \advanced_testcase {
             -1,
         );
 
-        $this->assertSame(0, $DB->count_records('local_gugrades_gradesbackup', ['gradeitemid' => $gradeitem->id]));
+        $this->assertSame(1, $DB->count_records('local_gugrades_gradesbackup', ['gradeitemid' => $gradeitem->id]));
+        $history = $DB->get_record('local_gugrades_gradesbackup', [
+            'gradeitemid' => $gradeitem->id,
+            'gradetype' => 'FIRST',
+            'iscurrent' => 0,
+        ], '*', MUST_EXIST);
+        $this->assertEquals(40.0, (float) $history->rawgrade);
 
         $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '0', 0);
         $zero = $DB->get_record('local_gugrades_gradesbackup', [
             'gradeitemid' => $gradeitem->id,
             'gradetype' => 'FIRST',
+            'iscurrent' => 1,
         ], '*', MUST_EXIST);
         $this->assertEquals(0.0, (float) $zero->rawgrade);
+        $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup', ['gradeitemid' => $gradeitem->id]));
+    }
+
+    /**
+    * Existing history and current values are copied a batch at a time.
+     *
+     * @covers \local_gugrades\grades::backfill_grade_backups
+     * @covers \local_gugrades\task\gradesbackup
+     */
+    public function test_backfill_preserves_grade_history(): void {
+        global $DB;
+
+        [$course, $student, $gradeitem] = $this->course_with_item();
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '11', 11);
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '22', 22);
+        $DB->delete_records('local_gugrades_gradesbackup');
+        unset_config('gradesbackup_backfill_id', 'local_gugrades');
+
+        while (grades::backfill_grade_backups(1)) {
+        }
+
+        $history = $DB->get_records('local_gugrades_grade', ['courseid' => $course->id], 'id ASC');
+        $this->assertCount(2, $history);
+        $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup', ['courseid' => $course->id]));
+        foreach ($history as $grade) {
+            $backup = $DB->get_record('local_gugrades_gradesbackup', ['gradeid' => $grade->id], '*', MUST_EXIST);
+            $this->assertEquals($grade->iscurrent, $backup->iscurrent);
+            $this->assertEquals($grade->rawgrade, $backup->rawgrade);
+            $this->assertEquals($grade->auditby, $backup->auditby);
+            $this->assertEquals($grade->audittimecreated, $backup->audittimecreated);
+            $this->assertSame($grade->auditcomment, $backup->auditcomment);
+        }
+        unset_config('gradesbackup_backfill_id', 'local_gugrades');
+        while (grades::backfill_grade_backups(1)) {
+        }
+        $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup', ['courseid' => $course->id]));
     }
 
     /**
      * Existing grades are copied a batch at a time, and status messages are skipped.
      *
      * @covers \local_gugrades\grades::backfill_grade_backups
-     * @covers \local_gugrades\task\gradesbackup
      */
     public function test_backfill_copies_existing_grades_in_batches(): void {
         global $DB;
@@ -631,6 +714,7 @@ final class gradesbackup_test extends \advanced_testcase {
         $this->setAdminUser();
         [$course, $student, $gradeitem] = $this->course_with_item();
         $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '21', 21);
+        $this->write_grade($course->id, $gradeitem->id, $student->id, 'FIRST', '24', 24);
 
         $DB->delete_records('local_gugrades_grade', ['courseid' => $course->id]);
         $DB->delete_records('local_gugrades_column', ['courseid' => $course->id]);
@@ -689,6 +773,9 @@ final class gradesbackup_test extends \advanced_testcase {
             'courseid' => $newcourseid,
             'gradetype' => 'FIRST',
         ]));
+        $this->assertEquals(0, $restored->iscurrent);
+        $this->assertSame('Captured', $restored->auditcomment);
+        $this->assertSame(2, $DB->count_records('local_gugrades_gradesbackup', ['courseid' => $newcourseid]));
         $this->assertSame(0, $DB->count_records('local_gugrades_grade', ['courseid' => $newcourseid]));
     }
 }

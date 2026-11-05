@@ -347,7 +347,9 @@ class restore_local_gugrades_plugin extends restore_local_plugin {
             return;
         }
         $gradeid = $this->get_mappingid('gugrades_grade', $data->gradeid);
-        $data->gradeid = $gradeid ?: 0;
+        $data->gradeid = $gradeid ?: null;
+        $data->iscurrent = $data->iscurrent ?? 1;
+        $data->auditby = $this->get_mappingid('user', $data->auditby ?? 0) ?: 0;
 
         $DB->insert_record('local_gugrades_gradesbackup', $data);
         $this->mark_backup_tables_included();

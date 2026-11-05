@@ -403,7 +403,7 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         );
         $this->assertEquals('BIOL_1001_UPAS_2026-27_Lab_A', $data['filename']);
 
-        // Override the award. Initial grade should remain the first attempt.
+        // Without reassessment, the course-total first attempt mirrors the overridden award.
         $itemid = $this->get_gradeitemid_for_category('Summative');
         $nothing = write_additional_grade::execute(
             courseid:       $this->course->id,
@@ -421,7 +421,7 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
             $nothing
         );
 
-        // Get CSV data: initial remains first attempt, current is the award.
+        // Get CSV data: both results mirror the overridden total.
         $data = get_aggregation_export_data::execute($courseid, $categoryid, 0, 'upas', []);
         $data = external_api::clean_returnvalue(
             get_aggregation_export_data::execute_returns(),
@@ -429,7 +429,7 @@ final class aggregation_export_test extends \local_gugrades\external\gugrades_ag
         );
 
         $expected = '"Student Number","Last Name","First Name","Subject","Catalog Nbr","Descr Course Name","First Attempt Grade","Award Grade"
-"1234567","Bloggs","Fred","BIOL","1001","Biology 1","D1","EC"
+"1234567","Bloggs","Fred","BIOL","1001","Biology 1","EC","EC"
 "1234560","Perez","Juan","BIOL","1001","Biology 1","",""
 ';
         $this->assertEquals($expected, $data['csv']);

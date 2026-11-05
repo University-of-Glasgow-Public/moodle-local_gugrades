@@ -232,11 +232,16 @@ class backup_local_gugrades_plugin extends backup_local_plugin {
                     'catoverride',
                     'capped',
                     'engcapped',
+                    'iscurrent',
+                    'auditby',
+                    'audittimecreated',
+                    'auditcomment',
                     'gradeid',
                     'timemodified',
                 ]
             );
             $gradebackup->annotate_ids('user', 'userid');
+            $gradebackup->annotate_ids('user', 'auditby');
             $gradebackups->add_child($gradebackup);
             $gradebackup->set_source_table('local_gugrades_gradesbackup', ['courseid' => backup::VAR_COURSEID]);
             $gugrades->add_child($gradebackups);

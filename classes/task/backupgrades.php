@@ -25,7 +25,7 @@
 namespace local_gugrades\task;
 
 /**
- * Copy current grades into the backup table.
+ * Copy grades and history into the backup table.
  * Listed under Site administration > Server > Tasks > Scheduled tasks.
  */
 class backupgrades extends \core\task\scheduled_task {
