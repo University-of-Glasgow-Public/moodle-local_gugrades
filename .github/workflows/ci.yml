@@ -92,7 +92,8 @@ jobs:
 
       - name: Behat features
         id: behat
-        if: ${{ !cancelled() }}
+        # Temporarily disable Moodle 5.1 Behat; Moodle 4.5 runs in behat.yml.
+        if: ${{ false }}
         run: moodle-plugin-ci behat --profile firefox
 
       - name: Upload Behat Faildump
