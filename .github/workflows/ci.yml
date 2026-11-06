@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         php: ['8.3']
-        moodle-branch: ['MOODLE_501_STABLE']
+        moodle-branch: ['MOODLE_405_STABLE']
         database: [mariadb]
 
     steps:
@@ -92,7 +92,7 @@ jobs:
 
       - name: Behat features
         id: behat
-        # Temporarily disable Moodle 5.1 Behat; Moodle 4.5 runs in behat.yml.
+        # Behat runs in the dedicated Moodle 4.5 workflow, behat.yml.
         if: ${{ false }}
         run: moodle-plugin-ci behat --profile firefox
 
