@@ -121,15 +121,15 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
     }
 
     /**
-     * Weighted-mean column labels display normalized coefficients.
+     * Weighted-mean columns retain the configured gradebook coefficients.
      */
-    public function test_weighted_mean_column_weights_are_normalized(): void {
+    public function test_weighted_mean_column_weights_preserve_coefficients(): void {
         $categoryid = $this->get_grade_category('Summer exam');
         [$columns] = \local_gugrades\aggregation::get_columns($this->course->id, $categoryid);
 
         $this->assertCount(3, $columns);
         foreach ($columns as $column) {
-            $this->assertEquals(33.333, $column->weight);
+            $this->assertEquals(100, $column->weight);
         }
     }
 

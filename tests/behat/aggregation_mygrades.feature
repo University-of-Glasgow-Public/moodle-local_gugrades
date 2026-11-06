@@ -8,7 +8,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
         | Student MyGrades  | core_course | course | 0      |
     And the following "courses" exist:
         | fullname | shortname | format | Course start date     | id |
-        | Course 1 | C1        | topics | 16 July 2026 00 00   | 2 |
+            | Course 1 | C1        | topics | 16 July 2026 00:00   | 2 |
     And the following "users" exist:
         | username | firstname | lastname | email |
         | teacher1 | Teacher | 1 | teacher1@example.com |
@@ -73,7 +73,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "B1"
-    And I wait until "//span[normalize-space(.)='33.333%']" "xpath_element" exists
+    And I wait until "//td[contains(., '33.333%')]" "xpath_element" exists
     And I should see "33.333%"
     And I should see "Grades missing" in the total cell
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
@@ -87,7 +87,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "C1"
-    And I wait until "//span[normalize-space(.)='66.667%']" "xpath_element" exists
+    And I wait until "//td[contains(., '66.667%')]" "xpath_element" exists
     And I should see "66.667%"
     And I should see "Grades missing" in the total cell
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
@@ -101,7 +101,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "B3"
-    And I wait until "//span[normalize-space(.)='100%']" "xpath_element" exists
+    And I wait until "//td[contains(., '100%')]" "xpath_element" exists
     And I should see "100%"
     Then I should see "B3 (15.33333)" in the total cell
   Scenario: IS Overrides Total
@@ -119,7 +119,7 @@ Feature: Testing aggregation_mygrades in local_gugrades
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists
     And I click on "//div[@id='tabmenu']//*[@role='tab' and contains(., 'Course grade aggregation')]" "xpath_element"
     Then I should see "B1"
-    And I wait until "//span[normalize-space(.)='33.333%']" "xpath_element" exists
+    And I wait until "//td[contains(., '33.333%')]" "xpath_element" exists
     And I should see "33.333%"
     And I should see "Grades missing" in the total cell
     And I wait until "//div[@id='tabmenu']" "xpath_element" exists

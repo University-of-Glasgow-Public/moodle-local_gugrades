@@ -206,6 +206,7 @@
      */
     const tablecolumns = computed(() => {
         const cols = [];
+        const totalweight = columns.value.reduce((total, column) => total + Math.max(0, column.weight), 0);
 
         // First initial (column hidden)
         cols.push(columnHelper.accessor('firstinitial', {
@@ -265,7 +266,10 @@
                 id: 'GROUP_' + column.fieldname,
                 header: (context) => {
                     return h(AggregationTableHeader, {
-                        column: column,
+                        column: showweights.value && totalweight > 0 ? {
+                            ...column,
+                            weight: Math.round(Math.max(0, column.weight) * 100000 / totalweight) / 1000,
+                        } : column,
                         headercontext: context,
                         showweights: showweights.value,
                         onExpandclicked: () => expand_clicked(column.categoryid),
