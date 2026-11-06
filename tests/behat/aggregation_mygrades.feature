@@ -62,6 +62,8 @@ Feature: Testing aggregation_mygrades in local_gugrades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades" in current page administration
+        And I wait until "captureselect" "region" exists
+        And I wait until ".vm-wrapper" "css_element" does not exist
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
@@ -103,6 +105,8 @@ Feature: Testing aggregation_mygrades in local_gugrades
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I navigate to "MyGrades" in current page administration
+        And I wait until "captureselect" "region" exists
+        And I wait until ".vm-wrapper" "css_element" does not exist
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
