@@ -31,6 +31,27 @@ jobs:
         with:
           path: plugin
 
+      - name: Check out required Glasgow plugins
+        uses: actions/checkout@v4
+        with:
+          repository: University-of-Glasgow-Public/moodle
+          ref: 4dec2bddc56908b9def98b376cb860b61428d8cc
+          path: dependency-source
+          persist-credentials: false
+          sparse-checkout: |
+            enrol/gudatabase
+            local/guldap
+            local/guprivacy
+            report/guid
+
+      - name: Prepare required plugins
+        run: |
+          mkdir -p ci-plugins
+          cp -R dependency-source/enrol/gudatabase ci-plugins/enrol_gudatabase
+          cp -R dependency-source/local/guldap ci-plugins/local_guldap
+          cp -R dependency-source/local/guprivacy ci-plugins/local_guprivacy
+          cp -R dependency-source/report/guid ci-plugins/report_guid
+
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
@@ -50,7 +71,7 @@ jobs:
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
 
       - name: Install moodle-plugin-ci
-        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        run: moodle-plugin-ci install --plugin ./plugin --extra-plugins ./ci-plugins --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
