@@ -255,6 +255,20 @@ class aggregation {
             ];
         }
 
+        // Weighted mean coefficients are relative; show each column's normalized share.
+        if (self::show_weights($gradecategoryid)) {
+            $weightsum = array_sum(array_map(fn($column) => max(0, (float) $column->weight), $columns));
+            if ($weightsum > 0) {
+                foreach ($columns as $column) {
+                    $column->weight = round(
+                        max(0, (float) $column->weight) * 100 / $weightsum,
+                        3,
+                        PHP_ROUND_HALF_DOWN,
+                    );
+                }
+            }
+        }
+
         // Get aggregation type for these columns (i.e. this grade category).
         [$atype, $warnings] = self::get_aggregation_type($columns, $gradecategoryid);
 

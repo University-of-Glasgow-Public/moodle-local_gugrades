@@ -49,7 +49,7 @@ Feature: Testing import_grades_mygrades in local_gugrades
     And I wait until ".vm-wrapper" "css_element" does not exist
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
-    And I wait until "input[name='importfillns'][value='fillns']:checked" "css_element" exists
+    And I wait until "input[type='radio'][value='fillns']:checked" "css_element" exists
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     Then I should see "A4"
