@@ -7,7 +7,7 @@ Feature: Testing import_grades_mygrades in local_gugrades
         | name              | component   | area   | itemid |
         | Student MyGrades  | core_course | course | 0      |
     And the following "courses" exist:
-        | fullname | shortname | format | Course start date     | id |
+        | fullname | shortname | format | startdate             | id |
             | Course 1 | C1        | topics | 16 April 2025 00:00   | 2 |
     And the following "users" exist:
         | username | firstname | lastname | email |
