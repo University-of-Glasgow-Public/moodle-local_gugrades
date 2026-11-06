@@ -49,6 +49,7 @@ Feature: Testing import_grades_mygrades in local_gugrades
     And I wait until ".vm-wrapper" "css_element" does not exist
     And I click on "Test assignment 1" "link" in the "captureselect" "region"
     And I click on "Import grades" "button"
+    And I wait until "//input[@name='importfillns' and @value='fillns']" "xpath_element" exists
     And the field "importfillns" matches value "fillns"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
     And I click on "Import grades" "button" in the ".vm-content" "css_element"
