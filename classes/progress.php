@@ -94,11 +94,8 @@ class progress {
         $cache = \cache::make('local_gugrades', 'progress');
         $tag = self::get_tag($courseid, $uniqueid, $progresstype, $staffuserid);
 
-        if ($progress = $cache->get($tag)) {
-            return $progress;
-        } else {
-            return -1;
-        }
+        $progress = $cache->get($tag);
+        return $progress === false ? -1 : (int) $progress;
     }
 
     /**

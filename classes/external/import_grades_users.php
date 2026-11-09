@@ -92,7 +92,7 @@ class import_grades_users extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        set_time_limit(0);
+        \local_gugrades\api::more_time();
 
         // If already converted then import is not permitted.
         if (\local_gugrades\conversion::is_conversion_applied($courseid, $gradeitemid)) {
@@ -107,9 +107,12 @@ class import_grades_users extends external_api {
         $userids = $userlist;
         $importcount = 0;
         $importeduserids = [];
+        $usercount = count($userids);
+        $importprogressrange = $dryrun ? 100 : 50;
 
-        // Track progress.
+        // Track importing as the first half of a real import, or all of a dry run.
         $count = 0;
+        \local_gugrades\progress::initialise($courseid, 0, 'import');
 
         foreach ($userids as $userid) {
             if (
@@ -133,13 +136,24 @@ class import_grades_users extends external_api {
 
             // Record progress.
             $count++;
-            $progress = 100 * $count / count($userids);
+            $progress = $usercount ? $importprogressrange * $count / $usercount : 100;
             \local_gugrades\progress::record($courseid, 0, 'import', intval($progress));
         }
 
-        // Aggregate everything.
-        $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
-        \local_gugrades\aggregation::aggregate($courseid, $gradecategoryid, $userids);
+        // Dry runs only count potential imports; they must not rewrite course totals.
+        if (!$dryrun && $importeduserids) {
+            $gradecategoryid = \local_gugrades\grades::get_gradecategoryid_from_gradeitemid($gradeitemid);
+            \local_gugrades\aggregation::aggregate(
+                $courseid,
+                $gradecategoryid,
+                $importeduserids,
+                'import',
+                50,
+                50,
+            );
+        }
+
+        \local_gugrades\progress::terminate($courseid, 0, 'import');
 
         // Log.
         if (!$dryrun) {

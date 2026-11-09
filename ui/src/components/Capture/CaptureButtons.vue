@@ -6,7 +6,7 @@
         <AddMultipleButton :enable="caneditgrades" :disabledReason="cannotEditReason" :itemid="props.itemid"  @openmultiple="multipleclicked"></AddMultipleButton>
         <ReleaseButton :enable="props.gradesimported && caneditgrades" :disabledReason="releaseDisabledReason" :gradeitemid="props.itemid" :groupid="props.groupid" :released="props.released" @released="emit('refreshtable')"></ReleaseButton>
         <ViewFullNamesButton v-if="props.usershidden" :revealnames="props.revealnames" @viewfullnames="viewfullnames"></ViewFullNamesButton>
-        <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" @converted="emit('refreshtable')"></ConversionButton>
+        <ConversionButton v-if="props.showconversion && caneditgrades" :itemid="props.itemid" :staffuserid="props.staffuserid" @converted="emit('refreshtable')"></ConversionButton>
         <ExportCaptureButton :itemid="props.itemid" :groupid="props.groupid" :itemname="props.itemname" :revealnames="revealnames"></ExportCaptureButton>
         <ResetAssessmentButton v-if="caneditgrades" :itemid="props.itemid" @reset="emit('refreshtable')"></ResetAssessmentButton>
         <NameFilterButton :usershidden="props.usershidden && !props.revealnames"></NameFilterButton>

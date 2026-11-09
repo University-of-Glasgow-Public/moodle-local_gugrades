@@ -7,7 +7,7 @@
 
     <VueModal v-model="showselectmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings['conversionselect']">
 
-        <PleaseWait v-if="waiting"></PleaseWait>
+        <PleaseWait v-if="waiting" progresstype="conversion" :staffuserid="props.staffuserid"></PleaseWait>
 
         <div v-if="showdiscrepancy">
             <UAlert variant="warning" class="mb-3">{{ mstrings['conversiondiscrepancywarning'] }}</UAlert>
@@ -131,6 +131,7 @@
 
     const props = defineProps<{
         itemid: number;
+        staffuserid?: number;
     }>();
 
     const emits = defineEmits(['converted']);

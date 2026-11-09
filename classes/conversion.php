@@ -438,6 +438,20 @@ class conversion {
         // Also set any grades that have been added since (i.e. any grades
         // with points == 1) to not current.
         if ($mapid == 0) {
+            $capturegradeitemid = $gradeitemid;
+            $converteduserids = [];
+            if ($capturegradeitemid) {
+                \local_gugrades\progress::initialise($courseid, 0, 'conversion');
+                $converteduserids = $DB->get_fieldset_sql(
+                    "SELECT DISTINCT userid
+                       FROM {local_gugrades_grade}
+                      WHERE courseid = :courseid
+                        AND gradeitemid = :gradeitemid
+                        AND gradetype = 'CONVERTED'
+                        AND iscurrent = 1",
+                    ['courseid' => $courseid, 'gradeitemid' => $capturegradeitemid],
+                );
+            }
             $DB->delete_records('local_gugrades_map_item', $params);
 
             // If category, remove any overridden grades.
@@ -496,9 +510,15 @@ class conversion {
                 \local_gugrades\api::recalculate($courseid, $gradecategoryid);
             } else if ($gradeitemid) {
                 $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
-                if ($gradeitem->categoryid) {
-                    \local_gugrades\api::recalculate($courseid, $gradeitem->categoryid);
+                if ($gradeitem->categoryid && $converteduserids) {
+                    \local_gugrades\aggregation::aggregate(
+                        $courseid,
+                        $gradeitem->categoryid,
+                        array_map('intval', $converteduserids),
+                        'conversion',
+                    );
                 }
+                \local_gugrades\progress::terminate($courseid, 0, 'conversion');
             }
 
             return;
@@ -532,11 +552,22 @@ class conversion {
         }
 
         if ($gradeitemid) {
-            self::apply_capture_conversion($courseid, $gradeitemid, $mapinfo);
+            $converteduserids = self::apply_capture_conversion($courseid, $gradeitemid, $mapinfo);
 
-            // Get the containing gradecategory for aggregation recalc.
             $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
-            \local_gugrades\api::recalculate($courseid, $gradeitem->categoryid);
+            if ($gradeitem->categoryid && $converteduserids) {
+                \local_gugrades\aggregation::aggregate(
+                    $courseid,
+                    $gradeitem->categoryid,
+                    $converteduserids,
+                    'conversion',
+                    50,
+                    50,
+                );
+            } else {
+                \local_gugrades\progress::record($courseid, 0, 'conversion', 100);
+            }
+            \local_gugrades\progress::terminate($courseid, 0, 'conversion');
         } else {
             // Recalculate everything :(.
             \local_gugrades\api::recalculate($courseid, $gradecategoryid);
@@ -668,13 +699,19 @@ class conversion {
      * @param int $courseid
      * @param int $gradeitemid
      * @param object $mapinfo
+     * @return int[] User IDs whose converted grades were written.
      */
-    public static function apply_capture_conversion(int $courseid, int $gradeitemid, object $mapinfo) {
+    public static function apply_capture_conversion(int $courseid, int $gradeitemid, object $mapinfo): array {
         global $DB;
 
         // Get list of users.
         $activity = \local_gugrades\users::activity_factory($gradeitemid, $courseid, 0);
         $users = $activity->get_users();
+        if (!$users) {
+            return [];
+        }
+        $userids = array_map(static fn($user) => (int) $user->id, $users);
+        $bulkdata = \local_gugrades\usercapture::load_aggregation_data($courseid, $userids);
 
         // Get map values.
         $mapvalues = $DB->get_records('local_gugrades_map_value', ['mapid' => $mapinfo->id], 'percentage ASC');
@@ -682,10 +719,16 @@ class conversion {
         // Get the grade item.
         $gradeitem = \local_gugrades\grades::get_gradeitem($gradeitemid);
 
+        $converteduserids = [];
+        $count = 0;
+        \local_gugrades\progress::initialise($courseid, 0, 'conversion');
+
         // Iterate over users converting grades.
         foreach ($users as $user) {
-            $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $user->id);
+            $usercapture = \local_gugrades\usercapture::create($courseid, $gradeitemid, $user->id, $bulkdata);
             $provisional = $usercapture->get_provisional();
+            $count++;
+            \local_gugrades\progress::record($courseid, 0, 'conversion', (int) floor(50 * $count / count($users)));
 
             // If there's no provision grade, then there's nothing to convert.
             if (!$provisional) {
@@ -742,6 +785,7 @@ class conversion {
                     ispoints:           false,
                 );
             }
+            $converteduserids[] = (int) $user->id;
         }
 
         // Provisional column will now represent a scale.
@@ -755,6 +799,8 @@ class conversion {
             $DB->update_record('local_gugrades_column', $provisionalcolumn);
             \local_gugrades\grades::save_column_backup($provisionalcolumn);
         }
+
+        return $converteduserids;
     }
 
     /**

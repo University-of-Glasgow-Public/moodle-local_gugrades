@@ -38,6 +38,54 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_advanced_t
  */
 final class import_grades_users_test extends \local_gugrades\external\gugrades_advanced_testcase {
     /**
+     * A dry run counts importable grades without recalculating category totals.
+     *
+     * @covers \local_gugrades\external\import_grades_users::execute
+     */
+    public function test_dry_run_does_not_aggregate(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+        $result = import_grades_users::execute(
+            courseid: $this->course->id,
+            gradeitemid: $this->gradeitemidassign1,
+            additional: 'update',
+            fillns: 'none',
+            reason: 'FIRST',
+            other: '',
+            dryrun: true,
+            userlist: [$this->student->id],
+        );
+
+        $this->assertSame(1, $result['importcount']);
+        $this->assertFalse($DB->record_exists_select(
+            'local_gugrades_grade',
+            'courseid = :courseid AND gradetype IN (:category, :firstcategory)',
+            [
+                'courseid' => $this->course->id,
+                'category' => 'CATEGORY',
+                'firstcategory' => 'CATEGORY1',
+            ],
+        ));
+    }
+
+    /**
+     * Initial progress value zero is distinct from a missing progress record.
+     *
+     * @covers \local_gugrades\progress::initialise
+     * @covers \local_gugrades\progress::get
+     * @covers \local_gugrades\progress::terminate
+     */
+    public function test_progress_reports_zero_after_initialization(): void {
+        \local_gugrades\progress::initialise($this->course->id, 0, 'testimport');
+
+        $this->assertSame(0, \local_gugrades\progress::get($this->course->id, 0, 'testimport'));
+
+        \local_gugrades\progress::terminate($this->course->id, 0, 'testimport');
+        $this->assertSame(-1, \local_gugrades\progress::get($this->course->id, 0, 'testimport'));
+    }
+
+    /**
      * Import first grades.
      *
      * @covers \local_gugrades\external\import_grades_users::execute

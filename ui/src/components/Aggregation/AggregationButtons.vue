@@ -1,7 +1,7 @@
 <template>
     <div class="flex gap-2 mt-2">
         <RecalculateButton v-if="caneditgrades" :categoryid="props.categoryid" :staffuserid="props.staffuserid" @recalculated="refreshtable"></RecalculateButton>
-        <ConversionButton v-if="!props.toplevel && caneditgrades" :categoryid="props.categoryid" :disabled="!allowconversion" :disabledReason="conversionDisabledReason" @converted="refreshtable"></ConversionButton>
+        <ConversionButton v-if="!props.toplevel && caneditgrades" :categoryid="props.categoryid" :staffuserid="props.staffuserid" :disabled="!allowconversion" :disabledReason="conversionDisabledReason" @converted="refreshtable"></ConversionButton>
         <ReleaseCategoryButton v-if="!props.toplevel && caneditgrades"
             :disabled="!props.allowrelease"
             :disabledReason="releaseDisabledReason"

@@ -886,9 +886,9 @@ class api {
         $items = \local_gugrades\grades::get_gradeitems_recursive($gradecategory);
         $itemcount = count($items);
         $usercount = \local_gugrades\users::count_enrolled_users($courseid);
-        $transactioncount = $itemcount * $usercount;
         $gradecount = 0;
         $affecteduserids = [];
+        $importprogressrange = $dryrun ? 100 : 50;
 
         // Counts are to track progress.
         $iitems = 0;
@@ -931,19 +931,26 @@ class api {
                 // ...but it'll be close enough.
                 // This took a lot of thinking about. I'll leave it as an exercise for those who follow me :).
                 $progress = floor((100 * $iitems / $itemcount) + (100 * $iusers / $itemcount / $usercount));
+                $progress = min($importprogressrange, $progress * $importprogressrange / 100);
                 \local_gugrades\progress::record($courseid, 0, 'import', intval($progress));
             }
 
             $iitems++;
         }
 
-        // Terminate progress and just show 'please wait' for aggregation bit.
-        \local_gugrades\progress::terminate($courseid, 0, 'import');
-
-        // Finally, do the aggregation (once).
-        if (!$dryrun) {
-            self::recalculate($courseid, $categoryid);
+        // Reaggregate only students whose grades were actually imported.
+        if (!$dryrun && $affecteduserids) {
+            \local_gugrades\aggregation::aggregate(
+                $courseid,
+                $categoryid,
+                array_values($affecteduserids),
+                'import',
+                50,
+                50,
+            );
         }
+
+        \local_gugrades\progress::terminate($courseid, 0, 'import');
 
         return [$itemcount, $gradecount, array_values($affecteduserids)];
     }

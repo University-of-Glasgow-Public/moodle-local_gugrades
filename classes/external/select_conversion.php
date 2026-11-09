@@ -72,6 +72,7 @@ class select_conversion extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
+        \local_gugrades\api::more_time();
         \local_gugrades\api::select_conversion($courseid, $gradeitemid, $gradecategoryid, $mapid);
 
         // If gradecategoryid was given, we need to get the corresponding gradeitemid.

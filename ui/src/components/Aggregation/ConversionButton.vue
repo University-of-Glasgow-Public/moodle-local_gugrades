@@ -7,7 +7,7 @@
 
     <VueModal v-model="showselectmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.conversionselect">
 
-        <PleaseWait v-if="waiting"></PleaseWait>
+        <PleaseWait v-if="waiting" progresstype="aggregate" :staffuserid="props.staffuserid"></PleaseWait>
 
         <div v-if="!waiting">
 
@@ -104,6 +104,7 @@
 
     const props = defineProps({
         categoryid: Number,
+        staffuserid: Number,
         disabled: {
             type: Boolean,
             default: false,

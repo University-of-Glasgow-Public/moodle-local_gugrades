@@ -1708,8 +1708,22 @@ class aggregation {
      * @param int $courseid
      * @param int $gradecategoryid
      * @param array $users
+     * @param string $progresstype
+     * @param int $progressoffset
+     * @param int $progressrange
      */
-    public static function aggregate(int $courseid, int $gradecategoryid, array $users) {
+    public static function aggregate(
+        int $courseid,
+        int $gradecategoryid,
+        array $users,
+        string $progresstype = 'aggregate',
+        int $progressoffset = 0,
+        int $progressrange = 100,
+    ) {
+
+        if (!$users) {
+            return;
+        }
 
         // If $users is array of objects, convert to array of ids.
         if (is_object($users[0])) {
@@ -1738,13 +1752,16 @@ class aggregation {
         $anyalteredweights = self::any_altered_weights($courseid);
         $categories = \local_gugrades\grades::get_gradecategories_recursive($level1categoryid);
         $capturedata = \local_gugrades\usercapture::load_aggregation_data($courseid, $users);
+        if ($progresstype === 'aggregate') {
+            \local_gugrades\progress::initialise($courseid, 0, $progresstype);
+        }
 
         // Run through each user and aggregate their grades.
         foreach ($users as $userid) {
             // Progress.
-            $progress = 100 * $count / $numberofusers;
             $count++;
-            \local_gugrades\progress::record($courseid, 0, 'aggregate', intval($progress));
+            $progress = $progressoffset + $progressrange * $count / $numberofusers;
+            \local_gugrades\progress::record($courseid, 0, $progresstype, (int) $progress);
 
             // Invalidate any stored data.
             self::invalidate_aggdata($courseid, $level1categoryid, $userid, $categories);
@@ -1764,6 +1781,9 @@ class aggregation {
                 $anyalteredweights,
                 $capturedata,
             );
+        }
+        if ($progresstype === 'aggregate') {
+            \local_gugrades\progress::terminate($courseid, 0, $progresstype);
         }
     }
 
