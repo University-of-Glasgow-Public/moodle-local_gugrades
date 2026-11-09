@@ -31,6 +31,9 @@ define('NOTES_SHORTNAME_LENGTH', 30);
  * Group functions used to manipulate user-related data
  */
 class users {
+    /** @var array<string, array> Request-local gradeable-user lists. */
+    private static array $gradeableuserscache = [];
+
     /**
      * Get course module from grade item
      * @param int $itemid Grade item ID
@@ -117,6 +120,17 @@ class users {
      * @return array
      */
     public static function get_gradeable_users(\core\context\course|false $context, $firstname = '', $lastname = '', $groupid = 0) {
+        $cacheenabled = !\local_gugrades\api::is_unit_test();
+        $cachekey = implode(':', [
+            $context ? $context->id : 0,
+            $groupid,
+            $firstname,
+            $lastname,
+        ]);
+        if ($cacheenabled && isset(self::$gradeableuserscache[$cachekey])) {
+            return array_map(static fn($user) => clone $user, self::$gradeableuserscache[$cachekey]);
+        }
+
         $fields = 'u.id, u.username, u.idnumber, u.firstname, u.lastname, u.email,
             u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, u.picture, u.imagealt';
         $users = get_enrolled_users($context, 'moodle/grade:view', $groupid, $fields);
@@ -134,7 +148,12 @@ class users {
             });
         }
 
-        return $users;
+        if (!$cacheenabled) {
+            return $users;
+        }
+
+        self::$gradeableuserscache[$cachekey] = $users;
+        return array_map(static fn($user) => clone $user, $users);
     }
 
     /**

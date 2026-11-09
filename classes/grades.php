@@ -2454,10 +2454,25 @@ class grades {
         global $DB;
 
         $columns = $DB->get_records('local_gugrades_column', ['courseid' => $courseid]);
+        if (!$columns) {
+            return;
+        }
+
+        $usedcolumnids = $DB->get_fieldset_select(
+            'local_gugrades_grade',
+            'DISTINCT columnid',
+            'courseid = :courseid',
+            ['courseid' => $courseid],
+        );
+        $usedcolumnids = array_fill_keys(array_map('intval', $usedcolumnids), true);
+        $unusedcolumnids = [];
         foreach ($columns as $column) {
-            if (!$DB->record_exists('local_gugrades_grade', ['columnid' => $column->id])) {
-                $DB->delete_records('local_gugrades_column', ['id' => $column->id]);
+            if (!isset($usedcolumnids[$column->id])) {
+                $unusedcolumnids[] = $column->id;
             }
+        }
+        if ($unusedcolumnids) {
+            $DB->delete_records_list('local_gugrades_column', 'id', $unusedcolumnids);
         }
     }
 
