@@ -121,6 +121,23 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
     }
 
     /**
+     * Zero-weight items remain present in weighted-mean column data.
+     */
+    public function test_zero_weight_column_is_returned(): void {
+        global $DB;
+
+        $categoryid = $this->get_grade_category('Summer exam');
+        $gradeitemid = $this->get_gradeitemid('Question 1');
+        $DB->set_field('grade_items', 'aggregationcoef', 0, ['id' => $gradeitemid]);
+
+        [$columns] = \local_gugrades\aggregation::get_columns($this->course->id, $categoryid);
+        $column = array_values(array_filter($columns, fn($column) => $column->gradeitemid == $gradeitemid))[0];
+
+        $this->assertTrue(\local_gugrades\aggregation::show_weights($categoryid));
+        $this->assertEquals(0, $column->weight);
+    }
+
+    /**
      * Weighted-mean columns retain the configured gradebook coefficients.
      */
     public function test_weighted_mean_column_weights_preserve_coefficients(): void {
