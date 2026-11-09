@@ -58,6 +58,9 @@
     "vite-plugin-vue-devtools": "^8.1.1",
     "vue-tsc": "^3.2.6"
   },
+  "overrides": {
+    "minimatch": "11.0.1"
+  },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   }
