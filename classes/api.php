@@ -2224,6 +2224,8 @@ class api {
         $user->atype = $atype;
         $user->formattedatype = \local_gugrades\aggregation::translate_atype($atype);
         $user->explain = $explain;
+        $user->calculation = $result->calculation ?? '';
+        $user->calculation1st = $result->firstsitting->calculation ?? '';
 
         // MGU-1596: For from2026 reassessment categories, say which grade produced each result.
         $user->firstsittingexplain = '';

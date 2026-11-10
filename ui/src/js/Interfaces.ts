@@ -271,6 +271,8 @@ export interface IUser {
     error1st?: string;
     firstsittingexplain?: string;
     awardexplain?: string;
+    calculation?: string;
+    calculation1st?: string;
     capped?: boolean;
     engcapped?: boolean;
     engcapped1st?: boolean;

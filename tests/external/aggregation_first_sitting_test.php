@@ -39,6 +39,23 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  */
 final class aggregation_first_sitting_test extends gugrades_aggregation_testcase {
     /**
+     * Student-facing working keeps uncapped first-sitting and capped award results separate.
+     */
+    public function test_calculation_working_for_dual_results_and_cap(): void {
+        $this->set_reassessment(true);
+        $result = \local_gugrades\api::get_explain_aggregation(
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
+        );
+
+        $this->assertStringContainsString('18 * 0.5 + 14 * 0.5 = 9 + 7 = 16', $result['calculation']);
+        $this->assertStringContainsString('16 becomes 9', $result['calculation']);
+        $this->assertStringContainsString('16 * 0.5 + 14 * 0.5 = 8 + 7 = 15', $result['calculation1st']);
+        $this->assertStringNotContainsString('Cap applied', $result['calculation1st']);
+    }
+
+    /**
      * @var array $categories
      */
     private array $categories;
@@ -1232,6 +1249,8 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
         $explain = $this->explain('Dual reassessment');
         $this->assertEquals(get_string('explain_awardoverridden', 'local_gugrades'), $explain['awardexplain']);
         $this->assertStringContainsString('Attempt one', $explain['firstsittingexplain']);
+        $this->assertStringContainsString(get_string('calculationoverride', 'local_gugrades'), $explain['calculation']);
+        $this->assertStringNotContainsString('Unrounded grade', $explain['calculation']);
     }
 
     /**

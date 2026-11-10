@@ -1265,6 +1265,7 @@ class aggregation {
      * @param bool $firstnursingcondmet First-sitting nursing condition result, updated by reference.
      * @param bool|null $anyalteredweights Whether this run has any altered weights.
      * @param object|null $capturedata Current assessment snapshot for this run.
+     * @param bool $explaincalculation Collect numeric working for the requested category only.
      * @return object
      */
     protected static function aggregate_user(
@@ -1277,6 +1278,7 @@ class aggregation {
         bool &$firstnursingcondmet = false,
         ?bool $anyalteredweights = null,
         ?object $capturedata = null,
+        bool $explaincalculation = false,
     ) {
         global $DB;
 
@@ -1428,6 +1430,7 @@ class aggregation {
                 $userid,
                 $firstcategorycondmet,
                 true,
+                $explaincalculation,
             );
         } else if ($level > 1) {
             $DB->set_field('local_gugrades_grade', 'iscurrent', 0, [
@@ -1439,7 +1442,16 @@ class aggregation {
             ]);
         }
 
-        $result = self::aggregate_category($courseid, $category, $items, $level, $userid, $categorycondmet);
+        $result = self::aggregate_category(
+            $courseid,
+            $category,
+            $items,
+            $level,
+            $userid,
+            $categorycondmet,
+            false,
+            $explaincalculation,
+        );
         $result->nursingcondmet = $categorycondmet;
         if (($level == 1) && !$hasfirstsitting) {
             $firstsitting = clone $result;
@@ -1515,6 +1527,7 @@ class aggregation {
      * @param int $userid
      * @param bool $nursingcondmet
      * @param bool $firstsitting
+     * @param bool $explaincalculation Collect numeric working only for Explain.
      * @return object
      */
     private static function aggregate_category(
@@ -1525,9 +1538,14 @@ class aggregation {
         int $userid,
         bool &$nursingcondmet,
         bool $firstsitting = false,
+        bool $explaincalculation = false,
     ): object {
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         $aggregation = $regulation->get_aggregation($courseid, $category->atype);
+        if ($explaincalculation) {
+            $aggregation = \local_gugrades\aggregation\calculation::calculator($courseid, $category->atype, $regulation);
+            $calculationinput = array_map(static fn($item) => clone $item, $items);
+        }
 
         // An override belongs only to the ordinary result, never to CATEGORY1.
         $override = false;
@@ -1600,7 +1618,7 @@ class aggregation {
         ];
         self::write_aggregated_category($courseid, $userid, $aggregatedcategory, $firstsitting ? 'CATEGORY1' : 'CATEGORY');
 
-        return (object)[
+        $result = (object)[
             'total' => $total,
             'rawgrade' => $rawgrade,
             'admingrade' => $admingrade,
@@ -1616,6 +1634,16 @@ class aggregation {
             'capped' => $capped,
             'engcapped' => $engcapped,
         ];
+        if ($explaincalculation) {
+            $result->calculation = \local_gugrades\aggregation\calculation::describe(
+                $aggregation,
+                $category,
+                $calculationinput,
+                $result,
+                (bool) $override,
+            );
+        }
+        return $result;
     }
 
     /**
@@ -1662,7 +1690,20 @@ class aggregation {
         $level = \local_gugrades\grades::get_category_level($gradecategoryid);
 
         // Aggregate this user.
-        return self::aggregate_user($courseid, $tree, $userid, $level, $skipdroplow);
+        $nursingcondmet = false;
+        $firstnursingcondmet = false;
+        return self::aggregate_user(
+            $courseid,
+            $tree,
+            $userid,
+            $level,
+            $skipdroplow,
+            $nursingcondmet,
+            $firstnursingcondmet,
+            null,
+            null,
+            true,
+        );
     }
 
     /**

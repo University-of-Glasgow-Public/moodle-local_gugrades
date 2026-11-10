@@ -5,7 +5,7 @@
         {{ mstrings.explain }}
     </a>
 
-    <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="rounded max-w-3xl" :title="mstrings.explain">
+    <VueModal v-model="showexplainmodal" :enableClose="false" modalClass="scrollable-modal rounded max-w-3xl" :title="mstrings.explain">
 
         <template #titlebar>
             <div class="p-4 font-semibold flex justify-between gap-2 align-middle border-b border-base-300">
@@ -107,22 +107,22 @@
             <div class="mb-6 border-b border-brand-light-purple/30 pb-6">
                 <div class="uppercase text-xs font-bold tracking-wider text-brand-dark-purple mt-4 mb-3">{{ mstrings.grades }}</div>
                 
-                <div v-for="field in user!.fields" class="bg-brand-light-yellow/50 text-slate-800 rounded-lg border border-brand-light-yellow/50 shadow-sm mb-3 px-4 py-2.5">
-                    <div class="border-brand-light-yellow/40 border-b pb-2">
-                        <div class="flex justify-between items-center pb-1.5">
-                            <div class="font-semibold text-brand-dark-purple">{{ field.fullname }}</div>
-                            <div class="font-bold"><GradeColor :grade="field.display" :strikethrough="field.dropped"  size="text-lg"/></div>
+                <div v-for="field in user!.fields" class="bg-brand-light-yellow/50 text-slate-800 rounded border border-brand-light-yellow/50 mb-2 px-3 py-1.5">
+                    <div class="border-brand-light-yellow/40 border-b pb-1">
+                        <div class="flex justify-between items-center gap-2">
+                            <div class="min-w-0 font-semibold text-sm text-brand-dark-purple">{{ field.fullname }}</div>
+                            <div class="shrink-0 font-bold"><GradeColor :grade="field.display" :strikethrough="field.dropped" size="text-base"/></div>
                         </div>
                         
-                        <div class="flex flex-wrap gap-1.5 pt-0.5">
-                            <div v-if="!field.available" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.notavailable }}</div>
-                            <div v-if="field.dropped" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.dropped }}</div>
-                            <div v-if="field.hidden" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.hidden }}</div>
-                            <div v-if="field.overridden" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.overridden }}</div>
+                        <div class="flex flex-wrap gap-1 pt-1">
+                            <div v-if="!field.available" class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.notavailable }}</div>
+                            <div v-if="field.dropped" class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.dropped }}</div>
+                            <div v-if="field.hidden" class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.hidden }}</div>
+                            <div v-if="field.overridden" class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-brand-light-red text-brand-dark-red">{{ mstrings.overridden }}</div>
                         </div>
                     </div>
                     
-                    <div class="flex flex-wrap gap-x-6 gap-y-1 pt-2 text-sm text-slate-600">
+                    <div class="flex flex-wrap gap-x-4 gap-y-0.5 pt-1 text-xs text-slate-600">
                         <div v-if="user!.showweights" class="flex gap-1.5">
                             <span class="text-slate-500">{{ mstrings.weight }}:</span>
                             <span class="font-semibold text-slate-800">{{ field.weight }}&percnt;</span>
@@ -152,6 +152,26 @@
                 </ul>
             </UAlert>
 
+            <section v-if="user!.calculation" class="mt-5">
+                <div class="flex items-center justify-between gap-3 mb-2">
+                    <h3 class="text-sm font-bold text-brand-dark-purple">{{ mstrings.calculationtitle }}</h3>
+                    <UTooltip :text="copied ? mstrings.calculationcopied : mstrings.calculationcopy">
+                        <UButton appearance="outline" size="sm" :aria-label="mstrings.calculationcopy" @click="copy_calculation">
+                            <Check v-if="copied" :size="16" />
+                            <Copy v-else :size="16" />
+                        </UButton>
+                    </UTooltip>
+                </div>
+                <textarea
+                    ref="calculationelement"
+                    readonly
+                    :value="calculationtext"
+                    :rows="Math.min(20, calculationtext.split('\n').length + 1)"
+                    :aria-label="mstrings.calculationtitle"
+                    class="w-full min-h-40 resize-y rounded border border-brand-light-purple/40 bg-white p-3 text-sm leading-6 text-slate-800"
+                ></textarea>
+            </section>
+
             <div class="flex justify-end">
                 <!-- Updated the custom button class styles to use your primary university-blue color instead of warning -->
                 <button 
@@ -168,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { computed, ref } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -176,9 +196,10 @@
     import YesNo from '@/components/YesNo.vue';
     import UButton from '../Common/UButton.vue';
     import UAlert from '../Common/UAlert.vue';
-    import { CircleAlert, X } from '@lucide/vue';
+    import { Check, CircleAlert, Copy, X } from '@lucide/vue';
     import type { IUser } from '@/js/Interfaces';
     import GradeColor from '../Common/GradeColor.vue';
+    import UTooltip from '../Common/UTooltip.vue';
 
     const showexplainmodal = ref(false);
     const debug = ref({});
@@ -186,6 +207,29 @@
     const user = ref< IUser >();
     const mstringstore = useMstrings();
     const { mstrings } = storeToRefs( mstringstore );
+    const calculationelement = ref<HTMLTextAreaElement>();
+    const copied = ref(false);
+    const calculationtext = computed(() => {
+        if (!user.value?.calculation) {
+            return '';
+        }
+        const lines = [user.value.displayname, `${mstrings.value.strategy}: ${user.value.strategy}`, ''];
+        if (user.value.calculation1st) {
+            lines.push(`${mstrings.value.firstsitting}:`, user.value.calculation1st, '', `${mstrings.value.award}:`);
+        }
+        lines.push(user.value.calculation);
+        return lines.join('\n');
+    });
+
+    async function copy_calculation() {
+        try {
+            await navigator.clipboard.writeText(calculationtext.value);
+            copied.value = true;
+        } catch {
+            calculationelement.value?.focus();
+            calculationelement.value?.select();
+        }
+    }
 
     const props = defineProps({
         userid: Number,
@@ -209,6 +253,8 @@
      */
     function explain() {
 
+        loading.value = true;
+        copied.value = false;
         showexplainmodal.value = true;
 
         moodleFetch(
@@ -236,7 +282,7 @@
     .scrollable-modal {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 150px);
+    max-height: calc(100vh - 2rem);
     }
     .scrollable-modal .vm-titlebar {
     flex-shrink: 0;

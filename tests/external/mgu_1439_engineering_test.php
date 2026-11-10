@@ -145,4 +145,26 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
         $this->assertEquals('Academic Regs from 2026/27', $l1categories['regulation']);
         $this->assertEquals('Engineering', $l1categories['regulationextra']);
     }
+
+    /**
+     * Engineering subtotals must not replace the overall arithmetic in Explain.
+     */
+    public function test_calculation_working_preserves_overall_weights(): void {
+        $explain = get_explain_aggregation::execute(
+            $this->course->id,
+            $this->get_grade_category('Summative'),
+            $this->student->id,
+        );
+        $explain = external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
+        $this->assertStringContainsString(
+            'Item 1: grade 16 out of 22, effective weight 40%, contribution 6.4.',
+            $explain['calculation'],
+        );
+        $this->assertStringContainsString(
+            'Category 1: grade 5 out of 22, effective weight 40%, contribution 2.',
+            $explain['calculation'],
+        );
+        $this->assertStringContainsString('becomes 8.', $explain['calculation']);
+        $this->assertStringContainsString('Final grade = E1 (8).', $explain['calculation']);
+    }
 }

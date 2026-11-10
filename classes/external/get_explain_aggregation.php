@@ -120,6 +120,8 @@ class get_explain_aggregation extends external_api {
             'formattedatype' => new external_value(PARAM_TEXT, 'Human readable form of atype'),
             'error' => new external_value(PARAM_TEXT, 'Error condition'),
             'explain' => new external_value(PARAM_RAW, 'Explanation'),
+            'calculation' => new external_value(PARAM_RAW, 'Student-readable calculation working', VALUE_DEFAULT, ''),
+            'calculation1st' => new external_value(PARAM_RAW, 'First-sitting calculation working', VALUE_DEFAULT, ''),
             'displaygrade1st' => new external_value(PARAM_TEXT, 'First sitting grade (dual results only)', VALUE_DEFAULT, ''),
             'firstsittingexplain' => new external_value(PARAM_TEXT, 'Which grade gave the first sitting result', VALUE_DEFAULT, ''),
             'awardexplain' => new external_value(PARAM_TEXT, 'Which grade gave the award result', VALUE_DEFAULT, ''),
