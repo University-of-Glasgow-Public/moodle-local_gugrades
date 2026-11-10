@@ -167,4 +167,25 @@ final class mgu_1439_engineering_test extends \local_gugrades\external\gugrades_
         $this->assertStringContainsString('becomes 8.', $explain['calculation']);
         $this->assertStringContainsString('Final grade = E1 (8).', $explain['calculation']);
     }
+
+    /**
+     * Explain must handle a course with no captured grades without evaluating empty cap subtotals.
+     */
+    public function test_explain_with_all_grades_missing(): void {
+        global $DB;
+
+        $DB->delete_records('local_gugrades_grade', [
+            'courseid' => $this->course->id,
+            'userid' => $this->student->id,
+        ]);
+
+        $explain = get_explain_aggregation::execute(
+            $this->course->id,
+            $this->get_grade_category('Summative'),
+            $this->student->id,
+        );
+        $explain = external_api::clean_returnvalue(get_explain_aggregation::execute_returns(), $explain);
+
+        $this->assertNotEmpty($explain['calculation']);
+    }
 }

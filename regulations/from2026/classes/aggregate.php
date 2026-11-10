@@ -659,24 +659,29 @@ class aggregate {
         $examweight = array_sum(array_column($examitems, 'weight'));
         $courseweight = array_sum(array_column($courseitems, 'weight'));
         $totalweight = $examweight + $courseweight;
+        if ($totalweight <= 0) {
+            return $aggregatedgrade;
+        }
 
         // Normalise total weights.
         $examweight = round(100 * $examweight / $totalweight, 5);
         $courseweight = round(100 * $courseweight / $totalweight, 5);
 
-        // Get "aggregated" grades.
-        // It HAS to be weigghted mean - we wouldn't be here otherwise.
-        $examgrade = $this->strategy_weighted_mean($examitems);
-        $coursegrade = $this->strategy_weighted_mean($courseitems);
-
         // MGU-1439
         // If either exam or course id weighted >30% AND grade is below E3 (6.0)
         // output grade is capped at a max of E1 (8.0).
-        if (($examweight > 30) && ($examgrade < 6.0)) {
-            $aggregatedgrade = $aggregatedgrade > 8.0 ? 8.0 : $aggregatedgrade;
+        if ($examweight > 30) {
+            // A component above the threshold has positive weight and usable items to aggregate.
+            $examgrade = $this->strategy_weighted_mean($examitems);
+            if ($examgrade < 6.0) {
+                $aggregatedgrade = $aggregatedgrade > 8.0 ? 8.0 : $aggregatedgrade;
+            }
         }
-        if (($courseweight > 30) && ($coursegrade < 6.0)) {
-            $aggregatedgrade = $aggregatedgrade > 8.0 ? 8.0 : $aggregatedgrade;
+        if ($courseweight > 30) {
+            $coursegrade = $this->strategy_weighted_mean($courseitems);
+            if ($coursegrade < 6.0) {
+                $aggregatedgrade = $aggregatedgrade > 8.0 ? 8.0 : $aggregatedgrade;
+            }
         }
 
         return $aggregatedgrade;
