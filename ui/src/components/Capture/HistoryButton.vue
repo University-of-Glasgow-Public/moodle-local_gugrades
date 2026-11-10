@@ -10,10 +10,11 @@
             </ul>
         </div>
 
-        <UAlert v-if="grades.length == 0">{{ mstrings.nohistory }}</UAlert>
+        <UAlert v-if="loading">{{ mstrings.pleasewait }}</UAlert>
+        <UAlert v-else-if="grades.length == 0">{{ mstrings.nohistory }}</UAlert>
 
 
-        <UTable :data="grades" :columns="columns" :dense="true" :filterable="false" class="mt-3"></UTable>
+        <UTable v-if="!loading" :data="grades" :columns="columns" :dense="true" :filterable="false" class="mt-3"></UTable>
 
         <div class="flex justify-end mt-5">
             <UButton variant="warning" @click="closemodal">{{ mstrings.close }}</UButton>
@@ -41,6 +42,7 @@
     }
 
     const showhistorymodal = ref(false);
+    const loading = ref(false);
     const grades = ref([]);
     const headers = ref< IHeader[] >([]);
     const debug = ref({});
@@ -104,6 +106,10 @@
      * Read history on button click
      */
     function read_history() {
+        loading.value = true;
+        grades.value = [];
+        showhistorymodal.value = true;
+
         moodleFetch(
             'local_gugrades_get_history',
             {
@@ -113,13 +119,13 @@
         )
         .then((result: any) => {
             grades.value = result;
+            loading.value = false;
         })
         .catch((error) => {
             window.console.error(error);
+            loading.value = false;
             showhistorymodal.value = false;
             debug.value = error;
         });
-
-        showhistorymodal.value = true;
     }
 </script>
