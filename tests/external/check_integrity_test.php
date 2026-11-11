@@ -399,7 +399,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
         $this->assertCount(1, $result['reassessmentnotices']);
         $this->assertCount(1, $result['erroritems']);
         $this->assertEquals('Resit notice category', $result['reassessmentnotices'][0]['itemname']);
-        $this->assertEquals('Resit first sitting', $result['erroritems'][0]['itemname']);
+        $this->assertEquals('Resit first attempt', $result['erroritems'][0]['itemname']);
         $this->assertFalse($DB->record_exists('local_gugrades_resit', ['gradecategoryid' => $resitcat['categoryid']]));
     }
 
@@ -418,7 +418,7 @@ final class check_integrity_test extends \local_gugrades\external\gugrades_advan
 
         $firstitem = $this->getDataGenerator()->create_grade_item([
             'courseid' => $this->course->id,
-            'itemname' => 'Resit first sitting',
+            'itemname' => 'Resit first attempt',
         ]);
         $this->move_gradeitem_to_category($firstitem->id, $category->id);
 

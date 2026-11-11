@@ -99,7 +99,7 @@ final class mgu_1560_new_reg_reassessment_test extends \local_gugrades\external\
         }
 
         $summeritemid = $this->get_gradeitemid_from_grade_category('Summer exam');
-        $firstitemid = $this->get_gradeitemid('Summer first sitting');
+        $firstitemid = $this->get_gradeitemid('Summer first attempt');
         \local_gugrades\api::release_grades($this->course->id, $firstitemid, 0, false);
         $user = \local_gugrades\api::get_aggregation_dashboard_user(
             $this->course->id,

@@ -1262,7 +1262,7 @@ class aggregation {
      * @param int $level
      * @param bool $skipdroplow
      * @param bool $nursingcondmet Nursing condition result, updated by reference.
-     * @param bool $firstnursingcondmet First-sitting nursing condition result, updated by reference.
+     * @param bool $firstnursingcondmet First-attempt nursing condition result, updated by reference.
      * @param bool|null $anyalteredweights Whether this run has any altered weights.
      * @param object|null $capturedata Current assessment snapshot for this run.
      * @param bool $explaincalculation Collect numeric working for the requested category only.
@@ -1473,7 +1473,7 @@ class aggregation {
     }
 
     /**
-     * Check an overridden subtree for independently calculated first-sitting results.
+     * Check an overridden subtree for independently calculated first-attempt results.
      * @param object $category
      * @param object $aggregation
      * @return bool
@@ -1508,7 +1508,7 @@ class aggregation {
     }
 
     /**
-     * Read a required first-sitting result, including missing-grade/error results.
+     * Read a required first-attempt result, including missing-grade/error results.
      * @param int $courseid
      * @param int $gradeitemid
      * @param int $userid
@@ -1660,7 +1660,7 @@ class aggregation {
 
     /**
      * Recalculate one user for explanation, returning the full result for the requested category
-     * (including any first-sitting result and the items that decided each result).
+     * (including any first-attempt result and the items that decided each result).
      * @param int $courseid
      * @param int $gradecategoryid
      * @param int $userid

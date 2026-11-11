@@ -305,7 +305,7 @@ class aggregate {
         // MGU-1506: This is always D3:9.
         $lowestnursinggrade = 9;
 
-        // The first-sitting check runs after selecting its substantive item.
+        // The first-attempt check runs after selecting its substantive item.
         if ($isnursing && !$firstsitting) {
             if ($this->nursing_check($items, $lowestnursinggrade)) {
                 $conditionmet = true;

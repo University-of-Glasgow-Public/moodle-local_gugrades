@@ -202,7 +202,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         $this->setUser($this->teacher);
 
         // Set 'Summer resit' inside 'Summer exam' as resit.
-        $summerfirstsittingid = $this->get_gradeitemid('Summer first sitting');
+        $summerfirstsittingid = $this->get_gradeitemid('Summer first attempt');
         $summerresitid = $this->get_gradeitemid('Summer resit');
         $result = save_resit_item::execute($this->course->id, $summerresitid, true);
         $result = external_api::clean_returnvalue(
@@ -210,7 +210,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
             $result
         );
 
-        // Write some random grade into 1st sitting.
+        // Write some random grade into the 1st attempt.
         // As resit is a missing grade then this should be the aggregated result.
         $nothing = write_additional_grade::execute(
             courseid:          $this->course->id,
@@ -269,7 +269,7 @@ final class resits_test extends \local_gugrades\external\gugrades_aggregation_te
         $fred = $page['users'][0];
         $this->assertEquals(75, $fred['displaygrade']);
 
-        // Change first sitting grade to EC.
+        // Change first attempt grade to EC.
         $nothing = write_additional_grade::execute(
             courseid:          $this->course->id,
             gradeitemid:       $summerfirstsittingid,

@@ -244,7 +244,7 @@ Grade concepts
   inspect both local_gugrades_grade and local_gugrades_latest when changing
   grade lifecycle behaviour.
 - CATEGORY is the ordinary aggregated result. CATEGORY1 is an independent
-  first-sitting calculation for new-regulation reassessment categories and
+  first-attempt calculation for new-regulation reassessment categories and
   their ancestors. It is current within its own column, but is never selected
   as the latest/provisional grade or released in place of CATEGORY.
 - Aggregation carries both results up the category tree. Parents use CATEGORY1
@@ -266,7 +266,7 @@ Grade concepts
   current substantive grade exists but EC grades are available, CATEGORY1 uses
   the existing reassessment EC rules as a fallback. A single EC therefore gives
   EC in both totals; once a numeric/NS grade exists it takes precedence over EC
-  for first-sitting selection. With neither substantive grades nor EC, CATEGORY1
+  for first-attempt selection. With neither substantive grades nor EC, CATEGORY1
   reports missing grades. Ancestors
   aggregate the selected results normally. Removing reassessment flags retires unneeded CATEGORY1 rows on the
   next aggregation. CATEGORY1 is excluded from existing capture and history
@@ -275,25 +275,25 @@ Grade concepts
   based on the included category tree rather than an individual user's grades.
   Course totals always show both grades under every regulation. Without any
   reassessment, CATEGORY1 mirrors CATEGORY, including course-total overrides;
-  only reassessment introduces an independently calculated first-sitting result.
+  only reassessment introduces an independently calculated first-attempt result.
   After successful startup integrity checks, from2026 courses with current
   CATEGORY totals but no current CATEGORY1 results are automatically recalculated
   under a dedicated waiting modal, before tree loading and background setup.
   This is a course-wide legacy check, not a per-user completeness check.
   Both the page and row-refresh APIs expose displaygrade1st/isadmin1st/error1st
   for totals and display1st/isadmin1st/error1st for children. Missing or
-  administrative first-sitting outcomes keep their own display and status.
-  Released totals use the stored RELEASED (award) and RELEASED1 (first-sitting)
+  administrative first-attempt outcomes keep their own display and status.
+  Released totals use the stored RELEASED (award) and RELEASED1 (first-attempt)
   snapshots, exposed as releasegrade/releasegrade1st by both APIs. The Released
-  heading has matching first-sitting/award subcolumns when the total is dual.
+  heading has matching first-attempt/award subcolumns when the total is dual.
 - Aggregation table headers use TanStack column groups: category/item details
-  span Grade for a single result, or 1st Sitting and Award for dual results.
+  span Grade for a single result, or 1st Attempt and Award for dual results.
   Identity and category details occupy the top row, filters the middle row,
-  and Grade/1st Sitting/Award labels a distinct bottom row above the grades.
+  and Grade/1st Attempt/Award labels a distinct bottom row above the grades.
   The aggregation header uses one blue background with compact metadata and
   controls. The table fills the available width; dual-grade columns stay
   content-sized while names and single-grade columns take the remaining space.
-  A shared tint visually joins each first-sitting/award pair. Consistent vertical
+  A shared tint visually joins each first-attempt/award pair. Consistent vertical
   separators divide all columns in the body, filters and grade-label row,
   including each dual-grade pair; top headers span their grouped columns.
   Grade cells retain narrow padding and compact
@@ -321,7 +321,7 @@ Grade concepts
   Assessment information uses a contrasting yellow info button at the top right
   of each item/category header, separate from metadata and navigation. It has a
   descriptive tooltip and accessible label and opens the existing details dialog.
-  First-sitting cells are read-only. Award cells retain the existing override,
+  First-attempt cells are read-only. Award cells retain the existing override,
   visibility, dropped-grade and release behaviour. Sorting and filtering apply
   independently to the displayed result columns. Release and award exports use
   CATEGORY. UPAS uses CATEGORY1 for its First Attempt Grade when dual results

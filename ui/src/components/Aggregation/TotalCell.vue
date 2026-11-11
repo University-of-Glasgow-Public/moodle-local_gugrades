@@ -70,7 +70,7 @@
 
     /**
      * Engineering threshold reduced the first-attempt course total.
-     * With two results, that is the first-sitting column. With one result, it is the course total.
+     * With two results, that is the first-attempt column. With one result, it is the course total.
      */
     function engineeringCapped(item: Record<string, any>) {
         if (!props.toplevel) {

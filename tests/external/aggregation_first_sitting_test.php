@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * First-sitting aggregation plumbing tests.
+ * First-attempt aggregation plumbing tests.
  * @package local_gugrades
  * @copyright 2026
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  */
 final class aggregation_first_sitting_test extends gugrades_aggregation_testcase {
     /**
-     * Student-facing working keeps uncapped first-sitting and capped award results separate.
+     * Student-facing working keeps uncapped first-attempt and capped award results separate.
      */
     public function test_calculation_working_for_dual_results_and_cap(): void {
         $this->set_reassessment(true);
@@ -206,7 +206,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * First-sitting selection propagates, and repeat runs overwrite their own rows.
+     * First-attempt selection propagates, and repeat runs overwrite their own rows.
      */
     public function test_results_and_lifecycle(): void {
         global $DB;
@@ -459,7 +459,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * Non-substantive administrative grades cannot replace the first sitting.
+     * Non-substantive administrative grades cannot replace the first attempt.
      */
     public function test_administrative_grade_propagates(): void {
         $this->set_reassessment(true);
@@ -485,7 +485,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * First-sitting errors remain errors at every ancestor.
+     * First-attempt errors remain errors at every ancestor.
      */
     public function test_missing_grades_propagate(): void {
         global $DB;
@@ -618,7 +618,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * A single EC becomes a substantive first sitting, followed by a higher award.
+     * A single EC becomes a substantive first attempt, followed by a higher award.
      */
     public function test_ec_then_substantive_then_third_attempt(): void {
         global $DB;
@@ -1132,7 +1132,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * MGU-1596: NS is a substantive grade, so a first sitting plus NS is a resit.
+     * MGU-1596: NS is a substantive grade, so a first attempt plus NS is a resit.
      */
     public function test_ns_counts_as_resit(): void {
         $this->set_ugpg('Undergraduate');
@@ -1329,7 +1329,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * Duplicate first-sitting rows receive the same read repair as award rows.
+     * Duplicate first-attempt rows receive the same read repair as award rows.
      */
     public function test_first_sitting_duplicate_read_repair(): void {
         global $DB;
@@ -1360,10 +1360,10 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * First-sitting descriptions are translated without making them editable.
+     * First-attempt descriptions are translated without making them editable.
      */
     public function test_first_sitting_description(): void {
-        $this->assertSame('Category (1st Sitting)', \local_gugrades\gradetype::get_description('CATEGORY1'));
+        $this->assertSame('Category (1st Attempt)', \local_gugrades\gradetype::get_description('CATEGORY1'));
         $this->assertFalse(\local_gugrades\gradetype::can_gradetype_be_edited('CATEGORY1'));
         $this->assertArrayNotHasKey(
             'CATEGORY1',
@@ -1372,7 +1372,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
-     * UPAS exports each dual category's first-sitting result, not its award.
+     * UPAS exports each dual category's first-attempt result, not its award.
      */
     public function test_upas_first_sitting_export(): void {
         global $DB;

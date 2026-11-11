@@ -155,7 +155,7 @@ class upas extends base {
             return $parts[0];
         }
 
-        // First-sitting letter stored without a raw value (e.g. D1).
+        // First-attempt letter stored without a raw value (e.g. D1).
         if ($displaygrade && !str_contains($displaygrade, ' ')) {
             return $displaygrade;
         }
@@ -173,7 +173,7 @@ class upas extends base {
     }
 
     /**
-     * Get first sitting / first attempt grade for a user in this category
+     * Get first-attempt grade for a user in this category
      * @param int $courseid
      * @param int $gradecategoryid
      * @param object $user
@@ -205,7 +205,7 @@ class upas extends base {
 
         $category = $DB->get_record('local_gugrades_grade', $categoryparams + ['iscurrent' => 1]);
 
-        // If this category has a designated resit item, use the first sitting item.
+        // If this category has a designated resit item, use the first-attempt item.
         $resititemid = \local_gugrades\grades::get_resit_itemid($gradecategoryid);
         if ($resititemid) {
             $items = $DB->get_records('grade_items', ['categoryid' => $gradecategoryid]);
@@ -256,7 +256,7 @@ class upas extends base {
             }
         }
 
-        // No separate first sitting - initial grade is the same as the award.
+        // No separate first attempt - initial grade is the same as the award.
         return $this->sanitise_award_grade($user);
     }
 

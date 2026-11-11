@@ -2256,7 +2256,7 @@ class api {
 
     /**
      * Describe which item decided a reassessment result.
-     * @param string $label Name of the result (1st sitting / award).
+     * @param string $label Name of the result (1st attempt / award).
      * @param object|null $result Aggregated result (with any selection).
      * @param array $names Item full names keyed by grade item ID.
      * @return string
@@ -3211,7 +3211,7 @@ class api {
     }
 
     /**
-     * Find legacy from2026 courses that have totals but no first-sitting results yet.
+     * Find legacy from2026 courses that have totals but no first-attempt results yet.
      * @param int $courseid
      * @return int[] Top-level categories requiring recalculation.
      */

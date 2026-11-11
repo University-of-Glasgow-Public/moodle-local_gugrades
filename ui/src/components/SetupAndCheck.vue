@@ -107,7 +107,7 @@
         (isSettingUp.value || showerrors.value || shownotices.value || dualGradeFailed.value));
 
     const dualGradeMessage = computed(() => mstrings.value.dualgraderecalculationwait ||
-        'Please wait while we prepare the first-sitting and award grades for this course.');
+        'Please wait while we prepare the first-attempt and award grades for this course.');
 
     const modalTitle = computed(() => {
         if (shownotices.value) {
