@@ -102,6 +102,48 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * Original-regulation course totals have one grade result, not dual results.
+     */
+    public function test_original_regulation_has_single_course_total(): void {
+        global $DB;
+
+        $DB->set_field('course', 'startdate', strtotime('2026-07-31'), ['id' => $this->course->id]);
+
+        $this->assertSame(
+            'original',
+            \local_gugrades\regulations::get_active_regulation($this->course->id)->shortname(),
+        );
+        $this->assertFalse(\local_gugrades\aggregation::has_dual_grades(
+            $this->course->id,
+            $this->categories['Dual total']->id,
+        ));
+        $this->assertFalse(\local_gugrades\aggregation::has_dual_grades(
+            $this->course->id,
+            $this->categories['Dual reassessment']->id,
+        ));
+
+        $page = \local_gugrades\api::get_aggregation_page(
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            '',
+            '',
+            0,
+            true,
+        );
+        $this->assertFalse($page['dualgrades']);
+
+        $explain = \local_gugrades\api::get_explain_aggregation(
+            $this->course->id,
+            $this->categories['Dual total']->id,
+            $this->student->id,
+        );
+        $this->assertNotEmpty($explain['calculation']);
+        $this->assertSame('', $explain['calculation1st']);
+        $this->assertSame('', $explain['displaygrade1st']);
+        $this->assertSame('', $explain['firstsittingexplain']);
+    }
+
+    /**
      * Write a known grade without introducing import/conversion behaviour.
      * @param int $itemid
      * @param float $grade

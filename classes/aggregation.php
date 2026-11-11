@@ -1497,10 +1497,13 @@ class aggregation {
      * @return bool
      */
     public static function has_dual_grades(int $courseid, int $gradecategoryid): bool {
+        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
+        if ($regulation->shortname() !== 'from2026') {
+            return false;
+        }
         if (self::is_top_level($gradecategoryid)) {
             return true;
         }
-        $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         return self::has_reassessment(
             self::recurse_tree($courseid, $gradecategoryid),
             $regulation->get_aggregation($courseid, ''),

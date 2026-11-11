@@ -2217,6 +2217,7 @@ class api {
         // Regulation.
         $regulation = \local_gugrades\regulations::get_active_regulation($courseid);
         $user->regulationname = $regulation->shortname();
+        $dualgrades = \local_gugrades\aggregation::has_dual_grades($courseid, $gradecategoryid);
 
         // Add additional info.
         $user->showweights = $showweights;
@@ -2225,12 +2226,12 @@ class api {
         $user->formattedatype = \local_gugrades\aggregation::translate_atype($atype);
         $user->explain = $explain;
         $user->calculation = $result->calculation ?? '';
-        $user->calculation1st = $result->firstsitting->calculation ?? '';
+        $user->calculation1st = $dualgrades ? ($result->firstsitting->calculation ?? '') : '';
 
         // MGU-1596: For from2026 reassessment categories, say which grade produced each result.
         $user->firstsittingexplain = '';
         $user->awardexplain = '';
-        if (\local_gugrades\grades::is_reassessment_category_set($courseid, $gradecategoryid)) {
+        if ($dualgrades && \local_gugrades\grades::is_reassessment_category_set($courseid, $gradecategoryid)) {
             $names = array_column($user->fields, 'fullname', 'gradeitemid');
             $user->firstsittingexplain = self::explain_selection(
                 get_string('firstsitting', 'local_gugrades'),
