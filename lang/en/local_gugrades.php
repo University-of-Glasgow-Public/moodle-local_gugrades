@@ -467,6 +467,7 @@ $string['reasonforadditionalimport'] = 'Reason for importing again';
 $string['reasonforammendment'] = 'Reason for amendment (only for audit log)';
 $string['reassessment'] = 'Reassessment';
 $string['recalculate'] = 'Recalculate';
+$string['reassessmentgradespresent'] = 'Reassessment grades present';
 $string['recalculatehelp'] = 'Aggregation for all students will be recalculated. For large numbers of students and/or grade items, this may take some time.';
 $string['recordid'] = 'Identifier';
 $string['recursive_recursive'] = 'Import this grade item along with all peers and children';

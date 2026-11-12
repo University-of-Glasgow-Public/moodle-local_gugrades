@@ -1273,6 +1273,85 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * The table reports the cap's resit detection, even when the award is not capped.
+     */
+    public function test_reassessment_grades_present_on_aggregation_page(): void {
+        global $DB;
+
+        $this->build_schema([
+            (object)['name' => 'Attempt three', 'category' => false, 'type' => 'schedulea'],
+        ], $this->categories['Dual reassessment']->id);
+        $this->write_result($this->get_gradeitemid('Unaffected'), 4);
+        $this->set_ugpg('Undergraduate');
+        $this->set_reassessment(true);
+
+        $cases = [
+            'first attempt only' => [['grade', null, null], false],
+            'reassessment below cap' => [['grade', 'grade', null], true],
+            'first EC then grade' => [['ec', 'grade', null], false],
+            'two ECs then grade' => [['ec', 'ec', 'grade'], false],
+            'grade then EC' => [['grade', 'ec', null], false],
+            'grade, reassessment and EC' => [['grade', 'grade', 'ec'], true],
+            'EC then two grades' => [['ec', 'grade', 'grade'], true],
+            'grade and NS' => [['grade', 'ns', null], true],
+        ];
+        foreach ($cases as $name => [$attempts, $expected]) {
+            foreach (['Attempt one', 'Attempt two', 'Attempt three'] as $index => $itemname) {
+                $itemid = $this->get_gradeitemid($itemname);
+                $DB->delete_records('local_gugrades_grade', ['gradeitemid' => $itemid, 'userid' => $this->student->id]);
+                if ($attempts[$index] === 'grade') {
+                    $this->write_result($itemid, 4);
+                } else if ($attempts[$index] !== null) {
+                    write_additional_grade::execute(
+                        courseid: $this->course->id,
+                        gradeitemid: $itemid,
+                        userid: $this->student->id,
+                        reason: 'SECOND',
+                        other: '',
+                        admingrade: $attempts[$index] === 'ns' ? 'NOSUBMISSION' : 'GOODCAUSE_FO',
+                        scale: 0,
+                        grade: 0,
+                        notes: '',
+                    );
+                }
+            }
+            $this->aggregate();
+            $page = get_aggregation_page::execute(
+                $this->course->id, $this->categories['Dual middle']->id, '', '', 0, false,
+            );
+            $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+            $users = array_column($page['users'], null, 'id');
+            $this->assertTrue($page['showreassessmentgradespresent'], $name);
+            $this->assertSame($expected, $users[$this->student->id]['reassessmentgradespresent'], $name);
+            $this->assertFalse($users[$this->student2->id]['reassessmentgradespresent'], $name);
+            if ($name === 'reassessment below cap') {
+                $this->assertFalse((bool)$this->get_category_result('Dual total', 'CATEGORY')->capped);
+            }
+            $single = get_aggregation_user::execute($this->course->id, $this->categories['Dual middle']->id, $this->student->id);
+            $single = \core_external\external_api::clean_returnvalue(get_aggregation_user::execute_returns(), $single);
+            $this->assertSame($expected, $single['reassessmentgradespresent'], $name);
+        }
+
+        // A course-total override does not remove a resit, even after the status cache is cleared.
+        $this->write_result($this->get_category_result('Dual total', 'CATEGORY')->gradeitemid, 10, 'CATEGORY', true);
+        $this->aggregate();
+        \cache::make('local_gugrades', 'useraggdata')->delete(
+            'RESITTAKEN_' . $this->categories['Dual total']->id . '_' . $this->student->id,
+        );
+        $page = get_aggregation_page::execute($this->course->id, $this->categories['Dual total']->id, '', '', 0, false);
+        $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+        $users = array_column($page['users'], null, 'id');
+        $this->assertTrue($users[$this->student->id]['reassessmentgradespresent']);
+
+        // Removing all flags must invalidate the cached result even without an explicit recalculation.
+        write_flags::execute($this->course->id, []);
+        $page = get_aggregation_page::execute($this->course->id, $this->categories['Dual total']->id, '', '', 0, false);
+        $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+        $users = array_column($page['users'], null, 'id');
+        $this->assertFalse($users[$this->student->id]['reassessmentgradespresent']);
+    }
+
+    /**
      * Calculation and explanation do not need programme/profile display data (without a resit).
      */
     public function test_calculation_and_explanation_without_programme_lookup(): void {

@@ -109,6 +109,7 @@ class get_aggregation_page extends external_api {
             'staffuserid' => new external_value(PARAM_INT, 'UserID of person running MyGrades ($USER->id'),
             'completionused' => new external_value(PARAM_BOOL, 'Is the completion % in use?'),
             'showresitrequired' => new external_value(PARAM_BOOL, 'Show the per-user reassessment-required column?'),
+            'showreassessmentgradespresent' => new external_value(PARAM_BOOL, 'Show whether reassessment grades are present?'),
             'isreassessment' => new external_value(PARAM_BOOL, 'Is this category a reassessment?'),
             'dualgrades' => new external_value(PARAM_BOOL, 'Does this category aggregate first-attempt and award results?'),
             'debug' => new external_multiple_structure(
@@ -133,6 +134,12 @@ class get_aggregation_page extends external_api {
                     'profileurl' => new external_value(PARAM_URL, 'Like to user profile page'),
                     'idnumber' => new external_value(PARAM_TEXT, 'User ID number'),
                     'resitrequired' => new external_value(PARAM_BOOL, 'Is resit required?'),
+                    'reassessmentgradespresent' => new external_value(
+                        PARAM_BOOL,
+                        'Has a reassessment been taken in the top-level aggregation?',
+                        VALUE_DEFAULT,
+                        false,
+                    ),
                     'completed' => new external_value(PARAM_FLOAT, '%age of course completed'),
                     'displaygrade' => new external_value(PARAM_TEXT, 'Content for total column'),
                     'displaygrade1st' => new external_value(PARAM_TEXT, 'First-attempt total for display'),

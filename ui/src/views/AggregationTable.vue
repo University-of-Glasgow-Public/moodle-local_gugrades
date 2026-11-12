@@ -170,6 +170,7 @@
     const caneditgrades = ref(false);
     const completionused = ref(false);
     const showresitrequired = ref(false);
+    const showreassessmentgradespresent = ref(false);
     const filterstore = useFilter();
     const issetupcomplete = ref(false);
     const isreassessment = ref(false);
@@ -369,6 +370,17 @@
             } else {
                 cols.push(...releaseColumns);
             }
+        }
+
+        if (showreassessmentgradespresent.value) {
+            cols.push(columnHelper.accessor('reassessmentgradespresent', {
+                header: () => h('span', {class: 'flex h-7 w-full items-center justify-center text-center text-xs leading-tight'},
+                    h('span', {class: 'w-24'}, mstringstore.getMstring('reassessmentgradespresent'))),
+                enableColumnFilter: false,
+                enableSorting: false,
+                cell: ({row}) => h('div', {class: 'text-center'},
+                    mstringstore.getMstring(row.original.reassessmentgradespresent ? 'yes' : 'no')),
+            }));
         }
 
         return cols;
@@ -588,6 +600,7 @@
             staffuserid.value = result.staffuserid;
             completionused.value = result.completionused;
             showresitrequired.value = result.showresitrequired;
+            showreassessmentgradespresent.value = result.showreassessmentgradespresent;
             isreassessment.value = result.isreassessment;
             dualgrades.value = result.dualgrades;
 

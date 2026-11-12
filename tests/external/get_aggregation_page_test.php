@@ -84,7 +84,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
         global $DB;
 
         $this->setUser($this->teacher);
-        foreach (['2025-01-01' => true, '2027-01-01' => false] as $date => $expected) {
+        foreach (['2026-07-31' => true, '2026-08-01' => false] as $date => $expected) {
             $DB->set_field('course', 'startdate', strtotime($date), ['id' => $this->course->id]);
             $page = get_aggregation_page::execute(
                 $this->course->id,
@@ -96,6 +96,7 @@ final class get_aggregation_page_test extends \local_gugrades\external\gugrades_
             );
             $page = external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
             $this->assertSame($expected, $page['showresitrequired']);
+            $this->assertSame(!$expected, $page['showreassessmentgradespresent']);
         }
     }
 

@@ -93,6 +93,12 @@ class get_aggregation_user extends external_api {
             'profileurl' => new external_value(PARAM_URL, 'Like to user profile page'),
             'idnumber' => new external_value(PARAM_TEXT, 'User ID number'),
             'resitrequired' => new external_value(PARAM_BOOL, 'Is resit required?'),
+            'reassessmentgradespresent' => new external_value(
+                PARAM_BOOL,
+                'Has a reassessment been taken in the top-level aggregation?',
+                VALUE_DEFAULT,
+                false,
+            ),
             'completed' => new external_value(PARAM_FLOAT, '%age of course completed'),
             'displaygrade' => new external_value(PARAM_TEXT, 'Content for total column'),
             'displaygrade1st' => new external_value(PARAM_TEXT, 'First-attempt total for display'),

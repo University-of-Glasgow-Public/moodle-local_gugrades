@@ -386,7 +386,76 @@ class aggregation {
         foreach ($categories as $category) {
             $cachetag = self::get_aggdata_cachetag($courseid, $category->id, $userid);
             $cache->delete($cachetag);
+            if ($category->depth == 2) {
+                $cache->delete('RESITTAKEN_' . $category->id . '_' . $userid);
+            }
         }
+    }
+
+    /**
+     * Signature of the resit flags used to detect changes without a grade edit.
+     * @param int $courseid
+     * @return string
+     */
+    private static function resit_flags_signature(int $courseid): string {
+        global $DB;
+
+        $flags = $DB->get_records(
+            'local_gugrades_flag',
+            ['courseid' => $courseid, 'resit' => 1],
+            'id',
+            'id, gradecategoryid, gradeitemid',
+        );
+        return $flags ? sha1(serialize($flags)) : '';
+    }
+
+    /**
+     * Cache the result of the same top-level calculation used for the resit cap.
+     * @param int $categoryid
+     * @param int $userid
+     * @param bool $resittaken
+     * @param string $flagsignature
+     */
+    private static function cache_resit_taken(int $categoryid, int $userid, bool $resittaken, string $flagsignature): void {
+        $cache = \cache::make('local_gugrades', 'useraggdata');
+        $cache->set('RESITTAKEN_' . $categoryid . '_' . $userid, [
+            'flagsignature' => $flagsignature,
+            'resittaken' => $resittaken,
+        ]);
+    }
+
+    /**
+     * Get the top-level resit result for each user, calculating missing or outdated results.
+     * @param int $courseid
+     * @param int $gradecategoryid
+     * @param array $users
+     * @return array User IDs mapped to booleans.
+     */
+    public static function get_resit_taken_for_users(int $courseid, int $gradecategoryid, array $users): array {
+        if (!$users) {
+            return [];
+        }
+        $level1id = \local_gugrades\grades::get_level_one_parent($gradecategoryid);
+        $signature = self::resit_flags_signature($courseid);
+        if ($signature === '') {
+            return array_fill_keys(array_column($users, 'id'), false);
+        }
+        $cache = \cache::make('local_gugrades', 'useraggdata');
+        $results = [];
+        $missing = [];
+        foreach ($users as $user) {
+            $cached = $cache->get('RESITTAKEN_' . $level1id . '_' . $user->id);
+            if (is_array($cached) && isset($cached['flagsignature'], $cached['resittaken']) &&
+                    $cached['flagsignature'] === $signature) {
+                $results[$user->id] = $cached['resittaken'];
+            } else {
+                $missing[] = $user->id;
+            }
+        }
+        if ($missing) {
+            $results += self::aggregate($courseid, $level1id, $missing, '');
+        }
+        return $results;
     }
 
     /**
@@ -614,9 +683,16 @@ class aggregation {
      * @param int $gradecategoryid
      * @param array $users
      * @param array $columns
+     * @param array|null $resittaken Top-level resit results, or null when not required.
      * @return array
      */
-    public static function add_aggregation_fields_to_users(int $courseid, int $gradecategoryid, array $users, array $columns) {
+    public static function add_aggregation_fields_to_users(
+        int $courseid,
+        int $gradecategoryid,
+        array $users,
+        array $columns,
+        ?array $resittaken = null,
+    ) {
         global $DB;
 
         $gcat = $DB->get_record('grade_categories', ['id' => $gradecategoryid], '*', MUST_EXIST);
@@ -672,11 +748,17 @@ class aggregation {
                 !isset($existingids[$user->id]) ||
                     ($dualgrades != isset($firstids[$gradecatitem->id][$user->id])) || $missingfirst
             ) {
-                self::aggregate_user_helper($courseid, $gradecategoryid, $user->id);
+                $result = self::aggregate_user_helper($courseid, $gradecategoryid, $user->id);
+                if ($resittaken !== null) {
+                    $resittaken[$user->id] = $result->resittaken;
+                }
                 $userhelpercount++;
             }
 
             $users[$id] = self::add_aggregation_fields_to_user($courseid, $gradecategoryid, $user, $columns, $anyalteredweights);
+            if ($resittaken !== null) {
+                $users[$id]->reassessmentgradespresent = $resittaken[$user->id];
+            }
         }
 
         // Debug stuff.
@@ -1741,8 +1823,13 @@ class aggregation {
             self::clear_course_droplow($courseid);
         }
 
+        $flagsignature = \local_gugrades\regulations::get_active_regulation($courseid)->shortname() === 'from2026' ?
+            self::resit_flags_signature($courseid) : null;
         // Aggregate this user.
         $aggregatedresult = self::aggregate_user($courseid, $toplevel, $userid, 1, $skipdroplow);
+        if ($flagsignature !== null) {
+            self::cache_resit_taken($level1categoryid, $userid, $aggregatedresult->resittaken, $flagsignature);
+        }
 
         return $aggregatedresult;
     }
@@ -1755,6 +1842,7 @@ class aggregation {
      * @param string $progresstype
      * @param int $progressoffset
      * @param int $progressrange
+     * @return array User IDs mapped to resit detection results.
      */
     public static function aggregate(
         int $courseid,
@@ -1766,7 +1854,7 @@ class aggregation {
     ) {
 
         if (!$users) {
-            return;
+            return [];
         }
 
         // If $users is array of objects, convert to array of ids.
@@ -1796,6 +1884,9 @@ class aggregation {
         $anyalteredweights = self::any_altered_weights($courseid);
         $categories = \local_gugrades\grades::get_gradecategories_recursive($level1categoryid);
         $capturedata = \local_gugrades\usercapture::load_aggregation_data($courseid, $users);
+        $results = [];
+        $flagsignature = \local_gugrades\regulations::get_active_regulation($courseid)->shortname() === 'from2026' ?
+            self::resit_flags_signature($courseid) : null;
         if ($progresstype === 'aggregate') {
             \local_gugrades\progress::initialise($courseid, 0, $progresstype);
         }
@@ -1805,7 +1896,9 @@ class aggregation {
             // Progress.
             $count++;
             $progress = $progressoffset + $progressrange * $count / $numberofusers;
-            \local_gugrades\progress::record($courseid, 0, $progresstype, (int) $progress);
+            if ($progresstype !== '') {
+                \local_gugrades\progress::record($courseid, 0, $progresstype, (int) $progress);
+            }
 
             // Invalidate any stored data.
             self::invalidate_aggdata($courseid, $level1categoryid, $userid, $categories);
@@ -1814,7 +1907,7 @@ class aggregation {
             // as call recurses.
             $nursingcondmet = false;
             $firstnursingcondmet = false;
-            self::aggregate_user(
+            $result = self::aggregate_user(
                 $courseid,
                 $toplevel,
                 $userid,
@@ -1825,10 +1918,15 @@ class aggregation {
                 $anyalteredweights,
                 $capturedata,
             );
+            if ($flagsignature !== null) {
+                self::cache_resit_taken($level1categoryid, $userid, $result->resittaken, $flagsignature);
+            }
+            $results[$userid] = $result->resittaken;
         }
         if ($progresstype === 'aggregate') {
             \local_gugrades\progress::terminate($courseid, 0, $progresstype);
         }
+        return $results;
     }
 
     /**

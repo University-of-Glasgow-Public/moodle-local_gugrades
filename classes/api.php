@@ -2336,6 +2336,7 @@ class api {
                 'completionused' => false,
                 // MGU-1596: Per-user reassessment controls apply only to the older regulations.
                 'showresitrequired' => $regulation->shortname() !== 'from2026',
+                'showreassessmentgradespresent' => $regulation->shortname() === 'from2026',
                 'isreassessment' => false,
                 'dualgrades' => false,
             ];
@@ -2380,9 +2381,13 @@ class api {
         // Warning message on top level.
         $istoplevel = \local_gugrades\aggregation::is_top_level($gradecategoryid);
 
+        // Ensure the top-level resit calculation is available before reading user fields.
+        $resittaken = $regulation->shortname() === 'from2026' ?
+            \local_gugrades\aggregation::get_resit_taken_for_users($courseid, $gradecategoryid, $users) : null;
+
         // Add the columns to the user fields.
         [$users, $addaggdebug] =
-            \local_gugrades\aggregation::add_aggregation_fields_to_users($courseid, $gradecategoryid, $users, $columns);
+            \local_gugrades\aggregation::add_aggregation_fields_to_users($courseid, $gradecategoryid, $users, $columns, $resittaken);
         $timeaddfields = microtime(true);
 
         // Get breadcrumb trail.
@@ -2432,6 +2437,7 @@ class api {
             'completionused' => $regulation->is_completion_supported(),
             // MGU-1596: Per-user reassessment controls apply only to the older regulations.
             'showresitrequired' => $regulation->shortname() !== 'from2026',
+            'showreassessmentgradespresent' => $regulation->shortname() === 'from2026',
             'isreassessment' => $isreassessment,
             'dualgrades' => \local_gugrades\aggregation::has_dual_grades($courseid, $gradecategoryid),
         ];
@@ -2448,7 +2454,7 @@ class api {
         global $DB;
 
         // ...(Re-)aggregate this user. Regardless.
-        \local_gugrades\aggregation::aggregate_user_helper($courseid, $gradecategoryid, $userid, true);
+        $result = \local_gugrades\aggregation::aggregate_user_helper($courseid, $gradecategoryid, $userid, true);
 
         // Get categories and items at this level.
         [$columns, $atype, $warnings] = \local_gugrades\aggregation::get_columns($courseid, $gradecategoryid);
@@ -2457,6 +2463,7 @@ class api {
         $context = \context_course::instance($courseid);
         $user = \local_gugrades\aggregation::get_user($courseid, $gradecategoryid, $userid);
         $user = \local_gugrades\aggregation::add_aggregation_fields_to_user($courseid, $gradecategoryid, $user, $columns);
+        $user->reassessmentgradespresent = $result->resittaken;
 
         return (array) $user;
     }

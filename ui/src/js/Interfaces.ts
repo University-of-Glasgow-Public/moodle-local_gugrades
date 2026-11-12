@@ -264,6 +264,7 @@ export interface IUser {
     profileurl: string;
     idnumber: string;
     resitrequired: boolean;
+    reassessmentgradespresent: boolean;
     completed: number;
     displaygrade: string;
     displaygrade1st?: string;
