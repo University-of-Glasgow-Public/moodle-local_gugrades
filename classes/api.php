@@ -2336,7 +2336,7 @@ class api {
                 'completionused' => false,
                 // MGU-1596: Per-user reassessment controls apply only to the older regulations.
                 'showresitrequired' => $regulation->shortname() !== 'from2026',
-                'showreassessmentgradespresent' => $regulation->shortname() === 'from2026',
+                'showreassessmentgradespresent' => false,
                 'isreassessment' => false,
                 'dualgrades' => false,
             ];
@@ -2380,9 +2380,10 @@ class api {
 
         // Warning message on top level.
         $istoplevel = \local_gugrades\aggregation::is_top_level($gradecategoryid);
+        $showreassessmentgradespresent = $istoplevel && $regulation->shortname() === 'from2026';
 
         // Ensure the top-level resit calculation is available before reading user fields.
-        $resittaken = $regulation->shortname() === 'from2026' ?
+        $resittaken = $showreassessmentgradespresent ?
             \local_gugrades\aggregation::get_resit_taken_for_users($courseid, $gradecategoryid, $users) : null;
 
         // Add the columns to the user fields.
@@ -2437,7 +2438,7 @@ class api {
             'completionused' => $regulation->is_completion_supported(),
             // MGU-1596: Per-user reassessment controls apply only to the older regulations.
             'showresitrequired' => $regulation->shortname() !== 'from2026',
-            'showreassessmentgradespresent' => $regulation->shortname() === 'from2026',
+            'showreassessmentgradespresent' => $showreassessmentgradespresent,
             'isreassessment' => $isreassessment,
             'dualgrades' => \local_gugrades\aggregation::has_dual_grades($courseid, $gradecategoryid),
         ];

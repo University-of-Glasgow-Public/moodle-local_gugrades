@@ -1317,7 +1317,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             }
             $this->aggregate();
             $page = get_aggregation_page::execute(
-                $this->course->id, $this->categories['Dual middle']->id, '', '', 0, false,
+                $this->course->id, $this->categories['Dual total']->id, '', '', 0, false,
             );
             $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
             $users = array_column($page['users'], null, 'id');
@@ -1330,6 +1330,13 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             $single = get_aggregation_user::execute($this->course->id, $this->categories['Dual middle']->id, $this->student->id);
             $single = \core_external\external_api::clean_returnvalue(get_aggregation_user::execute_returns(), $single);
             $this->assertSame($expected, $single['reassessmentgradespresent'], $name);
+        }
+
+        foreach (['Dual middle', 'Dual reassessment'] as $name) {
+            $page = get_aggregation_page::execute($this->course->id, $this->categories[$name]->id, '', '', 0, false);
+            $page = \core_external\external_api::clean_returnvalue(get_aggregation_page::execute_returns(), $page);
+            $this->assertFalse($page['toplevel']);
+            $this->assertFalse($page['showreassessmentgradespresent']);
         }
 
         // A course-total override does not remove a resit, even after the status cache is cleared.

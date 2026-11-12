@@ -372,7 +372,7 @@
             }
         }
 
-        if (showreassessmentgradespresent.value) {
+        if (toplevel.value && showreassessmentgradespresent.value) {
             cols.push(columnHelper.accessor('reassessmentgradespresent', {
                 header: () => h('span', {class: 'flex h-7 w-full items-center justify-center text-center text-xs leading-tight'},
                     h('span', {class: 'w-24'}, mstringstore.getMstring('reassessmentgradespresent'))),

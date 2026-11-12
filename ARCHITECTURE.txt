@@ -26,8 +26,8 @@ Main entry points
 
 Reassessment grades present
 ---------------------------
-The from2026 aggregation table shows whether a resit was taken in the selected
-top-level aggregation tree, using the same calculation as the resit cap even
+The from2026 top-level aggregation table shows whether a resit was taken in its
+aggregation tree, using the same calculation as the resit cap even
 when the award is not capped. Results are cached with the resit flags and
 invalidated with aggregation data; missing results require a recalculation.
 Changes to resit flags invalidate these results, including removal of all flags.
