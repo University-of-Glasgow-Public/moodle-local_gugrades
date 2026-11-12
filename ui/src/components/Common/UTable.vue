@@ -25,6 +25,7 @@
             v-for="row in table.getRowModel().rows" 
             :key="row.id"
             class="transition-colors duration-150 ease-in-out hover:text-university-blue"
+            :class="{ 'utable-active-grade': activeGradeUser && rowUserId !== undefined && row.original[rowUserId] === activeGradeUser.userid }"
           >
             <td 
               v-for="cell in row.getVisibleCells()" 
@@ -170,8 +171,9 @@
 
 
 <script setup lang="ts" generic="TData">
-    import { computed, nextTick, onMounted, ref, useId, watch, type CSSProperties } from 'vue'
+    import { computed, nextTick, onMounted, provide, ref, useId, watch, type CSSProperties } from 'vue'
     import UTableHead from '@/components/Common/UTableHead.vue'
+    import { gradeDialogSelectionKey, type GradeDialogSelection } from '@/js/gradeDialogSelection'
     import { useEventListener, useResizeObserver } from '@vueuse/core'
     import { 
         useVueTable, 
@@ -196,6 +198,7 @@
         sortable?: boolean;
         filterable?: boolean;
         bottomGradeLabels?: boolean;
+        rowUserId?: keyof TData;
     }
 
     const props = withDefaults(defineProps<BaseTableProps>(), {
@@ -207,6 +210,9 @@
         filterable: true,
         bottomGradeLabels: false,
     });
+
+    const activeGradeUser = ref<GradeDialogSelection | null>(null);
+    provide(gradeDialogSelectionKey, activeGradeUser);
 
     // This allows users to click and change sorting later if needed
     const sorting = ref<SortingState>(props.initialSort);
@@ -560,6 +566,14 @@
 
   tbody tr:hover td.utable-pin-name {
     background-color: color-mix(in srgb, var(--color-brand-light-purple) 15%, white) !important;
+  }
+
+  tbody tr.utable-active-grade,
+  tbody tr.utable-active-grade:hover,
+  tbody tr.utable-active-grade td.utable-pin-name,
+  tbody tr.utable-active-grade:hover td.utable-pin-name,
+  tbody tr.utable-active-grade td.utable-dual-grade {
+    background-color: color-mix(in srgb, var(--color-brand-light-yellow) 45%, white) !important;
   }
 
   .utable-pin-name--scrolled {

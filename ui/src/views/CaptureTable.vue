@@ -60,6 +60,7 @@
                 <UTable 
                     :data="users"
                     :columns="tablecolumns" 
+                    row-user-id="id"
                     :filters="tablefilters"
                     :visibility="{firstinitial: false, lastinitial: false}"
                     :initial-sort="[{ id: 'displayname', desc: false }]" 

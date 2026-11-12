@@ -176,7 +176,7 @@
 
 
 <script setup lang="ts">
-    import {ref, computed} from 'vue';
+    import {ref, computed, inject, onBeforeUnmount, watch} from 'vue';
     import { storeToRefs } from 'pinia';
     import { useMstrings } from '@/stores/mstrings.js';
     import { moodleFetch } from '@/js/moodlefetch';
@@ -185,6 +185,7 @@
     import UButton from '../Common/UButton.vue';
     import UAlert from '../Common/UAlert.vue';
     import type { IGradetype } from '@/js/Interfaces';
+    import { gradeDialogSelectionKey } from '@/js/gradeDialogSelection';
 
     interface IAdminMenu {
         value: string;
@@ -237,6 +238,26 @@
         name: String,
         released: Boolean,
         close: Function,
+    });
+
+    const activeGradeUser = inject(gradeDialogSelectionKey, null);
+    const selectionOwner = Symbol('gradeDialog');
+
+    watch([showaddgrademodal, () => props.userid], ([open, userid]) => {
+        if (!activeGradeUser) {
+            return;
+        }
+        if (open && userid !== undefined) {
+            activeGradeUser.value = { userid, owner: selectionOwner };
+        } else if (activeGradeUser.value?.owner === selectionOwner) {
+            activeGradeUser.value = null;
+        }
+    }, { flush: 'sync' });
+
+    onBeforeUnmount(() => {
+        if (activeGradeUser?.value?.owner === selectionOwner) {
+            activeGradeUser.value = null;
+        }
     });
 
     /**
