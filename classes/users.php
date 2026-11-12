@@ -401,6 +401,43 @@ class users {
     }
 
     /**
+     * Create the administrator-controlled test account marker if needed.
+     */
+    public static function ensure_test_account_profile_field(): void {
+        global $CFG, $DB;
+
+        if ($DB->record_exists('user_info_field', ['shortname' => 'gugrades_testaccount'])) {
+            return;
+        }
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+        require_once($CFG->dirroot . '/user/profile/definelib.php');
+        $categoryname = get_string('pluginname', 'local_gugrades');
+        if (!$category = $DB->get_record('user_info_category', ['name' => $categoryname])) {
+            $category = (object)['name' => $categoryname];
+            \profile_save_category($category);
+        }
+
+        \profile_save_field((object)[
+            'shortname' => 'gugrades_testaccount',
+            'name' => get_string('testaccountprofilefield', 'local_gugrades'),
+            'datatype' => 'checkbox',
+            'description' => [
+                'text' => get_string('testaccountprofilefield_desc', 'local_gugrades'),
+                'format' => FORMAT_HTML,
+            ],
+            'categoryid' => $category->id,
+            'required' => 0,
+            'locked' => 1,
+            'visible' => PROFILE_VISIBLE_NONE,
+            'forceunique' => 0,
+            'signup' => 0,
+            'defaultdata' => 0,
+            'defaultdataformat' => 0,
+        ], []);
+    }
+
+    /**
      * UG/PG status already recorded for this student on this course.
      * @param int $courseid
      * @param int $userid
@@ -504,12 +541,29 @@ class users {
      * When a course id is supplied and that course already has a recorded status, that status is
      * returned. A resolved status is recorded for the course once MyGrades has grades for the
      * student, or when $record is set because this call is applying the status to a result.
+     * Marked test accounts use their profile field without caching or recording it.
      * @param int $userid
      * @param int $courseid Course whose recorded status should be used. 0 reads the current status only.
      * @param bool $record Record a resolved status against the course even when it has no grades yet.
      * @return string
      */
     public static function get_ugpg(int $userid, int $courseid = 0, bool $record = false): string {
+        global $DB;
+
+        $sql = "SELECT 1
+                  FROM {user_info_data} d
+                  JOIN {user_info_field} f ON f.id = d.fieldid
+                 WHERE d.userid = :userid AND f.shortname = :shortname AND f.datatype = :datatype
+                   AND " . $DB->sql_compare_text('d.data') . " = :enabled";
+        if ($DB->record_exists_sql($sql, [
+            'userid' => $userid,
+            'shortname' => 'gugrades_testaccount',
+            'datatype' => 'checkbox',
+            'enabled' => '1',
+        ])) {
+            return self::get_profile_field($userid, 'ugpg') ?: 'Unknown';
+        }
+
         if ($courseid) {
             $saved = self::get_saved_course_ugpg($courseid, $userid);
             if ($saved !== '') {

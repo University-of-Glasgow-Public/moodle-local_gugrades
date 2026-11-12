@@ -745,5 +745,10 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110500, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026111200) {
+        \local_gugrades\users::ensure_test_account_profile_field();
+        upgrade_plugin_savepoint(true, 2026111200, 'local', 'gugrades');
+    }
+
     return true;
 }

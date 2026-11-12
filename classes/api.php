@@ -3015,6 +3015,7 @@ class api {
         // Make sure custom user fields exist
         // We need these for UG/PG tests.
         \report_guid\lib::check_create_userprofile();
+        \local_gugrades\users::ensure_test_account_profile_field();
 
         // First step is to recalculate 'summative' categories.
         $categories = \local_gugrades\grades::get_firstlevel($courseid);

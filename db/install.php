@@ -32,6 +32,8 @@ require_once($CFG->dirroot . '/local/gugrades/locallib.php');
 function xmldb_local_gugrades_install() {
     global $CFG, $DB;
 
+    \local_gugrades\users::ensure_test_account_profile_field();
+
     // Add scales for Schedule A and Schedule B.
     $schedulea = (object)[
         'courseid' => 0,

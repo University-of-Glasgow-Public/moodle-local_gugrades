@@ -24,6 +24,18 @@ Main entry points
 - classes/external/: Moodle webservice/external API functions.
 - classes/activities/: activity-specific grade import and reading behaviour.
 
+Manual UG/PG testing
+--------------------
+Administrators can enable the locked, default-off "MyGrades test account"
+user profile checkbox for test accounts. These accounts use the current ugpg
+profile field directly, without reading or writing the UG/PG cache or the
+course-specific status, and without an external lookup when the field is empty.
+An empty field is Unknown. Other accounts retain the normal course snapshot.
+Use Undergraduate or Postgraduate Taught in the ugpg profile field and
+recalculate the course total after changing it. The checkbox does not prevent
+the enrolment plugin from updating the ugpg profile field, so test accounts
+must not use an ID number matching a real external programme record.
+
 Aggregation performance benchmark
 ---------------------------------
 tests/external/aggregation_performance_test.php is opt-in and uses only the

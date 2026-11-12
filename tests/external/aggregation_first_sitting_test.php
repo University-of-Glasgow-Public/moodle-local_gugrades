@@ -1017,6 +1017,83 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
     }
 
     /**
+     * The test-account marker is created once, disabled and restricted by default.
+     */
+    public function test_test_account_profile_field_setup(): void {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/user/profile/definelib.php');
+        if ($field = $DB->get_record('user_info_field', ['shortname' => 'gugrades_testaccount'])) {
+            \profile_delete_field($field->id);
+        }
+        \local_gugrades\users::ensure_test_account_profile_field();
+        $field = $DB->get_record('user_info_field', ['shortname' => 'gugrades_testaccount'], '*', MUST_EXIST);
+        $this->assertSame('checkbox', $field->datatype);
+        $this->assertEquals(0, $field->defaultdata);
+        $this->assertEquals(1, $field->locked);
+        $this->assertEquals(0, $field->visible);
+        $this->assertEquals(0, $field->signup);
+
+        \local_gugrades\users::ensure_test_account_profile_field();
+        $this->assertEquals(1, $DB->count_records('user_info_field', ['shortname' => 'gugrades_testaccount']));
+        $this->setUser($this->student);
+        $profilefield = \profile_get_user_field('checkbox', $field->id, $this->student->id);
+        $this->assertFalse($profilefield->is_visible());
+        $this->setAdminUser();
+        $this->assertTrue($profilefield->is_visible());
+    }
+
+    /**
+     * Test accounts use the current profile status even with a cache and a course snapshot.
+     */
+    public function test_test_account_uses_live_profile_for_resit_cap(): void {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+        \report_guid\lib::check_create_userprofile();
+        \local_gugrades\users::ensure_test_account_profile_field();
+        set_config('dbtype', '', 'enrol_gudatabase');
+        $cache = \cache::make('local_gugrades', 'ugpg');
+        $cache->set($this->student->id, 'Undergraduate');
+        $this->assertSame('Undergraduate', \local_gugrades\users::get_ugpg($this->student->id, $this->course->id));
+
+        \profile_save_data((object)[
+            'id' => $this->student->id,
+            'profile_field_gugrades_testaccount' => 1,
+            'profile_field_ugpg' => 'Postgraduate Taught',
+        ]);
+        $this->set_reassessment(true);
+        $this->aggregate();
+        $this->assertEquals(12, $this->get_category_result('Dual total', 'CATEGORY')->convertedgrade);
+        $this->assertSame('Postgraduate Taught', \local_gugrades\users::get_ugpg($this->student->id, $this->course->id));
+        $this->assertSame('Undergraduate', $cache->get($this->student->id));
+        $this->assertSame('Undergraduate', \local_gugrades\users::get_saved_course_ugpg($this->course->id, $this->student->id));
+
+        \profile_save_data((object)['id' => $this->student->id, 'profile_field_ugpg' => 'Undergraduate']);
+        $this->aggregate();
+        $this->assertEquals(9, $this->get_category_result('Dual total', 'CATEGORY')->convertedgrade);
+
+        \profile_save_data((object)['id' => $this->student->id, 'profile_field_ugpg' => '']);
+        $this->assertSame('Unknown', \local_gugrades\users::get_ugpg($this->student->id, $this->course->id, true));
+        $this->aggregate();
+        $this->assertEquals(9, $this->get_category_result('Dual total', 'CATEGORY')->convertedgrade);
+        $this->assertSame('Undergraduate', \local_gugrades\users::get_saved_course_ugpg($this->course->id, $this->student->id));
+
+        \profile_save_data((object)['id' => $this->student->id, 'profile_field_gugrades_testaccount' => 0]);
+        $this->assertSame('Undergraduate', \local_gugrades\users::get_ugpg($this->student->id, $this->course->id));
+
+        \profile_save_data((object)[
+            'id' => $this->student2->id,
+            'profile_field_gugrades_testaccount' => 1,
+            'profile_field_ugpg' => 'Postgraduate Taught',
+        ]);
+        $cache->delete($this->student2->id);
+        $this->assertSame('Postgraduate Taught', \local_gugrades\users::get_ugpg($this->student2->id, $this->course->id, true));
+        $this->assertFalse($cache->get($this->student2->id));
+        $this->assertSame('', \local_gugrades\users::get_saved_course_ugpg($this->course->id, $this->student2->id));
+    }
+
+    /**
      * MGU-1596: A resit caps only the course total award; unknown status is treated (and explained) as UG.
      */
     public function test_resit_caps_course_total_unknown_as_ug(): void {
