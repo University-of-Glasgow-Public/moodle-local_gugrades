@@ -379,7 +379,7 @@ final class aggregation_first_sitting_test extends gugrades_aggregation_testcase
             $this->get_category_result('Dual total', 'CATEGORY')->displaygrade,
             $this->get_category_result('Dual total', 'CATEGORY1')->displaygrade
         );
-        $this->assertTrue(\local_gugrades\aggregation::has_dual_grades(
+        $this->assertFalse(\local_gugrades\aggregation::has_dual_grades(
             $this->course->id,
             $this->categories['Dual total']->id,
         ));
