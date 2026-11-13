@@ -884,6 +884,7 @@ class grades {
      * @param bool $notavailable (only applicable to categories)
      * @param bool $capped MGU-1596: Course total award capped because of a resit.
      * @param bool $engcapped First-attempt course total capped by the Engineering threshold.
+     * @param bool $manualentry Whether this is an individually entered grade.
      */
     public static function write_grade(
         int $courseid,
@@ -905,6 +906,7 @@ class grades {
         bool $notavailable = false,
         bool $capped = false,
         bool $engcapped = false,
+        bool $manualentry = false,
     ) {
         global $DB, $USER;
 
@@ -926,6 +928,20 @@ class grades {
 
         // Get/create the column entry.
         $column = self::get_column($courseid, $gradeitemid, $gradetype, $other, $ispoints);
+        $manualpreviousid = 0;
+        if ($manualentry && !$overwrite) {
+            $previous = $DB->get_records('local_gugrades_grade', [
+                'courseid' => $courseid,
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+                'columnid' => $column->id,
+                'iscurrent' => 1,
+                'catoverride' => $catoverride ? 1 : 0,
+            ], 'id DESC', 'id', 0, 1);
+            if ($previousgrade = reset($previous)) {
+                $manualpreviousid = (int)$previousgrade->id;
+            }
+        }
 
         // If this is CATEGORY and there's a corresponding 'catoverride' record then we don't
         // attempt to write anything new.
@@ -1001,6 +1017,8 @@ class grades {
                 $gugrade->catoverride = $catoverride;
                 $gugrade->capped = $capped;
                 $gugrade->engcapped = $engcapped;
+                $gugrade->manualentry = $manualentry;
+                $gugrade->manualpreviousid = $manualpreviousid;
 
                 $DB->update_record('local_gugrades_grade', $gugrade);
                 self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
@@ -1032,6 +1050,8 @@ class grades {
         $gugrade->catoverride = $catoverride;
         $gugrade->capped = $capped;
         $gugrade->engcapped = $engcapped;
+        $gugrade->manualentry = $manualentry;
+        $gugrade->manualpreviousid = $manualpreviousid;
         $gugrade->id = $DB->insert_record('local_gugrades_grade', $gugrade);
         self::set_latest_grade($courseid, $gradeitemid, $userid, $gugrade);
         self::save_grade_backup($gugrade, $other);

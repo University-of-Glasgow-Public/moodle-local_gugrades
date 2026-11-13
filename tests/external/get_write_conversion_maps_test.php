@@ -1064,6 +1064,49 @@ final class get_write_conversion_maps_test extends \local_gugrades\external\gugr
     }
 
     /**
+     * Undo applies to scale and administrative entries made after conversion, not the earlier points grade.
+     * @covers \local_gugrades\api::undo_additional_grade
+     */
+    public function test_undo_after_conversion(): void {
+        global $DB;
+        $this->setUser($this->teacher);
+        $courseid = $this->course->id;
+        $itemid = $this->gradeitemidassign1;
+        $userid = $this->student->id;
+        $map = get_conversion_map::execute($courseid, 0, 'schedulea');
+        $map = external_api::clean_returnvalue(get_conversion_map::execute_returns(), $map);
+        $saved = write_conversion_map::execute($courseid, 0, 'Undo conversion', 'schedulea', 100, $map['map']);
+        $saved = external_api::clean_returnvalue(write_conversion_map::execute_returns(), $saved);
+        $this->import_grades($courseid, $itemid, [$userid]);
+        write_additional_grade::execute($courseid, $itemid, $userid, 'SECOND', '', '', 0, 60, 'Points', false, true);
+        select_conversion::execute($courseid, $itemid, 0, $saved['mapid']);
+        $this->assertNull(\local_gugrades\api::get_undoable_grade($courseid, $itemid, $userid));
+
+        write_additional_grade::execute($courseid, $itemid, $userid, 'THIRD', '', '', 18, 0, 'Scale', false, true);
+        $scalegrade = \local_gugrades\api::get_undoable_grade($courseid, $itemid, $userid);
+        $this->assertNotNull($scalegrade);
+        write_additional_grade::undo($courseid, $itemid, $userid, $scalegrade->id, 'Wrong scale grade');
+        $this->assertNull(\local_gugrades\api::get_undoable_grade($courseid, $itemid, $userid));
+
+        write_additional_grade::execute($courseid, $itemid, $userid, 'AGREED', '', 'NOSUBMISSION', 0, 0, 'Admin', false, true);
+        $admingrade = \local_gugrades\api::get_undoable_grade($courseid, $itemid, $userid);
+        $this->assertNotNull($admingrade);
+        $form = get_add_grade_form::execute($courseid, $itemid, $userid);
+        [$code, $description] = \local_gugrades\admingrades::get_displaygrade_from_name('NOSUBMISSION');
+        $this->assertSame("$code - $description", $form['undograde']);
+        write_additional_grade::undo($courseid, $itemid, $userid, $admingrade->id, 'Wrong admin grade');
+        $this->assertNull(\local_gugrades\api::get_undoable_grade($courseid, $itemid, $userid));
+        $audits = $DB->get_records('local_gugrades_audit', [
+            'courseid' => $courseid,
+            'gradeitemid' => $itemid,
+            'relateduserid' => $userid,
+        ], 'id DESC', '*', 0, 1);
+        $audit = reset($audits);
+        $this->assertStringContainsString("$code - $description", $audit->message);
+        $this->assertStringContainsString('Wrong admin grade', $audit->message);
+    }
+
+    /**
      * Now that maps can have empty values - check the conversion still works as expected.
      * @covers \local_gugrades\external\get_conversion_map::execute
      * @covers \local_gugrades\external\write_conversion_map::execute

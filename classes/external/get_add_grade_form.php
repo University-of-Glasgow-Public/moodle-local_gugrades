@@ -72,7 +72,30 @@ class get_add_grade_form extends external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        return \local_gugrades\api::get_add_grade_form($courseid, $gradeitemid, $userid);
+        $form = \local_gugrades\api::get_add_grade_form($courseid, $gradeitemid, $userid);
+        $grade = \local_gugrades\api::get_undoable_grade($courseid, $gradeitemid, $userid);
+        $form['undoid'] = $grade ? (int)$grade->id : 0;
+        $form['undograde'] = $grade ? $grade->displaygrade : '';
+        if ($grade && !empty($grade->admingrade)) {
+            [$code, $description] = \local_gugrades\admingrades::get_displaygrade_from_name($grade->admingrade);
+            $form['undograde'] = "$code - $description";
+        }
+        $form['undoreason'] = $grade ? \local_gugrades\gradetype::get_description($grade->gradetype) : '';
+        if ($grade && $grade->gradetype === 'OTHER') {
+            $column = $DB->get_record('local_gugrades_column', ['id' => $grade->columnid], '*', MUST_EXIST);
+            $form['undoreason'] .= ' (' . $column->other . ')';
+        }
+        $form['undotime'] = $grade ? userdate($grade->audittimecreated) : '';
+        $form['undoprevious'] = '';
+        if ($grade && $grade->manualpreviousid) {
+            $previous = $DB->get_record('local_gugrades_grade', ['id' => $grade->manualpreviousid], '*', MUST_EXIST);
+            $form['undoprevious'] = $previous->displaygrade;
+            if (!empty($previous->admingrade)) {
+                [$code, $description] = \local_gugrades\admingrades::get_displaygrade_from_name($previous->admingrade);
+                $form['undoprevious'] = "$code - $description";
+            }
+        }
+        return $form;
     }
 
     /**
@@ -90,6 +113,11 @@ class get_add_grade_form extends external_api {
             'itemname' => new external_value(PARAM_TEXT, 'Grade item name'),
             'fullname' => new external_value(PARAM_TEXT, 'User full name'),
             'idnumber' => new external_value(PARAM_TEXT, 'User ID number'),
+            'undoid' => new external_value(PARAM_INT, 'Undoable grade ID'),
+            'undograde' => new external_value(PARAM_TEXT, 'Undoable grade'),
+            'undoreason' => new external_value(PARAM_TEXT, 'Undoable grade reason'),
+            'undotime' => new external_value(PARAM_TEXT, 'Undoable grade entry time'),
+            'undoprevious' => new external_value(PARAM_TEXT, 'Previous grade to restore'),
             'iscategory' => new external_value(PARAM_BOOL, 'Is this a category (being overriden)?'),
             'overridden' => new external_value(PARAM_BOOL, 'Is this an overridden category?'),
             'available' => new external_value(PARAM_BOOL, 'Is add/override available at all in this context?'),

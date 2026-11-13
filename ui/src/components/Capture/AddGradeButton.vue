@@ -1,5 +1,6 @@
 <template>
     <DebugDisplay :debug="debug"></DebugDisplay>
+    <ConfirmModal :show="showundoconfirm" :message="undomessage" @confirm="confirm_undo" />
 
     <a  @click.prefent="add_grade()" class="block px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-university-blue/10">
         {{ buttontitle }}
@@ -139,6 +140,7 @@
                     name="notes"
                     v-model="notes"
                     validation="required:trim"
+                    rows="2"
                 />
             </FormKit>
 
@@ -149,6 +151,21 @@
                     {{ mstrings.remove }}
                 </UButton>
             </div>
+
+            <section v-if="undoid" class="mt-6 border-t-2 border-brand-light-purple/30 pt-5">
+                <h3 class="mb-3 text-base font-semibold text-brand-dark-purple">{{ mstrings.undograde }}</h3>
+                <FormKit type="form" :actions="false" @submit="showundoconfirm = true">
+                    <FormKit
+                        type="textarea"
+                        :label="mstrings.explanation"
+                        name="undoexplanation"
+                        v-model="undoexplanation"
+                        validation="required:trim"
+                        rows="2"
+                    />
+                    <UButton type="submit" variant="warning" :disabled="undoing">{{ mstrings.undograde }}</UButton>
+                </FormKit>
+            </section>
 
             <!-- Main modal actions alignment footer -->
             <div class="flex justify-end mt-6 pt-4 border-t border-brand-light-purple/20">
@@ -185,6 +202,7 @@
     import DebugDisplay from '@/components/Common/DebugDisplay.vue';
     import UButton from '../Common/UButton.vue';
     import UAlert from '../Common/UAlert.vue';
+    import ConfirmModal from '../Common/ConfirmModal.vue';
     import type { IGradetype } from '@/js/Interfaces';
     import { gradeDialogSelectionKey } from '@/js/gradeDialogSelection';
 
@@ -203,6 +221,14 @@
 
     const showaddgrademodal = ref(false);
     const showreleaseddialogue = ref(false);
+    const showundoconfirm = ref(false);
+    const undoing = ref(false);
+    const undoid = ref(0);
+    const undograde = ref('');
+    const undoreason = ref('');
+    const undotime = ref('');
+    const undoprevious = ref('');
+    const undoexplanation = ref('');
     const debug = ref({});
     const gradetypes = ref< IGradetype[] >([]);
     const idnumber = ref('');
@@ -240,6 +266,42 @@
         released: Boolean,
         close: Function,
     });
+
+    const undomessage = computed(() => {
+        let message = (mstrings.value.undogradedetails ?? '')
+            .replace('{$a->reason}', undoreason.value)
+            .replace('{$a->grade}', undograde.value)
+            .replace('{$a->time}', undotime.value)
+            .replace('{$a->student}', props.name ?? '')
+            .replace('{$a->item}', props.itemname ?? '');
+        if (undoprevious.value) {
+            message += ' ' + (mstrings.value.undorestore ?? '').replace('{$a}', undoprevious.value);
+        }
+        return message;
+    });
+
+    function confirm_undo(confirmed: boolean) {
+        showundoconfirm.value = false;
+        if (!confirmed || undoing.value) {
+            return;
+        }
+        undoing.value = true;
+        moodleFetch('local_gugrades_undo_additional_grade', {
+            gradeitemid: props.itemid,
+            userid: props.userid,
+            gradeid: undoid.value,
+            explanation: undoexplanation.value,
+        }).then(() => {
+            toast.success(mstringstore.getMstring('undogradedone'));
+            grade_added();
+            closemodal();
+        }).catch((error) => {
+            debug.value = error;
+            closemodal();
+        }).finally(() => {
+            undoing.value = false;
+        });
+    }
 
     const activeGradeUser = inject(gradeDialogSelectionKey, null);
     const selectionOwner = Symbol('gradeDialog');
@@ -294,6 +356,8 @@
      */
     function add_grade() {
         notes.value = '';
+        undoexplanation.value = '';
+        undoid.value = 0;
 
         moodleFetch(
             'local_gugrades_get_add_grade_form',
@@ -313,6 +377,11 @@
             grademax.value = result.grademax;
             scalemenu.value = result.scalemenu;
             adminmenu.value = result.adminmenu;
+            undoid.value = result.undoid;
+            undograde.value = result.undograde;
+            undoreason.value = result.undoreason;
+            undotime.value = result.undotime;
+            undoprevious.value = result.undoprevious;
 
             // Add 'use grade' option onto front of adminmenu
             adminmenu.value.unshift({
@@ -373,6 +442,7 @@
                 scale:scale.value ? scale.value : 0,
                 grade: grade.value,
                 notes: notes.value,
+                manualentry: true,
             }
         )
         .then(() => {

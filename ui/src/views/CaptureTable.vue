@@ -398,6 +398,7 @@
                     scale: column.points ? 0 : grade,
                     grade: column.points ? grade : 0,
                     notes: notes,
+                    manualentry: true,
                 }
             )
             .catch((error) => {

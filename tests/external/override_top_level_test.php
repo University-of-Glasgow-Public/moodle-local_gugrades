@@ -38,6 +38,52 @@ require_once($CFG->dirroot . '/local/gugrades/tests/external/gugrades_aggregatio
  */
 final class override_top_level_test extends \local_gugrades\external\gugrades_aggregation_testcase {
     /**
+     * Undoing a category override restores its calculated grade.
+     * @covers \local_gugrades\api::undo_additional_grade
+     */
+    public function test_undo_category_override(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+        $this->load_data('data2b', $this->student->id);
+        foreach ($this->gradeitemids as $gradeitemid) {
+            $this->import_grades($this->course->id, $gradeitemid, [$this->student->id]);
+        }
+        write_additional_grade::execute(
+            $this->course->id,
+            $this->summativeitem->id,
+            $this->student->id,
+            'CATEGORY',
+            '',
+            '',
+            13,
+            0,
+            'Manual override',
+            false,
+            true
+        );
+        $grade = \local_gugrades\api::get_undoable_grade($this->course->id, $this->summativeitem->id, $this->student->id);
+        $this->assertNotNull($grade);
+        write_additional_grade::undo(
+            $this->course->id,
+            $this->summativeitem->id,
+            $this->student->id,
+            $grade->id,
+            'Wrong override'
+        );
+        $this->assertFalse($DB->record_exists('local_gugrades_grade', [
+            'gradeitemid' => $this->summativeitem->id,
+            'userid' => $this->student->id,
+            'iscurrent' => 1,
+            'catoverride' => 1,
+        ]));
+        $this->assertNotNull(\local_gugrades\grades::get_aggregated_from_gradeitemid(
+            $this->summativeitem->id,
+            $this->student->id
+        ));
+    }
+
+    /**
      * @var object $gradecatsummative
      */
     protected object $gradecatsummative;

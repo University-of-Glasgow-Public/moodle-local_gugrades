@@ -750,5 +750,27 @@ function xmldb_local_gugrades_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026111200, 'local', 'gugrades');
     }
 
+    if ($oldversion < 2026111300) {
+        $table = new xmldb_table('local_gugrades_grade');
+        $field = new xmldb_field('manualentry', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'catoverride');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026111300, 'local', 'gugrades');
+    }
+
+    if ($oldversion < 2026111301) {
+        $table = new xmldb_table('local_gugrades_grade');
+        $field = new xmldb_field('manualpreviousid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0', 'manualentry');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026111301, 'local', 'gugrades');
+    }
+
+    if ($oldversion < 2026111302) {
+        upgrade_plugin_savepoint(true, 2026111302, 'local', 'gugrades');
+    }
+
     return true;
 }

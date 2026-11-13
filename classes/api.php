@@ -1382,6 +1382,7 @@ class api {
      * @param float $grade
      * @param string $notes
      * @param bool $delete
+     * @param bool $manualentry
      */
     public static function write_additional_grade(
         int $courseid,
@@ -1393,7 +1394,8 @@ class api {
         int $scale,
         float $grade,
         string $notes,
-        bool $delete = false
+        bool $delete = false,
+        bool $manualentry = false
     ) {
 
         global $DB;
@@ -1518,6 +1520,7 @@ class api {
                 ispoints:       !$mapping->is_scale(),
                 overwrite:      false,
                 catoverride:    $catoverride,
+                manualentry:    $manualentry,
             );
         }
 
@@ -1525,6 +1528,131 @@ class api {
         if ($aggregationsupported) {
             \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $userid);
         }
+    }
+
+    /**
+     * Find the latest undoable manual grade for one student and grade item.
+     * @param int $courseid
+     * @param int $gradeitemid
+     * @param int $userid
+     * @return object|null
+     */
+    public static function get_undoable_grade(int $courseid, int $gradeitemid, int $userid): ?object {
+        global $DB;
+
+        $records = $DB->get_records_sql(
+            "SELECT * FROM {local_gugrades_grade}
+              WHERE courseid = :courseid AND gradeitemid = :gradeitemid AND userid = :userid
+                AND iscurrent = 1 AND gradetype <> 'CATEGORY1'
+                AND (gradetype <> 'CATEGORY' OR catoverride = 1)
+              ORDER BY id DESC",
+            ['courseid' => $courseid, 'gradeitemid' => $gradeitemid, 'userid' => $userid],
+            0,
+            1,
+        );
+        $grade = reset($records);
+        if (!$grade || !$grade->manualentry) {
+            return null;
+        }
+        if ($grade->points && \local_gugrades\conversion::is_conversion_applied($courseid, $gradeitemid)) {
+            return null;
+        }
+        if ($grade->manualpreviousid) {
+            $previous = $DB->get_record('local_gugrades_grade', [
+                'id' => $grade->manualpreviousid,
+                'courseid' => $courseid,
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+                'columnid' => $grade->columnid,
+                'iscurrent' => 0,
+            ]);
+            if (!$previous || ($previous->points && \local_gugrades\conversion::is_conversion_applied($courseid, $gradeitemid))) {
+                return null;
+            }
+        }
+        return $grade;
+    }
+
+    /**
+     * Undo the specified latest manual grade and reaggregate the student.
+     * @param int $courseid
+     * @param int $gradeitemid
+     * @param int $userid
+     * @param int $gradeid
+     * @param string $explanation
+     */
+    public static function undo_additional_grade(
+        int $courseid,
+        int $gradeitemid,
+        int $userid,
+        int $gradeid,
+        string $explanation,
+    ): void {
+        global $DB;
+
+        require_capability('local/gugrades:editgrades', \context_course::instance($courseid));
+        if (trim($explanation) === '') {
+            throw new \moodle_exception('invalidparameter', 'error');
+        }
+        $transaction = $DB->start_delegated_transaction();
+        $grade = self::get_undoable_grade($courseid, $gradeitemid, $userid);
+        if (!$grade || (int)$grade->id !== $gradeid) {
+            throw new \moodle_exception('invalidparameter', 'error');
+        }
+
+        $previousgrade = null;
+        if ($grade->manualpreviousid) {
+            $previousgrade = $DB->get_record('local_gugrades_grade', [
+                'id' => $grade->manualpreviousid,
+                'courseid' => $courseid,
+                'gradeitemid' => $gradeitemid,
+                'userid' => $userid,
+                'columnid' => $grade->columnid,
+            ], '*', MUST_EXIST);
+            if (
+                $previousgrade->iscurrent ||
+                ($previousgrade->points && \local_gugrades\conversion::is_conversion_applied($courseid, $gradeitemid))
+            ) {
+                throw new \moodle_exception('invalidparameter', 'error');
+            }
+        }
+        $DB->delete_records('local_gugrades_grade', ['id' => $gradeid]);
+        $DB->delete_records('local_gugrades_gradesbackup', ['gradeid' => $gradeid]);
+        if ($previousgrade) {
+            $previousgrade->iscurrent = 1;
+            $previousgrade->manualentry = 0;
+            $DB->update_record('local_gugrades_grade', $previousgrade);
+            \local_gugrades\grades::save_grade_backup($previousgrade);
+        }
+        $DB->set_field('local_gugrades_grade', 'manualentry', 0, [
+            'courseid' => $courseid,
+            'gradeitemid' => $gradeitemid,
+            'userid' => $userid,
+        ]);
+        $DB->delete_records('local_gugrades_latest', ['gradeitemid' => $gradeitemid, 'userid' => $userid]);
+        \local_gugrades\grades::set_latest_grade($courseid, $gradeitemid, $userid);
+        [$aggregationsupported] = \local_gugrades\grades::are_all_grades_supported($courseid, $gradeitemid);
+        if ($aggregationsupported) {
+            $mapping = \local_gugrades\grades::mapping_factory($courseid, $gradeitemid);
+            \local_gugrades\aggregation::aggregate_user_helper($courseid, $mapping->get_gradecategoryid(), $userid);
+        }
+        $display = $grade->displaygrade;
+        if (!empty($grade->admingrade)) {
+            [$code, $description] = \local_gugrades\admingrades::get_displaygrade_from_name($grade->admingrade);
+            $display = "$code - $description";
+        }
+        $reason = \local_gugrades\gradetype::get_description($grade->gradetype);
+        if ($grade->gradetype === 'OTHER') {
+            $column = $DB->get_record('local_gugrades_column', ['id' => $grade->columnid], '*', MUST_EXIST);
+            $reason .= ' (' . $column->other . ')';
+        }
+        \local_gugrades\audit::write(
+            $courseid,
+            $userid,
+            $gradeitemid,
+            'Undid grade ' . $display . ' (' . $reason . '): ' . trim($explanation),
+        );
+        $transaction->allow_commit();
     }
 
     /**

@@ -47,6 +47,7 @@ $services = [
             'local_gugrades_get_add_grade_form',
             'local_gugrades_get_gradetypes',
             'local_gugrades_write_additional_grade',
+            'local_gugrades_undo_additional_grade',
             'local_gugrades_save_settings',
             'local_gugrades_get_settings',
             'local_gugrades_dashboard_get_courses',
@@ -221,6 +222,14 @@ $functions = [
         'description' => 'Write a new grade for a given grade item / user.',
         'type' => 'write',
         'ajax' => true,
+    ],
+    'local_gugrades_undo_additional_grade' => [
+        'classname' => 'local_gugrades\external\write_additional_grade',
+        'methodname' => 'undo',
+        'description' => 'Undo an individually entered grade.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/gugrades:editgrades',
     ],
     'local_gugrades_save_settings' => [
         'classname' => 'local_gugrades\external\save_settings',

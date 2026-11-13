@@ -322,6 +322,7 @@
                 scale: savescale,
                 grade: parsedgrade,
                 notes: notes,
+                manualentry: true,
             }
         )
         .then(() => {

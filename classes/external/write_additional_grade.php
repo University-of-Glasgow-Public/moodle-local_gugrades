@@ -50,6 +50,7 @@ class write_additional_grade extends external_api {
             'grade' => new external_value(PARAM_FLOAT, 'Points grade'),
             'notes' => new external_value(PARAM_TEXT, 'Optional notes'),
             'delete' => new external_value(PARAM_BOOL, 'Delete overridden category', VALUE_DEFAULT, false),
+            'manualentry' => new external_value(PARAM_BOOL, 'Individually entered grade', VALUE_DEFAULT, false),
         ]);
     }
 
@@ -65,6 +66,7 @@ class write_additional_grade extends external_api {
      * @param float $grade
      * @param string $notes
      * @param bool $delete
+     * @param bool $manualentry
      * @return array
      */
     public static function execute(
@@ -77,7 +79,8 @@ class write_additional_grade extends external_api {
         $scale,
         $grade,
         $notes,
-        $delete = false
+        $delete = false,
+        $manualentry = false
     ) {
         global $DB;
 
@@ -95,6 +98,7 @@ class write_additional_grade extends external_api {
             'grade' => $grade,
             'notes' => $notes,
             'delete' => $delete,
+            'manualentry' => $manualentry,
         ]);
 
         // Get item (if it exists).
@@ -115,7 +119,8 @@ class write_additional_grade extends external_api {
             $scale,
             $grade,
             $notes,
-            $delete
+            $delete,
+            $manualentry
         );
 
         // Log.
@@ -150,6 +155,56 @@ class write_additional_grade extends external_api {
         \local_gugrades\audit::write($courseid, $userid, $gradeitemid, 'Additional grade written, ' . $additional);
 
         return [];
+    }
+
+    /**
+     * Define undo input parameters.
+     * @return external_function_parameters
+     */
+    public static function undo_parameters() {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID'),
+            'gradeitemid' => new external_value(PARAM_INT, 'Grade item ID'),
+            'userid' => new external_value(PARAM_INT, 'Student ID'),
+            'gradeid' => new external_value(PARAM_INT, 'Grade revision to undo'),
+            'explanation' => new external_value(PARAM_TEXT, 'Reason for undoing the grade'),
+        ]);
+    }
+
+    /**
+     * Undo a grade revision.
+     * @param int $courseid
+     * @param int $gradeitemid
+     * @param int $userid
+     * @param int $gradeid
+     * @param string $explanation
+     * @return array
+     */
+    public static function undo($courseid, $gradeitemid, $userid, $gradeid, $explanation) {
+        $params = self::validate_parameters(self::undo_parameters(), [
+            'courseid' => $courseid,
+            'gradeitemid' => $gradeitemid,
+            'userid' => $userid,
+            'gradeid' => $gradeid,
+            'explanation' => $explanation,
+        ]);
+        self::validate_context(\context_course::instance($params['courseid']));
+        \local_gugrades\api::undo_additional_grade(
+            $params['courseid'],
+            $params['gradeitemid'],
+            $params['userid'],
+            $params['gradeid'],
+            $params['explanation'],
+        );
+        return [];
+    }
+
+    /**
+     * Define undo return values.
+     * @return external_single_structure
+     */
+    public static function undo_returns() {
+        return new external_single_structure([]);
     }
 
     /**
