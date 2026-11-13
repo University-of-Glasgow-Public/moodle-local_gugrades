@@ -47,6 +47,7 @@ class upload_csv extends external_api {
             'reason' => new external_value(PARAM_TEXT, 'Reason (SECOND, THIRD and so on)'),
             'other' => new external_value(PARAM_TEXT, '...if Other reason'),
             'csv' => new external_value(PARAM_TEXT, 'Raw CSV file data'),
+            'notes' => new external_value(PARAM_TEXT, 'Explanation for the import', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -59,9 +60,10 @@ class upload_csv extends external_api {
      * @param string $reason
      * @param string $other
      * @param string $csv
+     * @param string $notes
      * @return array
      */
-    public static function execute($courseid, $gradeitemid, $groupid, $testrun, $reason, $other, $csv) {
+    public static function execute($courseid, $gradeitemid, $groupid, $testrun, $reason, $other, $csv, $notes = '') {
 
         \local_gugrades\development::increase_debugging();
 
@@ -74,6 +76,7 @@ class upload_csv extends external_api {
             'reason' => $reason,
             'other' => $other,
             'csv' => $csv,
+            'notes' => $notes,
         ]);
 
         // Security.
@@ -88,7 +91,8 @@ class upload_csv extends external_api {
             $testrun,
             $reason,
             $other,
-            $csv
+            $csv,
+            $notes
         );
 
         // Log.

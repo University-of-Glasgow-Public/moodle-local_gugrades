@@ -167,6 +167,7 @@ final class csv_capture_test extends \local_gugrades\external\gugrades_advanced_
      * @covers \local_gugrades\external\upload_csv::execute
      */
     public function test_upload_csv(): void {
+        global $DB;
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -207,7 +208,16 @@ final class csv_capture_test extends \local_gugrades\external\gugrades_advanced_
 
         // Run first again, but this time save the grades (not testrun).
         $csv = $this->make_csv($this->uploaddata1);
-        $data = upload_csv::execute($this->course->id, $this->gradeitemidassign2, 0, false, 'SECOND', '', $csv);
+        $data = upload_csv::execute(
+            $this->course->id,
+            $this->gradeitemidassign2,
+            0,
+            false,
+            'SECOND',
+            '',
+            $csv,
+            'Results from the marking panel',
+        );
         $data = external_api::clean_returnvalue(
             upload_csv::execute_returns(),
             $data
@@ -228,6 +238,15 @@ final class csv_capture_test extends \local_gugrades\external\gugrades_advanced_
         $this->assertEquals('SECOND', $fred['grades'][0]['gradetype']);
         $this->assertEquals('F2:4', $fred['grades'][1]['displaygrade']);
         $this->assertEquals('PROVISIONAL', $fred['grades'][1]['gradetype']);
+        $imported = $DB->get_records('local_gugrades_grade', [
+            'gradeitemid' => $this->gradeitemidassign2,
+            'gradetype' => 'SECOND',
+            'iscurrent' => 1,
+        ]);
+        $this->assertCount(2, $imported);
+        foreach ($imported as $grade) {
+            $this->assertSame('Results from the marking panel', $grade->auditcomment);
+        }
     }
 
     /**

@@ -30,10 +30,11 @@
             />
             <FormKit
                 type="textarea"
-                label="Notes"
+                :label="mstrings.explanation"
                 :placeholder="mstrings['reasonforammendment']"
                 name="notes"
                 v-model="notes"
+                validation="required:trim"
             />
         </FormKit>
 
@@ -92,6 +93,7 @@
         // Clear for new form
         other.value = '';
         reason.value = '';
+        notes.value = '';
 
         moodleFetch(
             'local_gugrades_get_gradetypes',
@@ -138,7 +140,7 @@
         )
         .then((result: any) => {
             const columnid = result.columnid;
-            emits('openmultiple', columnid);
+            emits('openmultiple', columnid, notes.value);
         })
         .catch((error) => {
             window.console.error(error);

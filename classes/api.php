@@ -262,6 +262,7 @@ class api {
      * @param string $reason
      * @param string $other
      * @param string $csv
+     * @param string $notes
      * @return array [$testrunlines, $errorcount, $addcount]
      */
     public static function csv_upload(
@@ -271,7 +272,8 @@ class api {
         bool $testrun,
         string $reason,
         string $other,
-        string $csv
+        string $csv,
+        string $notes = ''
     ) {
 
         // Get correct level for this category.
@@ -422,7 +424,7 @@ class api {
                     other:          $other,
                     iscurrent:      true,
                     iserror:        false,
-                    auditcomment:   'CSV import',
+                    auditcomment:   $notes !== '' ? $notes : 'CSV import',
                     ispoints:       !$mapping->is_scale(),
                 );
                 $addcount++;

@@ -114,8 +114,8 @@
      * Multiple button has added another column
      * We need to know what it was
      */
-    function multipleclicked(columnid: number) {
-        emit('openmultiple', columnid);
+    function multipleclicked(columnid: number, notes: string) {
+        emit('openmultiple', columnid, notes);
     }
 
     /**

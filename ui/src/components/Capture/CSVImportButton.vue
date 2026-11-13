@@ -95,6 +95,14 @@
                             name="other"
                             v-model="other"
                         />
+                        <FormKit
+                            type="textarea"
+                            :label="mstrings.explanation"
+                            :placeholder="mstrings.reasonforammendment"
+                            name="notes"
+                            v-model="notes"
+                            validation="required:trim"
+                        />
                     </FormKit>
                 </div>
             </div>
@@ -140,6 +148,7 @@
     const gradetypes = ref<IGradetype[]>([]);
     const reason = ref<string>('');
     const other = ref('');
+    const notes = ref('');
     const debug = ref({});
     const incorrectfiletype = ref(false);
     const waiting = ref(false);
@@ -223,6 +232,7 @@
                 reason: reason.value,
                 other: other.value,
                 csv: csvcontent.value,
+                notes: notes.value,
             }
         )
         .then((result: any) => {
@@ -319,6 +329,7 @@
         incorrectfiletype.value = false;
         showcsvmodal.value = false;
         pagestate.value = 'showuploadpage';
+        notes.value = '';
     }
 </script>
 

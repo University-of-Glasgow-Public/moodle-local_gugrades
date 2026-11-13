@@ -134,10 +134,11 @@
                 <FormKit
                     type="textarea"
                     outer-class="mb-3"
-                    label="Notes"
+                    :label="mstrings.explanation"
                     :placeholder="mstrings.reasonforammendment"
                     name="notes"
                     v-model="notes"
+                    validation="required:trim"
                 />
             </FormKit>
 
@@ -292,6 +293,7 @@
      * Get data for form
      */
     function add_grade() {
+        notes.value = '';
 
         moodleFetch(
             'local_gugrades_get_add_grade_form',

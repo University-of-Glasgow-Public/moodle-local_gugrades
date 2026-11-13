@@ -88,7 +88,7 @@
         }),
 
         columnHelper.accessor('auditcomment', {
-            header:  mstringstore.getMstring('comment'),
+            header:  mstringstore.getMstring('explanation'),
         }),
     ];
 

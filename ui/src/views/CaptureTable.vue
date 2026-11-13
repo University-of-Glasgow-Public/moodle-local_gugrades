@@ -124,6 +124,7 @@
     const collapsed = ref(false);
     const editcolumn = ref('');
     const editcolumnid = ref(0);
+    const bulkeditnotes = ref('');
     const showconversion = ref(false);
     const showcsvimport = ref(true);
     const debug = ref({});
@@ -318,7 +319,8 @@
     /**
      * Bulk edit cog clicked
      */
-    function bulk_edit_clicked(column: any) {
+    function bulk_edit_clicked(column: any, notes = '') {
+        bulkeditnotes.value = notes;
 
         moodleFetch('local_gugrades_get_capture_cell_form',
             {
@@ -347,10 +349,10 @@
     /**
      * Multiple button requesting bulk edit
      */
-    function open_multiple(columnid: number) {
+    function open_multiple(columnid: number, notes: string) {
         bulk_edit_clicked({
             id: columnid,
-        });
+        }, notes);
     }
 
     /**
@@ -382,7 +384,7 @@
         bulkeditstore.forEach((bulkitem, userid) => {
             const admingrade = bulkitem.admingrade;
             const grade = bulkitem.grade;
-            const notes = '';
+            const notes = bulkeditnotes.value;
 
             // Capture the fetch promise
             const request = moodleFetch(
