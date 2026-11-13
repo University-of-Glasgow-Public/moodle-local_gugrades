@@ -135,8 +135,18 @@ class write_additional_grade extends external_api {
         $event->trigger();
 
         // Audit.
-        $additional = empty($admingrade) ? $grade : $admingrade;
-        $additional .= ' (' . $reason . ')';
+        if (empty($admingrade)) {
+            $additional = $grade;
+        } else {
+            [$code, $description] = \local_gugrades\admingrades::get_displaygrade_from_name($admingrade);
+            $additional = "$code - $description";
+        }
+        $gradetypes = \local_gugrades\gradetype::get_menu($gradeitemid, true);
+        $reasonlabel = $gradetypes[$reason] ?? \local_gugrades\gradetype::get_description($reason);
+        if ($reason === 'OTHER' && $other !== '') {
+            $reasonlabel .= ' (' . $other . ')';
+        }
+        $additional .= ' (' . $reasonlabel . ')';
         \local_gugrades\audit::write($courseid, $userid, $gradeitemid, 'Additional grade written, ' . $additional);
 
         return [];

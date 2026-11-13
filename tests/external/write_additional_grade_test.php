@@ -43,6 +43,7 @@ final class write_additional_grade_test extends \local_gugrades\external\gugrade
      * @covers \local_gugrades\external\write_additional_grade::execute
      */
     public function test_new_column(): void {
+        global $DB;
 
         // Make sure that we're a teacher.
         $this->setUser($this->teacher);
@@ -72,6 +73,13 @@ final class write_additional_grade_test extends \local_gugrades\external\gugrade
             write_additional_grade::execute_returns(),
             $nothing
         );
+
+        $audit = $DB->get_record('local_gugrades_audit', [
+            'courseid' => $this->course->id,
+            'relateduserid' => $this->student->id,
+            'gradeitemid' => $this->gradeitemidassign2,
+        ], '*', MUST_EXIST);
+        $this->assertStringContainsString(get_string('gradetypesecond', 'local_gugrades'), $audit->message);
 
         // Get capture page.
         $page = get_capture_page::execute($this->course->id, $this->gradeitemidassign2, '', '', 0, false);
@@ -149,6 +157,97 @@ final class write_additional_grade_test extends \local_gugrades\external\gugrade
         $grades = $fred['grades'];
         $this->assertEquals('No grade', $grades[2]['displaygrade']);
         $this->assertEquals('No grade', $grades[3]['displaygrade']);
+    }
+
+    /**
+     * Audit messages describe both new and existing Other grade reasons.
+     * @covers \local_gugrades\external\write_additional_grade::execute
+     */
+    public function test_audit_other_reason(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+        $this->import_grades($this->course->id, $this->gradeitemidassign2, [$this->student->id]);
+
+        write_additional_grade::execute(
+            $this->course->id,
+            $this->gradeitemidassign2,
+            $this->student->id,
+            'OTHER',
+            'Panel review',
+            '',
+            18,
+            0,
+            'Notes'
+        );
+        $column = $DB->get_record('local_gugrades_column', [
+            'gradeitemid' => $this->gradeitemidassign2,
+            'gradetype' => 'OTHER',
+        ], '*', MUST_EXIST);
+        $this->assertSame('Panel review', $column->other);
+        write_additional_grade::execute(
+            $this->course->id,
+            $this->gradeitemidassign2,
+            $this->student->id,
+            'OTHER_' . $column->id,
+            '',
+            '',
+            19,
+            0,
+            'Notes'
+        );
+        $audits = array_slice(array_values($DB->get_records('local_gugrades_audit', [
+            'courseid' => $this->course->id,
+            'relateduserid' => $this->student->id,
+            'gradeitemid' => $this->gradeitemidassign2,
+        ], 'id ASC')), -2);
+        $this->assertCount(2, $audits);
+        $this->assertStringContainsString(get_string('gradetypeother', 'local_gugrades') . ' (Panel review)', $audits[0]->message);
+        $this->assertStringContainsString('(Panel review)', $audits[1]->message);
+        $this->assertStringNotContainsString('OTHER_', $audits[1]->message);
+    }
+
+    /**
+     * Audit messages use the configured administrative grade label, not its internal name.
+     * @covers \local_gugrades\external\write_additional_grade::execute
+     */
+    public function test_audit_administrative_grade(): void {
+        global $DB;
+
+        $this->setUser($this->teacher);
+        $this->import_grades($this->course->id, $this->gradeitemidassign2, [$this->student->id]);
+        set_config('admingrade_nosubmission', json_encode([
+            'code' => 'NS',
+            'description' => 'Custom no submission description',
+        ]), 'local_gugrades');
+
+        write_additional_grade::execute(
+            $this->course->id,
+            $this->gradeitemidassign2,
+            $this->student->id,
+            'SECOND',
+            '',
+            'NOSUBMISSION',
+            0,
+            0,
+            'Notes'
+        );
+
+        $audits = $DB->get_records('local_gugrades_audit', [
+            'courseid' => $this->course->id,
+            'relateduserid' => $this->student->id,
+            'gradeitemid' => $this->gradeitemidassign2,
+        ], 'id DESC', '*', 0, 1);
+        $audit = reset($audits);
+        $this->assertStringContainsString('NS - Custom no submission description', $audit->message);
+        $this->assertStringContainsString(get_string('gradetypesecond', 'local_gugrades'), $audit->message);
+        $this->assertStringNotContainsString('NOSUBMISSION', $audit->message);
+        $this->assertTrue($DB->record_exists('local_gugrades_grade', [
+            'gradeitemid' => $this->gradeitemidassign2,
+            'userid' => $this->student->id,
+            'admingrade' => 'NOSUBMISSION',
+            'iscurrent' => 1,
+        ]));
     }
 
     /**
